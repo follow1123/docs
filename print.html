@@ -1,0 +1,1826 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>文档</title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="linux/index.html"><strong aria-hidden="true">1.</strong> Linux</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="linux/basics/index.html"><strong aria-hidden="true">1.1.</strong> Linux基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="linux/basics/user_management.html"><strong aria-hidden="true">1.1.1.</strong> 用户管理</a></li><li class="chapter-item expanded "><a href="linux/basics/run_level.html"><strong aria-hidden="true">1.1.2.</strong> 运行级别</a></li><li class="chapter-item expanded "><a href="linux/basics/help.html"><strong aria-hidden="true">1.1.3.</strong> 帮助</a></li><li class="chapter-item expanded "><a href="linux/basics/file_and_dir.html"><strong aria-hidden="true">1.1.4.</strong> 文件和目录</a></li><li class="chapter-item expanded "><a href="linux/basics/date_time.html"><strong aria-hidden="true">1.1.5.</strong> 日期和时间</a></li><li class="chapter-item expanded "><a href="linux/basics/search.html"><strong aria-hidden="true">1.1.6.</strong> 搜索</a></li><li class="chapter-item expanded "><a href="linux/basics/zip.html"><strong aria-hidden="true">1.1.7.</strong> 压缩和解压</a></li><li class="chapter-item expanded "><a href="linux/basics/perm_and_groups.html"><strong aria-hidden="true">1.1.8.</strong> 权限和组</a></li><li class="chapter-item expanded "><a href="linux/basics/time_and_tasks.html"><strong aria-hidden="true">1.1.9.</strong> 定时任务</a></li><li class="chapter-item expanded "><a href="linux/basics/disk_management.html"><strong aria-hidden="true">1.1.10.</strong> 磁盘管理</a></li><li class="chapter-item expanded "><a href="linux/basics/network.html"><strong aria-hidden="true">1.1.11.</strong> 网络</a></li><li class="chapter-item expanded "><a href="linux/basics/process.html"><strong aria-hidden="true">1.1.12.</strong> 进程</a></li><li class="chapter-item expanded "><a href="linux/basics/shell.html"><strong aria-hidden="true">1.1.13.</strong> shell脚本</a></li><li class="chapter-item expanded "><a href="linux/basics/log.html"><strong aria-hidden="true">1.1.14.</strong> 日志</a></li></ol></li><li class="chapter-item expanded "><a href="linux/desktop_env/index.html"><strong aria-hidden="true">1.2.</strong> Linux桌面环境</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="linux/desktop_env/audio.html"><strong aria-hidden="true">1.2.1.</strong> 音频</a></li><li class="chapter-item expanded "><a href="linux/desktop_env/install.html"><strong aria-hidden="true">1.2.2.</strong> debian安装</a></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">文档</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="linux"><a class="header" href="#linux">Linux</a></h1>
+<ul>
+<li>linux 相关文档</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="linux-1"><a class="header" href="#linux-1">Linux</a></h1>
+<ul>
+<li>linux 系统基础命令，目前以debian为例</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="用户管理"><a class="header" href="#用户管理">用户管理</a></h1>
+<ul>
+<li><code>useradd 用户名</code> 添加用户</li>
+<li><code>userdel 用户名</code> 删除用户</li>
+<li><code>userdel -r 用户名</code> 删除用户，并删除该用户的家目录</li>
+<li><code>useradd -d 目录路径 用户名</code> 添加用户并指定该用户的家目录地址</li>
+<li><code>passwd 用户名</code> 修改该用户的密码</li>
+<li><code>id 用户名</code> 查看该用户的信息</li>
+<li><code>su 用户名</code> 切换用户</li>
+<li><code>whoami</code> 查看当前是那个用户登录</li>
+<li><code>who am i</code>  查看当前是那个用户登录，并显示登录时间</li>
+<li><strong>用户组</strong>
+<ul>
+<li><code>groupadd 组名</code>  新增一个组</li>
+<li><code>groupdel 组名</code> 删除一个组 </li>
+<li><code>useradd -g 组名 用户名</code>添加用户并添加该用户到那个组内</li>
+<li><code>usermod -g 组名</code> 修改该用户的组信息</li>
+</ul>
+</li>
+<li>用户和组相关文件
+<ul>
+<li>/etc/passwd文件
+<ul>
+<li>用户( user)的配置文件，记录用户的各种信息</li>
+<li>每行的含义∶用户名:口令:用户标识号:组标识号:注释性描述:主目录:登录Shell</li>
+</ul>
+</li>
+<li>/etc/shadow 文件
+<ul>
+<li>口令的配置文件</li>
+<li>每行的含义:登录名:加密口令:最后一次修改时间:最小时间间隔:最大时间间隔:警告时间:不活动时间:失效时间:标志</li>
+</ul>
+</li>
+<li>/etc/group文件
+<ul>
+<li>组(group)的配置文件，记录Linux包含的组的信息每行含义∶组名:口令:组标识号:组内用户列表</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="运行级别"><a class="header" href="#运行级别">运行级别</a></h1>
+<ul>
+<li>
+<p>基本介绍</p>
+<ul>
+<li>0：关机</li>
+<li>1：单用户【找回丢失密码】</li>
+<li>2：多用户状态没有网络服务</li>
+<li>3：多用户状态有网络服务</li>
+<li>4：系统未使用保留给用户5:图形界面</li>
+<li>6：系统重启</li>
+<li>常用运行级别是3和5,也可以指定默认运行级别，后面演示</li>
+<li>命令:<code>init[0123456]</code>应用案例:通过<code>init</code>来切换不同的运行级别，比如动5-3，然后关机。</li>
+</ul>
+</li>
+<li>
+<p>指定运行级别</p>
+<ul>
+<li>CentOS7后运行级别说明</li>
+<li>在centos7以前,/etc/inittab文件中</li>
+<li>进行了简化，如下:
+<ul>
+<li>multi-user.target: analogous to runlevel 3</li>
+<li>graphical.target: analogous to runlevel 5</li>
+<li><code>systemctl get-default</code> 查看当前气筒处于那个运行级别</li>
+<li><code>systemctl set-default xxx.target</code> 设置系统为那个运行级别</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="关机重启"><a class="header" href="#关机重启"><strong>关机重启</strong></a></h2>
+<ul>
+<li><code>shutdown -h now</code> 立该进行关机</li>
+<li><code>shudown -h 1</code> 1分钟后会关机了</li>
+<li><code>shutdown -r now</code> 现在重新启动计算机</li>
+<li><code>halt</code>  关机</li>
+<li><code>reboot</code> 重启</li>
+<li><code>sync</code>  把内存的数据同步到磁盘.</li>
+</ul>
+<h2 id="用户登录或注销"><a class="header" href="#用户登录或注销"><strong>用户登录或注销</strong></a></h2>
+<ul>
+<li>登录时尽量少用root帐号登录，因为它是系统管理员，最大的权限，避免操作失误。可以利用普通用户登录，登录后再用<code>su-用户名</code>命令来切换成系统管理员身份</li>
+<li>root用户切换到其他用户不需要任何操作</li>
+<li>普通用户切换到其他用户需要使用密码登录</li>
+<li>使用<code>exit</code>命令退出登录</li>
+<li>在提示符下输入logout即可注销用户</li>
+<li>logout 注销指令在图形运行级别无效，在运行级别3下有效</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="帮助指令"><a class="header" href="#帮助指令">帮助指令</a></h1>
+<ul>
+<li>man获得帮助信息
+<ul>
+<li>基本语法:man命令或配置文件(功能描述:获得帮助信息)案例:查看ls命令的帮助信息</li>
+</ul>
+</li>
+<li>help指令
+<ul>
+<li>基本语法:help命令(功能描述∶获得shell内置命令的帮助信息)</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="文件和目录"><a class="header" href="#文件和目录">文件和目录</a></h1>
+<ul>
+<li>
+<p><code>pwd</code> 查看当前处于那个目录下</p>
+</li>
+<li>
+<p><code>ls</code> 列出当前目录下的文件</p>
+<ul>
+<li><code>ls -a</code> 显示当前目录所有的文件和目录,包括隐藏的。</li>
+<li><code>ls -l</code> 以列表的方式显示信息</li>
+</ul>
+</li>
+<li>
+<p><code>cd</code> 切换目录</p>
+<ul>
+<li><code>cd 目录路径</code> 切换到指定目录</li>
+<li><code>cd ..</code> 退回到上一级目录</li>
+<li><code>cd ~</code> 切换到该用户的家目录（直接使用<code>cd</code>不带参数也一样）</li>
+</ul>
+</li>
+<li>
+<p><code>mkdir 目录名</code> 创建目录</p>
+<ul>
+<li><code>mkdir -p</code> 创建1多级目录</li>
+</ul>
+</li>
+<li>
+<p><code>rmdir 目录名</code> 删除空目录</p>
+<ul>
+<li>如果要删除非空目录，必须使用<code>rm -rf 目录名</code>递归删除</li>
+</ul>
+</li>
+<li>
+<p><code>touch 文件名</code></p>
+<ul>
+<li>创建一个空文件</li>
+</ul>
+</li>
+<li>
+<p><code>cp</code> 拷贝</p>
+<ul>
+<li><code>cp -r 目录名</code> 递归复制整个目录</li>
+</ul>
+</li>
+<li>
+<p><code>rm 文件或目录名</code> 删除</p>
+<ul>
+<li><code>rm -r</code> 递归删除文件夹</li>
+<li><code>rm -f</code>  强制删除，不提示</li>
+</ul>
+</li>
+<li>
+<p><code>mv 文件或目录名</code> 移动</p>
+<ul>
+<li>移动文件夹或目录，如果要移动的位置就是当前目录，则就是重命名</li>
+</ul>
+</li>
+<li>
+<p><code>cat 文件名</code> 显示文件内容</p>
+<ul>
+<li><code>cat -n</code> 显示行号</li>
+</ul>
+</li>
+<li>
+<p><code>more、less</code>查看文件内容</p>
+<ul>
+<li>这两个命令都是查看文件内容，只不过就是快捷键不同，和看不同文件的方便性</li>
+</ul>
+</li>
+<li>
+<p><code>echo 内容</code>输出内容到控制台</p>
+</li>
+<li>
+<p><code>head 文件名</code>查看文件前头10行</p>
+<ul>
+<li><code>head -n 行数</code> 指定查看文件前多少行（默认前10行）</li>
+</ul>
+</li>
+<li>
+<p><code>tail 文件名</code> 查看文件后10行</p>
+<ul>
+<li><code>tail -n 行数</code> 和head一样</li>
+<li><code>tail -f</code> 实时查看文件后几行（ctrl+z 退出）</li>
+</ul>
+</li>
+<li>
+<p><code>&gt;</code>、<code>&gt;&gt;</code> 将某个命令的结果重定向到那个位置，一个 <code>&gt;</code>表示覆盖，两个 <code>&gt;&gt;</code> 表示追加</p>
+<ul>
+<li>例如<code>ls -l &gt;&gt; info.txt</code>
+<ul>
+<li><code>ls -l</code>意思是显示当前目录下的文件信息，而结果是输出到控制台的，而上面的指令表示把结果输入的info.txt文件内</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>ln</code> 软连接（快捷方式）</p>
+<ul>
+<li><code>ln -s 目录 软连接名（快捷方式名）</code>（这两处地址必须写绝对路径）</li>
+</ul>
+</li>
+<li>
+<p><code>history</code> 查看历史使用过的命令</p>
+<ul>
+<li><code>history 数字</code> 查看最近多少次使用过的命令</li>
+<li><code>! 数字</code>  这里数字表示历史命令的id，这条命令表示执行对应id的历史命令</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="日期时间"><a class="header" href="#日期时间">日期时间</a></h1>
+<ul>
+<li><code>date</code> 显示当前时间
+<ul>
+<li><code>date &quot;+%Y-%m-%d %H:%M:%S&quot;</code> 以对应格式显示当前时间</li>
+<li><code>date -s 时间</code> 设置当前时间</li>
+</ul>
+</li>
+<li><code>cal</code> 显示当月日历
+<ul>
+<li><code>cal 年份</code> 显示当年的日历</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="搜索"><a class="header" href="#搜索">搜索</a></h1>
+<ul>
+<li><code>find</code> 查找
+<ul>
+<li><code>find -name</code> 使用文件名查找</li>
+<li><code>find -user</code> 使用用户名查找</li>
+<li><code>find -size</code> 使用文件大小查找</li>
+<li><code>find -size +10m</code> 表示要查找的文件大小大于10兆使用 <code>-</code>表示要查找的文件大小必须小于10m</li>
+</ul>
+</li>
+<li><code>locate</code> 定位</li>
+<li>使用前必须使用<code>updatedb</code>对当前文件系统创建一个文件索引</li>
+<li>查找速度快</li>
+<li><code>which 指令</code> 查找那个指令在那个目录</li>
+<li><code>grep</code> 过滤和 <code>|</code>（管道命令）结合使用，参数可以使用正则表达式
+<ul>
+<li><code>grep -n</code>  过滤的结果显示行号</li>
+<li><code>grep -i</code> 过滤的关键词忽略大小写</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="压缩和解压"><a class="header" href="#压缩和解压">压缩和解压</a></h1>
+<ul>
+<li>
+<p><code>gzip 文件名 文件名.gz</code> 压缩</p>
+<ul>
+<li>压缩后格式是<code>文件名.gz</code></li>
+<li><code>gzip</code> 只能压缩或解压文件，不能对目录进行压缩</li>
+</ul>
+</li>
+<li>
+<p><code>gunzip 文件名.gz 文件名</code> 解压</p>
+</li>
+<li>
+<p><code>zip/unzip</code>压缩和解压</p>
+<ul>
+<li>压缩后格式为<code>文件名.zip</code></li>
+<li><code>zip -r</code>递归对目录进行压缩</li>
+<li><code>unzip -d</code>对目录进行解压</li>
+</ul>
+</li>
+<li>
+<p><code>tar</code>压缩和解压</p>
+<ul>
+<li>压缩后格式为<code>文件名.tar.gz</code></li>
+<li>选项
+<ul>
+<li><code>-c</code>产生<code>.tar</code>打包文件</li>
+<li><code>-v</code>显示详细信息</li>
+<li><code>-f</code>指定压缩后的文件名</li>
+<li><code>-z</code>打包同时压缩</li>
+<li><code>-x</code>解包<code>.tar</code>文件</li>
+</ul>
+</li>
+<li>常用方式
+<ul>
+<li><code>tar -zcvf 目标文件目录/文件名.tar.gz 要压缩的文件或目录……</code>压缩</li>
+<li><code>tar -zxvf 压缩后的文件 -C 需要解压的目标目录</code> 解压</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="权限和组"><a class="header" href="#权限和组">权限和组</a></h1>
+<ul>
+<li>
+<p>基本介绍</p>
+<ul>
+<li>在linux中的每个用户必须属于一个组，不能独立于组外。在linux中每个文件有所有者、所在组、其它组的概念。
+<ol>
+<li>所有者</li>
+<li>所在组</li>
+<li>其他组</li>
+<li>改变用户所在组</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>
+<p>文件目录所有者</p>
+<ul>
+<li>一般为文件的创建者，创建了该文件</li>
+<li>查看文件所有者
+<ul>
+<li><code>ls -ahl</code>或 <code>ll -ah</code></li>
+</ul>
+</li>
+<li>修改文件所有者
+<ul>
+<li><code>chown 用户名 文件名</code></li>
+<li><code>chown 用户名:组名 文件名</code>这条指令可以连组名一起修改</li>
+</ul>
+</li>
+<li>修改所在组
+<ul>
+<li><code>chgrp 组名 文件名</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>权限</p>
+<p><img src="linux/basics/./img/QQ%E6%88%AA%E5%9B%BE20210301150854.png" alt="" /></p>
+<ul>
+<li>
+<p>0-9位说明</p>
+<ol>
+<li>
+<p>第0位确定文件类型(d, -,l,c,b)</p>
+<ul>
+<li>
+<p>I是链接,相当于windows的快捷方式</p>
+</li>
+<li>
+<p>d是目录，相当于windows的文件夹</p>
+</li>
+<li>
+<p>c是字符设备文件，鼠标，键盘</p>
+</li>
+<li>
+<p>b是块设备，比如硬盘</p>
+</li>
+</ul>
+</li>
+<li>
+<p>第1-3位确定所有者（该文件的所有者）拥有该文件的权限。---User</p>
+</li>
+<li>
+<p>第4-6位确定所属组(同用户组的）拥有该文件的权限，---Group</p>
+</li>
+<li>
+<p>第7-9位确定其他用户拥有该文件的权限---Other</p>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>rwx权限</strong></p>
+<ul>
+<li>rwx作用到文件
+<ul>
+<li>[r]代表可读(read):可以读取,查看</li>
+<li>[ w ]代表可写(write):可以修改,但是不代表可以删除该文件,删除一个文件的前提条件是对该文件所在的目录有写权限，才能删除该文件.</li>
+<li>[x]代表可执行(execute):可以被执行</li>
+</ul>
+</li>
+<li>rwx作用到目录
+<ul>
+<li>[r]代表可读(read):可以读取，ls查看目录内容</li>
+<li>[w]代表可写(write):可以修改，对目录内创建+删除+重命名目录</li>
+<li>[×]代表可执行(execute):可以进入该目录</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>改变文件rwx权限</p>
+<ul>
+<li><code>chmod</code>
+<ul>
+<li>u、g、o，分别代表所有者，组，和其他</li>
+<li>a代表所有</li>
+<li>使用+、-对该文件的权限进行添加或删除</li>
+<li>具体使用方式
+<ul>
+<li><code>chmod u+x,g+w,o-r 文件名</code></li>
+<li><code>chmod a-r 文件名</code>表示该文件，所有者、组内成员和其他人都没有了读的权限</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>也可以使用数字方式对文件的权限进行修改
+<ul>
+<li>r=4，w=2，x=1，使用这三数组进行相加</li>
+<li>具体使用方式
+<ul>
+<li><code>chmod 664 文件名</code></li>
+<li>这里6或4都是上面三个数字相加得到的</li>
+<li>第一位该表所有者，第二位代表组，第三位代表其他</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="定时任务"><a class="header" href="#定时任务">定时任务</a></h1>
+<h2 id="crond任务调度"><a class="header" href="#crond任务调度">crond任务调度</a></h2>
+<ul>
+<li>任务调度:是指系统在某个时间执行的特定的命令或程序。</li>
+<li>任务调度分类:1.系统工作:有些重要的工作必须周而复始地执行。如病毒扫描等个别用户工作:个别用户可能希望执行某些程序，比如对mysql数据库的备份。</li>
+<li><code>crontab</code>
+<ul>
+<li><code>crontab -e</code> 编辑定时任务</li>
+<li><code>crontab -l</code> 查看已有的任务</li>
+<li><code>crontab -r</code> 删除已有的任务</li>
+</ul>
+</li>
+<li>时间参数说明</li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">项目</th><th style="text-align: left">含义</th><th style="text-align: left">范围</th></tr></thead><tbody>
+<tr><td style="text-align: left">第一个<code>*</code></td><td style="text-align: left">一个小时中的第几分钟</td><td style="text-align: left">0-59</td></tr>
+<tr><td style="text-align: left">第二个<code>*</code></td><td style="text-align: left">一天中的第几个小时</td><td style="text-align: left">0-23</td></tr>
+<tr><td style="text-align: left">第三个<code>*</code></td><td style="text-align: left">一个月中的第几天</td><td style="text-align: left">1-31</td></tr>
+<tr><td style="text-align: left">第四个<code>*</code></td><td style="text-align: left">一年中的第几个月</td><td style="text-align: left">1-12</td></tr>
+<tr><td style="text-align: left">第五个<code>*</code></td><td style="text-align: left">一周中的星期几</td><td style="text-align: left">0-7(0和7都代表星期日)</td></tr>
+</tbody></table>
+</div>
+<ul>
+<li>参数符号说明</li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">特殊符号</th><th style="text-align: left">含义</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>*</code></td><td style="text-align: left">代表任何时间，比如第一个<code>*</code>代表一小时中每分钟都执行一次</td></tr>
+<tr><td style="text-align: left"><code>,</code></td><td style="text-align: left">代表不连续的时间，比如<code>0 8,12,16 * * *</code>命令，代表在每天的8点，12点，16点都执行一次</td></tr>
+<tr><td style="text-align: left"><code>-</code></td><td style="text-align: left">代表连续的时间范围，比如<code>0 5 * * 1-6</code>命令，代表在周一到周六的凌晨5点执行命令</td></tr>
+<tr><td style="text-align: left"><code>*/n</code></td><td style="text-align: left">代表每隔多久执行一次，比如<code>*/10 * * * *</code>命令，代表每隔10分钟执行一次</td></tr>
+</tbody></table>
+</div>
+<ul>
+<li>使用
+<ul>
+<li>使用<code>crontab -e</code>打开编辑器后</li>
+<li>输入<code>*/1 * * * * 任务操作</code>
+<ul>
+<li>表示每分钟执行</li>
+<li>任务操作那位置可以填写一个 <code>.sh</code>脚本路径</li>
+</ul>
+</li>
+<li>编辑后退出就可以了</li>
+<li>执行例子</li>
+</ul>
+</li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">时间</th><th style="text-align: left">含义</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>45 22 * * *</code></td><td style="text-align: left">在22点45分执行</td></tr>
+<tr><td style="text-align: left"><code>0 17 * * 1</code></td><td style="text-align: left">每周1的17点执行</td></tr>
+<tr><td style="text-align: left"><code>0 5 1,15 * *</code></td><td style="text-align: left">每月1号和15号的凌晨5点执行</td></tr>
+<tr><td style="text-align: left"><code>40 4 * * 1-5</code></td><td style="text-align: left">每周一到周五的凌晨4点40分执行</td></tr>
+<tr><td style="text-align: left"><code>*/10 4 * * * </code></td><td style="text-align: left">每天凌晨4点，每隔10分钟执行一次</td></tr>
+<tr><td style="text-align: left"><code>0 0 1,15 * 1</code></td><td style="text-align: left">每月1号和15号，每周一的0点都会执行</td></tr>
+</tbody></table>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="磁盘管理"><a class="header" href="#磁盘管理">磁盘管理</a></h1>
+<ul>
+<li>
+<p><strong>Linux分区</strong></p>
+<ul>
+<li>Linux来说无论有几个分区，分给哪一目录使用，它归根结底就只有一个根目录，一个独立且唯一的文件结构，Linux中每个分区都是用来组成整个文件系统的一部分。</li>
+<li>Linux采用了一种叫“载入”的处理方法，它的整个文件系统中包含了一整套的文件和目录，且将个分区和一个目录联系起来。这时要载入的一个分区将使它的存储空间在一个目录下获得、</li>
+</ul>
+</li>
+<li>
+<p>硬盘说明</p>
+<ul>
+<li>Linux硬盘分IDE硬盘和SCSI硬盘，目前基本上是SCSI硬盘</li>
+<li>对于IDE硬盘，驱动器标识符为“hdx~”，其中“hd”表明分区所在设备的类型，这里是指IDE硬盘了。“x”为盘号(a为基本盘，b为基本从属盘，c为辅助主盘，d为辅助从属盘)，”~”代表分区，前四个分区用数字1到4表示，它们是主分区或扩展分区，从5开始就是逻辑分区。例，hda3表示为第一个IDE硬盘上的第三个主分区或扩展分区,hdb2表示为第二个IDE硬盘上的第二个主分区或扩展分区。</li>
+<li>对于SCSI硬盘则标识为“sdx~&quot;，SCSI硬盘是用“sd”来表示分区所在设备的类型的，其余则和IDE硬盘的表示方法一样。</li>
+</ul>
+</li>
+<li>
+<p>挂载一块新硬盘</p>
+<ul>
+<li>查看分区详细信息：<code>lsblk -f</code></li>
+</ul>
+<ol>
+<li>
+<p>添加一块新硬盘</p>
+</li>
+<li>
+<p>创建分区</p>
+</li>
+</ol>
+<ul>
+<li>分区命令<code>fdisk /dev/sdb</code>进入交互式命令行</li>
+<li><code>m</code> 显示命令列表</li>
+<li><code>p</code> 显示磁盘分区</li>
+<li><code>n</code> 新增分区</li>
+<li><code>d</code> 删除分区</li>
+<li><code>w</code> 写入并退出</li>
+</ul>
+<ol start="3">
+<li>
+<p>格式化分区并指定该分区的文件类型：<code>mkfs -t ext4 /dev/sdb2</code></p>
+</li>
+<li>
+<p>将该分区挂载到对应目录下：<code>mount /dev/sdb1 目录名</code></p>
+<ol>
+<li>卸载命令：<code>umount /dev/sdb1</code></li>
+<li>用命令行挂载的方式重启后后会失效</li>
+</ol>
+</li>
+<li>
+<p>开机自动挂载方式</p>
+<ol>
+<li>
+<p>编辑挂载对应关系表：<code>vim /etc/fstab</code></p>
+</li>
+<li>
+<p>添加需要的挂载关系</p>
+</li>
+</ol>
+</li>
+</ol>
+<pre><code class="language-shell"># 磁盘文件      挂载目录
+/dev/sdb1       /disk1
+</code></pre>
+<ol start="3">
+<li>保存退出重启后分区会自动挂载到对应的文件下</li>
+</ol>
+</li>
+<li>
+<p>查看分区使用情况：<code>df -h</code></p>
+</li>
+<li>
+<p>查询指定目录的磁盘占用情况<code>du -h</code>默认查询当前目录</p>
+<ul>
+<li>
+<p><code>-s</code> 指定目录占用大小汇总</p>
+</li>
+<li>
+<p><code>-h</code> 带计量单位</p>
+</li>
+<li>
+<p><code>-a</code> 含文件</p>
+</li>
+<li>
+<p><code>--max-depth=1</code> 子目录深度</p>
+</li>
+<li>
+<p><code>-c</code> 列出明细的同时，增加汇总值</p>
+</li>
+<li>
+<p>例子:<code>du -hac --max-depth=1 /home</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p>统计个数命令：<code>wc -l</code></p>
+</li>
+<li>
+<p>磁盘情况查询</p>
+<ul>
+<li><code>df -h</code></li>
+<li><code>-s</code> 指定目录占用大小汇总</li>
+<li><code>-h</code> 带计量单位</li>
+<li><code>-a</code> 含文件</li>
+<li><code>--max-depth=1</code> 子目录深度</li>
+<li><code>-c</code> 列出明细的同时，增加汇总值</li>
+</ul>
+</li>
+<li>
+<p>使用<code>tree</code>命令查看文件目录状态</p>
+<ul>
+<li>下载tree，<code>yum install tree</code></li>
+<li><code>tree 目录</code> 查看</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="网络"><a class="header" href="#网络">网络</a></h1>
+<ul>
+<li>设置主机名和host映射
+<ul>
+<li>设置主机名
+<ul>
+<li><code>hostname</code> 查看主机名</li>
+<li>在/etc/hostname文件内修改主机名</li>
+<li>修改后重启才生效</li>
+</ul>
+</li>
+<li>hosts映射
+<ul>
+<li>编辑/etc/hosts文件</li>
+<li><code>vim /etc/host</code></li>
+<li>添加对应的关系<code>ip 对应的名字</code></li>
+<li>window下在C:\Windows\System32\drivers\etc目录下编辑hosts文件</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>主机名解析过程分析(Hosts、DNS)
+<ul>
+<li>Hosts是什么
+<ul>
+<li>一个文本文件,用来记录IP和Hostname(主机名)的映射关系</li>
+</ul>
+</li>
+<li>DNS
+<ol>
+<li>DNS，就是Domain Name System的缩写，翻译过来就是域名系统</li>
+<li>是互联网上作为域名和IP地址相互映射的一个分布式数据库</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>主机名解析机制分析(Hosts、DNS)
+<ul>
+<li>应用实例:用户在浏览器输入了www.baidu.com
+<ol>
+<li>浏览器先检查浏览器缓存中有没有该域名解析IP地址，有就先调用这个IP完成解析;如果没有检查操作系统DNS解析器缓存，如果有直接返回IP完成解析。这两个缓存，可以理解为本地解析器缓存</li>
+<li>一般来说，当电脑第一次成功访问某一网站后，在一定时间内，浏览器或操作系统会缓存他的IP地址（DNS解析记录)
+<ul>
+<li>如在cmd窗口中输入
+<ul>
+<li><code>ipconfig /displaydns</code>  DNS域名解析缓存</li>
+<li><code>ipconfig /flushdns</code>  手动清理dns缓存</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>如果本地解析器缓存没有找到对应映射，检查系统中hosts文件中有没有配置对应的域名IP映射，如果有，则完成解析并返回.</li>
+<li>如果本地DNS解析器缓存和hosts文件中均没有找到对应的IP，则到域名服务DNS进行解析域</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="进程"><a class="header" href="#进程">进程</a></h1>
+<ul>
+<li>
+<p>基本介绍</p>
+<ul>
+<li>在LINUX中，每个执行的程序都称为一个进程。每一个进程都分配一个ID号(pid,进程号)。</li>
+<li>每个进程都可能以两种方式存在的。前台与后台，所谓前台进程就是用户目前的屏幕上可以进行操的。后台进程则是实际在操作，但由于屏幕上无法看到的进程，通常使用后台方式执行。</li>
+<li>一般系统的服务都是以后台进程的方式存在，而且都会常驻在系统中。直到关机才才结束。</li>
+</ul>
+</li>
+<li>
+<p>显示系统执行的进程</p>
+</li>
+<li>
+<p>ps详解</p>
+<ul>
+<li>
+<p><code>ps -aux</code></p>
+<ul>
+<li><code>-a</code> 显示当前终端的所有进程信息</li>
+<li><code>-u</code> 以用户的格式显示进程信息</li>
+<li><code>-x</code> 显示后台进程运行的参数</li>
+</ul>
+</li>
+<li>
+<p>指令:ps -aux | grep xxx ，比如我看看有没有sshd服务</p>
+</li>
+<li>
+<p>指令说明</p>
+<ul>
+<li>System V展示风格</li>
+<li>USER:用户名称</li>
+<li>PID:进程号</li>
+<li><strong>%CPU:进程占用CPU的百分比</strong></li>
+<li><strong>%MEM:进程占用物理内存的百分比</strong></li>
+<li><strong>VSZ:进程占用的虚拟内存大小(单位:KB)</strong></li>
+<li><strong>RSS:进程占用的物理内存大小(单位:KB )</strong></li>
+<li>TTY:终端名称,缩写．</li>
+<li>STAT:进程状态，其中S-睡眠，s-表示该进程是会话的先导进程，N-表示进程拥有比普通优先级更低的优先级，R-正在运行，D-短期等待，Z-僵死进程，T-被跟踪或者被停止等等</li>
+<li>STARTED:进程的启动时间</li>
+<li>TIME : CPU时间，即进程使用CPU的总时间</li>
+<li>COMMAND:启动进程所用的命令和参数，如果过长会被截断显示</li>
+</ul>
+</li>
+<li>
+<p>以全格式显示当前进程</p>
+</li>
+</ul>
+</li>
+<li>
+<p><code>ps -ef</code></p>
+<ul>
+<li><code>-e</code> 显示所有进程</li>
+<li><code>-f</code> 全格式</li>
+</ul>
+</li>
+<li>
+<p>终止进程</p>
+<ul>
+<li><code>kill</code>
+<ul>
+<li><code>kill 进程id</code> 杀死对应id的进程 </li>
+<li><code>kill -9 进程id</code> 强制杀死一个进程</li>
+</ul>
+</li>
+<li><code>killall</code>
+<ul>
+<li><code>kill 进程名</code> 杀死对应进程名的进程</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>以树状形式显示进程信息</p>
+<ul>
+<li><code>pstree</code>
+<ul>
+<li><code>pstree -p</code> 以树状形式显示进程信息并显示进程id</li>
+<li><code>pstree -u</code> 以树状形式显示进程信息并显示进程登录的用户</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>服务管理</strong></p>
+</li>
+<li>
+<p><code>chkconfig</code>指令</p>
+<ul>
+<li><code>chkconfig 服务名 --list</code> 查看服务</li>
+<li><code>chkconfig --level 系统级别 服务名 on/off </code>设置某个服务在那个系统级别自启动</li>
+</ul>
+</li>
+<li>
+<p><code>systemctl</code>指令</p>
+<ul>
+<li><code>systemctl [start|stop|restart|status] 服务名</code></li>
+<li><code>systemctl list-unit-files</code> 查看开机启动的状态</li>
+<li><code>systemctl ebable 服务名</code> 设置服务开机启动</li>
+<li><code>systemctl disable 服务名</code> 关闭服务开机启动</li>
+<li><code>systemctl is-enabled</code> 查看某个服务是否开机自启 </li>
+</ul>
+</li>
+<li>
+<p><code>firewall</code>指令</p>
+<ul>
+<li><code>firewall-cmd --permanent --add-port=端口号/协议</code> 打开端口</li>
+<li><code>firewall-cmd --permanent --remove-port=端口号/协议</code> 关闭端口</li>
+<li><code>firewall-cmd --reload</code> 重载端口，打开和关闭端口后必须重载才能生效</li>
+<li><code>firewall-cmd --query-port=端口号/协议</code> 查询端口号是否打开</li>
+</ul>
+</li>
+<li>
+<p><code>top</code>命令</p>
+<ul>
+<li><code>top -d 秒数</code> 每隔多少秒更新一次</li>
+<li><code>top -i</code> 不显示闲置和僵死进程</li>
+<li><code>top -p 进程id</code> 通过id监控某个指定的进程</li>
+</ul>
+</li>
+<li>
+<p><strong>动态监控进程</strong></p>
+</li>
+<li>
+<p>输入<code>top</code>指令后可以输入以下命令进行交互</p>
+<ul>
+<li><code>P</code> 以CPU使用率排序（默认）</li>
+<li><code>M</code> 以内存使用率排序</li>
+<li><code>N</code> 以进程id排序</li>
+<li><code>q</code> 退出</li>
+</ul>
+</li>
+<li>
+<p>查看网络情况</p>
+<ul>
+<li><code>netstat -an</code> 按顺序排序输出</li>
+<li><code>netstat -p</code> 显示那个进程在调用</li>
+<li>常用使用直接输入<code>netstat -anp</code> </li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="shell脚本"><a class="header" href="#shell脚本">shell脚本</a></h1>
+<ul>
+<li>Shell是一个命令行解释器，它为用户提供了一个向Linux内核发送请求以便运行程序的界面系统级程序，用户可以用Shell来启动、挂起、停止甚至是编写一些程序。
+<ul>
+<li>创建一个以.sh结尾的文件，编写相应的bash脚本并保存
+<ul>
+<li>修改所有者拥有执行权限使用<code>./文件名</code>执行文件</li>
+<li>或者不用修改权限直接使用<code>sh 文件名</code> 执行文件</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="shell变量"><a class="header" href="#shell变量">Shell变量</a></h3>
+<p><code>$HOME</code>、<code>$PATH</code>、<code>$PWD</code>等为系统变量</p>
+<h4 id="位置参数变量"><a class="header" href="#位置参数变量">位置参数变量</a></h4>
+<ul>
+<li>获取执行shell脚本时后面带的参数</li>
+<li>例如<code>var.sh 100</code>后面的100就是参数
+<ul>
+<li>文件内使用<code>$1~$9</code>获取文件后的1~9位参数而<code>$0</code>为文件名本身</li>
+<li>第十个参数往后使用大括号包裹数组<code>${11}</code>来获取</li>
+<li>使用<code>$*</code>是将参数看作一个整体获取，相当于获取到一个所有参数组成的字符串</li>
+<li>使用<code>$@</code>获取到所有参数组成的集合</li>
+<li>使用<code>$#</code>获取所有参数的个数</li>
+</ul>
+</li>
+</ul>
+<h4 id="预定义变量"><a class="header" href="#预定义变量">预定义变量</a></h4>
+<ul>
+<li>就是shell设计者事先已经定义好的变量，可以直接在shell脚本中使用
+<ul>
+<li><code>$$</code> 当前进程的进程号(PID ) </li>
+<li><code>$!</code> 后台运行的最后一个进程的进程号（PID ) </li>
+<li><code>$?</code>（最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行;如果这个变量的值为非0(具体是哪个数，由命令自己来决定），则证明上一个命令执行不正确了</li>
+</ul>
+</li>
+</ul>
+<h3 id="运算符"><a class="header" href="#运算符">运算符</a></h3>
+<ul>
+<li>使用<code>$((运算式))</code>或者<code>$[运算式]</code></li>
+<li>或者<code>expr 运算式</code>这里的运算式必须有空格</li>
+</ul>
+<h4 id="条件判断"><a class="header" href="#条件判断">条件判断</a></h4>
+<blockquote>
+<p><strong>if</strong></p>
+</blockquote>
+<ul>
+<li>
+<p><strong>语法：</strong></p>
+<pre><code class="language-bash">if [ 条件 ]
+then
+	分支一
+elif [ 条件 ]
+then
+	分支二
+else
+	分支三
+fi
+</code></pre>
+<ul>
+<li>数值比较
+<ul>
+<li><code>-lt</code> 小于、<code>-le</code> 小于等于、<code>-eq</code> 等于、<code>-gt</code> 大于、<code>-ge</code> 大于等于、<code>-ne</code> 不等于</li>
+</ul>
+</li>
+<li>文件权限判断
+<ul>
+<li><code>-r</code> 是否有读的权限</li>
+<li><code>-w</code> 是否有写的权限</li>
+<li><code>-x</code> 是否有执行的权限</li>
+</ul>
+</li>
+<li>文件类型判断
+<ul>
+<li><code>-f</code> 文件是否存在并且是一个常规的文件</li>
+<li><code>-e</code> 文件是否存在</li>
+<li><code>-d</code> 文件是否存在并且是一个目录</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>case</strong></p>
+</blockquote>
+<ul>
+<li>
+<p>语法</p>
+<pre><code class="language-bash">case 值 in
+&quot;匹配值1&quot;)
+echo one
+;;
+&quot;匹配值2&quot;)
+echo two
+;;
+*)
+echo other
+;;
+esac
+</code></pre>
+</li>
+</ul>
+<blockquote>
+<p><strong>for循环</strong></p>
+</blockquote>
+<ul>
+<li>
+<p>语法</p>
+<pre><code class="language-bash">for 变量 in 值
+do
+	循环体        
+done
+</code></pre>
+<pre><code class="language-bash">for(( i=1; i&lt;=100; i++ ))
+do
+        循环体
+done
+
+</code></pre>
+</li>
+</ul>
+<blockquote>
+<p><strong>while循环</strong></p>
+</blockquote>
+<ul>
+<li>
+<p>语法</p>
+<pre><code class="language-bash">while [ 条件 ]
+do
+	循环体
+done
+</code></pre>
+</li>
+</ul>
+<h4 id="read读取控制台输入"><a class="header" href="#read读取控制台输入">read读取控制台输入</a></h4>
+<ul>
+<li>
+<p><code>read 选项 参数</code></p>
+</li>
+<li>
+<p><code>-p</code> 指定读取值时的提示符;</p>
+</li>
+<li>
+<p><code>-t</code> 指定读取值时等待的时间(秒），如果没有在指定的时间内输入，就不再等待了。.参数</p>
+</li>
+</ul>
+<h4 id="函数"><a class="header" href="#函数">函数</a></h4>
+<ul>
+<li>
+<p>系统函数</p>
+<ul>
+<li><code>basename 路径</code> 获取路径里的文件名</li>
+<li><code>basename 路径 后缀</code> 获取路径里的文件名并去掉文件名的后缀</li>
+<li><code>basedir 路径</code> 获取过文件的路径</li>
+</ul>
+</li>
+<li>
+<p>自定义函数</p>
+<pre><code class="language-bash"># 定义函数
+function 函数名(){
+	函数体
+}
+
+# 调用函数
+
+函数名 参数……
+</code></pre>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="日志"><a class="header" href="#日志">日志</a></h1>
+<ul>
+<li>
+<p>日志文件是重要的系统信息文件，其中记录了许多重要的系统事件，包括用户的登录信息、系统的启动信息、系统的安全信息、邮件相关信息、各种服务相关信息等。</p>
+</li>
+<li>
+<p>日志对于安全来说也很重要，它记录了系统每天发生的各种事情，通过日志来检查错误发生的原因或者受到攻击时攻击者留下的痕迹。</p>
+</li>
+<li>
+<p>系统常用的日志</p>
+</li>
+<li>
+<p><code>rsyslogd</code>服务管理这常用的系统日志</p>
+</li>
+<li>
+<p><code>/etc/rsyslog.conf</code>文件为<code>rsyslog</code>日志进程的配置文件</p>
+</li>
+<li>
+<p><strong>查看内存日志</strong></p>
+<ul>
+<li><code>journalctl</code> 可以查看内存日志,这里我们看看常用的指令journalctl##查看全部</li>
+<li><code>journalctl -n3</code> ##查看最新3条</li>
+<li><code>journalctl --since 19:00 --until 19:10:10</code> #查看起始时间到结束时间的日志可加日期journalctl -p err ##报错日志</li>
+<li><code>journalctl -o verbose</code> 日志详细内容</li>
+<li><code>journalctl_PiD=1245_COMM=sshd</code> ##查看包含这些参数的日志（在详细日志查看)</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="linux桌面环境"><a class="header" href="#linux桌面环境">Linux桌面环境</a></h1>
+<ul>
+<li>文档基于debian12</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="音频"><a class="header" href="#音频">音频</a></h1>
+<h2 id="alsa"><a class="header" href="#alsa">alsa</a></h2>
+<ul>
+<li>音频底层</li>
+</ul>
+<h2 id="pulseaudio"><a class="header" href="#pulseaudio">pulseaudio</a></h2>
+<ul>
+<li>音频服务</li>
+</ul>
+<h2 id="pipewire"><a class="header" href="#pipewire">pipewire</a></h2>
+<ul>
+<li>音频服务，可以替代pulseaudio</li>
+</ul>
+<h2 id="wireplumber"><a class="header" href="#wireplumber">wireplumber</a></h2>
+<ul>
+<li>pipewire 客户端</li>
+</ul>
+<h2 id="qpwgraph"><a class="header" href="#qpwgraph">qpwgraph</a></h2>
+<ul>
+<li>pipewire的图形界面客户端</li>
+</ul>
+<h2 id="bluez"><a class="header" href="#bluez">bluez</a></h2>
+<ul>
+<li>蓝牙协议底层</li>
+</ul>
+<h2 id="bluetooth"><a class="header" href="#bluetooth">bluetooth</a></h2>
+<ul>
+<li>蓝牙服务，自带bluetoothctl交互命令</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="debian安装"><a class="header" href="#debian安装">debian安装</a></h1>
+<ul>
+<li>
+<p>制作一个微pe的u盘</p>
+</li>
+<li>
+<p>设置电脑硬盘启动顺序为u盘启动</p>
+<ul>
+<li>以我的电脑为例dell笔记本，开机出现图标不停按F12，后续操作百度</li>
+</ul>
+</li>
+<li>
+<p>进入后格式化所有电脑硬盘</p>
+</li>
+<li>
+<p>使用debian制作启动盘</p>
+</li>
+<li>
+<p>由于安装时可能会提示缺少固件，需要下载nofree的固件先放在u盘内的firmware文件夹内，没有就新建一个，固件官网：https://packages.debian.org/search?keywords=stable</p>
+</li>
+<li>
+<p>安装过程参考https://www.cnblogs.com/Cylon/archive/2022/08/02/16544912.html</p>
+</li>
+<li>
+<p>固件官网：<code>https://packages.debian.org/stable</code></p>
+</li>
+<li>
+<p>固件git网站：<code>https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git</code></p>
+</li>
+<li>
+<p>卸载桌面环境apt autoremove  --purge kde*</p>
+</li>
+</ul>
+<h1 id="使用"><a class="header" href="#使用">使用</a></h1>
+<h2 id="连接wifi"><a class="header" href="#连接wifi">连接wifi</a></h2>
+<ul>
+<li>
+<p>查看网卡信息：<code>ifconfig -a</code></p>
+</li>
+<li>
+<p>启动网卡： <code>ifconfig wlan0 up</code></p>
+</li>
+<li>
+<p>生成wifi信息文件： <code>wpa_passphrase {SSID} {PASSWORD} &gt; /etc/wpa_supplicant/{SSID}.conf</code></p>
+</li>
+<li>
+<p>连接wifi： <code>wpa_supplicant -i wlan0 -c /etc/wpa_supplicant/{SSID}.conf -B</code></p>
+</li>
+<li>
+<p>启动动态分配ip服务：<code>dhclient wlan0</code></p>
+</li>
+<li>
+<p>制作一个微pe的u盘</p>
+</li>
+<li>
+<p>设置电脑硬盘启动顺序为u盘启动</p>
+<ul>
+<li>以我的电脑为例dell笔记本，开机出现图标不停按F12，后续操作百度</li>
+</ul>
+</li>
+<li>
+<p>进入后格式化所有电脑硬盘</p>
+</li>
+<li>
+<p>使用debian制作启动盘</p>
+</li>
+<li>
+<p>由于安装时可能会提示缺少固件，需要下载nofree的固件先放在u盘内的firmware文件夹内，没有就新建一个，固件官网：https://packages.debian.org/search?keywords=stable</p>
+</li>
+<li>
+<p>安装过程参考https://www.cnblogs.com/Cylon/archive/2022/08/02/16544912.html</p>
+</li>
+<li>
+<p>固件官网：<code>https://packages.debian.org/stable</code></p>
+</li>
+<li>
+<p>固件git网站：<code>https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git</code></p>
+</li>
+<li>
+<p>卸载桌面环境apt autoremove  --purge kde*</p>
+</li>
+</ul>
+<h1 id="使用-1"><a class="header" href="#使用-1">使用</a></h1>
+<h2 id="连接wifi-1"><a class="header" href="#连接wifi-1">连接wifi</a></h2>
+<ul>
+<li>查看网卡信息：<code>ifconfig -a</code></li>
+<li>启动网卡： <code>ifconfig wlan0 up</code></li>
+<li>生成wifi信息文件： <code>wpa_passphrase {SSID} {PASSWORD} &gt; /etc/wpa_supplicant/{SSID}.conf</code></li>
+<li>连接wifi： <code>wpa_supplicant -i wlan0 -c /etc/wpa_supplicant/{SSID}.conf -B</code></li>
+<li>启动动态分配ip服务：<code>dhclient wlan0</code></li>
+</ul>
+<h2 id="磁盘"><a class="header" href="#磁盘">磁盘</a></h2>
+<ul>
+<li>
+<p>查看磁盘大小 <code>df -h</code> ，<code>fdisk -l</code></p>
+</li>
+<li>
+<h6 id="查看sata速度和具体设备sudo-dmesg--grep-sata"><a class="header" href="#查看sata速度和具体设备sudo-dmesg--grep-sata">查看SATA速度和具体设备<code>sudo dmesg | grep SATA</code></a></h6>
+</li>
+</ul>
+<h2 id="字体"><a class="header" href="#字体">字体</a></h2>
+<ul>
+<li>设置字体大小 <code>dpkg-reconfigure console-setup</code></li>
+<li>设置字体<code>dpkg-reconfigure locales</code></li>
+<li>没有<code>ifconfig</code>命令时用<code>ip addr show</code>查看ip</li>
+</ul>
+<h2 id="内核"><a class="header" href="#内核">内核</a></h2>
+<ul>
+<li>
+<p>切换linux内核</p>
+<ul>
+<li>查看当前使用的内核和需要切换的内核<code>grep menuentry /boot/grub/grub.cfg</code></li>
+<li>复制menuentry后面需要切换的内核的字符串信息</li>
+<li>开始引导配置 <code>nvim /etc/default/grub</code></li>
+<li>修改<code>GRUB_DEFAULT=0</code>为GRUB_DEFAULT=&quot;Advanced options for Debian GNU/Linux&gt;上一步复制的字符串&quot;后保存退出</li>
+<li>执行更新引导配置命令<code>update-grub</code></li>
+<li>重启后使用<code>uname -a</code>查看是否修改成功</li>
+</ul>
+</li>
+<li>
+<p>删除多余的内核文件</p>
+<ul>
+<li>查看当前系统内安装的内核文件<code>ls /lib/modules</code></li>
+<li><code>apt autoremove --purge linux-image-内核名字</code>删除内核</li>
+</ul>
+</li>
+<li>
+<p>删除旧的内核</p>
+<ul>
+<li>使用<code>uname -a</code>查看正在使用的内核、</li>
+<li>使用<code> dpkg --get-selections |grep linux</code>查看内核列表</li>
+<li>找到多余的内核后使用<code>dpkg --purge --force-remove-essential linux-image-版本号</code>删除</li>
+</ul>
+</li>
+</ul>
+<h2 id="用户"><a class="header" href="#用户">用户</a></h2>
+<ul>
+<li><code>useradd 用户名</code> 创建用户</li>
+<li><code>passwd 用户名</code> 设置用户名的密码</li>
+<li><code>chmod -d 用户家目录 用户名</code> 设置用户的家目录</li>
+<li><code>cp /etc/skel/.b* 用户家目录</code>、 <code>cp /etc/skel/.p* 用户家目录</code> 复制所需的命令行配置文件到用户的家目录下</li>
+<li><code>chown -R 用户名:用户名 用户家目录</code> 设置用户家目录所以文件的拥有者</li>
+<li><code>chmod 770 用户家目录</code> 设置用户家目录的权限</li>
+<li><code>usermod -s /bin/bash 用户名</code> 配置相关操作 </li>
+</ul>
+<h2 id="sudo"><a class="header" href="#sudo">sudo</a></h2>
+<ul>
+<li><code>apt install sudo</code> 安装</li>
+<li>让普通用户可以使用sudo 命令
+<ul>
+<li>在<code>/etc/sudoers.d</code>目录下新建<code>用户名</code>文件</li>
+<li>编写<code>用户名 ALL=(ALL) ALL</code>保存退出，这个表示用户可以执行所有命令</li>
+</ul>
+</li>
+</ul>
+<h2 id="ssh"><a class="header" href="#ssh">ssh</a></h2>
+<ul>
+<li>使用密钥登录
+<ul>
+<li>linux 服务端需要登录的用户家目录下新建.ssh文件夹（如果没有）</li>
+<li>客户端使用<code>ssh-keygen</code>命令生成密钥对</li>
+<li>将生成的<code>id_rsa.pub</code>公钥发送到服务端家目录下的<code>.ssh/authorized_keys</code>文件内</li>
+<li>出现 WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!
+<ul>
+<li>使用命令清除所连接的IP<code>ssh-keygen -R XX.XX.XX.XX</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="apt"><a class="header" href="#apt">apt</a></h2>
+<ul>
+<li>
+<p>修改国内源</p>
+<ul>
+<li>手动修改 <code>sudo nvim /etc/apt/sources.list</code></li>
+<li><a href="linux/desktop_env/../../resource/linux/desktop_env/sources.list.deb11">debian11</a></li>
+<li><a href="linux/desktop_env/../../resource/linux/desktop_env/sources.list.deb12">debian12</a></li>
+</ul>
+</li>
+<li>
+<p>ppa源</p>
+<ul>
+<li>软件安装<code>apt install software-properties-common</code></li>
+<li>添加ppa源<code>add-apt-repository &quot;url&quot;</code></li>
+<li>删除ppa源<code>add-apt-repository -r &quot;url&quot;</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="其它"><a class="header" href="#其它">其它</a></h2>
+<h3 id="windows远程dwm桌面环境"><a class="header" href="#windows远程dwm桌面环境">windows远程dwm桌面环境</a></h3>
+<p>在用户目录下新建.xsession文件，里面添加以下命令</p>
+<pre><code class="language-shell">exec dwm
+</code></pre>
+<p>安装xrdp：<code>apt install xrdp</code></p>
+<p>启动：<code>sudo /etc/init.d/xrdp start</code></p>
+<h3 id="笔记本电源管理相关"><a class="header" href="#笔记本电源管理相关">笔记本电源管理相关</a></h3>
+<ul>
+<li>笔记本合盖休眠配置文件：/etc/systemd/logind.conf</li>
+<li>linux 引导页面配置文件：/etc/default/grub</li>
+<li>将GRUB_TIMEOUT设置为0则可以跳过引导页面</li>
+</ul>
+<h3 id="输入法"><a class="header" href="#输入法">输入法</a></h3>
+<ul>
+<li>fcitx5：<code>sudo apt install fcitx5 fcitx5-frontend-qt5 fcitx5-frontend-gtk3 fcitx5-frontend-gtk2 fcitx5-chinese-addons</code></li>
+</ul>
+<h3 id="linux设置键盘速率"><a class="header" href="#linux设置键盘速率">linux设置键盘速率</a></h3>
+<p><code>xset r rate 250 60</code></p>
+<p>250毫秒后开始重复，每60毫秒重复一次</p>
+<h1 id="dwm"><a class="header" href="#dwm">DWM</a></h1>
+<ul>
+<li>基础桌面环境：<code>apt install libx11-dev libxft-dev libxinerama-dev xorg</code></li>
+<li>系统托盘：<code>apt install trayer</code></li>
+<li>壁纸软件：<code>apt install feh</code></li>
+<li>复制配置文件<code>cp /etc/X11/xinit/xinitrc ~/.xinitrc</code></li>
+<li>基础命令：
+<ul>
+<li>killall：<code>psmisc</code></li>
+</ul>
+</li>
+<li>使用git clone dwm源码官网https://tools.suckless.org/</li>
+<li>进入dwm目录<code>make clean instal</code>编译安装dwm
+<ul>
+<li>安装编译依赖<code>sudo apt install make gcc</code></li>
+<li>编译xinitrc文件 <code>nvim ~/.xinitrc</code></li>
+<li>文件最后加上<code>exec dwm</code></li>
+</ul>
+</li>
+<li>文件上面有些目录可能需要注释才能启动</li>
+<li>安装输入法<code>apt install fcitx fcitx-pinyin</code></li>
+<li>用dmenu打开<code>fcitx-config-gtk3</code>应用，配置双拼</li>
+<li>安装nerd fonts图标字体
+<ul>
+<li>nerd fonts 字体下载页面：https://www.nerdfonts.com/font-downloads</li>
+<li>选择一个字体下载，我这里选择一个只有图标的字体</li>
+<li>解压字体压缩包到系统字体目录下：<code>sudo unzip 压缩包名称 -d /usr/share/fonts/压缩包名称</code></li>
+<li>进入到解压的字体目录下：<code>cd /usr/share/fonts/压缩包名称</code>
+<ul>
+<li>生成核心字体信息：<code>sudo mkfontscale</code></li>
+<li>生成字体文件夹：<code>sudo mkfontdir</code></li>
+<li>刷新系统字体缓存：<code>sudo fc-cache -fv</code></li>
+</ul>
+</li>
+<li>打开dwm配置文件
+<ul>
+<li>查找字体名称：<code>fc-list | grep 安装的字体名称</code></li>
+<li>复制出对应的字体名称，在grep出结果里面，一般在 <code>:style=xxx</code>前面，<code>xxx.ttf：</code>后面</li>
+<li>找到<code>*fonts[]</code>常量，将上一步复制的字体名称粘贴在这里，后面加上<code>pixelsize=图标大小:type=上一步style后面的值:antialise=true:autohint=true</code>后面两个是抗锯齿之类的属性</li>
+<li>保存退出后<code>sudo make clean install</code> 重新编译安装dwm</li>
+<li>重启后就可以设置nerd fonts的字体了，字体网址：https://www.nerdfonts.com/cheat-sheet</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="问题"><a class="header" href="#问题">问题</a></h1>
+<p>apt install 或upgrade 时 installed initramfs-tools package post-installation script subprocess returned error exit status 1错误</p>
+<ul>
+<li><code>rm /var/lib/dpkg/info/报错的包名</code></li>
+<li><code>dpkg --configure -D 777 报错的包名</code></li>
+<li><code>apt -f install</code></li>
+</ul>
+<h3 id="ppa错误"><a class="header" href="#ppa错误">PPA错误</a></h3>
+<h4 id="e-the-repository-httpppalaunchpadnetjonathonfvimubuntu-focal-release-no-longer-has-a-release-file"><a class="header" href="#e-the-repository-httpppalaunchpadnetjonathonfvimubuntu-focal-release-no-longer-has-a-release-file">E: The repository ‘http://ppa.launchpad.net/jonathonf/<a href="https://so.csdn.net/so/search?q=vim&amp;spm=1001.2101.3001.7020">vim</a>/ubuntu focal Release’ no longer has a Release file.</a></h4>
+<ul>
+<li>
+<p>删除仓库，-r 后面的参数表示要删除的仓库，取值如下图所示，记得换成自己报错的仓库</p>
+</li>
+<li>
+<p>sudo apt-add-repository -r ppa:jonathonf/vim	# 这里换成自己报错的仓库</p>
+</li>
+<li>
+<p>更新仓库包列表</p>
+</li>
+<li>
+<p>sudo apt update</p>
+</li>
+</ul>
+<h3 id="更新错误"><a class="header" href="#更新错误">更新错误</a></h3>
+<ul>
+<li>
+<p>错误：</p>
+<p>dpkg: 处理软件包 initramfs-tools (--configure)时出错：
+installed initramfs-tools package post-installation script subprocess returned error exit status 1
+在处理时有错误发生：
+initramfs-tools
+E: Sub-process /usr/bin/dpkg returned an error code (1)</p>
+</li>
+<li>
+<p>解决方法：</p>
+<ul>
+<li>现将info文件夹更名：<code>sudo mv /var/lib/dpkg/info /var/lib/dpkg/info_old</code></li>
+<li>再新建一个新的info文件夹：<code>sudo mkdir /var/lib/dpkg/info</code></li>
+<li><code>sudo apt-get update</code></li>
+<li><code>apt-get -f install</code> </li>
+<li>执行完上一步操作后会在新的info文件夹下生成一些文件，现将这些文件全部移到info_old文件夹下：<code>sudo mv /var/lib/dpkg/info/* /var/lib/dpkg/info_old</code> </li>
+<li>把自己新建的info文件夹删掉：<code>sudo rm -rf /var/lib/dpkg/info</code></li>
+<li>把以前的info文件夹重新改回名字：<code>sudo mv /var/lib/dpkg/info_old /var/lib/dpkg/info</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="nvidia显卡驱动相关"><a class="header" href="#nvidia显卡驱动相关">nvidia显卡驱动相关</a></h2>
+<ul>
+<li><code>sudo apt install build-essential libglvnd-dev</code></li>
+<li>如果出现以下错误</li>
+</ul>
+<pre><code>Unable to find the kernel source tree for the currently running kernel.  Please make sure you have installed the kernel source files for
+your kernel and that they are properly configured; on Red Hat Linux systems, for example, be sure you have the 'kernel-source' or
+'kernel-devel' RPM installed.  If you know the correct kernel source files are installed, you may specify the kernel source path with
+the '--kernel-source-path' command line option
+</code></pre>
+<pre><code>* 安装内核源码包：`sudo apt install linux-source`
+* 安装内核头文件包：`sudo apt install linux-headers-$(uname -r)`
+* 这些操作以debian为例
+</code></pre>
+<h2 id="网络工具相关"><a class="header" href="#网络工具相关">网络工具相关</a></h2>
+<ul>
+<li><code>sudo apt install net-tools</code></li>
+</ul>
+<h2 id="安装typora"><a class="header" href="#安装typora">安装typora</a></h2>
+<ul>
+<li><a href="https://typoraio.cn/#linux">linux官方安装教程</a></li>
+<li>适合debian系linux</li>
+<li><code>wget -qO - https://typoraio.cn/linux/public-key.asc | sudo tee /etc/apt/trusted.gpg.d/typora.asc</code></li>
+<li><code>sudo add-apt-repository 'deb https://typoraio.cn/linux ./'</code></li>
+<li><code>sudo apt-get update</code></li>
+<li><code>sudo apt-get install typora</code></li>
+</ul>
+<h2 id="缺少ifconfig命令"><a class="header" href="#缺少ifconfig命令">缺少ifconfig命令</a></h2>
+<ul>
+<li><code>sudo apt install net-tools</code></li>
+</ul>
+<h2 id="禁用watchdog程序导致系统关机或重启时卡死"><a class="header" href="#禁用watchdog程序导致系统关机或重启时卡死">禁用watchdog程序，导致系统关机或重启时卡死</a></h2>
+<ul>
+<li>打开grub文件 <code>sudo nvim /etc/default/grub</code></li>
+<li>添加或修改<code>GRUB_CMDLINE_LINUX=&quot;nmi_watchdog=0&quot;</code></li>
+<li>更新grub配置 <code>sudo update-grub</code></li>
+</ul>
+<h2 id="磁盘-1"><a class="header" href="#磁盘-1">磁盘</a></h2>
+<ul>
+<li>
+<p>查看磁盘大小 <code>df -h</code> ，<code>fdisk -l</code></p>
+</li>
+<li>
+<h6 id="查看sata速度和具体设备sudo-dmesg--grep-sata-1"><a class="header" href="#查看sata速度和具体设备sudo-dmesg--grep-sata-1">查看SATA速度和具体设备<code>sudo dmesg | grep SATA</code></a></h6>
+</li>
+</ul>
+<h2 id="字体-1"><a class="header" href="#字体-1">字体</a></h2>
+<ul>
+<li>设置字体大小 <code>dpkg-reconfigure console-setup</code></li>
+<li>设置字体<code>dpkg-reconfigure locales</code></li>
+<li>没有<code>ifconfig</code>命令时用<code>ip addr show</code>查看ip</li>
+</ul>
+<h2 id="内核-1"><a class="header" href="#内核-1">内核</a></h2>
+<ul>
+<li>
+<p>切换linux内核</p>
+<ul>
+<li>查看当前使用的内核和需要切换的内核<code>grep menuentry /boot/grub/grub.cfg</code></li>
+<li>复制menuentry后面需要切换的内核的字符串信息</li>
+<li>开始引导配置 <code>nvim /etc/default/grub</code></li>
+<li>修改<code>GRUB_DEFAULT=0</code>为GRUB_DEFAULT=&quot;Advanced options for Debian GNU/Linux&gt;上一步复制的字符串&quot;后保存退出</li>
+<li>执行更新引导配置命令<code>update-grub</code></li>
+<li>重启后使用<code>uname -a</code>查看是否修改成功</li>
+</ul>
+</li>
+<li>
+<p>删除多余的内核文件</p>
+<ul>
+<li>查看当前系统内安装的内核文件<code>ls /lib/modules</code></li>
+<li><code>apt autoremove --purge linux-image-内核名字</code>删除内核</li>
+</ul>
+</li>
+<li>
+<p>删除旧的内核</p>
+<ul>
+<li>使用<code>uname -a</code>查看正在使用的内核、</li>
+<li>使用<code> dpkg --get-selections |grep linux</code>查看内核列表</li>
+<li>找到多余的内核后使用<code>dpkg --purge --force-remove-essential linux-image-版本号</code>删除</li>
+</ul>
+</li>
+</ul>
+<h2 id="用户-1"><a class="header" href="#用户-1">用户</a></h2>
+<ul>
+<li><code>useradd 用户名</code> 创建用户</li>
+<li><code>passwd 用户名</code> 设置用户名的密码</li>
+<li><code>chmod -d 用户家目录 用户名</code> 设置用户的家目录</li>
+<li><code>cp /etc/skel/.b* 用户家目录</code>、 <code>cp /etc/skel/.p* 用户家目录</code> 复制所需的命令行配置文件到用户的家目录下</li>
+<li><code>chown -R 用户名:用户名 用户家目录</code> 设置用户家目录所以文件的拥有者</li>
+<li><code>chmod 770 用户家目录</code> 设置用户家目录的权限</li>
+<li><code>usermod -s /bin/bash 用户名</code> 配置相关操作 </li>
+</ul>
+<h2 id="sudo-1"><a class="header" href="#sudo-1">sudo</a></h2>
+<ul>
+<li><code>apt install sudo</code> 安装</li>
+<li>让普通用户可以使用sudo 命令
+<ul>
+<li>在<code>/etc/sudoers.d</code>目录下新建<code>用户名</code>文件</li>
+<li>编写<code>用户名 ALL=(ALL) ALL</code>保存退出，这个表示用户可以执行所有命令</li>
+</ul>
+</li>
+</ul>
+<h2 id="ssh-1"><a class="header" href="#ssh-1">ssh</a></h2>
+<ul>
+<li>使用密钥登录
+<ul>
+<li>linux 服务端需要登录的用户家目录下新建.ssh文件夹（如果没有）</li>
+<li>客户端使用<code>ssh-keygen</code>命令生成密钥对</li>
+<li>将生成的<code>id_rsa.pub</code>公钥发送到服务端家目录下的<code>.ssh/authorized_keys</code>文件内</li>
+<li>出现 WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!
+<ul>
+<li>使用命令清除所连接的IP<code>ssh-keygen -R XX.XX.XX.XX</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="apt-1"><a class="header" href="#apt-1">apt</a></h2>
+<ul>
+<li>
+<p>源 <a href="linux/desktop_env/./file/sources.list">source.list</a></p>
+</li>
+<li>
+<p>ppa源</p>
+<ul>
+<li>软件安装<code>apt install software-properties-common</code></li>
+<li>添加ppa源<code>add-apt-repository &quot;url&quot;</code></li>
+<li>删除ppa源<code>add-apt-repository -r &quot;url&quot;</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="其它-1"><a class="header" href="#其它-1">其它</a></h2>
+<h3 id="windows远程dwm桌面环境-1"><a class="header" href="#windows远程dwm桌面环境-1">windows远程dwm桌面环境</a></h3>
+<p>在用户目录下新建.xsession文件，里面添加以下命令</p>
+<pre><code class="language-shell">exec dwm
+</code></pre>
+<p>安装xrdp：<code>apt install xrdp</code></p>
+<p>启动：<code>sudo /etc/init.d/xrdp start</code></p>
+<h3 id="笔记本电源管理相关-1"><a class="header" href="#笔记本电源管理相关-1">笔记本电源管理相关</a></h3>
+<ul>
+<li>笔记本合盖休眠配置文件：/etc/systemd/logind.conf</li>
+<li>linux 引导页面配置文件：/etc/default/grub</li>
+<li>将GRUB_TIMEOUT设置为0则可以跳过引导页面</li>
+</ul>
+<h3 id="输入法-1"><a class="header" href="#输入法-1">输入法</a></h3>
+<ul>
+<li>fcitx5：<code>sudo apt install fcitx5 fcitx5-frontend-qt5 fcitx5-frontend-gtk3 fcitx5-frontend-gtk2 fcitx5-chinese-addons</code></li>
+</ul>
+<h3 id="linux设置键盘速率-1"><a class="header" href="#linux设置键盘速率-1">linux设置键盘速率</a></h3>
+<p><code>xset r rate 250 60</code></p>
+<p>250毫秒后开始重复，每60毫秒重复一次</p>
+<h1 id="dwm-1"><a class="header" href="#dwm-1">DWM</a></h1>
+<ul>
+<li>基础桌面环境：<code>apt install libx11-dev libxft-dev libxinerama-dev xorg</code></li>
+<li>系统托盘：<code>apt install trayer</code></li>
+<li>壁纸软件：<code>apt install feh</code></li>
+<li>复制配置文件<code>cp /etc/X11/xinit/xinitrc ~/.xinitrc</code></li>
+<li>基础命令：
+<ul>
+<li>killall：<code>psmisc</code></li>
+</ul>
+</li>
+<li>使用git clone dwm源码官网https://tools.suckless.org/</li>
+<li>进入dwm目录<code>make clean instal</code>编译安装dwm
+<ul>
+<li>安装编译依赖<code>sudo apt install make gcc</code></li>
+<li>编译xinitrc文件 <code>nvim ~/.xinitrc</code></li>
+<li>文件最后加上<code>exec dwm</code></li>
+</ul>
+</li>
+<li>文件上面有些目录可能需要注释才能启动</li>
+<li>安装输入法<code>apt install fcitx fcitx-pinyin</code></li>
+<li>用dmenu打开<code>fcitx-config-gtk3</code>应用，配置双拼</li>
+<li>安装nerd fonts图标字体
+<ul>
+<li>nerd fonts 字体下载页面：https://www.nerdfonts.com/font-downloads</li>
+<li>选择一个字体下载，我这里选择一个只有图标的字体</li>
+<li>解压字体压缩包到系统字体目录下：<code>sudo unzip 压缩包名称 -d /usr/share/fonts/压缩包名称</code></li>
+<li>进入到解压的字体目录下：<code>cd /usr/share/fonts/压缩包名称</code>
+<ul>
+<li>生成核心字体信息：<code>sudo mkfontscale</code></li>
+<li>生成字体文件夹：<code>sudo mkfontdir</code></li>
+<li>刷新系统字体缓存：<code>sudo fc-cache -fv</code></li>
+</ul>
+</li>
+<li>打开dwm配置文件
+<ul>
+<li>查找字体名称：<code>fc-list | grep 安装的字体名称</code></li>
+<li>复制出对应的字体名称，在grep出结果里面，一般在 <code>:style=xxx</code>前面，<code>xxx.ttf：</code>后面</li>
+<li>找到<code>*fonts[]</code>常量，将上一步复制的字体名称粘贴在这里，后面加上<code>pixelsize=图标大小:type=上一步style后面的值:antialise=true:autohint=true</code>后面两个是抗锯齿之类的属性</li>
+<li>保存退出后<code>sudo make clean install</code> 重新编译安装dwm</li>
+<li>重启后就可以设置nerd fonts的字体了，字体网址：https://www.nerdfonts.com/cheat-sheet</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="问题-1"><a class="header" href="#问题-1">问题</a></h1>
+<h2 id="apt相关"><a class="header" href="#apt相关">apt相关</a></h2>
+<ul>
+<li>修改国内源
+<ul>
+<li>手动修改 <code>sudo nvim /etc/apt/sources.list</code></li>
+<li><a href="linux/desktop_env/./file/sources.list.deb11">debian11</a></li>
+<li><a href="linux/desktop_env/./file/sources.list.deb12">debian12</a></li>
+</ul>
+</li>
+</ul>
+<p>apt install 或upgrade 时 installed initramfs-tools package post-installation script subprocess returned error exit status 1错误</p>
+<ul>
+<li><code>rm /var/lib/dpkg/info/报错的包名</code></li>
+<li><code>dpkg --configure -D 777 报错的包名</code></li>
+<li><code>apt -f install</code></li>
+</ul>
+<h3 id="ppa错误-1"><a class="header" href="#ppa错误-1">PPA错误</a></h3>
+<h4 id="e-the-repository-httpppalaunchpadnetjonathonfvimubuntu-focal-release-no-longer-has-a-release-file-1"><a class="header" href="#e-the-repository-httpppalaunchpadnetjonathonfvimubuntu-focal-release-no-longer-has-a-release-file-1">E: The repository ‘http://ppa.launchpad.net/jonathonf/<a href="https://so.csdn.net/so/search?q=vim&amp;spm=1001.2101.3001.7020">vim</a>/ubuntu focal Release’ no longer has a Release file.</a></h4>
+<ul>
+<li>
+<p>删除仓库，-r 后面的参数表示要删除的仓库，取值如下图所示，记得换成自己报错的仓库</p>
+</li>
+<li>
+<p>sudo apt-add-repository -r ppa:jonathonf/vim	# 这里换成自己报错的仓库</p>
+</li>
+<li>
+<p>更新仓库包列表</p>
+</li>
+<li>
+<p>sudo apt update</p>
+</li>
+</ul>
+<h3 id="更新错误-1"><a class="header" href="#更新错误-1">更新错误</a></h3>
+<ul>
+<li>
+<p>错误：</p>
+<p>dpkg: 处理软件包 initramfs-tools (--configure)时出错：
+installed initramfs-tools package post-installation script subprocess returned error exit status 1
+在处理时有错误发生：
+initramfs-tools
+E: Sub-process /usr/bin/dpkg returned an error code (1)</p>
+</li>
+<li>
+<p>解决方法：</p>
+<ul>
+<li>现将info文件夹更名：<code>sudo mv /var/lib/dpkg/info /var/lib/dpkg/info_old</code></li>
+<li>再新建一个新的info文件夹：<code>sudo mkdir /var/lib/dpkg/info</code></li>
+<li><code>sudo apt-get update</code></li>
+<li><code>apt-get -f install</code> </li>
+<li>执行完上一步操作后会在新的info文件夹下生成一些文件，现将这些文件全部移到info_old文件夹下：<code>sudo mv /var/lib/dpkg/info/* /var/lib/dpkg/info_old</code> </li>
+<li>把自己新建的info文件夹删掉：<code>sudo rm -rf /var/lib/dpkg/info</code></li>
+<li>把以前的info文件夹重新改回名字：<code>sudo mv /var/lib/dpkg/info_old /var/lib/dpkg/info</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="nvidia显卡驱动相关-1"><a class="header" href="#nvidia显卡驱动相关-1">nvidia显卡驱动相关</a></h2>
+<ul>
+<li><code>sudo apt install build-essential libglvnd-dev</code></li>
+<li>如果出现以下错误</li>
+</ul>
+<pre><code>Unable to find the kernel source tree for the currently running kernel.  Please make sure you have installed the kernel source files for
+your kernel and that they are properly configured; on Red Hat Linux systems, for example, be sure you have the 'kernel-source' or
+'kernel-devel' RPM installed.  If you know the correct kernel source files are installed, you may specify the kernel source path with
+the '--kernel-source-path' command line option
+</code></pre>
+<pre><code>* 安装内核源码包：`sudo apt install linux-source`
+* 安装内核头文件包：`sudo apt install linux-headers-$(uname -r)`
+* 这些操作以debian为例
+</code></pre>
+<h2 id="网络工具相关-1"><a class="header" href="#网络工具相关-1">网络工具相关</a></h2>
+<ul>
+<li><code>sudo apt install net-tools</code></li>
+</ul>
+<h2 id="安装typora-1"><a class="header" href="#安装typora-1">安装typora</a></h2>
+<ul>
+<li><a href="https://typoraio.cn/#linux">linux官方安装教程</a></li>
+<li>适合debian系linux</li>
+<li><code>wget -qO - https://typoraio.cn/linux/public-key.asc | sudo tee /etc/apt/trusted.gpg.d/typora.asc</code></li>
+<li><code>sudo add-apt-repository 'deb https://typoraio.cn/linux ./'</code></li>
+<li><code>sudo apt-get update</code></li>
+<li><code>sudo apt-get install typora</code></li>
+</ul>
+<h2 id="缺少ifconfig命令-1"><a class="header" href="#缺少ifconfig命令-1">缺少ifconfig命令</a></h2>
+<ul>
+<li><code>sudo apt install net-tools</code></li>
+</ul>
+<h2 id="禁用watchdog程序导致系统关机或重启时卡死-1"><a class="header" href="#禁用watchdog程序导致系统关机或重启时卡死-1">禁用watchdog程序，导致系统关机或重启时卡死</a></h2>
+<ul>
+<li>打开grub文件 <code>sudo nvim /etc/default/grub</code></li>
+<li>添加或修改<code>GRUB_CMDLINE_LINUX=&quot;nmi_watchdog=0&quot;</code></li>
+<li>更新grub配置 <code>sudo update-grub</code></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
