@@ -844,7 +844,7 @@ public class Users {
 &lt;/mappers&gt;
 </code></pre>
 <h2 id="生命周期和作用域"><a class="header" href="#生命周期和作用域">生命周期和作用域</a></h2>
-<p><img src="/assets/java/img/mybatis%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png" alt="mybatis生命周期" /></p>
+<p><img src="../../../assets/java/img/mybatis%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png" alt="mybatis生命周期" /></p>
 <p><strong>生命周期，和作用域，是至关重要的，因为错误的使用会导致非常严重的并发问题。</strong></p>
 <ul>
 <li>
@@ -1352,11 +1352,11 @@ public void testGetUser(){
 </ul>
 </li>
 </ul>
-<p><img src="/assets/java/img/%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98java-1597374138185.png" alt="一级缓存java" /></p>
+<p><img src="../../../assets/java/img/%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98java-1597374138185.png" alt="一级缓存java" /></p>
 <ul>
 <li>两次查询实际上只查询了一次第二次输出从缓存里取数</li>
 </ul>
-<p><img src="/assets/java/img/%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98out-1597374084581.png" alt="一级缓存out" /></p>
+<p><img src="../../../assets/java/img/%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98out-1597374084581.png" alt="一级缓存out" /></p>
 <ul>
 <li>缓存失效的情况: 
 <ul>
@@ -1400,8 +1400,8 @@ public void testGetUser(){
        size=&quot;512&quot;
        readOnly=&quot;true&quot;/&gt;
 </code></pre>
-<p><img src="/assets/java/img/%E4%BA%8C%E7%BA%A7%E7%BC%93%E5%AD%98java.png" alt="二级缓存java" /></p>
-<p><img src="/assets/java/img/%E4%BA%8C%E7%BA%A7%E7%BC%93%E5%AD%98out-1597377652646.png" alt="二级缓存out" /></p>
+<p><img src="../../../assets/java/img/%E4%BA%8C%E7%BA%A7%E7%BC%93%E5%AD%98java.png" alt="二级缓存java" /></p>
+<p><img src="../../../assets/java/img/%E4%BA%8C%E7%BA%A7%E7%BC%93%E5%AD%98out-1597377652646.png" alt="二级缓存out" /></p>
 <ul>
 <li>注意：<strong>开启二级缓存对使用注解完成的sql方法无效</strong></li>
 <li><strong>需要缓存的类必须实现序列化接口</strong></li>
@@ -1410,7 +1410,7 @@ public void testGetUser(){
 <li>只有当会话提交，或者关闭的时候，才会提交到二级缓冲中</li>
 </ul>
 <h2 id="缓存原理"><a class="header" href="#缓存原理">缓存原理</a></h2>
-<p><img src="/assets/java/img/%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86.png" alt="缓存原理" /></p>
+<p><img src="../../../assets/java/img/%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86.png" alt="缓存原理" /></p>
 <ul>
 <li>缓存顺序：
 <ol>
@@ -1463,7 +1463,7 @@ public void testGetUser(){
            memoryStoreEvictionPolicy=&quot;LRU&quot;/&gt;
 &lt;/ehcache&gt;
 </code></pre>
-<p><img src="/assets/java/img/ehcache%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E.png" alt="ehcache配置说明" /></p>
+<p><img src="../../../assets/java/img/ehcache%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E.png" alt="ehcache配置说明" /></p>
 <h1 id="spring"><a class="header" href="#spring">Spring</a></h1>
 <h2 id="idea创建module跳language-level问题"><a class="header" href="#idea创建module跳language-level问题">idea创建module跳language level问题</a></h2>
 <pre><code class="language-xml">&lt;properties&gt;
@@ -1557,7 +1557,7 @@ public void testGetUser(){
 <li><strong>Spring就是一 个轻量级的控制反转(IOC) 和面向切面编程(AOP)的框架!</strong></li>
 </ul>
 <h3 id="组成"><a class="header" href="#组成">组成</a></h3>
-<p><img src="/assets/java/img/spring%E6%A8%A1%E5%9D%97.png" alt="spring模块" /></p>
+<p><img src="../../../assets/java/img/spring%E6%A8%A1%E5%9D%97.png" alt="spring模块" /></p>
 <ul>
 <li>扩展：
 <ul>
@@ -1593,7 +1593,7 @@ public void setUserDao(UserDao userDao) {
 }
 </code></pre>
 <p>降低耦合性</p>
-<p><img src="/assets/java/img/ioc.png" alt="ioc" /></p>
+<p><img src="../../../assets/java/img/ioc.png" alt="ioc" /></p>
 <blockquote>
 <p><strong>IOC</strong></p>
 </blockquote>
@@ -1869,7 +1869,7 @@ public class Address {
 &lt;bean id=&quot;user3&quot; class=&quot;com.yang.pojo.User&quot; c:name=&quot;张三&quot; c:age=&quot;18&quot;/&gt;
 </code></pre>
 <h3 id="bean的作用域"><a class="header" href="#bean的作用域">bean的作用域</a></h3>
-<p><img src="/assets/java/img/bean%E4%BD%9C%E7%94%A8%E5%9F%9F.png" alt="bean作用域" /></p>
+<p><img src="../../../assets/java/img/bean%E4%BD%9C%E7%94%A8%E5%9F%9F.png" alt="bean作用域" /></p>
 <ul>
 <li>
 <p>singleton：单例模式</p>
@@ -2096,7 +2096,7 @@ public class CustomConfig {
 <li>切入点(PointCut) :切面通知执行的“地点&quot;的定义。</li>
 <li>连接点(JointPoint) :与切入点匹配的执行点。</li>
 </ul>
-<p><img src="/assets/java/img/aop.png" alt="aop" /></p>
+<p><img src="../../../assets/java/img/aop.png" alt="aop" /></p>
 <h3 id="使用spring实现aop"><a class="header" href="#使用spring实现aop">使用Spring实现Aop</a></h3>
 <p>导包</p>
 <pre><code class="language-xml">&lt;!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver --&gt;
@@ -2498,7 +2498,7 @@ ${msg}
 <li>在spring的xml文件内托管该controller类</li>
 <li>问题：</li>
 </ul>
-<p><img src="/assets/java/img/%E9%97%AE%E9%A2%98.png" alt="问题" /></p>
+<p><img src="../../../assets/java/img/%E9%97%AE%E9%A2%98.png" alt="问题" /></p>
 <ul>
 <li>
 <p>使用注解方式：</p>
@@ -2541,7 +2541,7 @@ ${msg}
 </ul>
 <pre><code class="language-java">@Controller
 public class HelloController {
-    @RequestMapping(/assets/java/hello&quot;)
+    @RequestMapping(../../../assets/java/hello&quot;)
     public String hello(Model model){
         model.addAttribute(&quot;msg&quot;, &quot;Hello SpringMVCAnnotation!&quot;);
         return &quot;test&quot;;
@@ -2574,7 +2574,7 @@ ${msg}
 <pre><code class="language-java">@Controller
 public class OperationController {
     //url使用{}符号取值
-    @RequestMapping(/assets/java/add/{num1}/{num2}&quot;)
+    @RequestMapping(../../../assets/java/add/{num1}/{num2}&quot;)
     			//添加@PathVariable指定参数对应的名称
     public String add(@PathVariable(&quot;num1&quot;) int a,@PathVariable(&quot;num2&quot;) int b, Model model){
         model.addAttribute(&quot;result&quot;, a + b);
@@ -2593,7 +2593,7 @@ public class OperationController {
 <li>可以前缀加上forward:标识为页面转发</li>
 <li>不加默认为页面转发</li>
 </ul>
-<pre><code class="language-java">@RequestMapping(/assets/java/test&quot;)
+<pre><code class="language-java">@RequestMapping(../../../assets/java/test&quot;)
 public String tets(){
     return &quot;/WEB-INF/jsp/te.jsp&quot;;
 }
@@ -2604,7 +2604,7 @@ public String tets(){
 <ul>
 <li>在文件前面加redirect:标识为重定向</li>
 </ul>
-<pre><code class="language-java">@RequestMapping(/assets/java/redirect&quot;)
+<pre><code class="language-java">@RequestMapping(../../../assets/java/redirect&quot;)
 public String reTest(){
     System.out.println(&quot;-----------------&quot;);
     return &quot;redirect:/index.jsp&quot;;
@@ -2625,7 +2625,7 @@ public String reTest(){
     &lt;input type=&quot;submit&quot;&gt;
 &lt;/form&gt;
 </code></pre>
-<pre><code class="language-java">@RequestMapping(/assets/java/param1&quot;)
+<pre><code class="language-java">@RequestMapping(../../../assets/java/param1&quot;)
 public String pa1Test(@RequestParam(&quot;username&quot;) String username){
     System.out.println(username);
     return &quot;forward:/testParam1.jsp&quot;;
@@ -2641,7 +2641,7 @@ public String pa1Test(@RequestParam(&quot;username&quot;) String username){
     &lt;input type=&quot;submit&quot;&gt;
 &lt;/form&gt;
 </code></pre>
-<pre><code class="language-java">@RequestMapping(/assets/java/param2&quot;)
+<pre><code class="language-java">@RequestMapping(../../../assets/java/param2&quot;)
 public String pa1Test(User user){
     System.out.println(user);
     return &quot;forward:/testParam.jsp&quot;;
@@ -2708,7 +2708,7 @@ var jsonObj = JSON.parse(jsonStr);
 <li>如果需要该类里面的所有方法都不走视图解析器，返回字符串的话，将该类的@Controller注解替换为@RestControler</li>
 </ul>
 <pre><code class="language-java">@ResponseBody
-@RequestMapping(/assets/java/j1&quot;)
+@RequestMapping(../../../assets/java/j1&quot;)
 public String testJson01(){
     return &quot;123&quot;;
 }
@@ -2765,7 +2765,7 @@ public String testJson01() throws JsonProcessingException, UnsupportedEncodingEx
 </ul>
 </li>
 </ul>
-<pre><code class="language-java">@RequestMapping(/assets/java/j2&quot;)
+<pre><code class="language-java">@RequestMapping(../../../assets/java/j2&quot;)
 public String testJ2() throws JsonProcessingException {
     HashMap&lt;String, Object&gt; map = new HashMap&lt;&gt;();
     map.put(&quot;name&quot;,&quot;张三&quot;) ;
@@ -2782,7 +2782,7 @@ public String testJ2() throws JsonProcessingException {
 </ul>
 </li>
 </ul>
-<pre><code class="language-java">@RequestMapping(/assets/java/j3&quot;)
+<pre><code class="language-java">@RequestMapping(../../../assets/java/j3&quot;)
 public String testJ3() throws JsonProcessingException {
     ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();
     list.add(&quot;张三&quot;);
@@ -2801,7 +2801,7 @@ public String testJ3() throws JsonProcessingException {
 </ul>
 </li>
 </ul>
-<pre><code class="language-java">@RequestMapping(/assets/java/j4&quot;)
+<pre><code class="language-java">@RequestMapping(../../../assets/java/j4&quot;)
 public String testJ4() throws JsonProcessingException {
     HashMap&lt;String, Object&gt; map = new HashMap&lt;&gt;();
     map.put(&quot;name&quot;,&quot;张三&quot;) ;
@@ -2837,7 +2837,7 @@ public String testJ4() throws JsonProcessingException {
 </ul>
 </li>
 </ul>
-<pre><code class="language-java">@RequestMapping(/assets/java/j5&quot;)
+<pre><code class="language-java">@RequestMapping(../../../assets/java/j5&quot;)
 public String testJ5() {
     HashMap&lt;String, Object&gt; map = new HashMap&lt;&gt;();
     map.put(&quot;name&quot;,&quot;张三&quot;) ;
@@ -2856,7 +2856,7 @@ public String testJ5() {
 </ul>
 <pre><code class="language-java">@RestController
 public class AjaxController {
-    @RequestMapping(/assets/java/testAjax/{value}&quot;)
+    @RequestMapping(../../../assets/java/testAjax/{value}&quot;)
     public boolean testAjax(@PathVariable(&quot;value&quot;) String value){
         return &quot;123&quot;.equals(value);
     }

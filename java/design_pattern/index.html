@@ -366,7 +366,7 @@ public class CarFactory {
 <ul>
 <li>缺点：没有完全实现OCP原则，对程序进行扩展时需要修改已有的代码。</li>
 </ul>
-<p><img src="/assets/java/img/simplefactory.png" alt="simplefactory" /></p>
+<p><img src="../../../assets/java/img/simplefactory.png" alt="simplefactory" /></p>
 <hr />
 </li>
 <li>
@@ -419,7 +419,7 @@ public class BFactory implements Factory {
 <p>根据实际业务：简单工厂模式</p>
 </li>
 </ul>
-<p><img src="/assets/java/img/methodFactory.png" alt="methodFactory" /></p>
+<p><img src="../../../assets/java/img/methodFactory.png" alt="methodFactory" /></p>
 </li>
 </ul>
 <h3 id="抽象工厂模式"><a class="header" href="#抽象工厂模式">抽象工厂模式</a></h3>
@@ -507,7 +507,7 @@ public class HWFactory implements Factory {
     }
 }
 </code></pre>
-<p><img src="/assets/java/img/abstructFactory.png" alt="abstructFactory" /></p>
+<p><img src="../../../assets/java/img/abstructFactory.png" alt="abstructFactory" /></p>
 <ul>
 <li>优点：
 <ul>
@@ -616,7 +616,7 @@ public class CarDirector implements Director&lt;Car&gt; {
     }
 }
 </code></pre>
-<p><img src="/assets/java/img/%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F.png" alt="建造者模式" /></p>
+<p><img src="../../../assets/java/img/%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F.png" alt="建造者模式" /></p>
 <ul>
 <li>优点：
 <ul>
@@ -687,7 +687,7 @@ public class Client {
 <ul>
 <li>问题：当原型对象属性有引用类型时，只会将该引用类型的属性的指针克隆过去，设说明原型对象和新对象的那个引用类型属性都指向了同一个对象，一旦那个对象里面的值发生改变时，原型对象和新对象都会受到影响</li>
 </ul>
-<p><img src="/assets/java/img/%E6%B5%85%E5%85%8B%E9%9A%86%E7%9A%84%E9%97%AE%E9%A2%98.png" alt="浅克隆的问题" /></p>
+<p><img src="../../../assets/java/img/%E6%B5%85%E5%85%8B%E9%9A%86%E7%9A%84%E9%97%AE%E9%A2%98.png" alt="浅克隆的问题" /></p>
 </li>
 <li>
 <p>深克隆</p>
@@ -701,7 +701,7 @@ protected Object clone() throws CloneNotSupportedException {
     return clone;
 }
 </code></pre>
-<p><img src="/assets/java/img/%E6%B7%B1%E5%85%8B%E9%9A%86.png" alt="深克隆" /></p>
+<p><img src="../../../assets/java/img/%E6%B7%B1%E5%85%8B%E9%9A%86.png" alt="深克隆" /></p>
 </li>
 <li>
 <p>深克隆（序列化反序列化实现）</p>
@@ -784,7 +784,7 @@ public class HeadsetBy3_5mm {
     }
 }
 </code></pre>
-<p><img src="/assets/java/img/%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F-1597033069207.png" alt="适配器模式" /></p>
+<p><img src="../../../assets/java/img/%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F-1597033069207.png" alt="适配器模式" /></p>
 </li>
 </ul>
 <h3 id="代理模式"><a class="header" href="#代理模式">代理模式</a></h3>
@@ -855,7 +855,7 @@ public class Middleman implements Singer{
     }
 }
 </code></pre>
-<p><img src="/assets/java/img/%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86.png" alt="静态代理" /></p>
+<p><img src="../../../assets/java/img/%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86.png" alt="静态代理" /></p>
 <ul>
 <li>动态代理
 <ul>
@@ -929,7 +929,7 @@ public class MiddlemanMaker&lt;T&gt; implements InvocationHandler {
     }
 }
 </code></pre>
-<p><img src="/assets/java/img/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86.png" alt="动态代理" /></p>
+<p><img src="../../../assets/java/img/%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86.png" alt="动态代理" /></p>
 <ul>
 <li>AOP（Aspect Oriented Programming面向切面编程）
 <ul>
@@ -992,7 +992,7 @@ public class Dell implements Brand {
     }
 }
 </code></pre>
-<p><img src="/assets/java/img/%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F.png" alt="桥接模式" /></p>
+<p><img src="../../../assets/java/img/%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F.png" alt="桥接模式" /></p>
 <ul>
 <li>桥接模式可以取代多层继承的方案，多层继承违背了单一职责原则，复用性较差，类的个数也非常多，桥接模式可以极大的减少子类的个数，从而降低管理和维护的成本</li>
 <li>桥接模式极大的提高了系统可扩展性，在两个变化维度中任意扩展一个维度，都不需要修改原有的系统，符合开闭原则</li>
