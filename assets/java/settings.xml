@@ -1,4 +1,4 @@
-
+<project>
   <dependencies>
 <!--        mysql驱动-->
         <dependency>
