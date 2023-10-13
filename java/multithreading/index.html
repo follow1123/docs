@@ -1,0 +1,342 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>多线程 - 文档</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../linux/index.html"><strong aria-hidden="true">1.</strong> Linux</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../linux/desktop_env/index.html"><strong aria-hidden="true">1.1.</strong> Linux桌面环境</a></li><li class="chapter-item expanded "><a href="../../linux/vsftp/index.html"><strong aria-hidden="true">1.2.</strong> vsftp</a></li></ol></li><li class="chapter-item expanded "><a href="../../windows/index.html"><strong aria-hidden="true">2.</strong> Windows</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../windows/command_prompt/index.html"><strong aria-hidden="true">2.1.</strong> Command Prompt</a></li><li class="chapter-item expanded "><a href="../../windows/wsl2/index.html"><strong aria-hidden="true">2.2.</strong> wsl2</a></li></ol></li><li class="chapter-item expanded "><a href="../../docker/index.html"><strong aria-hidden="true">3.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../git/index.html"><strong aria-hidden="true">4.</strong> Git</a></li><li class="chapter-item expanded "><a href="../../java/index.html"><strong aria-hidden="true">5.</strong> Java</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../java/java_basics/index.html"><strong aria-hidden="true">5.1.</strong> Java基础</a></li><li class="chapter-item expanded "><a href="../../java/multithreading/index.html" class="active"><strong aria-hidden="true">5.2.</strong> 多线程</a></li><li class="chapter-item expanded "><a href="../../java/maven/index.html"><strong aria-hidden="true">5.3.</strong> Maven</a></li><li class="chapter-item expanded "><a href="../../java/design_pattern/index.html"><strong aria-hidden="true">5.4.</strong> 设计模式</a></li><li class="chapter-item expanded "><a href="../../java/java_web/index.html"><strong aria-hidden="true">5.5.</strong> Java Web</a></li><li class="chapter-item expanded "><a href="../../java/SSM/index.html"><strong aria-hidden="true">5.6.</strong> SSM</a></li><li class="chapter-item expanded "><a href="../../java/project/index.html"><strong aria-hidden="true">5.7.</strong> 项目</a></li><li class="chapter-item expanded "><a href="../../java/netty/index.html"><strong aria-hidden="true">5.8.</strong> Netty</a></li><li class="chapter-item expanded "><a href="../../java/spring/index.html"><strong aria-hidden="true">5.9.</strong> Spring</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../java/spring/spring_security/index.html"><strong aria-hidden="true">5.9.1.</strong> Spring Security</a></li><li class="chapter-item expanded "><a href="../../java/spring/spring_cloud/index.html"><strong aria-hidden="true">5.9.2.</strong> Spring Cloud</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../mysql/index.html"><strong aria-hidden="true">6.</strong> Mysql</a></li><li class="chapter-item expanded "><a href="../../nginx/index.html"><strong aria-hidden="true">7.</strong> Nginx</a></li><li class="chapter-item expanded "><a href="../../redis/index.html"><strong aria-hidden="true">8.</strong> Redis</a></li><li class="chapter-item expanded "><a href="../../vim/index.html"><strong aria-hidden="true">9.</strong> Vim/Neovim</a></li><li class="chapter-item expanded "><a href="../../vue/index.html"><strong aria-hidden="true">10.</strong> Vue</a></li><li class="chapter-item expanded "><a href="../../web/index.html"><strong aria-hidden="true">11.</strong> Web</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">文档</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="并发"><a class="header" href="#并发">并发</a></h1>
+<h2 id="共享模型"><a class="header" href="#共享模型">共享模型</a></h2>
+<h3 id="共享问题"><a class="header" href="#共享问题">共享问题</a></h3>
+<ul>
+<li><strong>临界区</strong>
+一段代码块内会对一个资源进行读写操作，会有多个线程执行这段代码块，这段代码块就叫临界区</li>
+<li><strong>竞态条件</strong>
+多个线程在临界区内执行，由于代码的执行序列不同而导致结果无法预测，称之为发生了竞态条件</li>
+</ul>
+<h3 id="synchronized"><a class="header" href="#synchronized">synchronized</a></h3>
+<ul>
+<li>锁升级原理</li>
+</ul>
+<p><img src="./img/image-20210608161529253.png" alt="" /></p>
+<p><img src="./img/image-20210608163209781.png" alt="" /></p>
+<ul>
+<li>无锁到偏向锁
+<ul>
+<li>对象的markword倒数第三位为1的话则可以使用偏向锁，否则竞争时直接升级为轻量级锁。</li>
+<li>无锁到偏向锁的过程：
+<ul>
+<li>一个线程需要加锁时会将线程的id写入锁对象的markword头上面，</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="线程安全分析"><a class="header" href="#线程安全分析">线程安全分析</a></h3>
+<h3 id="monitor"><a class="header" href="#monitor">Monitor</a></h3>
+<p>使用synchronized(obj) 锁定一个对象时将这个对象和操作系统提供的monitor对象关联，</p>
+<pre><code class="language-mermaid">graph TD
+
+subgraph Monitor
+	a(WaitSet)
+	b(EntitySet)
+	c(Owner)
+end
+</code></pre>
+<p>一个monitor对象包含这几个属性，</p>
+<ul>
+<li>entitySet
+<ul>
+<li>当一个线程获取对象锁时如果owner已经指向一个线程则进入这个队列等待</li>
+</ul>
+</li>
+<li>Owner
+<ul>
+<li>当一个对象获取该对象锁时，如果owner没有指向任何线程，则owner指向这个线程，代表这个对象锁被该线程拥有</li>
+</ul>
+</li>
+</ul>
+<p>当对象锁和monitor关联后，这个对象的markword位置则会存放指向monitor的指针，而markword里面的相关属性会被存放到monitor对象内</p>
+<h3 id="waitnotify"><a class="header" href="#waitnotify">wait/notify</a></h3>
+<h3 id="现车状态转换"><a class="header" href="#现车状态转换">现车状态转换</a></h3>
+<h3 id="活跃性"><a class="header" href="#活跃性">活跃性</a></h3>
+<h3 id="lock"><a class="header" href="#lock">Lock</a></h3>
+<h1 id="其他"><a class="header" href="#其他">其他</a></h1>
+<h2 id="synchronized-1"><a class="header" href="#synchronized-1">synchronized</a></h2>
+<h6 id="保证被包裹的代码块的原子性"><a class="header" href="#保证被包裹的代码块的原子性">保证被包裹的代码块的原子性</a></h6>
+<ul>
+<li>底层实现（大致）：
+<ul>
+<li>JDK早期直接就是重量级锁（向操作系统申请锁）</li>
+<li>后来改进为锁升级的过程
+<ul>
+<li>偏向锁：当一段加锁了的代码第一次被一个线程访问时，会在这个锁上标记这个线程的id号，下次如果还是这个线程访问就直接通行，没有进行其他操作，提高了效率。</li>
+<li>自旋锁：接着上面的过程，如果有多个线程访问时，当一个线程持有这个锁未释放时，其他线程就会在外面执行自选操作，类似while循环。</li>
+<li>重量级锁：当自旋次数达到10此后就会向操作系统申请重量级锁。</li>
+</ul>
+</li>
+<li>理解：偏向锁和自旋锁都是用户态的操作效率会提高，重量级锁是用户态内核态频繁切换，降低了效率，但是自旋锁也有缺点，就是如果当自旋的线程多了起来也会降低效率，因为自旋操作时这个线程没有被挂起，当自旋的线程多了之后就会有一大堆线程在执行自旋操作，而操作算是一种无意义的操作，所以当一段加锁的代码执行时间很长而且会有很多个线程访问时不建议使用自旋锁</li>
+</ul>
+</li>
+<li>在synchronized代码块内出异常默认锁会被释放</li>
+<li>synchronized不能锁字符串常量和基础的数值包装类型
+<ul>
+<li>字符串常量在字符串常量池内始终是一个对象</li>
+<li>数组包装类型由于内部结构跟改一下就会变成不同的对象</li>
+</ul>
+</li>
+</ul>
+<h2 id="volatile"><a class="header" href="#volatile">volatile</a></h2>
+<h6 id="保证被修饰的对象不被指令重排"><a class="header" href="#保证被修饰的对象不被指令重排">保证被修饰的对象不被指令重排</a></h6>
+<ul>
+<li>保证线程的可见性
+<ul>
+<li>jvm虚拟机分为heap、stack等空间，heap空间是共享的而开启线程就是创建一个stack，这两个线程在不同的stack里面访问heap里面的同一个数据时都需要copy一份数据到自己stack空间里面的数据存储区域内，再在自己的区域内对这个数据进行修改，修改完才写回到heap空间，而另一个线程也需要获取这个数据，而不知道这个数据被没被修改，所以需要保证线程的可见性这里需要使用到cpu的缓存一直循协议。</li>
+</ul>
+</li>
+<li>禁止指令重排
+<ul>
+<li>编译器会将程序编译完的指令进行重写排序以提高效率。</li>
+<li>我自己的理解：在一段代码内上半部分的代码执行耗时上，下半部分的代码执行耗时端，而这两部分代码执行时也没有太多关联，编译器就会将下半部分的代码编译完的指令安排到上半部分代码前面执行。</li>
+<li>在单例模式的双重检测锁实现方式下也需要使用volatile关键字修饰实例对象
+<ul>
+<li>因为jvm在创建对象时会分为三步：申请空间、初始化成员变量、赋值到实例，在这几个部分内：
+<ul>
+<li>如果第一个线程在锁内初始化这个对象，初始化时发生了指令重排，把第二和第三个步骤换了一下，那么第二个线程就会拿到一个默认值全部为空的对象。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="两阶段终止模式"><a class="header" href="#两阶段终止模式">两阶段终止模式</a></h2>
+<pre><code class="language-mermaid">graph TD
+w(&quot;while(true)&quot;) --&gt; a
+a(&quot;是否被打断？&quot;) --&gt; b(&quot;料理后事&quot;)
+b --&gt; c((结束循环))
+a --&gt; 否 --&gt; d(睡眠2s)
+d --&gt; 无异常 --&gt; e(执行监控记录)
+d --&gt; 有异常 --&gt; i(设置打断标记)
+i --&gt; w
+e --&gt; w
+</code></pre>
+<h3 id=""><a class="header" href="#"></a></h3>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../java/java_basics/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../java/maven/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../java/java_basics/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../java/maven/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,2992 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>SSM - 文档</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../linux/index.html"><strong aria-hidden="true">1.</strong> Linux</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../linux/desktop_env/index.html"><strong aria-hidden="true">1.1.</strong> Linux桌面环境</a></li><li class="chapter-item expanded "><a href="../../linux/vsftp/index.html"><strong aria-hidden="true">1.2.</strong> vsftp</a></li></ol></li><li class="chapter-item expanded "><a href="../../windows/index.html"><strong aria-hidden="true">2.</strong> Windows</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../windows/command_prompt/index.html"><strong aria-hidden="true">2.1.</strong> Command Prompt</a></li><li class="chapter-item expanded "><a href="../../windows/wsl2/index.html"><strong aria-hidden="true">2.2.</strong> wsl2</a></li></ol></li><li class="chapter-item expanded "><a href="../../docker/index.html"><strong aria-hidden="true">3.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../git/index.html"><strong aria-hidden="true">4.</strong> Git</a></li><li class="chapter-item expanded "><a href="../../java/index.html"><strong aria-hidden="true">5.</strong> Java</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../java/java_basics/index.html"><strong aria-hidden="true">5.1.</strong> Java基础</a></li><li class="chapter-item expanded "><a href="../../java/multithreading/index.html"><strong aria-hidden="true">5.2.</strong> 多线程</a></li><li class="chapter-item expanded "><a href="../../java/maven/index.html"><strong aria-hidden="true">5.3.</strong> Maven</a></li><li class="chapter-item expanded "><a href="../../java/design_pattern/index.html"><strong aria-hidden="true">5.4.</strong> 设计模式</a></li><li class="chapter-item expanded "><a href="../../java/java_web/index.html"><strong aria-hidden="true">5.5.</strong> Java Web</a></li><li class="chapter-item expanded "><a href="../../java/SSM/index.html" class="active"><strong aria-hidden="true">5.6.</strong> SSM</a></li><li class="chapter-item expanded "><a href="../../java/project/index.html"><strong aria-hidden="true">5.7.</strong> 项目</a></li><li class="chapter-item expanded "><a href="../../java/netty/index.html"><strong aria-hidden="true">5.8.</strong> Netty</a></li><li class="chapter-item expanded "><a href="../../java/spring/index.html"><strong aria-hidden="true">5.9.</strong> Spring</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../java/spring/spring_security/index.html"><strong aria-hidden="true">5.9.1.</strong> Spring Security</a></li><li class="chapter-item expanded "><a href="../../java/spring/spring_cloud/index.html"><strong aria-hidden="true">5.9.2.</strong> Spring Cloud</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../mysql/index.html"><strong aria-hidden="true">6.</strong> Mysql</a></li><li class="chapter-item expanded "><a href="../../nginx/index.html"><strong aria-hidden="true">7.</strong> Nginx</a></li><li class="chapter-item expanded "><a href="../../redis/index.html"><strong aria-hidden="true">8.</strong> Redis</a></li><li class="chapter-item expanded "><a href="../../vim/index.html"><strong aria-hidden="true">9.</strong> Vim/Neovim</a></li><li class="chapter-item expanded "><a href="../../vue/index.html"><strong aria-hidden="true">10.</strong> Vue</a></li><li class="chapter-item expanded "><a href="../../web/index.html"><strong aria-hidden="true">11.</strong> Web</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">文档</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="mybatis"><a class="header" href="#mybatis">Mybatis</a></h1>
+<h2 id="pojo工具类"><a class="header" href="#pojo工具类">pojo工具类</a></h2>
+<pre><code class="language-java">package com.yang.utils;
+
+import org.apache.ibatis.session.SqlSession;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+/**
+ * @auther YF
+ * @create 2020-07-30-20:48
+ */
+public class PojoUtils {
+
+    private static String showTables = &quot;show tables&quot;;
+
+    private static String desTable = &quot;describe &quot;;
+
+    private static String packageName;
+
+    private static StringBuilder sb;
+
+    private static ArrayList&lt;String&gt; fieldNames;
+
+    private static ArrayList&lt;String&gt; fieldTypes;
+
+    private static String empty = &quot; &quot;;
+
+    private static String table = &quot;\t&quot;;
+
+    private static String nextLine = &quot;\n&quot;;
+
+    static {
+        String name = PojoUtils.class.getPackage().getName();
+        String substring = name.substring(0, name.lastIndexOf(&quot;.&quot;) + 1);
+        packageName = substring + &quot;pojo&quot;;
+    }
+
+    private static String getPath(){
+        return packageName.replace(&quot;.&quot;, &quot;/&quot;);
+    }
+
+    public static void initPojo(Connection connection, String packageN){
+        if (packageN != null || !&quot;&quot;.equals(packageN.trim())){
+            packageName = packageN;
+        }
+        initPojo(connection);
+    }
+
+    public static void initPojo(SqlSession sqlSession, String packageN){
+        if (packageN != null || !&quot;&quot;.equals(packageN.trim())){
+            packageName = packageN;
+        }
+        initPojo(sqlSession);
+    }
+
+    public static void initPojo(Connection connection) {
+        try(PreparedStatement statement = connection.prepareStatement(showTables);
+            ResultSet rs = statement.executeQuery()) {
+            while (rs.next()){
+                String tableName = rs.getString(1);
+                initPOJOFields(connection ,tableName);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println(&quot;pojo 初始化失败！&quot;);
+        }
+    }
+
+    public static void initPojo(SqlSession sqlSession) {
+        try {
+            Connection connection = sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection();
+            initPojo(connection);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            sqlSession.close();
+        }
+    }
+
+    public static void deletePojo(){
+        File file = new File(&quot;src/main/java/&quot; + getPath());
+        if (file.exists()) {
+            File[] files = file.listFiles();
+            for (File file1 : files) {
+                file1.delete();
+            }
+            file.delete();
+        }
+    }
+
+    public static void rebuildPojo(Connection connection){
+        deletePojo();
+        initPojo(connection);
+    }
+    public static void rebuildPojo(SqlSession sqlSession){
+        deletePojo();
+        initPojo(sqlSession);
+    }
+
+    private static void initPOJOFields(Connection connection,String tableName) {
+        if (fieldNames == null){
+            fieldNames = new ArrayList&lt;&gt;();
+        }else {
+            fieldNames.clear();
+        }
+        if (fieldTypes == null){
+            fieldTypes = new ArrayList&lt;&gt;();
+        }else {
+            fieldTypes.clear();
+        }
+        try(PreparedStatement statement = connection.prepareStatement(desTable + tableName);
+            ResultSet rs = statement.executeQuery()) {
+            while (rs.next()){
+                fieldNames.add(headToLower(rs.getString(1)));
+                String fileType = rs.getString(2);
+                if (fileType.startsWith(&quot;char&quot;) || fileType.startsWith(&quot;varchar&quot;)){
+                    fieldTypes.add(&quot;String&quot;);
+                }else if (fileType.startsWith(&quot;int&quot;)){
+                    fieldTypes.add(&quot;int&quot;);
+                }else if (fileType.startsWith(&quot;double&quot;)){
+                    fieldTypes.add(&quot;double&quot;);
+                }else if (fileType.startsWith(&quot;longblob&quot;)){
+                    fieldTypes.add(&quot;byte[]&quot;);
+                }else if (fileType.startsWith(&quot;timestamp&quot;)){
+                    fieldTypes.add(&quot;java.util.Date&quot;);
+                }
+            }
+            createPojo(tableName);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private static void createPojo(String tableName) {
+        File file = new File(&quot;src/main/java/&quot; + getPath());
+        if (!file.exists()){
+            file.mkdir();
+        }
+        String className = headToUpper(tableName);
+        String path = file.getAbsolutePath() + &quot;/&quot; + className + &quot;.java&quot;;
+        try(BufferedWriter fos = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path)))){
+            String classFile = getClassFile(className);
+            fos.write(classFile);
+            fos.flush();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }x
+    /**
+     * 建造类的核心方法
+     * @param className
+     * @return
+     */
+    private static String getClassFile(String className) {
+        if (sb == null) {
+            sb = new StringBuilder();
+        }else {
+            sb.delete(0, sb.length());
+        }
+        sb.append(&quot;package &quot;).append(packageName).append(&quot;;&quot;).append(nextLine);
+        sb.append(&quot;public class &quot;).append(className).append(empty).append(&quot;implements java.io.Serializable&quot;)
+            .append(&quot;{&quot;).append(nextLine);
+        appendFields();
+        appendEmptyConstructor(className);
+        appendGetterAndSetter();
+        appendToString(className);
+        sb.append(&quot;}&quot;);
+        return sb.toString();
+    }
+    /**
+     * 生成属性
+     */
+    private static void appendFields(){
+        for (int i = 0; i &lt; fieldNames.size(); i++) {
+            sb.append(table).append(&quot;private &quot;).append(fieldTypes.get(i)).append(empty)
+                .append(fieldNames.get(i)).append(&quot;;&quot;).append(nextLine);
+        }
+    }
+    /**
+     * 生成空参构造方法
+     * @param className
+     */
+    private static void appendEmptyConstructor(String className){
+        sb.append(table).append(&quot;public &quot;).append(className).append(&quot;(){}&quot;).append(nextLine);
+    }
+
+    /**
+     * 生成get和set方法
+     */
+    private static void appendGetterAndSetter(){
+        for (int i = 0; i &lt; fieldNames.size(); i++) {
+            sb.append(table).append(&quot;public &quot;).append(fieldTypes.get(i)).append(empty)
+                .append(&quot;get&quot;).append(headToUpper(fieldNames.get(i))).append(&quot;(){&quot;).append(nextLine)
+                .append(table).append(table).append(&quot;return this.&quot;).append(fieldNames.get(i))
+                .append(&quot;;&quot;).append(nextLine).append(table).append(&quot;}&quot;).append(nextLine);
+            sb.append(table).append(&quot;public void &quot;).append(&quot;set&quot;).append(headToUpper(fieldNames.get(i)))
+                .append(&quot;(&quot;).append(fieldTypes.get(i)).append(empty).append(&quot;value&quot;)
+                .append(&quot;){&quot;).append(nextLine).append(table).append(table).append(&quot;this.&quot;)
+                .append(fieldNames.get(i)).append(empty).append(&quot;=&quot;).append(empty)
+                .append(&quot;value;&quot;).append(nextLine).append(table).append(&quot;}&quot;).append(nextLine);
+        }
+    }
+
+    /**
+     * 生成toString
+     * @param className
+     */
+    private static void appendToString(String className){
+        sb.append(table).append(&quot;@Override&quot;).append(nextLine);
+        sb.append(table).append(&quot;public String toString() {&quot;).append(nextLine);
+        sb.append(table).append(table).append(&quot;return &quot;).append(&quot;\&quot;&quot;)
+            .append(className).append(&quot;{&quot;);
+        for (int i = 0; i &lt; fieldNames.size(); i++) {
+            sb.append(i &gt; 0 ? &quot;\&quot;, &quot; : &quot;&quot;).append(fieldNames.get(i)).append(&quot;='\&quot;+&quot;);
+            sb.append(fieldNames.get(i)).append(&quot;+\&quot;'&quot;)
+                .append(&quot;\&quot;+&quot;)
+                .append(nextLine).append(table).append(table);
+        }
+        sb.append(&quot;\&quot;}&quot;).append(&quot;\&quot;;&quot;).append(nextLine);
+
+        sb.append(table).append(&quot;}&quot;).append(nextLine);
+    }
+
+    private static String headToUpper(String t){
+        return t.substring(0, 1).toUpperCase() + t.substring(1);
+    }
+    private static String headToLower(String t){
+        return t.substring(0, 1).toLowerCase() + t.substring(1);
+    }
+}
+</code></pre>
+<h2 id="xml文件骨架"><a class="header" href="#xml文件骨架">xml文件骨架</a></h2>
+<h2 id="核心配置"><a class="header" href="#核心配置">核心配置</a></h2>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE configuration
+        PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+        &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
+&lt;configuration&gt;
+    &lt;environments default=&quot;development&quot;&gt;
+        &lt;environment id=&quot;development&quot;&gt;
+            &lt;transactionManager type=&quot;JDBC&quot;/&gt;
+            &lt;dataSource type=&quot;POOLED&quot;&gt;
+                &lt;property name=&quot;driver&quot; value=&quot;com.mysql.cj.jdbc.Driver&quot;/&gt;
+                &lt;property name=&quot;url&quot; value=&quot;&quot;/&gt;
+                &lt;property name=&quot;username&quot; value=&quot;用户名&quot;/&gt;
+                &lt;property name=&quot;password&quot; value=&quot;密码&quot;/&gt;
+            &lt;/dataSource&gt;
+        &lt;/environment&gt;
+    &lt;/environments&gt;
+    &lt;mappers&gt;
+    &lt;/mappers&gt;
+&lt;/configuration&gt;
+</code></pre>
+<h3 id="mapper配置"><a class="header" href="#mapper配置">mapper配置</a></h3>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE mapper
+        PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+        &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+&lt;mapper namespace=&quot;dao接口的全限定名&quot;&gt;
+    &lt;select id=&quot;对应的方法名&quot; resultType=&quot;返回结果的全限定名&quot;&gt;
+    	sql语句
+    &lt;/select&gt;
+&lt;/mapper&gt;
+</code></pre>
+<h2 id="简介"><a class="header" href="#简介">简介</a></h2>
+<ul>
+<li>MyBatis是一款优秀的持久层框架</li>
+<li>它支持定制化SQL.存储过程以及高级映射。</li>
+<li>MyBatis避免了几乎所有的JDBC代码和手动设置参数以及获取结果集。</li>
+<li>MyBatis可以使用简单的XML或注解来配置和映射原生类型、接口和Java的POJO (Plain Old JavaObjects， 普通老式Java对象)为数据库中的记录。</li>
+<li>MyBatis本是apache的一一个开源项目iBatis, 2010年这个项目由apache software foundation迁移到了google code,并且改名为MyBatis 。</li>
+<li>2013年11月迁移到Github。</li>
+</ul>
+<h3 id="获取"><a class="header" href="#获取">获取</a></h3>
+<ul>
+<li>maven仓库:</li>
+</ul>
+<pre><code class="language-xml">&lt;!-- https ://mvnrepository. com/artifact/org. mybatis/mybatis --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org. mybatis&lt;/groupId&gt;
+    &lt;artifactId&gt;mybatis&lt;/artifactId&gt;
+    &lt;version&gt;3.5.2&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ul>
+<li>Github : https://github.com/mybatis/mybatis-3/releases</li>
+<li>中文文档: https://mybatis.org/mybatis-3/zh/index.html</li>
+</ul>
+<h3 id="持久化"><a class="header" href="#持久化">持久化</a></h3>
+<p>数据持久化</p>
+<ul>
+<li>
+<p>持久化就是将程序的数据在持久状态和瞬时状态转化的过程</p>
+</li>
+<li>
+<p>内存:断电即失</p>
+</li>
+<li>
+<p>数据库(Jdbc), io文件持久化。</p>
+</li>
+</ul>
+<h3 id="持久层"><a class="header" href="#持久层">持久层</a></h3>
+<p>Dao层，Service层， Controller层……</p>
+<ul>
+<li>完成持久化工作的代码块</li>
+<li>层界限十分明显。</li>
+</ul>
+<h2 id="mybatis程序"><a class="header" href="#mybatis程序">Mybatis程序</a></h2>
+<blockquote>
+<p>jdbc url</p>
+</blockquote>
+<pre><code class="language-properties">jdbc:mysql://localhost:3306/session1?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=Asia/Shanghai
+</code></pre>
+<ul>
+<li>编写配置：</li>
+</ul>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE configuration
+        PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+        &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
+&lt;configuration&gt;
+    &lt;environments default=&quot;development&quot;&gt;
+        &lt;environment id=&quot;development&quot;&gt;
+            &lt;transactionManager type=&quot;JDBC&quot;/&gt;
+            &lt;dataSource type=&quot;POOLED&quot;&gt;
+                &lt;property name=&quot;driver&quot; value=&quot;com.mysql.cj.jdbc.Driver&quot;/&gt;
+                &lt;property name=&quot;url&quot; value=&quot;&quot;/&gt;
+                &lt;property name=&quot;username&quot; value=&quot;用户名&quot;/&gt;
+                &lt;property name=&quot;password&quot; value=&quot;密码&quot;/&gt;
+            &lt;/dataSource&gt;
+        &lt;/environment&gt;
+    &lt;/environments&gt;
+&lt;/configuration&gt;
+</code></pre>
+<ul>
+<li>编写获取SqlSession的工具类</li>
+</ul>
+<pre><code class="language-java">public class JDBCUtils {
+    private static SqlSessionFactory sqlSessionFactory;
+    static {
+        try(InputStream is = JDBCUtils.class.getClassLoader().getResourceAsStream(&quot;mybatis-info.xml&quot;)){
+            sqlSessionFactory = new SqlSessionFactoryBuilder().build(is);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException(&quot;connection failed!&quot;);
+        }
+    }
+    public static SqlSession getSqlSession(){
+        return sqlSessionFactory.openSession();
+    }
+}
+</code></pre>
+<ul>
+<li>
+<p>编写代码</p>
+<ul>
+<li>编写实体类</li>
+<li>编写dao接口</li>
+</ul>
+<pre><code class="language-java">public interface UserDao {
+    List&lt;Users&gt; getUser();
+}
+</code></pre>
+<ul>
+<li><del>编写dao接口实现类</del></li>
+<li>编写对应的mapper配置文件</li>
+</ul>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE mapper
+        PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+        &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+&lt;mapper namespace=&quot;dao接口的全限定名&quot;&gt;
+    &lt;select id=&quot;对应的方法名&quot; resultType=&quot;返回结果的全限定名&quot;&gt;
+    	sql语句
+    &lt;/select&gt;
+&lt;/mapper&gt;
+</code></pre>
+<ul>
+<li>测试</li>
+</ul>
+<pre><code class="language-java">@Test
+public void testGetUser(){
+    //获取sqlSession对象
+    SqlSession sqlSession = JDBCUtils.getSqlSession();
+    //获取对应的dao对象
+    UserDao mapper = sqlSession.getMapper(UserDao.class);
+    //执行得到结果
+    List&lt;Users&gt; user = mapper.getUser();
+    for (Users users : user) {
+        System.out.println(users.getEmail());
+    }
+    //关闭连接
+    sqlSession.close();
+}
+</code></pre>
+</li>
+</ul>
+<h2 id="crud"><a class="header" href="#crud">CRUD</a></h2>
+<ul>
+<li>
+<p>namespace</p>
+<ul>
+<li>namespace中的包名要和Dao/mapper接口的包名一致</li>
+</ul>
+</li>
+<li>
+<p><strong>select</strong></p>
+<ul>
+<li>id：就是对应的namespace中的方法名</li>
+<li>resultType：sql语句执行的返回值</li>
+<li>paramterType：参数类型</li>
+<li>xml配置</li>
+</ul>
+<pre><code class="language-xml">&lt;select id=&quot;getUserById&quot; parameterType=&quot;int&quot; resultType=&quot;com.yang.pojo.Users&quot;&gt;
+    select * from users where users.userId = #{id}
+&lt;/select&gt;
+</code></pre>
+<ul>
+<li>代码</li>
+</ul>
+<pre><code class="language-java">@Test
+public void testGetUser(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    List&lt;Users&gt; user = mapper.getUser();
+    for (Users users : user) {
+        System.out.println(users.getEmail());
+    }
+    //关闭连接
+    sqlSession.close();
+}
+</code></pre>
+</li>
+<li>
+<p><strong>insert</strong></p>
+<ul>
+<li>xml配置</li>
+</ul>
+<pre><code class="language-xml">&lt;insert id=&quot;insertUser&quot; parameterType=&quot;com.yang.pojo.Users&quot;&gt;
+    insert into users (email, password) values (#{Email}, #{Password})
+&lt;/insert&gt;
+</code></pre>
+<ul>
+<li>代码</li>
+</ul>
+<pre><code class="language-java">@Test
+public void testInsertUser(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    HashMap&lt;String, Object&gt; hashMap = new HashMap&lt;&gt;();
+    Users users = new Users();
+    users.setEmail(&quot;fsafaefwea&quot;);
+    users.setPassword(&quot;fdsfsse&quot;);
+    int i = mapper.insertUser(users);
+    //提交事务
+    sqlSession.commit();
+    sqlSession.close();
+    System.out.println(&quot;修改&quot;+(i &gt; 0 ? &quot;成功！&quot; : &quot;失败！&quot;));
+}
+</code></pre>
+</li>
+<li>
+<p><strong>delete</strong></p>
+<ul>
+<li>xml配置</li>
+</ul>
+<pre><code class="language-xml">&lt;delete id=&quot;deleteUser&quot; parameterType=&quot;int&quot;&gt;
+    delete from users where users.userId = #{id}
+&lt;/delete&gt;
+</code></pre>
+<ul>
+<li>代码</li>
+</ul>
+<pre><code class="language-java">@Test
+public void testDeleteUser(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    HashMap&lt;String, Object&gt; hashMap = new HashMap&lt;&gt;();
+    int i = mapper.deleteUser(105);
+    //提交事务
+    sqlSession.commit();
+    sqlSession.close();
+    System.out.println(&quot;修改&quot;+(i &gt; 0 ? &quot;成功！&quot; : &quot;失败！&quot;));
+}
+</code></pre>
+</li>
+<li>
+<p><strong>update</strong></p>
+<ul>
+<li>xml配置</li>
+</ul>
+<pre><code class="language-xml">&lt;update id=&quot;updateUser&quot; parameterType=&quot;java.util.Map&quot;&gt;
+    update users set users.password = #{pwd}, users.email = #{email}
+    where users.userId = #{id}
+&lt;/update&gt;
+</code></pre>
+<ul>
+<li>代码</li>
+</ul>
+<pre><code class="language-java">@Test
+public void testUpdateUser(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    HashMap&lt;String, Object&gt; hashMap = new HashMap&lt;&gt;();
+    hashMap.put(&quot;pwd&quot;, &quot;123456&quot;);
+    hashMap.put(&quot;email&quot;, &quot;behappy@vip.sina.com&quot;);
+    hashMap.put(&quot;id&quot;, 1);
+    int i = mapper.updateUser(hashMap);
+    //提交事务
+    sqlSession.commit();
+    sqlSession.close();
+    System.out.println(&quot;修改&quot;+(i &gt; 0 ? &quot;成功！&quot; : &quot;失败！&quot;));
+}
+</code></pre>
+</li>
+<li>
+<p>注意：增删改需要提交事务</p>
+</li>
+<li>
+<p>假设,我们的实体类，或者数据库中的表，字段或者参数过多,我们应当考虑使用Map</p>
+</li>
+<li>
+<p>模糊查询</p>
+<ul>
+<li>xml配置</li>
+</ul>
+<pre><code class="language-xml">&lt;select id=&quot;getUserByFirstName&quot; parameterType=&quot;String&quot; resultType=&quot;com.yang.pojo.Users&quot;&gt;
+    select * from users where users.firstName like '%' #{id} '%'
+&lt;/select&gt;
+</code></pre>
+<ul>
+<li>代码</li>
+</ul>
+<pre><code class="language-java">@Test
+public void testGetUserByEmail(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    List&lt;Users&gt; a = mapper.getUserByFirstName(&quot;ia&quot;);
+    for (Users users : a) {
+        System.out.println(users.getFirstName() + &quot; &quot; + users.getLastName());
+    }
+    sqlSession.close();
+}
+</code></pre>
+</li>
+</ul>
+<h2 id="配置解析"><a class="header" href="#配置解析">配置解析</a></h2>
+<p><strong>核心配置文件</strong></p>
+<ul>
+<li>mybatis-config.xml</li>
+<li>MyBatis的配置文件包含了会深深影响MyBatis行为的设置和属性信息。</li>
+</ul>
+<pre><code class="language-xml">configuration (配置)
+properties (属性)
+settings (设置)
+typeAliases (类型别名)
+typeHandlers (类型处理器)
+objectFactory (对象工厂)
+plugins (插件)
+environments (环境配置)
+environment (环境变量)
+transactionManager (事务管理器)
+datasource (数据源)
+</code></pre>
+<h3 id="环境配置environments"><a class="header" href="#环境配置environments">环境配置(environments)</a></h3>
+<p>MyBatis可以配置成适应多种环境</p>
+<p>尽管可以配置多个环境，但每个SqlSessionFactory实例只能选择一种环境</p>
+<p>Mybatis默认的事务管理器就是JDBC，连接池: POOLED</p>
+<h3 id="属性-properties"><a class="header" href="#属性-properties">属性. (properties)</a></h3>
+<p>我们可以通过properties属性来实现引用配置:文件</p>
+<p>这些属性都是可外部配置且可动态替换的，既可以在典型的Java属性文件中配置,亦可通过properties元素的子元素来传递。[db.properties]</p>
+<ul>
+<li>编写一个配置文件</li>
+</ul>
+<pre><code class="language-properties">driver=com.mysql.cj.jdbc.Driver
+url=jdbc:mysql://localhost:3306/session1?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=Asia/Shanghai
+username=root
+password=112358
+</code></pre>
+<ul>
+<li>在核心配置文件中引入
+<ul>
+<li>properties标签必须在configuration标签内的最前面</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;properties resource=&quot;db.properties&quot;/&gt;
+</code></pre>
+<ul>
+<li>可以直接引入外部文件</li>
+<li>可以在其中增加一-些属性配置</li>
+<li>如果两个文件有同一个字段，优先使用外部配置文件的</li>
+</ul>
+<h3 id="类型别名typealiases"><a class="header" href="#类型别名typealiases">类型别名(typeAliases)</a></h3>
+<ul>
+<li>类型别名是为Java类型设置一 个短的名字。</li>
+<li>存在的意义仅在于用来减少类完全限定名的冗余。</li>
+</ul>
+<pre><code class="language-xml">&lt;typeAliases&gt;
+    &lt;typeAlias type=&quot;com.yang.pojo.Users&quot; alias=&quot;user&quot;/&gt;
+&lt;/typeAliases&gt;
+</code></pre>
+<ul>
+<li>也可以指定一个包名， MyBatis 会在包名下面搜索需要的Java Bean</li>
+<li>扫描实体类的包，它的默认别名就为这个类的类名，首字母小写</li>
+</ul>
+<pre><code class="language-xml">&lt;typeAliases&gt;
+    &lt;package name=&quot;com.yang.pojo&quot;/&gt;
+&lt;/typeAliases&gt;
+</code></pre>
+<ul>
+<li>在实体类比较少的时候，使用第一种方式。</li>
+<li>如果实体类十分多,建议使用第二种。</li>
+<li>第一种可以DIY别名，第二种则.不行，如果非要改，需要在实体.上增加注解</li>
+</ul>
+<pre><code class="language-xml">@Alias(&quot;别名&quot;)
+public class Users {
+}
+</code></pre>
+<h3 id="设置"><a class="header" href="#设置">设置</a></h3>
+<ul>
+<li>这是MyBatis中极为重要的调整设置，它们会改变MyBatis的运行时行为。</li>
+</ul>
+<h3 id="其他配置"><a class="header" href="#其他配置">其他配置</a></h3>
+<ul>
+<li>typeHandlers (类型处理器)</li>
+<li>objectFactory_ (对象工厂)</li>
+<li>plugins插件
+<ul>
+<li>mybatis-generator-core</li>
+<li>mybatis-plus</li>
+</ul>
+</li>
+<li>通用mapper</li>
+</ul>
+<h3 id="映射器mappers"><a class="header" href="#映射器mappers">映射器（mappers）</a></h3>
+<p>MapperRegistry:注册绑定我们的Mapper文件;</p>
+<ul>
+<li>方式一:</li>
+</ul>
+<pre><code class="language-xml">&lt;mappers&gt;
+    &lt;mapper resource=对应xml的路径/&gt;
+&lt;/mappers&gt;
+</code></pre>
+<ul>
+<li>方式二:使用class文件绑定注册
+<ul>
+<li>接口和他的Mapper配置文件必须同名</li>
+<li>接口和他的Mapper配置文件必须在同一一个包下</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;mappers&gt;
+    &lt;mapper class=对应类的全限定名/&gt;
+&lt;/mappers&gt;
+</code></pre>
+<ul>
+<li>方式三:使用扫描包进行注入绑定
+<ul>
+<li>和方式二需要注意的顶一样</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;mappers&gt;
+    &lt;package name=对应类的包名/&gt;
+&lt;/mappers&gt;
+</code></pre>
+<h2 id="生命周期和作用域"><a class="header" href="#生命周期和作用域">生命周期和作用域</a></h2>
+<p><img src="/assets/java/img/mybatis%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png" alt="mybatis生命周期" /></p>
+<p><strong>生命周期，和作用域，是至关重要的，因为错误的使用会导致非常严重的并发问题。</strong></p>
+<ul>
+<li>
+<p><strong>SqlSessionFactorybuilder</strong></p>
+<ul>
+<li>一旦创建了SqlSessionFactory, 就不再需要它了</li>
+<li>局部变量</li>
+</ul>
+</li>
+<li>
+<p><strong>SqISessionFactory</strong></p>
+<ul>
+<li>可以想象为数据库连接池</li>
+<li>SqlSessionFactory - -旦被创建就应该在应用的运行期间一直存在，没有任何理由丢弃它或重新创建另一个实例</li>
+<li>因此SqlSessionFactory的最佳作用域是应用作用域</li>
+<li>最简单的就是使用单例模式或者静态单例模式</li>
+</ul>
+</li>
+<li>
+<p><strong>SqlSession</strong></p>
+<ul>
+<li>连接到连接池的一一个请求</li>
+<li>SqlSession的实例不是线程安全的，因此是不能被共享的，所以它的最佳的作用域是请求或方法作用域</li>
+<li>用完之后需要赶紧关闭，否则资源被占用</li>
+</ul>
+</li>
+</ul>
+<p>**这里面的每一个Mapper, 就代表一个具体的业务 **</p>
+<h2 id="resultmap"><a class="header" href="#resultmap">ResultMap</a></h2>
+<p><strong>解决属性名和字段名不一致的问题</strong></p>
+<p>解决方法：</p>
+<ul>
+<li>起别名（在sql层面直接起别名）</li>
+<li>使用resultMap
+<ul>
+<li>resu1tMap元素是MyBatis中最重要最强大的元素</li>
+<li>ResultMap的设计思想是，对于简单的语句根本不需要配置显式的结果映射，而对于复杂-一点的语句只需要描述它们的关系就行了。</li>
+<li>ResultMap最优秀的地方在于，虽然你已经对它相当了解了，但是根本就不需要显式地用到他们。</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;resultMap id=&quot;mapId&quot; type=&quot;对应的实体类&quot;&gt;
+    &lt;!--        将实体类的字段名也数据库表的列名对应起来--&gt;
+    &lt;result column=&quot;数据库内的列名&quot; property=&quot;对应实体类的字段名&quot;/&gt;
+&lt;/resultMap&gt;
+</code></pre>
+<h2 id="日志"><a class="header" href="#日志">日志</a></h2>
+<h3 id="日志工厂"><a class="header" href="#日志工厂">日志工厂</a></h3>
+<p>如果一个数据库操作，出现了异常,我们需要排错。日志就是最好的助手!</p>
+<p>曾经: sout、 debug</p>
+<p>现在:日志工厂</p>
+<ul>
+<li>loglmpl（指定MyBatis所用日志的具体实现，未指定时将自动查找）
+<ul>
+<li>SLF4j</li>
+<li>LOG4J</li>
+<li>LOG4]2</li>
+<li>JDK_ LOGGING</li>
+<li>COMMONS_LOGGING</li>
+<li>STDOUT_LOGGING</li>
+<li>NO_LOGGING</li>
+</ul>
+</li>
+<li>在Mybatis中具体使用那个一日志实现，在设置中设定</li>
+<li><strong>STDOUT_ LOGGING标准日志输出</strong></li>
+<li>在mybatis核心配置文件中，配置我们的日志</li>
+<li>配置STDOUT_LOGGING为日志的实现</li>
+</ul>
+<pre><code class="language-xml">&lt;settings&gt;
+    &lt;setting name=&quot;logImpl&quot; value=&quot;STDOUT_LOGGING&quot;/&gt;
+&lt;/settings&gt;
+</code></pre>
+<h3 id="log4j"><a class="header" href="#log4j">LOG4J</a></h3>
+<ul>
+<li>
+<p>Log4j:</p>
+<ul>
+<li>Log4j是Apache的-一个开源项目，通过使用Log4j,我们可以控制日志信息输送的目的地是控制台、文件、GUI组件</li>
+<li>我们也可以控制每一条日志的输出格式;</li>
+<li>通过定义每一条日志信息的级别，我们能够更加细致地控制日志的生成过程。</li>
+<li>通过一一个配置文件来灵活地进行配置，而不需要修改应用的代码。</li>
+</ul>
+</li>
+<li>
+<p>导包</p>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;!-- https://mvnrepository.com/artifact/log4j/log4j --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;log4j&lt;/groupId&gt;
+    &lt;artifactId&gt;log4j&lt;/artifactId&gt;
+    &lt;version&gt;1.2.17&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ul>
+<li>log4j.properties</li>
+</ul>
+<pre><code class="language-properties">#将等级为DEBUG的日志信息输出到console和file这两个目的地，console 和file的定义在下面的代码
+1og4j.rootLogger=DEBUG,console,file
+#控制台输出的相关设置
+1og4j.appender.console = org.apache.log4j.ConsoleAppender
+1og4j.appender.console.Target = System.out
+1og4j.appender.console.Threshold=DEBUG
+1og4j.appender.console.layout=org.apache.1og4j.PatternLayout
+1og4j.appender.console.layout.ConversionPattern=[%c]-%m%n
+#文件输出的相关设置
+1og4j.appender.file = org.apache.log4j.RollingFileAppender
+1pg4j.appender.file.File=./log/yang.1og
+1og4j.appender.file.iaxFileSize=10mb 
+1og4j.appender.file.Threshold=DEBUG
+1og4j.appender.file.layout=org.apache.log4j.PatternLayout
+1og4j.appender.file.layout.ConversionPattern=[%p][%d{yy-MM-dd}][%c]%m%n
+#日志输出级别
+1og4j.logger.org.mybatis=DEBUG
+1og4j.logger.java.sq1=DEBUG
+1og4j.logger.java.sql.Statement=DEBUG
+1og4j.logger.java.sq1.ResultSet=DEBUG
+1og4j.logger.java.sq1.PreparedStatement=DEBUG
+</code></pre>
+<ul>
+<li>配置log4j为日志的实现</li>
+</ul>
+<pre><code class="language-xml">&lt;settings&gt;
+    &lt;setting name=&quot;logImpl&quot; value=&quot;LOG4J&quot;/&gt;
+&lt;/settings&gt;
+</code></pre>
+<ul>
+<li>获取logger对象使用该对象实现手动打印日志</li>
+</ul>
+<pre><code class="language-java">Logger logger = Logger.getLogger(类名.class);
+</code></pre>
+<h2 id="分页"><a class="header" href="#分页">分页</a></h2>
+<h3 id="使用limit进行分页"><a class="header" href="#使用limit进行分页">使用Limit进行分页</a></h3>
+<ul>
+<li>xml配置</li>
+</ul>
+<pre><code class="language-xml">&lt;select id=&quot;getUserLimit&quot; resultType=&quot;com.yang.pojo.Users&quot;&gt;
+    select * from users limit #{param1}, #{param2}
+&lt;/select&gt;
+</code></pre>
+<ul>
+<li>代码</li>
+</ul>
+<pre><code class="language-java">@Test
+public void testGetUserLimit(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    List&lt;Users&gt; user = mapper.getUserLimit(5, 5);
+    for (Users users : user) {
+        System.out.println(users.getUserId() + &quot;--&quot;+  users.getEmail());
+    }
+    //关闭连接
+    sqlSession.close();
+}
+</code></pre>
+<h3 id="parametertype多个参数的解决方法"><a class="header" href="#parametertype多个参数的解决方法">parameterType多个参数的解决方法</a></h3>
+<ul>
+<li>使用map封装</li>
+</ul>
+<pre><code class="language-xml">&lt;select id=&quot;getUserLimit2&quot; parameterType=&quot;map&quot; resultType=&quot;com.yang.pojo.Users&quot;&gt;
+    select * from users limit #{startIndex}, #{pageSize}
+&lt;/select&gt;
+</code></pre>
+<pre><code class="language-java">@Test
+public void testGetUserLimit2(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    HashMap&lt;String, Object&gt; map = new HashMap&lt;&gt;();
+    map.put(&quot;startIndex&quot;, 0);
+    map.put(&quot;pageSize&quot;, 5);
+    List&lt;Users&gt; user = mapper.getUserLimit2(map);
+    for (Users users : user) {
+        System.out.println(users.getUserId() + &quot;--&quot;+  users.getEmail());
+    }
+    //关闭连接
+    sqlSession.close();
+}
+</code></pre>
+<ul>
+<li>不写parameterType使用arg或param使用方式：
+<ul>
+<li>arg0，arg1，arg2 ……</li>
+<li>param1，param2，param3 ……</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;select id=&quot;getUserLimit&quot; resultType=&quot;com.yang.pojo.Users&quot;&gt;
+    select * from users limit #{param1}, #{param2}
+&lt;/select&gt;
+</code></pre>
+<pre><code class="language-java">@Test
+public void testGetUserLimit(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    List&lt;Users&gt; user = mapper.getUserLimit(5, 5);
+    for (Users users : user) {
+        System.out.println(users.getUserId() + &quot;--&quot;+  users.getEmail());
+    }
+    //关闭连接
+    sqlSession.close();
+}
+</code></pre>
+<ul>
+<li>xml转义字符</li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center"><code>&amp;lt;</code></th><th style="text-align: center">&lt;</th><th style="text-align: center">小于号</th></tr></thead><tbody>
+<tr><td style="text-align: center"><code>&amp;gt;</code></td><td style="text-align: center">&gt;</td><td style="text-align: center">大于号</td></tr>
+<tr><td style="text-align: center"><code>&amp;amp;</code></td><td style="text-align: center">&amp;</td><td style="text-align: center">和</td></tr>
+<tr><td style="text-align: center"><code>&amp;apos;</code></td><td style="text-align: center">’</td><td style="text-align: center">单引号</td></tr>
+<tr><td style="text-align: center"><code>&amp;quot;</code></td><td style="text-align: center">&quot;</td><td style="text-align: center">双引号</td></tr>
+</tbody></table>
+</div>
+<h3 id="使用rowbounds实现分页"><a class="header" href="#使用rowbounds实现分页">使用RowBounds实现分页</a></h3>
+<ul>
+<li>xml配置</li>
+</ul>
+<pre><code class="language-xml">&lt;select id=&quot;getUserByRowBounds&quot; resultType=&quot;com.yang.pojo.Users&quot;&gt;
+    select * from users
+&lt;/select&gt;
+</code></pre>
+<ul>
+<li>代码</li>
+</ul>
+<pre><code class="language-java">@Test
+public void getUserByRowBounds(){
+    List&lt;Users&gt; users = sqlSession.selectList(&quot;com.yang.dao.UserMapper.getUserByRowBounds&quot;, null, new RowBounds(5, 5));
+    for (Users user: users) {
+        System.out.println(user.getUserId() + &quot;--&quot;+  user.getEmail());
+    }
+    //关闭连接
+    sqlSession.close();
+}
+</code></pre>
+<h2 id="使用注解开发"><a class="header" href="#使用注解开发">使用注解开发</a></h2>
+<h3 id="面向接口编程"><a class="header" href="#面向接口编程">面向接口编程</a></h3>
+<ul>
+<li>
+<p>大家之前都学过面向对象编程，也学习过接口，但在真正的开发中，很多时候我们会选择面向接口编程</p>
+</li>
+<li>
+<p>根本原因: 解耦 ,可拓展,提高复用，分层开发中,上层不用管具体的实现,大家都遵守共同的标准,使得开发变得容易，规范性更好</p>
+</li>
+<li>
+<p>在一一个面向对象的系统中，系统的各种功能是由许许多多的不同对象协作完成的。在这种情况下，各个对象内部是如何实现自己的,对系统设计人员来讲就不那么重要了</p>
+</li>
+<li>
+<p>-各个对象之间的协作关系则成为系统设计的关键。小到不同类之间的通信，大到各模块之间的交互，在系统设计之初都是要着重考虑的,这也是系统设计的主要工作内容。面向接口编程就是指按照这种思想来编程</p>
+</li>
+<li>
+<p>关于接口的理解</p>
+<ul>
+<li>接口从更深层次的理解，应是定义(规范，约束)与实现(名实分离的原则)的分离</li>
+<li>接口的本身反映了系统设计人员对系统的抽象理解</li>
+<li>接口应有两类:
+<ul>
+<li>第一类是对一个个体的抽象，它可对应为-一个抽象体(abstract class)</li>
+<li>第二类是对一个个体某一-方 面的抽象，即形成一个抽象面(interface) </li>
+</ul>
+</li>
+<li>个体有可能有多个抽象面。抽象体与抽象面是有区别的</li>
+</ul>
+</li>
+<li>
+<p>三个面向区别</p>
+<ul>
+<li>面向对象是指，我们考虑问题时，以对象为单位,考虑它的属性及方法.</li>
+<li>面向过程是指,我们考虑问题时，以一个具体的流程(事务过程)为单位，考虑它的实现.</li>
+<li>接口设计与非接口设计是针对复用技术而言的，与面向对象(过程)不是一个问题.更多的体现就是对系统整体的架构.</li>
+</ul>
+</li>
+</ul>
+<h3 id="使用注解开发-1"><a class="header" href="#使用注解开发-1">使用注解开发</a></h3>
+<ul>
+<li>编写Mapper接口</li>
+</ul>
+<pre><code class="language-java">public interface UserMapper {
+    @Select(&quot;select * from users&quot;)
+    List&lt;Users&gt; getUser();
+}
+</code></pre>
+<ul>
+<li>在核心配置文件中绑定接口</li>
+</ul>
+<pre><code class="language-xml">&lt;mappers&gt;
+    &lt;mapper class=&quot;com.yang.mapper.UserMapper&quot;/&gt;
+&lt;/mappers&gt;
+</code></pre>
+<ul>
+<li>测试</li>
+</ul>
+<pre><code class="language-java">@Test
+public void testGetUser(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    List&lt;Users&gt; user = mapper.getUser();
+    for (Users users : user) {
+        System.out.println(users.getUserId() + &quot;--&quot; + users.getEmail());
+    }
+}
+</code></pre>
+<ul>
+<li>
+<p>缺点：</p>
+<ul>
+<li>无法使用ResultMap</li>
+<li>在sql参数较多时会很麻烦</li>
+</ul>
+</li>
+<li>
+<p>插入：@Insert(&quot;sql语句&quot;)</p>
+</li>
+<li>
+<p>修改：@Update(&quot;sql语句&quot;)</p>
+</li>
+<li>
+<p>删除：@Delete(&quot;sql语句&quot;)</p>
+</li>
+<li>
+<p>关于@Param()注解</p>
+<ul>
+<li>基本类型的参数或者String类型,需要加上</li>
+<li>引用类型不需要加</li>
+<li>如果只有一一个基本类型的话，可以忽略，但是建议大家都加上</li>
+<li>我们在SQL中弓|用的就是我们这里的@Param()中设定的属性名</li>
+</ul>
+</li>
+<li>
+<p>#{}和${}的区别就是Statement和PreparedStatement的区别</p>
+</li>
+</ul>
+<h2 id="一对多和多对一的处理"><a class="header" href="#一对多和多对一的处理">一对多和多对一的处理</a></h2>
+<h3 id="多对一"><a class="header" href="#多对一">多对一</a></h3>
+<ul>
+<li>按照查询嵌套处理</li>
+</ul>
+<pre><code class="language-xml">&lt;resultMap id=&quot;tsMap&quot; type=&quot;student&quot;&gt;
+&lt;!--    将该属性与表中的tid关联起来--&gt;
+&lt;!--    select 相当于查询跟tid关联的值赋给teacher属性--&gt;
+    &lt;association property=&quot;teacher&quot; javaType=&quot;teacher&quot; column=&quot;tid&quot; select=&quot;getTeacher&quot;/&gt;
+&lt;/resultMap&gt;
+&lt;select id=&quot;getStudent&quot; resultMap=&quot;tsMap&quot;&gt;
+    select * from student
+&lt;/select&gt;
+&lt;select id=&quot;getTeacher&quot; resultType=&quot;teacher&quot;&gt;
+    select * from teacher where id = #{id}
+&lt;/select&gt;
+</code></pre>
+<ul>
+<li>按照结果嵌套处理</li>
+</ul>
+<pre><code class="language-xml">&lt;resultMap id=&quot;tsMap&quot; type=&quot;student&quot;&gt;
+    &lt;result property=&quot;id&quot; column=&quot;sid&quot;/&gt;
+    &lt;result property=&quot;name&quot; column=&quot;sname&quot;/&gt;
+    &lt;!--    将该引用属性里面的属性与链表查询的值关联起来--&gt;
+    &lt;association property=&quot;teacher&quot; javaType=&quot;teacher&quot;&gt;
+        &lt;result property=&quot;name&quot; column=&quot;tname&quot;/&gt;
+        &lt;result property=&quot;id&quot; column=&quot;tid&quot;/&gt;
+    &lt;/association&gt;
+&lt;/resultMap&gt;
+&lt;select id=&quot;getStudent&quot; resultMap=&quot;tsMap&quot;&gt;
+    select s.id sid, s.name sname, t.id tid, t.name tname
+    from student s, teacher t where s.tid = t.id
+&lt;/select&gt;
+</code></pre>
+<h3 id="一对多"><a class="header" href="#一对多">一对多</a></h3>
+<ul>
+<li>按照查询嵌套处理</li>
+</ul>
+<pre><code class="language-xml">&lt;resultMap id=&quot;tsMap&quot; type=&quot;teacher&quot;&gt;
+    &lt;result property=&quot;id&quot; column=&quot;id&quot;/&gt;
+    &lt;!-- 将集合属性进行关联--&gt;
+    &lt;collection property=&quot;students&quot; javaType=&quot;java.util.ArrayList&quot; ofType=&quot;student&quot; column=&quot;id&quot; select=&quot;getStudents&quot;/&gt;
+&lt;/resultMap&gt;
+&lt;select id=&quot;getTeacher&quot; resultMap=&quot;tsMap&quot;&gt;
+    select * from teacher
+&lt;/select&gt;
+&lt;select id=&quot;getStudents&quot; resultType=&quot;student&quot;&gt;
+    select * from student where tid = #{tid}
+&lt;/select&gt;
+</code></pre>
+<ul>
+<li>按照结果嵌套处理</li>
+</ul>
+<pre><code class="language-xml">&lt;resultMap id=&quot;tsMap&quot; type=&quot;teacher&quot;&gt;
+    &lt;result property=&quot;id&quot; column=&quot;tid&quot;/&gt;
+    &lt;result property=&quot;name&quot; column=&quot;tname&quot;/&gt;
+    &lt;!-- 将集合属性进行关联--&gt;
+    &lt;collection property=&quot;students&quot; javaType=&quot;java.util.ArrayList&quot; ofType=&quot;student&quot;&gt;
+        &lt;result property=&quot;id&quot; column=&quot;sid&quot;/&gt;
+        &lt;result property=&quot;name&quot; column=&quot;sname&quot;/&gt;
+    &lt;/collection&gt;
+&lt;/resultMap&gt;
+&lt;select id=&quot;getTeacher&quot; resultMap=&quot;tsMap&quot;&gt;
+    select t.id tid, t.name tname, s.id sid, s.name sname
+    from teacher t, student s
+    where t.id = s.tid
+&lt;/select&gt;
+</code></pre>
+<h3 id="小结"><a class="header" href="#小结">小结</a></h3>
+<ul>
+<li>
+<p>关联- association[多对一]</p>
+</li>
+<li>
+<p>集合- collection [一对多]</p>
+</li>
+<li>
+<p>javaType &amp; ofType</p>
+<ul>
+<li>
+<p>JavaType用来指定实体类中属性的类型</p>
+</li>
+<li>
+<p>ofType用来指定映射到List或者集合中的pojo类型,泛型中的约束类型!</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="动态sql"><a class="header" href="#动态sql">动态sql</a></h2>
+<h3 id="if"><a class="header" href="#if">if</a></h3>
+<pre><code class="language-xml">&lt;if test=&quot;arg0 != null&quot;&gt;
+    `Date` = #{arg0}
+&lt;/if&gt;
+&lt;if test=&quot;arg1 != null&quot;&gt;
+    and `EconomyPrice` = #{arg1}
+&lt;/if&gt;
+&lt;if test=&quot;arg2 != null&quot;&gt;
+    and `Gate` = #{arg2}
+&lt;/if&gt;
+</code></pre>
+<h3 id="choosewhenotherwise"><a class="header" href="#choosewhenotherwise">choose，when，otherwise</a></h3>
+<ul>
+<li>就是switch，case，default</li>
+</ul>
+<pre><code class="language-xml">&lt;choose&gt;
+    &lt;when test=&quot;arg0 != null&quot;&gt;
+        `Date` = #{arg0}
+    &lt;/when&gt;
+    &lt;when test=&quot;arg1 != null&quot;&gt;
+        and `EconomyPrice` = #{arg1}
+    &lt;/when&gt;
+    &lt;when test=&quot;arg2 != null&quot;&gt;
+        and `Gate` = #{arg2}
+    &lt;/when&gt;
+    &lt;otherwise&gt;
+
+    &lt;/otherwise&gt;
+&lt;/choose&gt;
+</code></pre>
+<h3 id="setwhere"><a class="header" href="#setwhere">set，where</a></h3>
+<ul>
+<li>去除写动态sql时多余的符号或关键字</li>
+</ul>
+<h3 id="foreach"><a class="header" href="#foreach">foreach</a></h3>
+<pre><code class="language-xml">&lt;foreach collection=&quot;gates&quot; item=&quot;gate&quot;
+         open=&quot;`Gate` in (&quot; separator=&quot;,&quot; close=&quot;)&quot;&gt;
+    #{gate}
+&lt;/foreach&gt;
+</code></pre>
+<p><strong>动态SQL就是在拼接SQL语句，我们只要保证SQL的正确性，按照SQL的格式，去排列组合就可以了</strong></p>
+<p><strong>现在Mysq|中写出完整的SQL,再对应的去修改成为我们的动态SQL实现通用即可</strong></p>
+<h2 id="缓存"><a class="header" href="#缓存">缓存</a></h2>
+<h3 id="简介-1"><a class="header" href="#简介-1">简介</a></h3>
+<ul>
+<li>什么是缓存[ Cache ]
+<ul>
+<li>存在内存中的临时数据</li>
+<li>用户经常查询的数据放在缓存(内存)中，用户去查询数据就不用从磁盘上(关系型数据库数据文件)查询，从缓存中查询，从而提高查询效率，解决了高并发系统的性能问题</li>
+</ul>
+</li>
+<li>为什么使用缓存
+<ul>
+<li>减少和数据库的交互次数,减少系统开销，提高系统效率</li>
+</ul>
+</li>
+<li>什么样的数据能使用缓存?
+<ul>
+<li>经常查询并且不经常改变的数据</li>
+</ul>
+</li>
+</ul>
+<h3 id="mybatis缓存"><a class="header" href="#mybatis缓存">Mybatis缓存</a></h3>
+<ul>
+<li>
+<p>MyBatis包含一个非常强大的查询缓存特性,它可以非常方便地定制和配置缓存。缓存可以极大的提升查询效率。</p>
+</li>
+<li>
+<p>MyBatis系统中默认定义了两级缓存: - -级缓存和二级缓存</p>
+<ul>
+<li>
+<p>默认情况下，只有一 -级缓存开启。 (SqISession级别的缓存， 也称为本地缓存)</p>
+</li>
+<li>
+<p>二级缓存需要手动开启和配置， 他是基于namespace级别的缓存。</p>
+</li>
+<li>
+<p>为了提高扩展性，MyBatis定义了缓存接口Cache。 我们可以通过实现Cache接口来自定义二级缓存</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="一级缓存"><a class="header" href="#一级缓存">一级缓存</a></h3>
+<ul>
+<li>一级缓存也叫本地缓存:
+<ul>
+<li>sqlSession从开启到关闭前得查询得属性会被缓存</li>
+<li>与数据库同一次会话期间查询到的数据会放在本地缓存中</li>
+<li>以后如果需要获取相同的数据，直接从缓存中拿，没必须再去查询数据库</li>
+</ul>
+</li>
+</ul>
+<p><img src="/assets/java/img/%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98java-1597374138185.png" alt="一级缓存java" /></p>
+<ul>
+<li>两次查询实际上只查询了一次第二次输出从缓存里取数</li>
+</ul>
+<p><img src="/assets/java/img/%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98out-1597374084581.png" alt="一级缓存out" /></p>
+<ul>
+<li>缓存失效的情况: 
+<ul>
+<li>查询不同的东西</li>
+<li>增删改操作，可能会改变原来的数据，所以必定会刷新缓存!</li>
+<li>查询不同的Mapper.xml</li>
+<li>手动清理缓存：
+<ul>
+<li>在下一次查询时调用<code>sqlSession.clearCache()</code>方法</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>一级缓存默认是开启的， 只在一次SqlSession中有效, 也就是拿到连接到关闭连接这个区间段</strong></p>
+<p><strong>一级缓存就是一个map</strong></p>
+<h3 id="134-二级缓存"><a class="header" href="#134-二级缓存">13.4、 二级缓存</a></h3>
+<ul>
+<li>二级缓存也叫全局缓存，一级缓存作用域太低了，所以诞生了二级缓存</li>
+<li>基于namespace级别的缓存，一个名称空间，对应一个二级缓存;</li>
+<li>工作机制
+<ul>
+<li>一个会话查询一条数据，这个数据就会被放在当前会话的一级缓存中;</li>
+<li>如果当前会话关闭了，这个会话对应的一-级缓存就没了;但是我们想要的是，会话关闭了，- -级缓存中的数据被保存到二级缓存中;</li>
+<li>新的会话查询信息，就可以从二级缓存中获取内容;</li>
+<li>不同的mapper查出的数据会放在自己对应的缓存(map)中</li>
+</ul>
+</li>
+<li>在核心配置文件里显示开启二级缓存（默认已开启）</li>
+</ul>
+<pre><code class="language-xml">&lt;setting name=&quot;cacheEnabled&quot; value=&quot;true'&quot;/&gt;
+</code></pre>
+<ul>
+<li>在对应得mapper.xml文件内加入标签</li>
+</ul>
+<pre><code class="language-xml">&lt;!--    默认方式--&gt;
+&lt;cache/&gt;
+&lt;!--    自定义方式--&gt;
+&lt;cache eviction=&quot;FIFO&quot;
+       flushInterval=&quot;60000&quot;
+       size=&quot;512&quot;
+       readOnly=&quot;true&quot;/&gt;
+</code></pre>
+<p><img src="/assets/java/img/%E4%BA%8C%E7%BA%A7%E7%BC%93%E5%AD%98java.png" alt="二级缓存java" /></p>
+<p><img src="/assets/java/img/%E4%BA%8C%E7%BA%A7%E7%BC%93%E5%AD%98out-1597377652646.png" alt="二级缓存out" /></p>
+<ul>
+<li>注意：<strong>开启二级缓存对使用注解完成的sql方法无效</strong></li>
+<li><strong>需要缓存的类必须实现序列化接口</strong></li>
+<li>只要开启了二级缓存,在同一个Mapper下就有效</li>
+<li>所有的数据都会先放在一级缓存中</li>
+<li>只有当会话提交，或者关闭的时候，才会提交到二级缓冲中</li>
+</ul>
+<h2 id="缓存原理"><a class="header" href="#缓存原理">缓存原理</a></h2>
+<p><img src="/assets/java/img/%E7%BC%93%E5%AD%98%E5%8E%9F%E7%90%86.png" alt="缓存原理" /></p>
+<ul>
+<li>缓存顺序：
+<ol>
+<li>先看二级缓存中有没有</li>
+<li>再看一级缓存中有没有</li>
+<li>查询数据库</li>
+</ol>
+</li>
+</ul>
+<h2 id="自定义缓存"><a class="header" href="#自定义缓存">自定义缓存</a></h2>
+<p>Ehcache是一种广泛使用的开源Java分布式缓存。主要面向通用缓存</p>
+<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.mybatis.caches&lt;/groupId&gt;
+    &lt;artifactId&gt;mybatis-ehcache&lt;/artifactId&gt;
+    &lt;version&gt;1.1.0&lt; /version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ul>
+<li>在对应得=的mapper.xml文件内指定缓存的实现方式</li>
+</ul>
+<pre><code class="language-xml">&lt;cache type=&quot;org.mybatis.caches.ehcache.EhcacheCache&quot;/&gt;
+</code></pre>
+<ul>
+<li>编写ehcache配置文件ehcache.xml</li>
+</ul>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;ehcache xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:noNamespaceSchemaLocation=&quot;http://ehcache.org/ehcache.xsd&quot;
+         updateCheck=&quot;false&quot;&gt;
+
+    &lt;diskStore path=&quot;./tmpdir/Tmp_EhCache&quot;/&gt;
+
+    &lt;defaultCache
+                  eternal=&quot;false&quot;
+                  maxElementsInMemory=&quot;10000&quot;
+                  overflowToDisk=&quot;false&quot;
+                  diskPersistent=&quot;false&quot;
+                  timeToIdleSeconds=&quot;1800&quot;
+                  timeToLiveSeconds=&quot;259200&quot;
+                  memoryStoreEvictionPolicy=&quot;LRU&quot;/&gt;
+
+    &lt;cache
+           name=&quot;cloud_user&quot;
+           eternal=&quot;false&quot;
+           maxElementsInMemory=&quot;5000&quot;
+           overflowToDisk=&quot;false&quot;
+           diskPersistent=&quot;false&quot;
+           timeToIdleSeconds=&quot;1800&quot;
+           timeToLiveSeconds=&quot;1800&quot;
+           memoryStoreEvictionPolicy=&quot;LRU&quot;/&gt;
+&lt;/ehcache&gt;
+</code></pre>
+<p><img src="/assets/java/img/ehcache%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E.png" alt="ehcache配置说明" /></p>
+<h1 id="spring"><a class="header" href="#spring">Spring</a></h1>
+<h2 id="idea创建module跳language-level问题"><a class="header" href="#idea创建module跳language-level问题">idea创建module跳language level问题</a></h2>
+<pre><code class="language-xml">&lt;properties&gt;
+    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+    &lt;maven.compiler.source&gt;1.8&lt;/maven.compiler.source&gt;
+    &lt;maven.compiler.target&gt;1.8&lt;/maven.compiler.target&gt;
+&lt;/properties&gt;
+&lt;!-- 或在&lt;build&gt;标签里面添加--&gt;
+&lt;plugins&gt;
+    &lt;plugin&gt;
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+        &lt;version&gt;3.7.0&lt;/version&gt;
+        &lt;configuration&gt;
+            &lt;source&gt;1.8&lt;/source&gt;
+            &lt;target&gt;1.8&lt;/target&gt;
+        &lt;/configuration&gt;
+    &lt;/plugin&gt;
+&lt;/plugins&gt;
+</code></pre>
+<h2 id="xml文件骨架-1"><a class="header" href="#xml文件骨架-1">xml文件骨架</a></h2>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+      https://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
+
+&lt;/beans&gt;
+</code></pre>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+    xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
+
+    &lt;context:annotation-config/&gt;
+
+&lt;/beans&gt;
+</code></pre>
+<h2 id="简介-2"><a class="header" href="#简介-2">简介</a></h2>
+<ul>
+<li>
+<p>2002， 首次推出了Spring框架的雏形: interface21框架!</p>
+</li>
+<li>
+<p>Spring框架即以interface21框架为基础，经过重新设计，并不断丰富其内涵，于2004年3月24日发布了1.0正式版。</p>
+</li>
+<li>
+<p>Rod Johnson，Spring Framework创始人</p>
+</li>
+<li>
+<p>spring理念: 使现有的技术更加容易使用，本身是一 个大杂烩，整合了现有的技术框架!</p>
+</li>
+<li>
+<p>SSH : Struct2 + Spring + Hibernate</p>
+</li>
+<li>
+<p>SSM : SpringMvc + Spring + Mybatis</p>
+</li>
+<li>
+<p>文档：https://docs.spring.io/spring/docs/5.2.0.RELEASE/spring-framework-reference/core.html#spring-core</p>
+</li>
+<li>
+<p>官方下载地址: http://repo.spring.io/release/org/springframework/spring</p>
+</li>
+<li>
+<p>GitHub: https://github.com/spring:projects/spring-framework</p>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-webmvc&lt;/artifactId&gt;
+    &lt;version&gt;5.2.7.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;!--spring整合mybatis--&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-jdbc&lt;/artifactId&gt;
+    &lt;version&gt;5.2.7.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+
+</code></pre>
+<ul>
+<li>Spring是一 个开源的免费的框架(容器) </li>
+<li>Spring是一 个轻量级的、非入侵式的框架</li>
+<li>控制反转(IOC) ，面向切面编程(AOP) </li>
+<li>支持事务的处理, 对框架整合的支持</li>
+<li><strong>Spring就是一 个轻量级的控制反转(IOC) 和面向切面编程(AOP)的框架!</strong></li>
+</ul>
+<h3 id="组成"><a class="header" href="#组成">组成</a></h3>
+<p><img src="/assets/java/img/spring%E6%A8%A1%E5%9D%97.png" alt="spring模块" /></p>
+<ul>
+<li>扩展：
+<ul>
+<li>Spring Boot
+<ul>
+<li>一个快速开发的脚手架。</li>
+<li>基于SpringBoot可以快速的开发单个微服务。</li>
+<li>约定大于配置!</li>
+</ul>
+</li>
+<li>Spring Cloud
+<ul>
+<li>SpringCloud 是基于SpringBoot实现的。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>因为现在大多数公司都在使用SpringBoot进行快速开发,学习SpringBoot的前提， 需要完全掌握Spring及SpringMVC</li>
+</ul>
+<h2 id="ioc理论"><a class="header" href="#ioc理论">IOC理论</a></h2>
+<ol>
+<li>UserDao接口</li>
+<li>UserDaoImpl实现类</li>
+<li>UserService接口</li>
+<li>UserServiceImpl业务实现类</li>
+</ol>
+<p>在我们之前的业务中,用户的需求可能会影响我们原来的代码，我们需要根据用户的需求去修改原代码!如果程序代码量十分大，修改一次的成本代价十分昂贵!</p>
+<p>使用set注入属性将将控制器交到用户手上用户向调用那个UserDao实现类直接在UserServiceImpl里面设置就行了</p>
+<pre><code class="language-java">private UserDao userDao;
+//使用set实现属性的注入
+public void setUserDao(UserDao userDao) {
+    this.userDao = userDao;
+}
+</code></pre>
+<p>降低耦合性</p>
+<p><img src="/assets/java/img/ioc.png" alt="ioc" /></p>
+<blockquote>
+<p><strong>IOC</strong></p>
+</blockquote>
+<ul>
+<li>控制反转loC(Inversion of Control),是一种设计思想，DI(依赖注入)是实现IoC的一种方法，也有人认为DI只是IoC的另一种说法。没有IoC的程序中，我们使用面向对象编程， 对象的创建与对象间的依赖关系完全硬编码在程序中，对象的创建由程序自己控制，控制反转后将对象的创建转移给第三方，个人认为所谓控制反转就是:获得依赖对象的方式反转了。</li>
+<li>采用XML方式配置Bean的时候，Bean的定义信息 是和实现分离的，而采用注解的方式可以把两者合为一体，Bean的定义信息直接以注解的形式定义在实现类中，从而达到了零配置的目的。</li>
+<li><strong>控制反转是一种通过描述(XML或注解)并通过第三方去生产或获取特定对象的方式。在Spring中实现控制反转的是IoC容器，其实现方法是依赖注入(Dependency Injection,DI)</strong></li>
+</ul>
+<h3 id="spring实现对象的托管"><a class="header" href="#spring实现对象的托管">spring实现对象的托管</a></h3>
+<ul>
+<li>编写实体类gettersetter方法</li>
+</ul>
+<pre><code class="language-java">public class Hello {
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;Hello{&quot; +
+            &quot;name='&quot; + name + '\'' +
+            '}';
+    }
+}
+</code></pre>
+<ul>
+<li>编写bean.xml文件</li>
+</ul>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+                           https://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
+    &lt;!--    使用bean标签对对象进行托管--&gt;
+    &lt;bean id=&quot;hello&quot; class=&quot;com.yang.pojo.Hello&quot;&gt;
+        &lt;!--        初始化属性的值--&gt;
+        &lt;property name=&quot;name&quot; value=&quot;hello java&quot;/&gt;
+    &lt;/bean&gt;
+&lt;/beans&gt;
+</code></pre>
+<ul>
+<li>测试</li>
+</ul>
+<pre><code class="language-java">@Test
+public void test02(){
+    //创建ClassPathXmlApplicationContext读取beans.xml文件
+    ApplicationContext context = new ClassPathXmlApplicationContext(&quot;beans.xml&quot;);
+    //调用getBean(&quot;id&quot;)方法获取托管的对象
+    Hello hello = context.getBean(&quot;hello&quot;, Hello.class);
+    System.out.println(hello);
+}
+</code></pre>
+<ul>
+<li>使用bean标签托管的对象默认使用单例模式创建，就是同一个id获取到的对象是同一个对象</li>
+</ul>
+<pre><code class="language-java">//创建ClassPathXmlApplicationContext读取beans.xml文件
+ApplicationContext context = new ClassPathXmlApplicationContext(&quot;beans.xml&quot;);
+//调用getBean(&quot;id&quot;)方法获取托管的对象
+Hello hello1 = context.getBean(&quot;hello&quot;, Hello.class);
+Hello hello2 = context.getBean(&quot;hello&quot;, Hello.class);
+System.out.println(hello1 == hello2);//true
+</code></pre>
+<ul>
+<li>
+<p>Hello对象是谁创建的?</p>
+<ul>
+<li>hello对象是由Spring创建的</li>
+</ul>
+</li>
+<li>
+<p>Hello对象的属性是怎么设置的?</p>
+<ul>
+<li>hello对象的属性是由Spring容器设置的,</li>
+</ul>
+</li>
+<li>
+<p>这个过程就叫控制反转:</p>
+<ul>
+<li>控制：谁来控制对象的创建,传统应用程序的对象是由程序本身控制创建的,使用Spring后,对象是由Spring来创建的.</li>
+<li>反转：程序本身不创建对象,而变成被动的接收对象.</li>
+</ul>
+</li>
+<li>
+<p>依赖注入:就是利用set方法来进行注入的.</p>
+</li>
+<li>
+<p>IOC是一种编程思想,由主动的编程变成被动的接收.</p>
+</li>
+<li>
+<p>可以通过newClassPathXmlApplicationContext去浏览一下底层源码 .</p>
+</li>
+<li>
+<p>,我们彻底不用再程序中去改动了,要实现不同的操作,只需要在xml配置文件中进行修改，IOC：对象由Spring来创建,管理,装配!</p>
+</li>
+</ul>
+<h2 id="ioc创建对象的方式"><a class="header" href="#ioc创建对象的方式">IOC创建对象的方式</a></h2>
+<ul>
+<li>使用无参构造 默认</li>
+<li>使用有参构造</li>
+</ul>
+<pre><code class="language-xml">&lt;!-- 使用下标--&gt;
+&lt;bean id=&quot;user&quot; class=&quot;com.yang.pojo.User&quot; scope=&quot;prototype&quot;&gt;
+    &lt;constructor-arg name=&quot;0&quot; value=&quot;张三&quot;/&gt;
+    &lt;constructor-arg name=&quot;1&quot; value=&quot;18&quot;/&gt;    
+&lt;/bean&gt;
+&lt;!-- 使用参数名--&gt;
+&lt;bean id=&quot;user&quot; class=&quot;com.yang.pojo.User&quot; scope=&quot;prototype&quot;&gt;
+    &lt;constructor-arg name=&quot;name&quot; value=&quot;张三&quot;/&gt;
+    &lt;constructor-arg name=&quot;age&quot; value=&quot;18&quot;/&gt;    
+&lt;/bean&gt;
+&lt;!-- 使用参数类型--&gt;
+&lt;bean id=&quot;user&quot; class=&quot;com.yang.pojo.User&quot; scope=&quot;prototype&quot;&gt;
+    &lt;constructor-arg name=&quot;java.lang.String&quot; value=&quot;张三&quot;/&gt;
+    &lt;constructor-arg name=&quot;int&quot; value=&quot;18&quot;/&gt;    
+&lt;/bean&gt;
+</code></pre>
+<ul>
+<li>在配置文件加载的时候，容器中管理的对象就已经初始化了!</li>
+</ul>
+<h2 id="spring配置"><a class="header" href="#spring配置">Spring配置</a></h2>
+<h3 id="别名"><a class="header" href="#别名">别名</a></h3>
+<pre><code class="language-xml">&lt;!-- bean的name标签也可以取别名，并且可以一次取多个别名--&gt;
+&lt;bean id=&quot;user&quot; class=&quot;com.yang.pojo.User&quot; scope=&quot;prototype&quot;
+      name=&quot;别名1,别名2,……&quot;&gt;
+    &lt;property name=&quot;name&quot; value=&quot;张三&quot;/&gt;	
+    &lt;property name=&quot;age&quot; value=&quot;18&quot;/&gt;
+&lt;/bean&gt;
+&lt;!--取别名--&gt;
+&lt;alias name=&quot;user&quot; alias=&quot;别名&quot;/&gt;
+</code></pre>
+<h3 id="import"><a class="header" href="#import">import</a></h3>
+<ul>
+<li>这个import,一般用于团队开发使用，他可以将多个配置文件，导入合并为-一个</li>
+<li>假设，现在项目中有多个人开发,这三个人复制不同的类开发,不同的类需要注册在不同的bean中，我们可以利</li>
+<li>用import将所有人的beans.xml合并为一个总的!</li>
+<li>applicationContext.xml文件里面导入其他文件</li>
+</ul>
+<pre><code class="language-xml">&lt;import resource=&quot;beans.xm1&quot;/&gt;
+&lt;import resource=&quot;beans2.xm]&quot;/&gt;
+&lt;import resource=&quot;beans3.xm1&quot;/&gt;
+</code></pre>
+<ul>
+<li>使用的时候，直接使用总的配置就可以了</li>
+</ul>
+<h2 id="依赖注入"><a class="header" href="#依赖注入">依赖注入</a></h2>
+<h3 id="构造器注入上面"><a class="header" href="#构造器注入上面">构造器注入（上面）</a></h3>
+<h3 id="set注入"><a class="header" href="#set注入">set注入</a></h3>
+<ul>
+<li>复杂注入：</li>
+<li>java类</li>
+</ul>
+<pre><code class="language-java">public class Student {
+    private String name;
+    private int age;
+    private Address address;
+    private List&lt;Integer&gt; is;
+    private Set&lt;String&gt; ss;
+    private Map&lt;String, Integer&gt; ms;
+    private int[] ins;
+    ……getter和setter方法
+}
+public class Address {
+    private String home;
+    private List&lt;String&gt; v2;
+    ……getter和setter方法
+}
+</code></pre>
+<ul>
+<li>xml</li>
+</ul>
+<pre><code class="language-xml">&lt;!--    address注入--&gt;
+&lt;bean id=&quot;address&quot; class=&quot;com.yang.pojo.Address&quot;&gt;
+    &lt;property name=&quot;home&quot; value=&quot;湖北&quot;/&gt;
+    &lt;property name=&quot;v2&quot;&gt;
+        &lt;list value-type=&quot;java.lang.String&quot;&gt;
+            &lt;value&gt;wqew&lt;/value&gt;
+            &lt;value&gt;wqeweww&lt;/value&gt;
+            &lt;value&gt;wqrewew&lt;/value&gt;
+        &lt;/list&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+&lt;!--    student注入--&gt;
+&lt;bean id=&quot;student&quot; class=&quot;com.yang.pojo.Student&quot;&gt;
+    &lt;property name=&quot;name&quot; value=&quot;小明&quot;/&gt;
+    &lt;property name=&quot;age&quot; value=&quot;18&quot;/&gt;
+    &lt;property name=&quot;address&quot; ref=&quot;address&quot;/&gt;
+    &lt;property name=&quot;is&quot;&gt;
+        &lt;list value-type=&quot;java.lang.Integer&quot;&gt;
+            &lt;value&gt;43&lt;/value&gt;
+            &lt;value&gt;4232&lt;/value&gt;
+            &lt;value&gt;44&lt;/value&gt;
+        &lt;/list&gt;
+    &lt;/property&gt;
+    &lt;property name=&quot;ins&quot;&gt;
+        &lt;array&gt;
+            &lt;value&gt;34&lt;/value&gt;
+            &lt;value&gt;3767&lt;/value&gt;
+            &lt;value&gt;376564&lt;/value&gt;
+            &lt;value&gt;3435434&lt;/value&gt;
+        &lt;/array&gt;
+    &lt;/property&gt;
+    &lt;property name=&quot;ss&quot;&gt;
+        &lt;set value-type=&quot;java.lang.String&quot;&gt;
+            &lt;value&gt;weqwq&lt;/value&gt;
+            &lt;value&gt;weqwqerwer&lt;/value&gt;
+            &lt;value&gt;weqrrewrewrwrewq&lt;/value&gt;
+        &lt;/set&gt;
+    &lt;/property&gt;
+    &lt;property name=&quot;ms&quot;&gt;
+        &lt;map key-type=&quot;java.lang.String&quot; value-type=&quot;java.lang.Integer&quot;&gt;
+            &lt;entry key=&quot;a&quot;&gt;
+                &lt;value&gt;44&lt;/value&gt;
+            &lt;/entry&gt;
+            &lt;entry key=&quot;b&quot;&gt;
+                &lt;value&gt;4324&lt;/value&gt;
+            &lt;/entry&gt;
+&lt;!--            &lt;entry key=&quot;a&quot; value=&quot;44&quot;/&gt;--&gt;
+&lt;!--            &lt;entry key=&quot;b&quot; value=&quot;4324&quot;/&gt;--&gt;
+        &lt;/map&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+</code></pre>
+<ul>
+<li>
+<p>map和properties的注入方式：</p>
+<ul>
+<li>map：</li>
+</ul>
+<pre><code class="language-xml">&lt;map key-type=&quot;java.lang.String&quot; value type=&quot;java.lang.Integer&quot;&gt;
+&lt;/map&gt;
+&lt;entry key=&quot;键&quot;&gt;
+    &lt;value&gt;值&lt;/value&gt;
+&lt;/entry&gt;
+&lt;entry key=&quot;键&quot; value=&quot;值&quot;/&gt;
+</code></pre>
+<ul>
+<li>properties:</li>
+</ul>
+<pre><code class="language-xml">&lt;props&gt;
+    &lt;prop key=&quot;键&quot;&gt;值&lt;/prop&gt;
+    &lt;prop key=&quot;键&quot;&gt;值&lt;/prop&gt;
+    &lt;prop key=&quot;键&quot;&gt;值&lt;/prop&gt;
+&lt;/props&gt;
+</code></pre>
+</li>
+</ul>
+<h3 id="拓展方式注入"><a class="header" href="#拓展方式注入">拓展方式注入</a></h3>
+<ul>
+<li>
+<p>必须导入xml约束（在bean标签内导入）</p>
+<ul>
+<li>p：xmlns:p=&quot;http://www.springframework.org/schema/p&quot;</li>
+<li>c：xmlns:c=&quot;http://www.springframework.org/schema/c&quot;</li>
+</ul>
+</li>
+<li>
+<p>p命名空间：</p>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;!--p命名空间注入--&gt;
+&lt;bean id=&quot;user&quot; class=&quot;com.yang.pojo.User&quot; p:name=&quot;张三&quot; p:age=&quot;18&quot;/&gt;
+</code></pre>
+<ul>
+<li>c命名空间：</li>
+</ul>
+<pre><code class="language-xml">&lt;!--c命名空间注入--&gt;
+&lt;bean id=&quot;user3&quot; class=&quot;com.yang.pojo.User&quot; c:name=&quot;张三&quot; c:age=&quot;18&quot;/&gt;
+</code></pre>
+<h3 id="bean的作用域"><a class="header" href="#bean的作用域">bean的作用域</a></h3>
+<p><img src="/assets/java/img/bean%E4%BD%9C%E7%94%A8%E5%9F%9F.png" alt="bean作用域" /></p>
+<ul>
+<li>
+<p>singleton：单例模式</p>
+<ul>
+<li>默认开启</li>
+<li>使用getbean()获取到的对象都是一个对象</li>
+</ul>
+<pre><code class="language-xml">&lt;!--    可以显示开启--&gt;
+&lt;bean name=&quot;user&quot; class=&quot;com.yang.pojo.User&quot; scope=&quot;singleton&quot;&gt;
+    &lt;property name=&quot;name&quot; value=&quot;张三&quot;/&gt;
+    &lt;property name=&quot;age&quot; value=&quot;18&quot;/&gt;
+&lt;/bean&gt;
+</code></pre>
+</li>
+<li>
+<p>prototype：原型模式</p>
+<ul>
+<li>使用getbean()获取到的对象相当于new一个对象</li>
+</ul>
+<pre><code class="language-xml">&lt;bean name=&quot;user&quot; class=&quot;com.yang.pojo.User&quot; scope=&quot;prototype&quot;&gt;
+    &lt;property name=&quot;name&quot; value=&quot;张三&quot;/&gt;
+    &lt;property name=&quot;age&quot; value=&quot;18&quot;/&gt;
+&lt;/bean&gt;
+</code></pre>
+</li>
+<li>
+<p>request、session、 application、 这些个只能在web开发中使用到</p>
+</li>
+</ul>
+<h2 id="bean的自动装配"><a class="header" href="#bean的自动装配">bean的自动装配</a></h2>
+<ul>
+<li>
+<p>autowire</p>
+<ul>
+<li>byName：根据容器类的id查找跟该属性名相同的bean	</li>
+<li>使用byname的时候，需要保证所有bean的id唯一， 并且这个bean需要和自动注入的属性的set方法的值一致!</li>
+</ul>
+<pre><code class="language-xml">&lt;bean id=&quot;dog&quot; class=&quot;com.yang.pojo.Dog&quot; p:name=&quot;小黑&quot;/&gt;
+&lt;bean id=&quot;cat&quot; class=&quot;com.yang.pojo.Cat&quot; p:name=&quot;小花&quot;/&gt;
+&lt;bean id=&quot;people&quot; class=&quot;com.yang.pojo.People&quot; p:name=&quot;小明&quot; autowire=&quot;byName&quot;/&gt;
+</code></pre>
+<ul>
+<li>byType：查找容器内的bean的类型是否符该属性的类型相同，相同则装配</li>
+<li>使用bytype的时候，需要保证所有bean的class唯一 , 并且这个bean需要和自动注入的属性的类型一致!</li>
+</ul>
+<pre><code class="language-xml">&lt;bean id=&quot;dog&quot; class=&quot;com.yang.pojo.Dog&quot; p:name=&quot;小黑&quot;/&gt;
+&lt;bean id=&quot;cat&quot; class=&quot;com.yang.pojo.Cat&quot; p:name=&quot;小花&quot;/&gt;
+&lt;bean id=&quot;people&quot; class=&quot;com.yang.pojo.People&quot; p:name=&quot;小明&quot; autowire=&quot;byName&quot;/&gt;
+</code></pre>
+<ul>
+<li>
+<h5 id="使用注解实现自动装配"><a class="header" href="#使用注解实现自动装配">使用注解实现自动装配</a></h5>
+<ul>
+<li>导入约束，配置注解的支持：</li>
+</ul>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+    xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
+
+    &lt;context:annotation-config/&gt;
+
+&lt;/beans&gt;
+</code></pre>
+<ul>
+<li>@Autowired
+<ul>
+<li>required属性：指定为false说明该字段可以为空</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-java">public class People {
+    private String name;
+    @Autowired
+    private Dog dog;
+    @Autowired
+    private Cat cat;
+}
+</code></pre>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
+    &lt;context:annotation-config/&gt;
+    &lt;bean id=&quot;dog&quot; class=&quot;com.yang.pojo.Dog&quot;/&gt;
+    &lt;bean id=&quot;cat&quot; class=&quot;com.yang.pojo.Cat&quot;/&gt;
+    &lt;bean id=&quot;people&quot; class=&quot;com.yang.pojo.People&quot;/&gt;
+&lt;/beans&gt;
+</code></pre>
+<ul>
+<li>如果@Autowired自动装配的环境比较复杂，自动装配无法通过一个注解[@Autowired] 完成的时候、我们可以</li>
+<li>使用@Qualifier(value=&quot;xx&quot;)去配置@Autowired的使用，指定一个唯一 的bean对象注入!</li>
+</ul>
+<pre><code class="language-java">public class People {
+    private String name;
+    @Autowired
+    @Qualifier(&quot;dog&quot;)
+    private Dog dog;
+    @Autowired
+    @Qualifier(&quot;cat&quot;)
+    private Cat cat;
+}
+</code></pre>
+<ul>
+<li>java自带的@Resources注解也可以使用这个注解相当于@Autowired+@Qualifier(value=&quot;xx&quot;)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="使用注解开发-2"><a class="header" href="#使用注解开发-2">使用注解开发</a></h2>
+<h5 id="在spring4之后要使用注解开发必须要保证aop的包导入了"><a class="header" href="#在spring4之后要使用注解开发必须要保证aop的包导入了">在Spring4之后，要使用注解开发，必须要保证aop的包导入了</a></h5>
+<h5 id="使用注解需要导入context约束增加注解的支持"><a class="header" href="#使用注解需要导入context约束增加注解的支持">使用注解需要导入context约束,增加注解的支持!</a></h5>
+<ul>
+<li>
+<p>bean</p>
+</li>
+<li>
+<p>属性如何注入</p>
+<ul>
+<li>在类上面加@Component注解</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-java">@Component
+public class People {
+    private String name;
+    private Dog dog;
+    private Cat cat;
+}
+</code></pre>
+<ul>
+<li>
+<p>衍生的注解</p>
+<ul>
+<li>@Component有几个衍生注解, 我们在web开发中，会按照mvc三层架构分层
+<ul>
+<li>dao [@Repository]</li>
+<li>service[ @Service]</li>
+<li>controller [ @Controller ]</li>
+</ul>
+</li>
+<li>这四个注解功能都是一 样的，都是代表将某个类注册到Spring中，装配Bean</li>
+</ul>
+</li>
+<li>
+<p>自动装配置</p>
+<ul>
+<li>@Autowired</li>
+<li>@Qualifier(&quot;&quot;)</li>
+</ul>
+</li>
+<li>
+<p>作用域</p>
+<ul>
+<li>@Scope(&quot;模式&quot;)</li>
+</ul>
+<pre><code class="language-java">@Component
+@Scope(&quot;prototype&quot;)
+public class People {
+    private String name;
+    private Dog dog;
+    private Cat cat;
+}
+</code></pre>
+</li>
+<li>
+<p>小结</p>
+<ul>
+<li>
+<p>xml与注解:</p>
+<ul>
+<li>xml更加万能，适用于任何场合!维护简单方便</li>
+<li>注解不是自己类使用不了，维护相对复杂!</li>
+</ul>
+</li>
+<li>
+<p>xml与注解最佳实践: </p>
+<ul>
+<li>xml用来管理bean;</li>
+<li>注解只负责完成属性的注入;</li>
+<li>我们在使用的过程中，只需要注意一个问题: 必须让注解生效，就需要开启注解的支持</li>
+</ul>
+<pre><code class="language-xml">&lt;context:component-scan base-package=&quot;包名&quot;/&gt;
+&lt;context:annotation-config/&gt;
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="使用java的方式配置spring"><a class="header" href="#使用java的方式配置spring">使用Java的方式配置Spring</a></h2>
+<h5 id="我们现在要完全不使用spring的xml配置了全权交给java来做"><a class="header" href="#我们现在要完全不使用spring的xml配置了全权交给java来做">我们现在要完全不使用Spring的xml配置了，全权交给Java来做!</a></h5>
+<h5 id="javaconfig是spring的一-个子项目在spring4之后-它成为了一个核心功能"><a class="header" href="#javaconfig是spring的一-个子项目在spring4之后-它成为了一个核心功能">JavaConfig是Spring的一-个子项目，在Spring4之后, 它成为了一个核心功能!</a></h5>
+<pre><code class="language-java">@Configuration
+//扫描包
+@ComponentScan(&quot;com.yang.pojo&quot;)
+//合并两个Configuration配置类
+@Import(CustomConfig2.class)
+public class CustomConfig {
+    @Bean
+    public User user(){
+        return new User();
+    }
+}
+</code></pre>
+<h2 id="aop"><a class="header" href="#aop">AOP</a></h2>
+<p>AOP (Aspect Oriented Programming)意为:面向切面编程，通过预编译方式和运行期动态代理实现程序功能的统- -维护的一种技术。AOP是OOP的延续,是软件开发中的一个热点，也是Spring框架中的一个重要内容,是函数式编程的一种衍生范型。利用AOP可以对业务逻辑的各个部分进行隔离，从而使得业务逻辑各部分之间的耦合度降低，提高程序的可重用性，同时提高了开发的效率。</p>
+<h3 id="aop在spring中的作用"><a class="header" href="#aop在spring中的作用">AOP在Spring中的作用</a></h3>
+<h5 id="提供声明式事务允许用户自定义切面"><a class="header" href="#提供声明式事务允许用户自定义切面">提供声明式事务允许用户自定义切面</a></h5>
+<ul>
+<li>横切关注点:跨越应用程序多个模块的方法或功能。即是，与我们业务逻辑无关的，但是我们需要关注的部‘分，就是横切关注点。如日志，安全,缓存,事务等等...</li>
+<li>切面(ASPECT) :横切关注点被模块化的特殊对象。即，它是一-个类。</li>
+<li>通知(Advice) :切面必须要完成的工作。即，它是类中的-一个方法。</li>
+<li>目标(Target) :被通知对象。</li>
+<li>代理(Proxy) :向目标对象应用通知之后创建的对象。</li>
+<li>切入点(PointCut) :切面通知执行的“地点&quot;的定义。</li>
+<li>连接点(JointPoint) :与切入点匹配的执行点。</li>
+</ul>
+<p><img src="/assets/java/img/aop.png" alt="aop" /></p>
+<h3 id="使用spring实现aop"><a class="header" href="#使用spring实现aop">使用Spring实现Aop</a></h3>
+<p>导包</p>
+<pre><code class="language-xml">&lt;!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.aspectj&lt;/groupId&gt;
+    &lt;artifactId&gt;aspectjweaver&lt;/artifactId&gt;
+    &lt;version&gt;1.9.5&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<h4 id="使用spring的api接口实现"><a class="header" href="#使用spring的api接口实现">使用spring的api接口实现</a></h4>
+<ul>
+<li>编写service层</li>
+</ul>
+<pre><code class="language-java">//接口
+public interface UserService {
+    void add();
+    void update();
+    void select();
+    void delete();
+}
+//实现类
+public class UserServiceImpl implements UserService {
+    @Override
+    public void add() {
+        System.out.println(&quot;添加了一个用户&quot;);
+    }
+    @Override
+    public void update() {
+        System.out.println(&quot;修改了一个用户&quot;);
+    }
+    @Override
+    public void select() {
+        System.out.println(&quot;查询了一个用户&quot;);
+    }
+    @Override
+    public void delete() {
+        System.out.println(&quot;删除了一个用户&quot;);
+    }
+}
+</code></pre>
+<ul>
+<li>编写日志类
+<ul>
+<li>前置日志实现MethodBeforeAdvice接口，在该方法执行前执行</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-java">public class Log  implements MethodBeforeAdvice {
+    @Override
+    public void before(Method method, Object[] objects, Object o) throws Throwable {
+        System.out.println(method.getName()+&quot; is start to invoked!&quot;);
+    }
+}
+</code></pre>
+<ul>
+<li>后置日志实现AfterReturningAdvice，在该方法执行后执行</li>
+</ul>
+<pre><code class="language-java">public class AfterLog implements AfterReturningAdvice {
+    @Override
+    public void afterReturning(Object returnValue, Method method, Object[] args, Object target) throws Throwable {
+        System.out.println(method.getName()+&quot; is invoked! result is: &quot; + returnValue);
+    }
+}
+</code></pre>
+<ul>
+<li>编写xml文件注册bean</li>
+</ul>
+<pre><code class="language-xml">&lt;bean id=&quot;userService&quot; class=&quot;com.yang.service.UserServiceImpl&quot;/&gt;
+&lt;bean id=&quot;log&quot; class=&quot;com.yang.log.Log&quot;/&gt;
+&lt;bean id=&quot;afterLog&quot; class=&quot;com.yang.log.AfterLog&quot;/&gt;
+</code></pre>
+<ul>
+<li>在xml文件内加入<code>&lt;aop:config&gt;</code>标签，实现对类进行切面编程</li>
+</ul>
+<pre><code class="language-xml">&lt;aop:config&gt;
+    &lt;aop:pointcut id=&quot;point&quot; expression=&quot;execution(* com.yang.service.UserService.*(..))&quot;/&gt;
+    &lt;aop:advisor advice-ref=&quot;log&quot; pointcut-ref=&quot;point&quot;/&gt;
+    &lt;aop:advisor advice-ref=&quot;afterLog&quot; pointcut-ref=&quot;point&quot;/&gt;
+&lt;/aop:config&gt;
+</code></pre>
+<h4 id="自定义方式实现aop"><a class="header" href="#自定义方式实现aop">自定义方式实现AOP</a></h4>
+<ul>
+<li>编写自定义切面类</li>
+</ul>
+<pre><code class="language-java">public class CustomLog {
+    public void before(){
+        System.out.println(&quot;方法执行前&quot;);
+    }
+    public void after(){
+        System.out.println(&quot;方法执行后&quot;);
+    }
+}
+</code></pre>
+<ul>
+<li>在xml文件里面注册</li>
+</ul>
+<pre><code class="language-xml">&lt;bean id=&quot;customLog&quot; class=&quot;com.yang.custom.CustomLog&quot;/&gt;
+</code></pre>
+<ul>
+<li>xml文件里面添加<code>&lt;aop:config&gt;</code>标签</li>
+</ul>
+<pre><code class="language-xml">&lt;aop:config&gt;
+    &lt;aop:aspect ref=&quot;customLog&quot;&gt;
+        &lt;aop:pointcut id=&quot;userServicePoint&quot; expression=&quot;execution(* com.yang.service.UserService.*(..))&quot;/&gt;
+        &lt;aop:before method=&quot;before&quot; pointcut-ref=&quot;userServicePoint&quot;/&gt;
+        &lt;aop:after method=&quot;after&quot; pointcut-ref=&quot;userServicePoint&quot;/&gt;
+    &lt;/aop:aspect&gt;
+&lt;/aop:config&gt;
+</code></pre>
+<h4 id="使用注解方式"><a class="header" href="#使用注解方式">使用注解方式</a></h4>
+<ul>
+<li>编写自定义切面类并添加注解</li>
+</ul>
+<pre><code class="language-java">@Aspect
+public class CustomAnnoPoint {
+    @Before(&quot;execution(* com.yang.service.UserService.*(..))&quot;)
+    public void before(){
+        System.out.println(&quot;注解实现--方法执行前&quot;);
+    }
+    @After(&quot;execution(* com.yang.service.UserService.*(..))&quot;)
+    public void after(){
+        System.out.println(&quot;注解实现--方法执行后&quot;);
+    }
+}
+</code></pre>
+<ul>
+<li>
+<p>xml文件里注册该类</p>
+<pre><code class="language-xml">&lt;bean id=&quot;customAnnoPoint&quot; class=&quot;com.yang.custom.CustomAnnoPoint&quot;/&gt;
+</code></pre>
+</li>
+<li>
+<p>xml文件内添加<code>&lt;aop:aspectj-autoproxy/&gt;</code>标签自动代理切面类</p>
+</li>
+<li>
+<p><code>&lt;aop:aspectj-autoproxy/&gt;</code>标签的proxy-target-class</p>
+<ul>
+<li>false（默认）：JDK实现</li>
+<li>true：cglib实现</li>
+</ul>
+</li>
+</ul>
+<h2 id="整合mybatis"><a class="header" href="#整合mybatis">整合mybatis</a></h2>
+<h3 id="方式一"><a class="header" href="#方式一">方式一</a></h3>
+<ul>
+<li>导包</li>
+</ul>
+<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-jdbc&lt;/artifactId&gt;
+    &lt;version&gt;5.2.7.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
+    &lt;artifactId&gt;mybatis-spring&lt;/artifactId&gt;
+    &lt;version&gt;2.0.3&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.aspectj&lt;/groupId&gt;
+    &lt;artifactId&gt;aspectjweaver&lt;/artifactId&gt;
+    &lt;version&gt;1.9.5&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-webmvc&lt;/artifactId&gt;
+    &lt;version&gt;5.2.7.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;junit&lt;/groupId&gt;
+    &lt;artifactId&gt;junit&lt;/artifactId&gt;
+    &lt;version&gt;4.13&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
+    &lt;artifactId&gt;mybatis&lt;/artifactId&gt;
+    &lt;version&gt;3.4.6&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ul>
+<li>编写spring的xml文件</li>
+<li>spring自带的数据源DriverManagerDataSource</li>
+</ul>
+<pre><code class="language-xml">&lt;bean id=&quot;dateSource&quot; class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
+    &lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.cj.jdbc.Driver&quot;/&gt;
+    &lt;property name=&quot;url&quot;
+              value=&quot;jdbc:mysql://localhost:3306/session1?useSSL=false&amp;amp;useUnicode=true&amp;amp;characterEncoding=UTF-8&amp;amp;serverTimezone=Asia/Shanghai&quot;/&gt;
+    &lt;property name=&quot;username&quot; value=&quot;root&quot;/&gt;
+    &lt;property name=&quot;password&quot; value=&quot;112358&quot;/&gt;
+&lt;/bean&gt;
+</code></pre>
+<ul>
+<li>spring自带的SqlSessionFactoryBean</li>
+</ul>
+<pre><code class="language-xml">&lt;bean id=&quot;sqlSessionFactory&quot; class=&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;
+    &lt;!--        注入数据源--&gt;
+    &lt;property name=&quot;dataSource&quot; ref=&quot;dateSource&quot;/&gt;
+    &lt;!--        获取mybatis的配置文件--&gt;
+    &lt;property name=&quot;configLocation&quot; value=&quot;classpath:mybatis-config.xml&quot;/&gt;
+    &lt;!--        扫描对应的xml配置文件--&gt;
+    &lt;property name=&quot;mapperLocations&quot; value=&quot;classpath:com/yang/dao/*.xml&quot;/&gt;
+&lt;/bean&gt;
+</code></pre>
+<ul>
+<li>spring自带的SqlSessionTemplate</li>
+</ul>
+<pre><code class="language-xml">&lt;bean id=&quot;sqlSession&quot; class=&quot;org.mybatis.spring.SqlSessionTemplate&quot;&gt;
+    &lt;constructor-arg index=&quot;0&quot; ref=&quot;sqlSessionFactory&quot;/&gt;
+&lt;/bean&gt;
+</code></pre>
+<ul>
+<li>编写对应的mapper.xml</li>
+</ul>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE mapper
+        PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+        &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+&lt;mapper namespace=&quot;com.yang.dao.UserMapper&quot;&gt;
+    &lt;select id=&quot;getUser&quot; resultType=&quot;users&quot;&gt;
+        select * from users limit 0, 10
+    &lt;/select&gt;
+&lt;/mapper&gt;
+</code></pre>
+<ul>
+<li>编写对应的Mapper实现类</li>
+</ul>
+<pre><code class="language-java">public class UserMapperImpl implements UserMapper {
+
+    private SqlSessionTemplate sqlSession;
+
+    private UserMapper userMapper;
+
+    public void setSqlSession(SqlSessionTemplate sqlSession) {
+        this.sqlSession = sqlSession;
+        userMapper = this.sqlSession.getMapper(UserMapper.class);
+    }
+
+    @Override
+    public List&lt;Users&gt; getUser() {
+        //        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        return userMapper.getUser();
+    }
+}
+</code></pre>
+<ul>
+<li>对应的实现类属性注入sqlSession类</li>
+</ul>
+<pre><code class="language-xml">&lt;bean id=&quot;userMapper&quot; class=&quot;com.yang.dao.UserMapperImpl&quot;&gt;
+    &lt;property name=&quot;sqlSession&quot; ref=&quot;sqlSession&quot;/&gt;
+&lt;/bean&gt;
+</code></pre>
+<ul>
+<li>测试</li>
+</ul>
+<pre><code class="language-java">@Test
+public void test03(){
+    UserMapper userMapper = context.getBean(&quot;userMapper&quot;, UserMapper.class);
+    List&lt;Users&gt; user = userMapper.getUser();
+    for (Users users : user) {
+        System.out.println(users);
+    }
+}
+</code></pre>
+<h3 id="方式二"><a class="header" href="#方式二">方式二</a></h3>
+<ul>
+<li>将方式一的托管spring自带的SqlSessionTemplate替换为对应的Mpper实现类继承SqlSessionDaoSupport接口sqlSession就可以使用父类的<code>getSession()</code>获取</li>
+<li>托管实现类事需要注入SqlSessioinFactory接口</li>
+</ul>
+<pre><code class="language-xml">&lt;bean id=&quot;userMapper2&quot; class=&quot;com.yang.dao.UserMapperImpl2&quot;&gt;
+    &lt;property name=&quot;sqlSessionFactory&quot; ref=&quot;sqlSessionFactory&quot;/&gt;
+&lt;/bean&gt;
+</code></pre>
+<h2 id="spring中的事务"><a class="header" href="#spring中的事务">Spring中的事务</a></h2>
+<h4 id="声明式事务aop"><a class="header" href="#声明式事务aop">声明式事务：AOP</a></h4>
+<ul>
+<li>
+<p>使用Aop实现事务</p>
+</li>
+<li>
+<p>xml文件内编写</p>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;bean id=&quot;transactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
+    &lt;constructor-arg name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;
+    &lt;!--        &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;--&gt;
+&lt;/bean&gt;
+</code></pre>
+<pre><code class="language-xml">&lt;tx:advice id=&quot;mapperTransaction&quot; transaction-manager=&quot;transactionManager&quot;&gt;
+    &lt;tx:attributes&gt;
+        &lt;tx:method name=&quot;update&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;delete&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+    &lt;/tx:attributes&gt;
+&lt;/tx:advice&gt;
+</code></pre>
+<pre><code class="language-xml">&lt;aop:config&gt;
+    &lt;aop:pointcut id=&quot;userMapperPointCut&quot; expression=&quot;execution(* com.yang.dao.UserMapper.*(..))&quot;/&gt;
+    &lt;aop:advisor advice-ref=&quot;mapperTransaction&quot; pointcut-ref=&quot;userMapperPointCut&quot;/&gt;
+&lt;/aop:config&gt;
+</code></pre>
+<ul>
+<li>使用注解实现的事务</li>
+<li>在需要使用事务的方法上加上@Transactional注解</li>
+</ul>
+<pre><code class="language-java">@Transactional
+public List&lt;Users&gt; getUser() {
+    HashMap&lt;String, Object&gt; map = new HashMap&lt;&gt;();
+    map.put(&quot;userId&quot;, 1001);
+    map.put(&quot;email&quot;, &quot;wqeqe@qq.com&quot;);
+    map.put(&quot;password&quot;, &quot;1111111&quot;);
+    userMapper.insertUser(map);
+    userMapper.deleteUser(103);
+
+    return userMapper.getUser();
+}
+</code></pre>
+<ul>
+<li>在xml文件内配置</li>
+</ul>
+<pre><code class="language-xml">&lt;bean id=&quot;transactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
+    &lt;constructor-arg name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;
+    &lt;!--        &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;--&gt;
+&lt;/bean&gt;
+
+&lt;!--注解实现事务的标签--&gt;
+&lt;tx:annotation-driven transaction-manager=&quot;transactionManager&quot;/&gt;
+</code></pre>
+<h4 id="编程式事务需要在代码里实现事务的管理"><a class="header" href="#编程式事务需要在代码里实现事务的管理">编程式事务：需要在代码里实现事务的管理</a></h4>
+<h1 id="springmvc"><a class="header" href="#springmvc">SpringMVC</a></h1>
+<h2 id="编写一个springmvc程序"><a class="header" href="#编写一个springmvc程序">编写一个springMVC程序</a></h2>
+<ul>
+<li>配置web.xml，注册DispatcherServlet</li>
+</ul>
+<pre><code class="language-xml">&lt;!--1.注册DispatcherServlet--&gt; 
+&lt;servlet&gt;
+    &lt;servlet-name&gt;springmvc&lt;/servlet-name&gt;
+    &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;
+    &lt;!--        关联springmvc的配置文件--&gt;
+    &lt;init-param&gt;
+        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+        &lt;param-value&gt;classpath:springmvc-servlet.xml&lt;/param-value&gt;
+    &lt;/init-param&gt;
+    &lt;!--        启动级别--&gt;
+    &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+&lt;/servlet&gt;
+&lt;!--    / 匹配所有请求不包括.jsp--&gt;
+&lt;!--    /* 匹配所有请求包括.jsp--&gt;  
+&lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;springmvc&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;/&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+</code></pre>
+<ul>
+<li>编写springmvc-servlet.xml文件</li>
+<li>添加处理器映射器</li>
+</ul>
+<pre><code class="language-xml">&lt;bean class=&quot;org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping&quot;/&gt;
+</code></pre>
+<ul>
+<li>添加处理器适配器</li>
+</ul>
+<pre><code class="language-xml">&lt;bean class=&quot;org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter&quot;/&gt;
+</code></pre>
+<ul>
+<li>添加视图解析器</li>
+</ul>
+<pre><code class="language-xml">&lt;!--    视图解析器: DispatcherServlet给他的ModeLAndView--&gt;
+&lt;bean class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;
+    &lt;property name=&quot;prefix&quot; value=&quot;WEB-INF/jsp/&quot;/&gt;
+    &lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;/&gt;
+&lt;/bean&gt;
+</code></pre>
+<ul>
+<li>编写controller类</li>
+</ul>
+<pre><code class="language-java">public class HelloController implements Controller {
+    @Override
+    public ModelAndView handleRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;msg&quot;, &quot;Hello SpringMVC&quot;);
+        mv.setViewName(&quot;he&quot;);
+        return mv;
+    }
+}
+</code></pre>
+<ul>
+<li>在WEB-INF目录下新建一个1文件夹再编写jsp页面获取controller类发送的数据</li>
+</ul>
+<pre><code class="language-jsp">&lt;%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Title&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+${msg}
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<ul>
+<li>在spring的xml文件内托管该controller类</li>
+<li>问题：</li>
+</ul>
+<p><img src="/assets/java/img/%E9%97%AE%E9%A2%98.png" alt="问题" /></p>
+<ul>
+<li>
+<p>使用注解方式：</p>
+<ul>
+<li>将springxml文件更改</li>
+</ul>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+       xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+      https://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+         http://www.springframework.org/schema/mvc
+          https://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+&lt;!--    扫描包--&gt;
+    &lt;context:component-scan base-package=&quot;com.yang.controller&quot;/&gt;
+&lt;!--    过滤静态资源--&gt;
+    &lt;mvc:default-servlet-handler/&gt;
+    &lt;!--
+        支持mvc注解驱动
+        在spring中一般采用@RequestMapping注解来完成映射关系
+        要想仪@Reques tMapping注解生效必须向上下文中注DefaultAnnotationHandlerMapping
+        和一个AnnotationMethodHandlerAdapter实例
+        这两个实例分别在类级别和方法级别处理。
+        而annotation-driven配置帮助我们自动完成上述两个实例的注入。
+    --&gt;
+    &lt;mvc:annotation-driven/&gt;
+    &lt;!--    视图解析器: DispatcherServlet给他的ModeLAndView--&gt;
+    &lt;bean id=&quot;internalResourceViewResolver&quot; class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;
+        &lt;property name=&quot;prefix&quot; value=&quot;WEB-INF/jsp/&quot;/&gt;
+        &lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;/&gt;
+    &lt;/bean&gt;
+&lt;/beans&gt;
+</code></pre>
+<ul>
+<li>编写对应controller类</li>
+</ul>
+<pre><code class="language-java">@Controller
+public class HelloController {
+    @RequestMapping(/assets/java/hello&quot;)
+    public String hello(Model model){
+        model.addAttribute(&quot;msg&quot;, &quot;Hello SpringMVCAnnotation!&quot;);
+        return &quot;test&quot;;
+    }
+}
+
+</code></pre>
+<ul>
+<li>在WEB-INF目录下新建一个1文件夹再编写jsp页面获取controller类发送的数据</li>
+</ul>
+<pre><code class="language-jsp">&lt;%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Title&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+${msg}
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+</li>
+<li>
+<p>Restful风格</p>
+<ul>
+<li>默认的资源拦截器可能拦截restful风格的输入方式</li>
+<li>在配置了视图解析器后使用视图解析器方式可能会出现404（自己遇见的问题待解决</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-java">@Controller
+public class OperationController {
+    //url使用{}符号取值
+    @RequestMapping(/assets/java/add/{num1}/{num2}&quot;)
+    			//添加@PathVariable指定参数对应的名称
+    public String add(@PathVariable(&quot;num1&quot;) int a,@PathVariable(&quot;num2&quot;) int b, Model model){
+        model.addAttribute(&quot;result&quot;, a + b);
+        return &quot;forward:/WEB-INFO/jsp/result.jsp&quot;;
+    }
+}
+</code></pre>
+<ul>
+<li>
+<p>不使用视图解析器实现页面转发和重定向的方式</p>
+</li>
+<li>
+<p>页面转发</p>
+<ul>
+<li>返回值填写项目下资源的完整路径</li>
+<li>可以前缀加上forward:标识为页面转发</li>
+<li>不加默认为页面转发</li>
+</ul>
+<pre><code class="language-java">@RequestMapping(/assets/java/test&quot;)
+public String tets(){
+    return &quot;/WEB-INF/jsp/te.jsp&quot;;
+}
+</code></pre>
+</li>
+<li>
+<p>重定向（重定向不能访问web-inf下的文件）</p>
+<ul>
+<li>在文件前面加redirect:标识为重定向</li>
+</ul>
+<pre><code class="language-java">@RequestMapping(/assets/java/redirect&quot;)
+public String reTest(){
+    System.out.println(&quot;-----------------&quot;);
+    return &quot;redirect:/index.jsp&quot;;
+}
+</code></pre>
+</li>
+</ul>
+<h2 id="获取前端表单的参数"><a class="header" href="#获取前端表单的参数">获取前端表单的参数</a></h2>
+<ul>
+<li>参数名称与mapping方法的形参名称一致
+<ul>
+<li>如果不一致需要在方法参数的前面加上@RequestParam(&quot;名称&quot;)与前端页面的名称一致</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-jsp">&lt;form action=&quot;${pageContext.request.contextPath}/param1&quot; method=&quot;get&quot;&gt;
+    &lt;input type=&quot;text&quot; name=&quot;username&quot; value=&quot;${username}&quot;&gt;&lt;br&gt;
+    &lt;input type=&quot;submit&quot;&gt;
+&lt;/form&gt;
+</code></pre>
+<pre><code class="language-java">@RequestMapping(/assets/java/param1&quot;)
+public String pa1Test(@RequestParam(&quot;username&quot;) String username){
+    System.out.println(username);
+    return &quot;forward:/testParam1.jsp&quot;;
+}
+</code></pre>
+<ul>
+<li>如果前端放回的数据刚好是一个对象则mapping方法内可以直接将该对象作为参数，如果对象的属性名与前端页面的参数不一致则不会赋值</li>
+</ul>
+<pre><code class="language-jsp">&lt;form action=&quot;${pageContext.request.contextPath}/param2&quot;&gt;
+    &lt;input type=&quot;text&quot; name=&quot;name&quot;&gt;&lt;br&gt;
+    &lt;input type=&quot;password&quot; name=&quot;password&quot;&gt;&lt;br&gt;
+    &lt;input type=&quot;number&quot; name=&quot;phone&quot;&gt;&lt;br&gt;
+    &lt;input type=&quot;submit&quot;&gt;
+&lt;/form&gt;
+</code></pre>
+<pre><code class="language-java">@RequestMapping(/assets/java/param2&quot;)
+public String pa1Test(User user){
+    System.out.println(user);
+    return &quot;forward:/testParam.jsp&quot;;
+}
+</code></pre>
+<h2 id="modelmodelmapmodelandview"><a class="header" href="#modelmodelmapmodelandview">Model、ModelMap、ModelAndView</a></h2>
+<ul>
+<li>model：适用于数据储存，简化了用户对model的操作</li>
+<li>modelmap：继承了LinkedHashMap，可以使用likedhashmap的操作</li>
+<li>modelandview：可以储存数据，可以设置放回的逻辑视图，进行控制展示层跳转</li>
+</ul>
+<h2 id="处理乱码问题"><a class="header" href="#处理乱码问题">处理乱码问题</a></h2>
+<ul>
+<li>方式一：自己编写字符过滤器</li>
+<li>方式二：配置spring自己实现的characterEncdingFilter</li>
+</ul>
+<pre><code class="language-xml">&lt;filter&gt;
+    &lt;filter-name&gt;characterEncodingFilter&lt;/filter-name&gt;
+    &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;/filter-class&gt;
+&lt;/filter&gt;
+&lt;filter-mapping&gt;
+    &lt;filter-name&gt;characterEncodingFilter&lt;/filter-name&gt;
+    &lt;url-pattern&gt;/&lt;/url-pattern&gt;
+&lt;/filter-mapping&gt;
+</code></pre>
+<h2 id="json"><a class="header" href="#json">Json</a></h2>
+<h4 id="使用jackson"><a class="header" href="#使用jackson">使用Jackson</a></h4>
+<ul>
+<li>
+<p>JavaScript解析和转换json</p>
+<ul>
+<li>将js里面的对象转换为json字符串</li>
+</ul>
+<pre><code class="language-javascript">//定义一个js对象
+var obj = {
+    name:&quot;张三&quot;,
+    age:18,
+    id:&quot;1001&quot;
+};
+//使用JSON对象的stringify方法将该js对象转换为json字符串
+let objStr = JSON.stringify(obj);
+</code></pre>
+<ul>
+<li>将json字符串解析为js里面的对象</li>
+</ul>
+<pre><code class="language-javascript">var jsonStr = '{&quot;name&quot;:&quot;张三&quot;,&quot;age&quot;:18,&quot;id&quot;:&quot;1001&quot;}';
+var jsonObj = JSON.parse(jsonStr);
+</code></pre>
+</li>
+<li>
+<p>java里面解析和转换json</p>
+<ul>
+<li>导包</li>
+</ul>
+<pre><code class="language-xml">&lt;!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+    &lt;artifactId&gt;jackson-databind&lt;/artifactId&gt;
+    &lt;version&gt;2.11.2&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ul>
+<li>在方法前面加上@ReponseBody是这个方法不走视图解析器而是直接在页面显示返回的字符串</li>
+<li>如果需要该类里面的所有方法都不走视图解析器，返回字符串的话，将该类的@Controller注解替换为@RestControler</li>
+</ul>
+<pre><code class="language-java">@ResponseBody
+@RequestMapping(/assets/java/j1&quot;)
+public String testJson01(){
+    return &quot;123&quot;;
+}
+</code></pre>
+<ul>
+<li>
+<p>创建ObjectMapper对象，调用writeValueAsString方法将一个java对象转换为json字符串</p>
+<ul>
+<li>
+<p>解决json转到前端的的乱码问题</p>
+<ul>
+<li>方式一：在Mapping里面添加一个参数produces = &quot;application/json;charset=utf-8&quot;,如果有多的mapping这种发视会非常麻烦</li>
+<li>方式二：springmvc提供的，在xml文件里面添加如下代码，可以全局使用</li>
+</ul>
+<pre><code class="language-xml">&lt;!--    解决json到前端页面的乱码问题--&gt;
+&lt;mvc:annotation-driven&gt;
+    &lt;mvc:message-converters register-defaults=&quot;true&quot;&gt;
+        &lt;bean class=&quot;org.springframework.http.converter.StringHttpMessageConverter&quot;&gt;
+            &lt;constructor-arg value=&quot;UTF-8&quot;/&gt;
+        &lt;/bean&gt;
+        &lt;bean class=&quot;org.springframework.http.converter.json.MappingJackson2HttpMessageConverter&quot;&gt;
+            &lt;property name=&quot;objectMapper&quot;&gt;
+                &lt;bean class=&quot;org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean&quot;&gt;
+                    &lt;property name=&quot;failOnEmptyBeans&quot; value=&quot;false&quot;/&gt;
+                &lt;/bean&gt;
+            &lt;/property&gt;
+        &lt;/bean&gt;
+    &lt;/mvc:message-converters&gt;
+&lt;/mvc:annotation-driven&gt;
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-java">@ResponseBody
+@RequestMapping(value = &quot;/j1&quot;, produces = &quot;application/json;charset=utf-8&quot;)
+public String testJson01() throws JsonProcessingException, UnsupportedEncodingException {
+    User user = new User(&quot;张三&quot;, &quot;qwqe&quot;, &quot;1111111&quot;);
+    //        HashMap&lt;String, String&gt; user = new HashMap&lt;&gt;();
+    //        user.put(&quot;name&quot;, &quot;张三&quot;);
+    //        user.put(&quot;age&quot;, &quot;12&quot;);
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonObj = mapper.writeValueAsString(user);
+    return jsonObj;
+}
+</code></pre>
+</li>
+<li>
+<p>将集合解析为json字串</p>
+<ul>
+<li>解析Map
+<ul>
+<li>和解析对象后的结果一样</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-java">@RequestMapping(/assets/java/j2&quot;)
+public String testJ2() throws JsonProcessingException {
+    HashMap&lt;String, Object&gt; map = new HashMap&lt;&gt;();
+    map.put(&quot;name&quot;,&quot;张三&quot;) ;
+    map.put(&quot;age&quot;, 18);
+    ObjectMapper mapper = new ObjectMapper();
+    String jObj = mapper.writeValueAsString(map);
+    return jObj;
+}
+</code></pre>
+<ul>
+<li>解析List，数组和list的解决结果一样
+<ul>
+<li>解析后的果为：<code>[&quot;张三&quot;,&quot;李四&quot;,&quot;王五&quot;,&quot;赵六&quot;]</code></li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-java">@RequestMapping(/assets/java/j3&quot;)
+public String testJ3() throws JsonProcessingException {
+    ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();
+    list.add(&quot;张三&quot;);
+    list.add(&quot;李四&quot;);
+    list.add(&quot;王五&quot;);
+    list.add(&quot;赵六&quot;);
+    ObjectMapper mapper = new ObjectMapper();
+    String jObj = mapper.writeValueAsString(list);
+    return jObj;
+}
+</code></pre>
+<ul>
+<li>嵌套解析
+<ul>
+<li>解析后的果为：<code>{&quot;name&quot;:&quot;张三&quot;,&quot;朋友&quot;:[&quot;李四&quot;,&quot;王五&quot;,&quot;赵六&quot;],&quot;age&quot;:18}</code></li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-java">@RequestMapping(/assets/java/j4&quot;)
+public String testJ4() throws JsonProcessingException {
+    HashMap&lt;String, Object&gt; map = new HashMap&lt;&gt;();
+    map.put(&quot;name&quot;,&quot;张三&quot;) ;
+    map.put(&quot;age&quot;, 18);
+    ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();
+    list.add(&quot;李四&quot;);
+    list.add(&quot;王五&quot;);
+    list.add(&quot;赵六&quot;);
+    map.put(&quot;朋友&quot;, list);
+    ObjectMapper mapper = new ObjectMapper();
+    String jObj = mapper.writeValueAsString(map);
+    return jObj;
+}
+</code></pre>
+</li>
+</ul>
+<h4 id="使用fastjson"><a class="header" href="#使用fastjson">使用FastJson</a></h4>
+<ul>
+<li>
+<p>导包</p>
+<pre><code class="language-xml">&lt;!-- https://mvnrepository.com/artifact/com.alibaba/fastjson --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.alibaba&lt;/groupId&gt;
+    &lt;artifactId&gt;fastjson&lt;/artifactId&gt;
+    &lt;version&gt;1.2.73&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+</li>
+<li>
+<p>调用</p>
+<ul>
+<li>直接调用JSON的静态方法toJsonString转换json</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-java">@RequestMapping(/assets/java/j5&quot;)
+public String testJ5() {
+    HashMap&lt;String, Object&gt; map = new HashMap&lt;&gt;();
+    map.put(&quot;name&quot;,&quot;张三&quot;) ;
+    map.put(&quot;age&quot;, 18);
+    ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();
+    list.add(&quot;李四&quot;);
+    list.add(&quot;王五&quot;);
+    list.add(&quot;赵六&quot;);
+    map.put(&quot;朋友&quot;, list);
+    return JSON.toJSONString(map);
+}
+</code></pre>
+<h2 id="ajax"><a class="header" href="#ajax">Ajax</a></h2>
+<ul>
+<li>编写后端操作</li>
+</ul>
+<pre><code class="language-java">@RestController
+public class AjaxController {
+    @RequestMapping(/assets/java/testAjax/{value}&quot;)
+    public boolean testAjax(@PathVariable(&quot;value&quot;) String value){
+        return &quot;123&quot;.equals(value);
+    }
+}
+</code></pre>
+<ul>
+<li>编写前端页面</li>
+</ul>
+<pre><code class="language-jsp">&lt;%@ page contentType=&quot;text/html;charset=UTF-8&quot; language=&quot;java&quot; %&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Title&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;script src=&quot;${pageContext.request.contextPath}/static/js/jquery-3.4.1.js&quot;&gt;&lt;/script&gt;
+    &lt;body&gt;
+        &lt;input type=&quot;text&quot; id=&quot;in&quot;&gt;&lt;br&gt;
+        &lt;input type=&quot;button&quot; id=&quot;bt&quot; value=&quot;提交&quot;/&gt;
+        &lt;script type=&quot;text/javascript&quot;&gt;
+            $(function () {
+                $('#bt').click(function () {
+                    //使用ajax实现异步请求
+                    $.post('${pageContext.request.contextPath}/testAjax/'+$('#in').val(), function (data) {
+                        alert(data);
+                    })
+                });
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h2 id="拦截器"><a class="header" href="#拦截器">拦截器</a></h2>
+<ul>
+<li>自定义类实现HandlerInterceptor接口</li>
+</ul>
+<pre><code class="language-java">public class MyInterceptor implements HandlerInterceptor {
+     //拦截前
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        //这里返回true说明通过
+        //返回false说明被拦截
+        return false;
+    }
+ 	//拦截后
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+
+    }
+	//清理
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+
+    }
+}
+</code></pre>
+<ul>
+<li>spring 配置文件内添加：</li>
+</ul>
+<pre><code class="language-xml">&lt;mvc:interceptors&gt;
+    &lt;mvc:interceptor&gt;
+        &lt;!--         /**代表所有路径下的请求全部拦--&gt;
+        &lt;mvc:mapping path=&quot;/**&quot;/&gt;
+        &lt;bean class=&quot;com.yang.interceptor.MyInterceptor&quot;/&gt;
+    &lt;/mvc:interceptor&gt;
+&lt;/mvc:interceptors&gt;
+</code></pre>
+<h2 id="文件上传"><a class="header" href="#文件上传">文件上传</a></h2>
+<ul>
+<li>前端页面</li>
+</ul>
+<pre><code class="language-jsp">
+</code></pre>
+<ul>
+<li>springxml文件里面配置文件上传的工具</li>
+</ul>
+<pre><code class="language-xml">&lt;bean id=&quot;multipartResolver&quot; class=&quot;org.springframework.web.multipart.commons.CommonsMultipartResolver&quot;&gt;
+        &lt;property name=&quot;defaultEncoding&quot; value=&quot;utf-8&quot;/&gt;
+        &lt;property name=&quot;maxUploadSize&quot; value=&quot;10485760&quot;/&gt;
+        &lt;property name=&quot;maxInMemorySize&quot; value=&quot;40960&quot;/&gt;
+&lt;/bean&gt;
+</code></pre>
+<p>​</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../java/java_web/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../java/project/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../java/java_web/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../java/project/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

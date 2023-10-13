@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="zh" class="sidebar-visible no-js light">
+<html lang="zh" class="light" dir="ltr">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
@@ -10,7 +10,7 @@
         
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#ffffff">
 
         <link rel="icon" href="../favicon.svg">
         <link rel="shortcut icon" href="../favicon.png">
@@ -31,7 +31,7 @@
         <!-- Custom theme stylesheets -->
 
     </head>
-    <body>
+    <body class="sidebar-visible no-js">
     <div id="body-container">
         <!-- Provide site root to javascript -->
         <script>
@@ -61,29 +61,34 @@
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             var html = document.querySelector('html');
-            html.classList.remove('no-js')
             html.classList.remove('light')
             html.classList.add(theme);
-            html.classList.add('js');
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
         </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
-            var html = document.querySelector('html');
+            var body = document.querySelector('body');
             var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
             } else {
                 sidebar = 'hidden';
             }
-            html.classList.remove('sidebar-visible');
-            html.classList.add("sidebar-" + sidebar);
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">目录</a></li><li class="chapter-item expanded "><a href="../linux/index.html" class="active"><strong aria-hidden="true">1.</strong> Linux</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../linux/basics/index.html"><strong aria-hidden="true">1.1.</strong> Linux基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../linux/basics/user_management.html"><strong aria-hidden="true">1.1.1.</strong> 用户管理</a></li><li class="chapter-item expanded "><a href="../linux/basics/run_level.html"><strong aria-hidden="true">1.1.2.</strong> 运行级别</a></li><li class="chapter-item expanded "><a href="../linux/basics/help.html"><strong aria-hidden="true">1.1.3.</strong> 帮助</a></li><li class="chapter-item expanded "><a href="../linux/basics/file_and_dir.html"><strong aria-hidden="true">1.1.4.</strong> 文件和目录</a></li><li class="chapter-item expanded "><a href="../linux/basics/date_time.html"><strong aria-hidden="true">1.1.5.</strong> 日期和时间</a></li><li class="chapter-item expanded "><a href="../linux/basics/search.html"><strong aria-hidden="true">1.1.6.</strong> 搜索</a></li><li class="chapter-item expanded "><a href="../linux/basics/zip.html"><strong aria-hidden="true">1.1.7.</strong> 压缩和解压</a></li><li class="chapter-item expanded "><a href="../linux/basics/perm_and_groups.html"><strong aria-hidden="true">1.1.8.</strong> 权限和组</a></li><li class="chapter-item expanded "><a href="../linux/basics/time_and_tasks.html"><strong aria-hidden="true">1.1.9.</strong> 定时任务</a></li><li class="chapter-item expanded "><a href="../linux/basics/disk_management.html"><strong aria-hidden="true">1.1.10.</strong> 磁盘管理</a></li><li class="chapter-item expanded "><a href="../linux/basics/network.html"><strong aria-hidden="true">1.1.11.</strong> 网络</a></li><li class="chapter-item expanded "><a href="../linux/basics/process.html"><strong aria-hidden="true">1.1.12.</strong> 进程</a></li><li class="chapter-item expanded "><a href="../linux/basics/shell.html"><strong aria-hidden="true">1.1.13.</strong> shell脚本</a></li><li class="chapter-item expanded "><a href="../linux/basics/log.html"><strong aria-hidden="true">1.1.14.</strong> 日志</a></li></ol></li><li class="chapter-item expanded "><a href="../linux/desktop_env/index.html"><strong aria-hidden="true">1.2.</strong> Linux桌面环境</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../linux/desktop_env/audio.html"><strong aria-hidden="true">1.2.1.</strong> 音频</a></li><li class="chapter-item expanded "><a href="../linux/desktop_env/install.html"><strong aria-hidden="true">1.2.2.</strong> debian安装</a></li></ol></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../linux/index.html" class="active"><strong aria-hidden="true">1.</strong> Linux</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../linux/desktop_env/index.html"><strong aria-hidden="true">1.1.</strong> Linux桌面环境</a></li><li class="chapter-item expanded "><a href="../linux/vsftp/index.html"><strong aria-hidden="true">1.2.</strong> vsftp</a></li></ol></li><li class="chapter-item expanded "><a href="../windows/index.html"><strong aria-hidden="true">2.</strong> Windows</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../windows/command_prompt/index.html"><strong aria-hidden="true">2.1.</strong> Command Prompt</a></li><li class="chapter-item expanded "><a href="../windows/wsl2/index.html"><strong aria-hidden="true">2.2.</strong> wsl2</a></li></ol></li><li class="chapter-item expanded "><a href="../docker/index.html"><strong aria-hidden="true">3.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../git/index.html"><strong aria-hidden="true">4.</strong> Git</a></li><li class="chapter-item expanded "><a href="../java/index.html"><strong aria-hidden="true">5.</strong> Java</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../java/java_basics/index.html"><strong aria-hidden="true">5.1.</strong> Java基础</a></li><li class="chapter-item expanded "><a href="../java/multithreading/index.html"><strong aria-hidden="true">5.2.</strong> 多线程</a></li><li class="chapter-item expanded "><a href="../java/maven/index.html"><strong aria-hidden="true">5.3.</strong> Maven</a></li><li class="chapter-item expanded "><a href="../java/design_pattern/index.html"><strong aria-hidden="true">5.4.</strong> 设计模式</a></li><li class="chapter-item expanded "><a href="../java/java_web/index.html"><strong aria-hidden="true">5.5.</strong> Java Web</a></li><li class="chapter-item expanded "><a href="../java/SSM/index.html"><strong aria-hidden="true">5.6.</strong> SSM</a></li><li class="chapter-item expanded "><a href="../java/project/index.html"><strong aria-hidden="true">5.7.</strong> 项目</a></li><li class="chapter-item expanded "><a href="../java/netty/index.html"><strong aria-hidden="true">5.8.</strong> Netty</a></li><li class="chapter-item expanded "><a href="../java/spring/index.html"><strong aria-hidden="true">5.9.</strong> Spring</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../java/spring/spring_security/index.html"><strong aria-hidden="true">5.9.1.</strong> Spring Security</a></li><li class="chapter-item expanded "><a href="../java/spring/spring_cloud/index.html"><strong aria-hidden="true">5.9.2.</strong> Spring Cloud</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../mysql/index.html"><strong aria-hidden="true">6.</strong> Mysql</a></li><li class="chapter-item expanded "><a href="../nginx/index.html"><strong aria-hidden="true">7.</strong> Nginx</a></li><li class="chapter-item expanded "><a href="../redis/index.html"><strong aria-hidden="true">8.</strong> Redis</a></li><li class="chapter-item expanded "><a href="../vim/index.html"><strong aria-hidden="true">9.</strong> Vim/Neovim</a></li><li class="chapter-item expanded "><a href="../vue/index.html"><strong aria-hidden="true">10.</strong> Vue</a></li><li class="chapter-item expanded "><a href="../web/index.html"><strong aria-hidden="true">11.</strong> Web</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -116,9 +121,9 @@
                                 <div id="menu-bar-hover-placeholder"></div>
                 <div id="menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
-                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
                             <i class="fa fa-bars"></i>
-                        </button>
+                        </label>
                         <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
                             <i class="fa fa-paint-brush"></i>
                         </button>
@@ -167,19 +172,1093 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="linux"><a class="header" href="#linux">Linux</a></h1>
+<h2 id="常用命令"><a class="header" href="#常用命令">常用命令</a></h2>
+<h3 id="关机重启"><a class="header" href="#关机重启"><strong>关机重启</strong></a></h3>
 <ul>
-<li>linux 相关文档</li>
+<li><code>shutdown -h now</code> 立该进行关机</li>
+<li><code>shudown -h 1</code> 1分钟后会关机了</li>
+<li><code>shutdown -r now</code> 现在重新启动计算机</li>
+<li><code>halt</code>  关机</li>
+<li><code>reboot</code> 重启</li>
+<li><code>sync</code>  把内存的数据同步到磁盘.</li>
+</ul>
+<h3 id="用户登录或注销"><a class="header" href="#用户登录或注销"><strong>用户登录或注销</strong></a></h3>
+<ul>
+<li>登录时尽量少用root帐号登录，因为它是系统管理员，最大的权限，避免操作失误。可以利用普通用户登录，登录后再用<code>su-用户名</code>命令来切换成系统管理员身份</li>
+<li>root用户切换到其他用户不需要任何操作</li>
+<li>普通用户切换到其他用户需要使用密码登录</li>
+<li>使用<code>exit</code>命令退出登录</li>
+<li>在提示符下输入logout即可注销用户</li>
+<li>logout 注销指令在图形运行级别无效，在运行级别3下有效</li>
+</ul>
+<h3 id="用户管理"><a class="header" href="#用户管理"><strong>用户管理</strong></a></h3>
+<ul>
+<li><code>useradd 用户名</code> 添加用户</li>
+<li><code>userdel 用户名</code> 删除用户</li>
+<li><code>userdel -r 用户名</code> 删除用户，并删除该用户的家目录</li>
+<li><code>useradd -d 目录路径 用户名</code> 添加用户并指定该用户的家目录地址</li>
+<li><code>passwd 用户名</code> 修改该用户的密码</li>
+<li><code>id 用户名</code> 查看该用户的信息</li>
+<li><code>su 用户名</code> 切换用户</li>
+<li><code>whoami</code> 查看当前是那个用户登录</li>
+<li><code>who am i</code>  查看当前是那个用户登录，并显示登录时间</li>
+<li><strong>用户组</strong>
+<ul>
+<li><code>groupadd 组名</code>  新增一个组</li>
+<li><code>groupdel 组名</code> 删除一个组 </li>
+<li><code>useradd -g 组名 用户名</code>添加用户并添加该用户到那个组内</li>
+<li><code>usermod -g 组名</code> 修改该用户的组信息</li>
+</ul>
+</li>
+<li>用户和组相关文件
+<ul>
+<li>/etc/passwd文件
+<ul>
+<li>用户( user)的配置文件，记录用户的各种信息</li>
+<li>每行的含义∶用户名:口令:用户标识号:组标识号:注释性描述:主目录:登录Shell</li>
+</ul>
+</li>
+<li>/etc/shadow 文件
+<ul>
+<li>口令的配置文件</li>
+<li>每行的含义:登录名:加密口令:最后一次修改时间:最小时间间隔:最大时间间隔:警告时间:不活动时间:失效时间:标志</li>
+</ul>
+</li>
+<li>/etc/group文件
+<ul>
+<li>组(group)的配置文件，记录Linux包含的组的信息每行含义∶组名:口令:组标识号:组内用户列表</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="运行级别"><a class="header" href="#运行级别"><strong>运行级别</strong></a></h3>
+<ul>
+<li>
+<p>基本介绍</p>
+<ul>
+<li>0：关机</li>
+<li>1：单用户【找回丢失密码】</li>
+<li>2：多用户状态没有网络服务</li>
+<li>3：多用户状态有网络服务</li>
+<li>4：系统未使用保留给用户5:图形界面</li>
+<li>6：系统重启</li>
+<li>常用运行级别是3和5,也可以指定默认运行级别，后面演示</li>
+<li>命令:<code>init[0123456]</code>应用案例:通过<code>init</code>来切换不同的运行级别，比如动5-3，然后关机。</li>
+</ul>
+</li>
+<li>
+<p>指定运行级别</p>
+<ul>
+<li>CentOS7后运行级别说明</li>
+<li>在centos7以前,/etc/inittab文件中</li>
+<li>进行了简化，如下:
+<ul>
+<li>multi-user.target: analogous to runlevel 3</li>
+<li>graphical.target: analogous to runlevel 5</li>
+<li><code>systemctl get-default</code> 查看当前气筒处于那个运行级别</li>
+<li><code>systemctl set-default xxx.target</code> 设置系统为那个运行级别</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>v找回root密码</strong></p>
+</blockquote>
+<ul>
+<li>
+<p>启动系统，进入开机界面是按<code>e</code>进入编辑界面</p>
+</li>
+<li>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210301102233.png" alt="" /></p>
+</li>
+<li>
+<p>在以下位置添加<code>init=/bin/sh</code></p>
+</li>
+<li>
+<p><img src="/assets/linux/img/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210301102519.png" alt="" /></p>
+</li>
+<li>
+<p>输入<code>ctrl+x</code>进入单用户模式</p>
+</li>
+<li>
+<p>进入后执行一下操作</p>
+</li>
+<li>
+<p><img src="/assets/linux/img/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210301103058.png" alt="" /></p>
+</li>
+<li>
+<p>等待重启后密码修改成功</p>
+</li>
+</ul>
+<h3 id="帮助指令"><a class="header" href="#帮助指令"><strong>帮助指令</strong></a></h3>
+<ul>
+<li>man获得帮助信息
+<ul>
+<li>基本语法:man命令或配置文件(功能描述:获得帮助信息)案例:查看ls命令的帮助信息</li>
+</ul>
+</li>
+<li>help指令
+<ul>
+<li>基本语法:help命令(功能描述∶获得shell内置命令的帮助信息)</li>
+</ul>
+</li>
+</ul>
+<h3 id="文件目录"><a class="header" href="#文件目录"><strong>文件目录</strong></a></h3>
+<ul>
+<li>
+<p><code>pwd</code> 查看当前处于那个目录下</p>
+</li>
+<li>
+<p><code>ls</code> 列出当前目录下的文件</p>
+<ul>
+<li><code>ls -a</code> 显示当前目录所有的文件和目录,包括隐藏的。</li>
+<li><code>ls -l</code> 以列表的方式显示信息</li>
+</ul>
+</li>
+<li>
+<p><code>cd</code> 切换目录</p>
+<ul>
+<li><code>cd 目录路径</code> 切换到指定目录</li>
+<li><code>cd ..</code> 退回到上一级目录</li>
+<li><code>cd ~</code> 切换到该用户的家目录（直接使用<code>cd</code>不带参数也一样）</li>
+</ul>
+</li>
+<li>
+<p><code>mkdir 目录名</code> 创建目录</p>
+<ul>
+<li><code>mkdir -p</code> 创建1多级目录</li>
+</ul>
+</li>
+<li>
+<p><code>rmdir 目录名</code> 删除空目录</p>
+<ul>
+<li>如果要删除非空目录，必须使用<code>rm -rf 目录名</code>递归删除</li>
+</ul>
+</li>
+<li>
+<p><code>touch 文件名</code></p>
+<ul>
+<li>创建一个空文件</li>
+</ul>
+</li>
+<li>
+<p><code>cp</code> 拷贝</p>
+<ul>
+<li><code>cp -r 目录名</code> 递归复制整个目录</li>
+</ul>
+</li>
+<li>
+<p><code>rm 文件或目录名</code> 删除</p>
+<ul>
+<li><code>rm -r</code> 递归删除文件夹</li>
+<li><code>rm -f</code>  强制删除，不提示</li>
+</ul>
+</li>
+<li>
+<p><code>mv 文件或目录名</code> 移动</p>
+<ul>
+<li>移动文件夹或目录，如果要移动的位置就是当前目录，则就是重命名</li>
+</ul>
+</li>
+<li>
+<p><code>cat 文件名</code> 显示文件内容</p>
+<ul>
+<li><code>cat -n</code> 显示行号</li>
+</ul>
+</li>
+<li>
+<p><code>more、less</code>查看文件内容</p>
+<ul>
+<li>这两个命令都是查看文件内容，只不过就是快捷键不同，和看不同文件的方便性</li>
+</ul>
+</li>
+<li>
+<p><code>echo 内容</code>输出内容到控制台</p>
+</li>
+<li>
+<p><code>head 文件名</code>查看文件前头10行</p>
+<ul>
+<li><code>head -n 行数</code> 指定查看文件前多少行（默认前10行）</li>
+</ul>
+</li>
+<li>
+<p><code>tail 文件名</code> 查看文件后10行</p>
+<ul>
+<li><code>tail -n 行数</code> 和head一样</li>
+<li><code>tail -f</code> 实时查看文件后几行（ctrl+z 退出）</li>
+</ul>
+</li>
+<li>
+<p><code>&gt;</code>、<code>&gt;&gt;</code> 将某个命令的结果重定向到那个位置，一个 <code>&gt;</code>表示覆盖，两个 <code>&gt;&gt;</code> 表示追加</p>
+<ul>
+<li>例如<code>ls -l &gt;&gt; info.txt</code>
+<ul>
+<li><code>ls -l</code>意思是显示当前目录下的文件信息，而结果是输出到控制台的，而上面的指令表示把结果输入的info.txt文件内</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>ln</code> 软连接（快捷方式）</p>
+<ul>
+<li><code>ln -s 目录 软连接名（快捷方式名）</code>（这两处地址必须写绝对路径）</li>
+</ul>
+</li>
+<li>
+<p><code>history</code> 查看历史使用过的命令</p>
+<ul>
+<li><code>history 数字</code> 查看最近多少次使用过的命令</li>
+<li><code>! 数字</code>  这里数字表示历史命令的id，这条命令表示执行对应id的历史命令</li>
+</ul>
+</li>
+</ul>
+<h3 id="日期时间"><a class="header" href="#日期时间"><strong>日期时间</strong></a></h3>
+<ul>
+<li><code>date</code> 显示当前时间
+<ul>
+<li><code>date &quot;+%Y-%m-%d %H:%M:%S&quot;</code> 以对应格式显示当前时间</li>
+<li><code>date -s 时间</code> 设置当前时间</li>
+</ul>
+</li>
+<li><code>cal</code> 显示当月日历
+<ul>
+<li><code>cal 年份</code> 显示当年的日历</li>
+</ul>
+</li>
+</ul>
+<h3 id="搜索查找"><a class="header" href="#搜索查找"><strong>搜索查找</strong></a></h3>
+<ul>
+<li><code>find</code> 查找
+<ul>
+<li><code>find -name</code> 使用文件名查找</li>
+<li><code>find -user</code> 使用用户名查找</li>
+<li><code>find -size</code> 使用文件大小查找</li>
+<li><code>find -size +10m</code> 表示要查找的文件大小大于10兆使用 <code>-</code>表示要查找的文件大小必须小于10m</li>
+</ul>
+</li>
+<li><code>locate</code> 定位</li>
+<li>使用前必须使用<code>updatedb</code>对当前文件系统创建一个文件索引</li>
+<li>查找速度快</li>
+<li><code>which 指令</code> 查找那个指令在那个目录</li>
+<li><code>grep</code> 过滤和 <code>|</code>（管道命令）结合使用，参数可以使用正则表达式
+<ul>
+<li><code>grep -n</code>  过滤的结果显示行号</li>
+<li><code>grep -i</code> 过滤的关键词忽略大小写</li>
+</ul>
+</li>
+</ul>
+<h3 id="压缩和解压"><a class="header" href="#压缩和解压"><strong>压缩和解压</strong></a></h3>
+<ul>
+<li>
+<p><code>gzip 文件名 文件名.gz</code> 压缩</p>
+<ul>
+<li>压缩后格式是<code>文件名.gz</code></li>
+<li><code>gzip</code> 只能压缩或解压文件，不能对目录进行压缩</li>
+</ul>
+</li>
+<li>
+<p><code>gunzip 文件名.gz 文件名</code> 解压</p>
+</li>
+<li>
+<p><code>zip/unzip</code>压缩和解压</p>
+<ul>
+<li>压缩后格式为<code>文件名.zip</code></li>
+<li><code>zip -r</code>递归对目录进行压缩</li>
+<li><code>unzip -d</code>对目录进行解压</li>
+</ul>
+</li>
+<li>
+<p><code>tar</code>压缩和解压</p>
+<ul>
+<li>压缩后格式为<code>文件名.tar.gz</code></li>
+<li>选项
+<ul>
+<li><code>-c</code>产生<code>.tar</code>打包文件</li>
+<li><code>-v</code>显示详细信息</li>
+<li><code>-f</code>指定压缩后的文件名</li>
+<li><code>-z</code>打包同时压缩</li>
+<li><code>-x</code>解包<code>.tar</code>文件</li>
+</ul>
+</li>
+<li>常用方式
+<ul>
+<li><code>tar -zcvf 目标文件目录/文件名.tar.gz 要压缩的文件或目录……</code>压缩</li>
+<li><code>tar -zxvf 压缩后的文件 -C 需要解压的目标目录</code> 解压</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="组管理和权限管理"><a class="header" href="#组管理和权限管理">组管理和权限管理</a></h2>
+<ul>
+<li>
+<p>基本介绍</p>
+<ul>
+<li>在linux中的每个用户必须属于一个组，不能独立于组外。在linux中每个文件有所有者、所在组、其它组的概念。
+<ol>
+<li>所有者</li>
+<li>所在组</li>
+<li>其他组</li>
+<li>改变用户所在组</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>
+<p>文件目录所有者</p>
+<ul>
+<li>一般为文件的创建者，创建了该文件</li>
+<li>查看文件所有者
+<ul>
+<li><code>ls -ahl</code>或 <code>ll -ah</code></li>
+</ul>
+</li>
+<li>修改文件所有者
+<ul>
+<li><code>chown 用户名 文件名</code></li>
+<li><code>chown 用户名:组名 文件名</code>这条指令可以连组名一起修改</li>
+</ul>
+</li>
+<li>修改所在组
+<ul>
+<li><code>chgrp 组名 文件名</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>权限</p>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210301150854.png" alt="" /></p>
+<ul>
+<li>
+<p>0-9位说明</p>
+<ol>
+<li>
+<p>第0位确定文件类型(d, -,l,c,b)</p>
+<ul>
+<li>
+<p>I是链接,相当于windows的快捷方式</p>
+</li>
+<li>
+<p>d是目录，相当于windows的文件夹</p>
+</li>
+<li>
+<p>c是字符设备文件，鼠标，键盘</p>
+</li>
+<li>
+<p>b是块设备，比如硬盘</p>
+</li>
+</ul>
+</li>
+<li>
+<p>第1-3位确定所有者（该文件的所有者）拥有该文件的权限。---User</p>
+</li>
+<li>
+<p>第4-6位确定所属组(同用户组的）拥有该文件的权限，---Group</p>
+</li>
+<li>
+<p>第7-9位确定其他用户拥有该文件的权限---Other</p>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>rwx权限</strong></p>
+<ul>
+<li>rwx作用到文件
+<ul>
+<li>[r]代表可读(read):可以读取,查看</li>
+<li>[ w ]代表可写(write):可以修改,但是不代表可以删除该文件,删除一个文件的前提条件是对该文件所在的目录有写权限，才能删除该文件.</li>
+<li>[x]代表可执行(execute):可以被执行</li>
+</ul>
+</li>
+<li>rwx作用到目录
+<ul>
+<li>[r]代表可读(read):可以读取，ls查看目录内容</li>
+<li>[w]代表可写(write):可以修改，对目录内创建+删除+重命名目录</li>
+<li>[×]代表可执行(execute):可以进入该目录</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>改变文件rwx权限</p>
+<ul>
+<li><code>chmod</code>
+<ul>
+<li>u、g、o，分别代表所有者，组，和其他</li>
+<li>a代表所有</li>
+<li>使用+、-对该文件的权限进行添加或删除</li>
+<li>具体使用方式
+<ul>
+<li><code>chmod u+x,g+w,o-r 文件名</code></li>
+<li><code>chmod a-r 文件名</code>表示该文件，所有者、组内成员和其他人都没有了读的权限</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>也可以使用数字方式对文件的权限进行修改
+<ul>
+<li>r=4，w=2，x=1，使用这三数组进行相加</li>
+<li>具体使用方式
+<ul>
+<li><code>chmod 664 文件名</code></li>
+<li>这里6或4都是上面三个数字相加得到的</li>
+<li>第一位该表所有者，第二位代表组，第三位代表其他</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="定时任务"><a class="header" href="#定时任务">定时任务</a></h2>
+<ul>
+<li>
+<p><strong>crond任务调度</strong></p>
+<ul>
+<li>
+<p>任务调度:是指系统在某个时间执行的特定的命令或程序。</p>
+</li>
+<li>
+<p>任务调度分类:1.系统工作:有些重要的工作必须周而复始地执行。如病毒扫描等个别用户工作:个别用户可能希望执行某些程序，比如对mysql数据库的备份。</p>
+</li>
+<li>
+<p><code>crontab</code></p>
+<ul>
+<li><code>crontab -e</code> 编辑定时任务</li>
+<li><code>crontab -l</code> 查看已有的任务</li>
+<li><code>crontab -r</code> 删除已有的任务</li>
+</ul>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210301154226.png" alt="" /></p>
+</li>
+</ul>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210301154250.png" alt="" /></p>
+<ul>
+<li>使用
+<ul>
+<li>使用<code>crontab -e</code>打开编辑器后</li>
+<li>输入<code>*/1 * * * * 任务操作</code>
+<ul>
+<li>表示每分钟执行</li>
+<li>任务操作那位置可以填写一个 <code>.sh</code>脚本路径</li>
+</ul>
+</li>
+<li>编辑后退出就可以了</li>
+</ul>
+</li>
+</ul>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210301154608.png" alt="" /></p>
+</li>
+<li>
+<p><strong>at定时任务</strong></p>
+<ul>
+<li>
+<p>基本介绍</p>
+<ul>
+<li>at命令是一次性定时计划任务，at的守护进程atd会以后台模式运行，检查作业队列来运行。</li>
+<li>默认情况下，atd守护进程每60秒检查作业队列，有作业时，会检查作业运行时间，如果时间与当肓时间匹配，则运行此作业。</li>
+<li>at命令是一次性定时计划任务，执行完一个任务后不再执行此任务了</li>
+<li>在使用at命令的时候，一定要保证atd进程的启动，可以使用相关指令来查看
+<ul>
+<li>使用<code>ps -ef | grep atd</code>查看atd是否运行</li>
+</ul>
+</li>
+</ul>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210301155156.png" alt="" /></p>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210301155230.png" alt="" /></p>
+</li>
+<li>
+<p>使用</p>
+<ul>
+<li><code>at now+1minutes</code>回车</li>
+<li>输入要执行的命令或脚本文件路径</li>
+<li>按两次<code>ctrl+d</code>保存</li>
+<li>表示一分钟后执行某个操作</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="磁盘分区挂载"><a class="header" href="#磁盘分区挂载">磁盘分区、挂载</a></h2>
+<ul>
+<li>
+<p><strong>Linux分区</strong></p>
+<ul>
+<li>Linux来说无论有几个分区，分给哪一目录使用，它归根结底就只有一个根目录，一个独立且唯一的文件结构，Linux中每个分区都是用来组成整个文件系统的一部分。</li>
+<li>Linux采用了一种叫“载入”的处理方法，它的整个文件系统中包含了一整套的文件和目录，且将个分区和一个目录联系起来。这时要载入的一个分区将使它的存储空间在一个目录下获得、</li>
+</ul>
+</li>
+<li>
+<p>硬盘说明</p>
+<ul>
+<li>Linux硬盘分IDE硬盘和SCSI硬盘，目前基本上是SCSI硬盘</li>
+<li>对于IDE硬盘，驱动器标识符为“hdx~”，其中“hd”表明分区所在设备的类型，这里是指IDE硬盘了。“x”为盘号(a为基本盘，b为基本从属盘，c为辅助主盘，d为辅助从属盘)，”~”代表分区，前四个分区用数字1到4表示，它们是主分区或扩展分区，从5开始就是逻辑分区。例，hda3表示为第一个IDE硬盘上的第三个主分区或扩展分区,hdb2表示为第二个IDE硬盘上的第二个主分区或扩展分区。</li>
+<li>对于SCSI硬盘则标识为“sdx~&quot;，SCSI硬盘是用“sd”来表示分区所在设备的类型的，其余则和IDE硬盘的表示方法一样。</li>
+</ul>
+</li>
+<li>
+<p>挂载一块新硬盘</p>
+<ul>
+<li>查看分区详细信息：<code>lsblk -f</code></li>
+</ul>
+<ol>
+<li>
+<p>添加一块新硬盘</p>
+</li>
+<li>
+<p>创建分区</p>
+<p><img src="/assets/linux/img/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210226095153.png" alt="" /></p>
+</li>
+<li>
+<p>格式化分区并指定该分区的文件类型：<code>mkfs -t ext4 /dev/sdb2</code></p>
+</li>
+<li>
+<p>将该分区挂载到对应目录下：<code>mount /dev/sdb1 目录名</code></p>
+<ol>
+<li>卸载命令：<code>umount /dev/sdb1</code></li>
+<li>用命令行挂载的方式重启后后会失效</li>
+</ol>
+</li>
+<li>
+<p>开机自动挂载方式</p>
+<ol>
+<li>
+<p>编辑挂载对应关系表：<code>vim /etc/fstab</code></p>
+</li>
+<li>
+<p>添加需要的挂载关系</p>
+<p><img src="/assets/linux/img/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210226103607.png" alt="" /></p>
+</li>
+<li>
+<p>保存退出重启后分区会自动挂载到对应的文件下</p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>
+<p>查看分区使用情况：<code>df -h</code></p>
+</li>
+<li>
+<p>查看某个具体文件占用内存的情况</p>
+<p><img src="/assets/linux/img/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210226104742.png" alt="" /></p>
+<p><img src="/assets/linux/img/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210226104913.png" alt="" /></p>
+</li>
+<li>
+<p>统计个数命令：<code>wc -l</code></p>
+</li>
+<li>
+<p>磁盘情况查询</p>
+<ul>
+<li><code>df -h</code></li>
+</ul>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210301160728.png" alt="" /></p>
+</li>
+<li>
+<p>使用<code>tree</code>命令查看文件目录状态</p>
+<ul>
+<li>下载tree，<code>yum install tree</code></li>
+<li><code>tree 目录</code> 查看</li>
+</ul>
+</li>
+</ul>
+<h2 id="网络配置"><a class="header" href="#网络配置">网络配置</a></h2>
+<ul>
+<li>
+<p><strong>linux网络环境配置</strong></p>
+</li>
+<li>
+<p>第一种方法(自动获取):</p>
+<ul>
+<li>登陆后，通过界面的来设置自动获取ip，特点 :linux启动后会自动获取IP缺点是每次自动获取的ip地址可能不一样。</li>
+</ul>
+</li>
+<li>
+<p>第二种方式(指定ip)</p>
+<ul>
+<li>直接修改配置文件来指定IP,并可以连接到外网,编辑<code>vim /etc/sysconfig/network-scripts/ifcfg-ens33</code></li>
+<li>进行如下编辑</li>
+</ul>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210301162459.png" alt="" /></p>
+<ul>
+<li>保存退出后重启网络服务<code>service network restart</code>或重启<code>reboot</code>即可</li>
+<li>如果使用虚拟机则还需要更改虚拟机的地址</li>
+</ul>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210301162955.png" alt="" /></p>
+</li>
+<li>
+<p>设置主机名和host映射</p>
+<ul>
+<li>设置主机名
+<ul>
+<li><code>hostname</code> 查看主机名</li>
+<li>在/etc/hostname文件内修改主机名</li>
+<li>修改后重启才生效</li>
+</ul>
+</li>
+<li>hosts映射
+<ul>
+<li>编辑/etc/hosts文件</li>
+<li><code>vim /etc/host</code></li>
+<li>添加对应的关系<code>ip 对应的名字</code></li>
+<li>window下在C:\Windows\System32\drivers\etc目录下编辑hosts文件</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>主机名解析过程分析(Hosts、DNS)</p>
+<ul>
+<li>Hosts是什么
+<ul>
+<li>一个文本文件,用来记录IP和Hostname(主机名)的映射关系</li>
+</ul>
+</li>
+<li>DNS
+<ol>
+<li>DNS，就是Domain Name System的缩写，翻译过来就是域名系统</li>
+<li>是互联网上作为域名和IP地址相互映射的一个分布式数据库</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>
+<p>主机名解析机制分析(Hosts、DNS)</p>
+<ul>
+<li>应用实例:用户在浏览器输入了www.baidu.com
+<ol>
+<li>浏览器先检查浏览器缓存中有没有该域名解析IP地址，有就先调用这个IP完成解析;如果没有检查操作系统DNS解析器缓存，如果有直接返回IP完成解析。这两个缓存，可以理解为本地解析器缓存</li>
+<li>一般来说，当电脑第一次成功访问某一网站后，在一定时间内，浏览器或操作系统会缓存他的IP地址（DNS解析记录)
+<ul>
+<li>如在cmd窗口中输入
+<ul>
+<li><code>ipconfig /displaydns</code>  DNS域名解析缓存</li>
+<li><code>ipconfig /flushdns</code>  手动清理dns缓存</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>如果本地解析器缓存没有找到对应映射，检查系统中hosts文件中有没有配置对应的域名IP映射，如果有，则完成解析并返回.</li>
+<li>如果本地DNS解析器缓存和hosts文件中均没有找到对应的IP，则到域名服务DNS进行解析域</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="进程管理"><a class="header" href="#进程管理">进程管理</a></h2>
+<ul>
+<li>
+<p>基本介绍</p>
+<ul>
+<li>在LINUX中，每个执行的程序都称为一个进程。每一个进程都分配一个ID号(pid,进程号)。</li>
+<li>每个进程都可能以两种方式存在的。前台与后台，所谓前台进程就是用户目前的屏幕上可以进行操的。后台进程则是实际在操作，但由于屏幕上无法看到的进程，通常使用后台方式执行。</li>
+<li>一般系统的服务都是以后台进程的方式存在，而且都会常驻在系统中。直到关机才才结束。</li>
+</ul>
+</li>
+<li>
+<p>显示系统执行的进程</p>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210301172751-1614591095276.png" alt="" /></p>
+</li>
+<li>
+<p>ps详解</p>
+<ul>
+<li>指令:ps -auxlgrep xxx ，比如我看看有没有sshd服务</li>
+<li>指令说明
+<ul>
+<li>System V展示风格</li>
+<li>USER:用户名称</li>
+<li>PID:进程号</li>
+<li><strong>%CPU:进程占用CPU的百分比</strong></li>
+<li><strong>%MEM:进程占用物理内存的百分比</strong></li>
+<li><strong>VSZ:进程占用的虚拟内存大小(单位:KB)</strong></li>
+<li><strong>RSS:进程占用的物理内存大小(单位:KB )</strong></li>
+<li>TTY:终端名称,缩写．</li>
+<li>STAT:进程状态，其中S-睡眠，s-表示该进程是会话的先导进程，N-表示进程拥有比普通优先级更低的优先级，R-正在运行，D-短期等待，Z-僵死进程，T-被跟踪或者被停止等等</li>
+<li>STARTED:进程的启动时间</li>
+<li>TIME : CPU时间，即进程使用CPU的总时间</li>
+<li>COMMAND:启动进程所用的命令和参数，如果过长会被截断显示</li>
+</ul>
+</li>
+<li>以全格式显示当前进程</li>
+</ul>
+</li>
+<li>
+<p><img src="/assets/linux/img/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210302091332.png" alt="" /></p>
+</li>
+<li>
+<p>终止进程</p>
+<ul>
+<li><code>kill</code>
+<ul>
+<li><code>kill 进程id</code> 杀死对应id的进程 </li>
+<li><code>kill -9 进程id</code> 强制杀死一个进程</li>
+</ul>
+</li>
+<li><code>killall</code>
+<ul>
+<li><code>kill 进程名</code> 杀死对应进程名的进程</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>以树状形式显示进程信息</p>
+<ul>
+<li><code>pstree</code>
+<ul>
+<li><code>pstree -p</code> 以树状形式显示进程信息并显示进程id</li>
+<li><code>pstree -u</code> 以树状形式显示进程信息并显示进程登录的用户</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>服务管理</strong></p>
+</li>
+</ul>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210302095630.png" alt="" /></p>
+<ul>
+<li>使用<code>setup</code>指令查看全部服务，管理开机自启的服务</li>
+</ul>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210302100003.png" alt="" /></p>
+<ul>
+<li>
+<p><code>chkconfig</code>指令</p>
+<ul>
+<li><code>chkconfig 服务名 --list</code> 查看服务</li>
+<li><code>chkconfig --level 系统级别 服务名 on/off </code>设置某个服务在那个系统级别自启动</li>
+</ul>
+</li>
+<li>
+<p><code>systemctl</code>指令</p>
+<ul>
+<li><code>systemctl [start|stop|restart|status] 服务名</code></li>
+<li><code>systemctl list-unit-files</code> 查看开机启动的状态</li>
+<li><code>systemctl ebable 服务名</code> 设置服务开机启动</li>
+<li><code>systemctl disable 服务名</code> 关闭服务开机启动</li>
+<li><code>systemctl is-enabled</code> 查看某个服务是否开机自启 </li>
+</ul>
+</li>
+<li>
+<p><code>firewall</code>指令</p>
+<ul>
+<li><code>firewall-cmd --permanent --add-port=端口号/协议</code> 打开端口</li>
+<li><code>firewall-cmd --permanent --remove-port=端口号/协议</code> 关闭端口</li>
+<li><code>firewall-cmd --reload</code> 重载端口，打开和关闭端口后必须重载才能生效</li>
+<li><code>firewall-cmd --query-port=端口号/协议</code> 查询端口号是否打开</li>
+</ul>
+</li>
+<li>
+<p><code>top</code>命令</p>
+<ul>
+<li><code>top -d 秒数</code> 每隔多少秒更新一次</li>
+<li><code>top -i</code> 不显示闲置和僵死进程</li>
+<li><code>top -p 进程id</code> 通过id监控某个指定的进程</li>
+</ul>
+</li>
+<li>
+<p><strong>动态监控进程</strong></p>
+</li>
+<li>
+<p>输入<code>top</code>指令后可以输入以下命令进行交互</p>
+<ul>
+<li><code>P</code> 以CPU使用率排序（默认）</li>
+<li><code>M</code> 以内存使用率排序</li>
+<li><code>N</code> 以进程id排序</li>
+<li><code>q</code> 退出</li>
+</ul>
+</li>
+<li>
+<p>查看网络情况</p>
+<ul>
+<li><code>netstat -an</code> 按顺序排序输出</li>
+<li><code>netstat -p</code> 显示那个进程在调用</li>
+<li>常用使用直接输入<code>netstat -anp</code> </li>
+</ul>
+</li>
+</ul>
+<h2 id="rpm和yum"><a class="header" href="#rpm和yum">RPM和YUM</a></h2>
+<ul>
+<li><strong>rpm包管理</strong>
+<ul>
+<li>rpm用于互联网下载包的打包及安装工具，它包含在某些Linux分发版中。它生成具有.RPM扩展名的文件。RPM是RedHat Package Manager (RedHat软件包管理工具）的缩写，类似windows的setup.exe，这一文件格式名称虽然打上了RedHat的标志，但理念是通用的。</li>
+<li>Linux的分发版本都有采用(suse,redhat, centos等等），可以算是公认的行业标准了。</li>
+</ul>
+</li>
+<li><code>rpm</code>相关指令
+<ul>
+<li><code>rpm -qa</code> 查询安装的所有软件包</li>
+<li><code>rpm - q 软件名</code> 查询该软件是否安装
+<ul>
+<li><code>rpm -qi 软件名</code> 查询该软件的详细信息</li>
+</ul>
+</li>
+<li><code>rpm -ql 软件名</code> 查询该软件包包含哪些文件</li>
+<li><code>rpm -qf 文件全路径</code> 查询该文件输入那个软件</li>
+<li><code>rpm -e 软件包名</code> 卸载相指令</li>
+<li><code>rpm -ivh 软件包全明</code> 安装软件包
+<ul>
+<li><code>-i</code> 安装</li>
+<li><code>-v</code> 提示</li>
+<li><code>-h</code> 进度条</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>yum</code>包管理
+<ul>
+<li>Yum是一Shell前端软件包管理器。基于RPM包管理，能够从指定的服务器自动下载RPM包并且安装，可以自动处理依赖性关系，并且一次安装所有依赖的软件包。</li>
+<li>配置源
+<ol>
+<li><code>cd /etc/yum.repos.d/</code> 切到/etc/yum.	.d目录</li>
+<li><code>mv CentOS-Base.repo CentOS-Base.repo.backup</code> 备份CentOS-Base.repo文件</li>
+<li><code>wget http://mirrors.aliyun.com/repo/Centos-7.repo</code> 使用<code>wget</code>下载阿里的源文件
+<ol>
+<li>使用<code>wget</code>如果报无法解析主机名则需要手动配置DNS</li>
+<li><code>vim /etc/resolv.conf</code> 编辑/etc/resolv.conf文件
+<ol>
+<li><code>service resatrt network</code>重启网络服务后<code>wget</code>就可以使用了</li>
+<li>如果重启网络后/etc/resolv.conf内的数据恢复原样，就看文件头是否有Generated by NetworkManager注释字样</li>
+<li>有则需要关闭NetworkManager服务，因为DNS被NetworkManager服务自动生成了</li>
+<li><code>systemctl stop NetworkManager</code> 关闭NetworkManager服务</li>
+<li><code>systemctl disable NetworkManager</code> 关闭NetworkManager服务的开机自启</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><code>mv Centos-7.repo CentOS-Base.repo</code>将下载好的Centos-7.repo文件重命名为CentOS-Base.repo`</li>
+<li><code>yum clean all</code> 清理缓存</li>
+<li><code>yum makecache</code> 生成缓存</li>
+<li>等待</li>
+</ol>
+</li>
+<li><code>yum listlgrep 软件列表</code> 查询yum服务器是否有需要安装的软件</li>
+<li><code>yum install 软件包名</code> 安装指定软件</li>
+</ul>
+</li>
+</ul>
+<h2 id="安装jdk"><a class="header" href="#安装jdk">安装jdk</a></h2>
+<ol>
+<li>
+<p>在/opt目录下创建jdk目录存放jdk压缩文件<code>mkdir /opt/jdk</code></p>
+</li>
+<li>
+<p>在/usr/local目录下创建java目录存放解压后的文件<code>mkdir /usr/local/java</code></p>
+</li>
+<li>
+<p>将/opt/jdk目录下的压缩文件解压到/usr/local/java目录下<code>tar -zxvf 压缩包名 -C /usr/local/java</code></p>
+</li>
+<li>
+<p>配置环境变量<code>vim /etc/profile</code></p>
+</li>
+<li>
+<p>添加如下代码</p>
+<pre><code class="language-bash">export JAVA_HOME=/usr/local/java/jdk1.8.0_281
+export PATH=$JAVA_HOME/bin:$PATH
+</code></pre>
+</li>
+</ol>
+<h2 id="shell编程"><a class="header" href="#shell编程">Shell编程</a></h2>
+<ul>
+<li>Shell是一个命令行解释器，它为用户提供了一个向Linux内核发送请求以便运行程序的界面系统级程序，用户可以用Shell来启动、挂起、停止甚至是编写一些程序。
+<ul>
+<li>创建一个以.sh结尾的文件，编写相应的bash脚本并保存
+<ul>
+<li>修改所有者拥有执行权限使用<code>./文件名</code>执行文件</li>
+<li>或者不用修改权限直接使用<code>sh 文件名</code> 执行文件</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="shell变量"><a class="header" href="#shell变量">Shell变量</a></h3>
+<p><code>$HOME</code>、<code>$PATH</code>、<code>$PWD</code>等为系统变量</p>
+<h4 id="位置参数变量"><a class="header" href="#位置参数变量">位置参数变量</a></h4>
+<ul>
+<li>获取执行shell脚本时后面带的参数</li>
+<li>例如<code>var.sh 100</code>后面的100就是参数
+<ul>
+<li>文件内使用<code>$1~$9</code>获取文件后的1~9位参数而<code>$0</code>为文件名本身</li>
+<li>第十个参数往后使用大括号包裹数组<code>${11}</code>来获取</li>
+<li>使用<code>$*</code>是将参数看作一个整体获取，相当于获取到一个所有参数组成的字符串</li>
+<li>使用<code>$@</code>获取到所有参数组成的集合</li>
+<li>使用<code>$#</code>获取所有参数的个数</li>
+</ul>
+</li>
+</ul>
+<h4 id="预定义变量"><a class="header" href="#预定义变量">预定义变量</a></h4>
+<ul>
+<li>就是shell设计者事先已经定义好的变量，可以直接在shell脚本中使用
+<ul>
+<li><code>$$</code> 当前进程的进程号(PID ) </li>
+<li><code>$!</code> 后台运行的最后一个进程的进程号（PID ) </li>
+<li><code>$?</code>（最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行;如果这个变量的值为非0(具体是哪个数，由命令自己来决定），则证明上一个命令执行不正确了</li>
+</ul>
+</li>
+</ul>
+<h3 id="运算符"><a class="header" href="#运算符">运算符</a></h3>
+<ul>
+<li>使用<code>$((运算式))</code>或者<code>$[运算式]</code></li>
+<li>或者<code>expr 运算式</code>这里的运算式必须有空格</li>
+</ul>
+<h4 id="条件判断"><a class="header" href="#条件判断">条件判断</a></h4>
+<blockquote>
+<p><strong>if</strong></p>
+</blockquote>
+<ul>
+<li>
+<p><strong>语法：</strong></p>
+<pre><code class="language-bash">if [ 条件 ]
+then
+	分支一
+elif [ 条件 ]
+then
+	分支二
+else
+	分支三
+fi
+</code></pre>
+<ul>
+<li>数值比较
+<ul>
+<li><code>-lt</code> 小于、<code>-le</code> 小于等于、<code>-eq</code> 等于、<code>-gt</code> 大于、<code>-ge</code> 大于等于、<code>-ne</code> 不等于</li>
+</ul>
+</li>
+<li>文件权限判断
+<ul>
+<li><code>-r</code> 是否有读的权限</li>
+<li><code>-w</code> 是否有写的权限</li>
+<li><code>-x</code> 是否有执行的权限</li>
+</ul>
+</li>
+<li>文件类型判断
+<ul>
+<li><code>-f</code> 文件是否存在并且是一个常规的文件</li>
+<li><code>-e</code> 文件是否存在</li>
+<li><code>-d</code> 文件是否存在并且是一个目录</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>case</strong></p>
+</blockquote>
+<ul>
+<li>
+<p>语法</p>
+<pre><code class="language-bash">case 值 in
+&quot;匹配值1&quot;)
+echo one
+;;
+&quot;匹配值2&quot;)
+echo two
+;;
+*)
+echo other
+;;
+esac
+</code></pre>
+</li>
+</ul>
+<blockquote>
+<p><strong>for循环</strong></p>
+</blockquote>
+<ul>
+<li>
+<p>语法</p>
+<pre><code class="language-bash">for 变量 in 值
+do
+	循环体        
+done
+</code></pre>
+<pre><code class="language-bash">for(( i=1; i&lt;=100; i++ ))
+do
+        循环体
+done
+
+</code></pre>
+</li>
+</ul>
+<blockquote>
+<p><strong>while循环</strong></p>
+</blockquote>
+<ul>
+<li>
+<p>语法</p>
+<pre><code class="language-bash">while [ 条件 ]
+do
+	循环体
+done
+</code></pre>
+</li>
+</ul>
+<h4 id="read读取控制台输入"><a class="header" href="#read读取控制台输入">read读取控制台输入</a></h4>
+<ul>
+<li>
+<p><code>read 选项 参数</code></p>
+</li>
+<li>
+<p><code>-p</code> 指定读取值时的提示符;</p>
+</li>
+<li>
+<p><code>-t</code> 指定读取值时等待的时间(秒），如果没有在指定的时间内输入，就不再等待了。.参数</p>
+</li>
+</ul>
+<h4 id="函数"><a class="header" href="#函数">函数</a></h4>
+<ul>
+<li>
+<p>系统函数</p>
+<ul>
+<li><code>basename 路径</code> 获取路径里的文件名</li>
+<li><code>basename 路径 后缀</code> 获取路径里的文件名并去掉文件名的后缀</li>
+<li><code>basedir 路径</code> 获取过文件的路径</li>
+</ul>
+</li>
+<li>
+<p>自定义函数</p>
+<pre><code class="language-bash"># 定义函数
+function 函数名(){
+	函数体
+}
+
+# 调用函数
+
+函数名 参数……
+</code></pre>
+</li>
+</ul>
+<h2 id="日志管理"><a class="header" href="#日志管理">日志管理</a></h2>
+<ul>
+<li>日志文件是重要的系统信息文件，其中记录了许多重要的系统事件，包括用户的登录信息、系统的启动信息、系统的安全信息、邮件相关信息、各种服务相关信息等。</li>
+<li>日志对于安全来说也很重要，它记录了系统每天发生的各种事情，通过日志来检查错误发生的原因或者受到攻击时攻击者留下的痕迹。</li>
+<li>系统常用的日志</li>
+</ul>
+<p><img src="/assets/linux/img/QQ%E6%88%AA%E5%9B%BE20210315151313.png" alt="" /></p>
+<ul>
+<li><code>rsyslogd</code>服务管理这常用的系统日志</li>
+<li><code>/etc/rsyslog.conf</code>文件为<code>rsyslog</code>日志进程的配置文件</li>
+<li><strong>查看内存日志</strong>
+<ul>
+<li><code>journalctl</code> 可以查看内存日志,这里我们看看常用的指令journalctl##查看全部</li>
+<li><code>journalctl -n3</code> ##查看最新3条</li>
+<li><code>journalctl --since 19:00 --until 19:10:10</code> #查看起始时间到结束时间的日志可加日期journalctl -p err ##报错日志</li>
+<li><code>journalctl -o verbose</code> ##日志详细内容</li>
+<li><code>journalctl_PiD=1245_COMM=sshd</code> ##查看包含这些参数的日志（在详细日志查看)</li>
+</ul>
+</li>
 </ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                                <i class="fa fa-angle-left"></i>
-                            </a>
 
-                            <a rel="next" href="../linux/basics/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../linux/desktop_env/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -189,11 +1268,8 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                        <i class="fa fa-angle-left"></i>
-                    </a>
 
-                    <a rel="next" href="../linux/basics/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../linux/desktop_env/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

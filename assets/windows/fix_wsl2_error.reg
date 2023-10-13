@@ -1,0 +1,4 @@
+Windows Registry Editor Version 5.00
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WinSock2\Parameters\AppId_Catalog\0408F7A3]
+"AppFullPath"="C:\\Windows\\System32\\wsl.exe"
+"PermittedLspCategories"=dword:80000000 
