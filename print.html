@@ -2168,7 +2168,13 @@ systemd=true
 </li>
 </ul>
 <h2 id="数据卷"><a class="header" href="#数据卷">数据卷</a></h2>
+<ul>
+<li><code>docker volume</code></li>
+</ul>
 <h2 id="网络"><a class="header" href="#网络">网络</a></h2>
+<ul>
+<li><code>docker network</code></li>
+</ul>
 <p><code>docker build -t 镜像名称:镜像标签 Dockerfile目录</code> 制作镜像</p>
 <h2 id="其他"><a class="header" href="#其他">其他</a></h2>
 <h3 id=""><a class="header" href="#"></a></h3>
@@ -2936,6 +2942,151 @@ e --&gt; w
 </li>
 </ul>
 <h1 id="settingsxml"><a class="header" href="#settingsxml"><a href="java/maven/../../assets/java/settings.xml">settings.xml</a></a></h1>
+<h2 id="maven坐标"><a class="header" href="#maven坐标">Maven坐标</a></h2>
+<blockquote>
+<p>定位jar包，简称<code>gav</code></p>
+</blockquote>
+<ul>
+<li><code>groupId</code> 公司/项目</li>
+<li><code>artifactId</code> 模块</li>
+<li><code>version</code> 版本</li>
+</ul>
+<h2 id="常用命令-2"><a class="header" href="#常用命令-2">常用命令</a></h2>
+<blockquote>
+<p>构建相关命令要在pom.xml路径下执行</p>
+</blockquote>
+<ul>
+<li>
+<p><code>mvn -v</code> 插件maven的版本信息</p>
+</li>
+<li>
+<p><code>mvn clean</code> 清理target目录</p>
+</li>
+<li>
+<p><code>mvn compile</code> 编译项目</p>
+<ul>
+<li>编译后的文件在target目录下</li>
+</ul>
+</li>
+<li>
+<p><code>mvn test-compile</code> 编译测试目录</p>
+<ul>
+<li>编译后的文件在target目录下</li>
+</ul>
+</li>
+<li>
+<p><code>mvn test</code> 执行测试代码</p>
+</li>
+<li>
+<p><code>mvn package</code> 项目打包，jar或war包</p>
+<ul>
+<li>打包后的文件在target目录下</li>
+</ul>
+</li>
+<li>
+<p><code>mvn install</code> 安装当前项目到本地仓库</p>
+<ul>
+<li><code>mvn install -Dmaven.test.skip=true</code> 跳过测试</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>根据gav(Maven坐标可)以找到本地对应的位置</p>
+</blockquote>
+<ul>
+<li>
+<p><code>mvn dependency:list</code> 列出当前项目的jar包依赖</p>
+</li>
+<li>
+<p><code>mvn dependency:tree</code> 以树型方式列出当前项目的jar包依赖</p>
+</li>
+</ul>
+<h2 id="依赖"><a class="header" href="#依赖">依赖</a></h2>
+<h3 id="依赖范围-scope标签"><a class="header" href="#依赖范围-scope标签">依赖范围, scope标签</a></h3>
+<blockquote>
+<p>在dependencies/dependency/scope标签内</p>
+</blockquote>
+<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+<blockquote>
+<p>scope标签可选值：compile,test,provided,system,runtime,import</p>
+</blockquote>
+<ul>
+<li>
+<p><code>compile</code> 默认值，在所有情况下都有用</p>
+</li>
+<li>
+<p><code>test</code> 只在test目录下可以使用</p>
+</li>
+<li>
+<p><code>provided</code> 除了不会被打包，其他情况都可以使用</p>
+</li>
+</ul>
+<h3 id="依赖传递"><a class="header" href="#依赖传递">依赖传递</a></h3>
+<p>依赖的scope为compile才能传递</p>
+<h3 id="依赖排除"><a class="header" href="#依赖排除">依赖排除</a></h3>
+<ul>
+<li>在需要排除依赖的标签内添加以下标签</li>
+</ul>
+<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+    &lt;exclusions&gt;
+        &lt;!-- 排除junit包--&gt;
+        &lt;exclusion&gt;
+            &lt;groupId&gt;junit&lt;/groupId&gt;
+            &lt;artifactId&gt;junit&lt;/artifactId&gt;
+        &lt;/exclusion&gt;
+    &lt;/exclusions&gt;
+&lt;/dependency&gt;
+</code></pre>
+<h2 id="继承"><a class="header" href="#继承">继承</a></h2>
+<blockquote>
+<p>当前工程的打包方式为pom的工程才能是工程</p>
+</blockquote>
+<h2 id="依赖管理"><a class="header" href="#依赖管理">依赖管理</a></h2>
+<ul>
+<li>在父工程内添加dependencyManagement标签添加依赖管理</li>
+</ul>
+<pre><code class="language-xml">&lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+    &lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;
+    &lt;version&gt;3.1.0&lt;/version&gt;
+  &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;
+</code></pre>
+<ul>
+<li>
+<p>然后在子工程内添加对应的依赖信息就可以使用，可以不添加version标签</p>
+</li>
+<li>
+<p>在properties标签内可以添加某个jar包内具体的版本号信息，在dependency标签内可以使用表达式使用</p>
+</li>
+</ul>
+<pre><code class="language-xml">&lt;properties&gt;
+    &lt;java.version&gt;11&lt;/java.version&gt;
+    &lt;!-- 在这里定义 --&gt; 
+    &lt;javax.servlet-api.version&gt;3.1.0&lt;/javax.servlet-api.version&gt;
+&lt;/properties&gt;
+
+&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+        &lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;
+        &lt;!-- 在这里使用 --&gt; 
+        &lt;version&gt;${javax.servlet-api.version}&lt;/version&gt;
+        &lt;scope&gt;provided&lt;/scope&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="设计模式"><a class="header" href="#设计模式">设计模式</a></h1>
 <h2 id="oop七大原则"><a class="header" href="#oop七大原则">OOP七大原则</a></h2>
 <p><strong>1、开闭原则（Open Close Principle）</strong></p>
@@ -7539,10 +7690,38 @@ public class LoginController {
 <p>文件之间的关系，spring security 通过投票决策的方式对资源进行授权</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="spring-cloud"><a class="header" href="#spring-cloud">Spring Cloud</a></h1>
 <h2 id="注册中心"><a class="header" href="#注册中心">注册中心</a></h2>
+<h3 id="eureka"><a class="header" href="#eureka">Eureka</a></h3>
+<h3 id="nacos"><a class="header" href="#nacos">Nacos</a></h3>
 <h2 id="配置中心"><a class="header" href="#配置中心">配置中心</a></h2>
+<h3 id="nacos-1"><a class="header" href="#nacos-1">Nacos</a></h3>
 <h3 id="配置优先级"><a class="header" href="#配置优先级">配置优先级</a></h3>
 <h3 id="远程环境配置远程共享配置本地配置"><a class="header" href="#远程环境配置远程共享配置本地配置">远程环境配置&gt;远程共享配置&gt;本地配置</a></h3>
 <h2 id="远程调用"><a class="header" href="#远程调用">远程调用</a></h2>
+<h3 id="feign"><a class="header" href="#feign">Feign</a></h3>
+<h3 id="ribbon-负载均衡"><a class="header" href="#ribbon-负载均衡">Ribbon 负载均衡</a></h3>
+<h2 id="网关"><a class="header" href="#网关">网关</a></h2>
+<h3 id="gateway"><a class="header" href="#gateway">Gateway</a></h3>
+<h2 id="消息队列"><a class="header" href="#消息队列">消息队列</a></h2>
+<h3 id="springamqp"><a class="header" href="#springamqp">SpringAMQP</a></h3>
+<blockquote>
+<p>消息队列通用协议</p>
+</blockquote>
+<h3 id="rabbitmq"><a class="header" href="#rabbitmq">RabbitMQ</a></h3>
+<h3 id="rocketmq"><a class="header" href="#rocketmq">RocketMQ</a></h3>
+<h3 id="kafka"><a class="header" href="#kafka">Kafka</a></h3>
+<h2 id="文本搜索"><a class="header" href="#文本搜索">文本搜索</a></h2>
+<h3 id="elasticsearch"><a class="header" href="#elasticsearch">Elasticsearch</a></h3>
+<h4 id="倒排索引"><a class="header" href="#倒排索引">倒排索引</a></h4>
+<h4 id="分词器"><a class="header" href="#分词器">分词器</a></h4>
+<h4 id="mapping"><a class="header" href="#mapping">mapping</a></h4>
+<h4 id="dsl"><a class="header" href="#dsl">DSL</a></h4>
+<h5 id="restclient-使用"><a class="header" href="#restclient-使用">RestClient 使用</a></h5>
+<h4 id="查询语法"><a class="header" href="#查询语法">查询语法</a></h4>
+<h4 id="数据同步"><a class="header" href="#数据同步">数据同步</a></h4>
+<h2 id="限流容灾"><a class="header" href="#限流容灾">限流、容灾</a></h2>
+<h3 id="sentinel"><a class="header" href="#sentinel">Sentinel</a></h3>
+<h2 id="分布式事务"><a class="header" href="#分布式事务">分布式事务</a></h2>
+<h3 id="seata"><a class="header" href="#seata">Seata</a></h3>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="mysql"><a class="header" href="#mysql">Mysql</a></h1>
 <h2 id="安装步骤"><a class="header" href="#安装步骤">安装步骤</a></h2>
 <ul>
