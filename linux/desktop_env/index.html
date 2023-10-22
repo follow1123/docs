@@ -282,19 +282,21 @@
 </li>
 </ul>
 <h2 id="ssh"><a class="header" href="#ssh">ssh</a></h2>
+<h3 id="ssh密钥登录"><a class="header" href="#ssh密钥登录">ssh密钥登录</a></h3>
+<blockquote>
+<p>假如<code>a</code>需要连接到<code>b</code></p>
+</blockquote>
+<pre><code class="language-bash"># 在`a`的终端下输入命令生成密钥，保存在当前用户目录下的.ssh文件夹内
+ssh-keygen # 正常环境下有提示回车即可（生产环境下需要看一下提示）
+
+# 将`a`机器下的~/.ssh/id_rsa.pub文件推送到服务器`b`上
+scp ~/.ssh/id_rsa.pub 用户名@`b`的ip:需要登录的用户目录/.ssh/authorized_keys
+
+# 使用ssh连接
+ssh `b`
+</code></pre>
 <ul>
-<li>使用密钥登录
-<ul>
-<li>linux 服务端需要登录的用户家目录下新建.ssh文件夹（如果没有）</li>
-<li>客户端使用<code>ssh-keygen</code>命令生成密钥对</li>
-<li>将生成的<code>id_rsa.pub</code>公钥发送到服务端家目录下的<code>.ssh/authorized_keys</code>文件内</li>
-<li>出现 WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!
-<ul>
-<li>使用命令清除所连接的IP<code>ssh-keygen -R XX.XX.XX.XX</code></li>
-</ul>
-</li>
-</ul>
-</li>
+<li>清理密钥 <code>ssh-keygen -R ip</code></li>
 </ul>
 <h2 id="apt"><a class="header" href="#apt">apt</a></h2>
 <ul>

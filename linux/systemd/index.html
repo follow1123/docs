@@ -256,6 +256,33 @@
 <blockquote>
 <p>loginctl</p>
 </blockquote>
+<h4 id="登录管理器配置文件"><a class="header" href="#登录管理器配置文件">登录管理器配置文件</a></h4>
+<ul>
+<li>默认路径</li>
+</ul>
+<pre><code class="language-bash">/etc/systemd/logind.conf
+/etc/systemd/logind.conf.d/*.conf
+/run/systemd/logind.conf.d/*.conf
+/usr/lib/systemd/logind.conf.d/*.conf
+</code></pre>
+<h2 id="常用配置项说明"><a class="header" href="#常用配置项说明">常用配置项说明</a></h2>
+<blockquote>
+<p>参考<a href="https://man.archlinux.org/man/logind.conf.5.en">archwiki</a></p>
+</blockquote>
+<ul>
+<li>
+<p><code>HandlePowerKey</code> 按下电源键操作</p>
+</li>
+<li>
+<p><code>IdleAction</code> 电脑空闲时的操作</p>
+</li>
+<li>
+<p><code>IdleActionSec</code> 电脑空闲多少时间后执行空闲操作</p>
+</li>
+<li>
+<p><code>HandleLidSwitch</code> 笔记本合盖操作</p>
+</li>
+</ul>
 <h3 id="unit配置保存路径"><a class="header" href="#unit配置保存路径">Unit配置保存路径</a></h3>
 <ul>
 <li>优先级从高到低</li>
