@@ -1,0 +1,454 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Shiro - 文档</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../linux/index.html"><strong aria-hidden="true">1.</strong> Linux</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../linux/desktop_env/index.html"><strong aria-hidden="true">1.1.</strong> Linux桌面环境</a></li><li class="chapter-item expanded "><a href="../../linux/vsftp/index.html"><strong aria-hidden="true">1.2.</strong> vsftp</a></li><li class="chapter-item expanded "><a href="../../linux/systemd/index.html"><strong aria-hidden="true">1.3.</strong> systemd</a></li></ol></li><li class="chapter-item expanded "><a href="../../windows/index.html"><strong aria-hidden="true">2.</strong> Windows</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../windows/command_prompt/index.html"><strong aria-hidden="true">2.1.</strong> Command Prompt</a></li><li class="chapter-item expanded "><a href="../../windows/wsl2/index.html"><strong aria-hidden="true">2.2.</strong> wsl2</a></li></ol></li><li class="chapter-item expanded "><a href="../../docker/index.html"><strong aria-hidden="true">3.</strong> Docker</a></li><li class="chapter-item expanded "><a href="../../git/index.html"><strong aria-hidden="true">4.</strong> Git</a></li><li class="chapter-item expanded "><a href="../../java/index.html"><strong aria-hidden="true">5.</strong> Java</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../java/java_basics/index.html"><strong aria-hidden="true">5.1.</strong> Java基础</a></li><li class="chapter-item expanded "><a href="../../java/multithreading/index.html"><strong aria-hidden="true">5.2.</strong> 多线程</a></li><li class="chapter-item expanded "><a href="../../java/maven/index.html"><strong aria-hidden="true">5.3.</strong> Maven</a></li><li class="chapter-item expanded "><a href="../../java/gradle/index.html"><strong aria-hidden="true">5.4.</strong> Gradle</a></li><li class="chapter-item expanded "><a href="../../java/design_pattern/index.html"><strong aria-hidden="true">5.5.</strong> 设计模式</a></li><li class="chapter-item expanded "><a href="../../java/java_web/index.html"><strong aria-hidden="true">5.6.</strong> Java Web</a></li><li class="chapter-item expanded "><a href="../../java/SSM/index.html"><strong aria-hidden="true">5.7.</strong> SSM</a></li><li class="chapter-item expanded "><a href="../../java/project/index.html"><strong aria-hidden="true">5.8.</strong> 项目</a></li><li class="chapter-item expanded "><a href="../../java/shiro/index.html" class="active"><strong aria-hidden="true">5.9.</strong> Shiro</a></li><li class="chapter-item expanded "><a href="../../java/netty/index.html"><strong aria-hidden="true">5.10.</strong> Netty</a></li><li class="chapter-item expanded "><a href="../../java/spring/index.html"><strong aria-hidden="true">5.11.</strong> Spring</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../../java/spring/spring_security/index.html"><strong aria-hidden="true">5.11.1.</strong> Spring Security</a></li><li class="chapter-item expanded "><a href="../../java/spring/spring_cloud/index.html"><strong aria-hidden="true">5.11.2.</strong> Spring Cloud</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../../mysql/index.html"><strong aria-hidden="true">6.</strong> Mysql</a></li><li class="chapter-item expanded "><a href="../../nginx/index.html"><strong aria-hidden="true">7.</strong> Nginx</a></li><li class="chapter-item expanded "><a href="../../redis/index.html"><strong aria-hidden="true">8.</strong> Redis</a></li><li class="chapter-item expanded "><a href="../../vim/index.html"><strong aria-hidden="true">9.</strong> Vim/Neovim</a></li><li class="chapter-item expanded "><a href="../../vue/index.html"><strong aria-hidden="true">10.</strong> Vue</a></li><li class="chapter-item expanded "><a href="../../web/index.html"><strong aria-hidden="true">11.</strong> Web</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">文档</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="shiro"><a class="header" href="#shiro">Shiro</a></h1>
+<h2 id="认证authentication"><a class="header" href="#认证authentication">认证(Authentication)</a></h2>
+<h3 id="身份principals"><a class="header" href="#身份principals">身份(principals)</a></h3>
+<blockquote>
+<p>一般对应用户名、邮箱</p>
+</blockquote>
+<h3 id="证明凭证credentials"><a class="header" href="#证明凭证credentials">证明/凭证(credentials)</a></h3>
+<blockquote>
+<p>一般对应密码</p>
+</blockquote>
+<h2 id="授权authorization"><a class="header" href="#授权authorization">授权(Authorization)</a></h2>
+<h3 id="主体subject"><a class="header" href="#主体subject">主体(Subject)</a></h3>
+<blockquote>
+<p>对应用户等</p>
+</blockquote>
+<h3 id="资源"><a class="header" href="#资源">资源</a></h3>
+<blockquote>
+<p>对应菜单，按钮等</p>
+</blockquote>
+<h3 id="权限"><a class="header" href="#权限">权限</a></h3>
+<blockquote>
+<p>对应是否能对资源进行crud操作</p>
+</blockquote>
+<h3 id="角色"><a class="header" href="#角色">角色</a></h3>
+<blockquote>
+<p>权限集合</p>
+</blockquote>
+<h2 id="会话管理session-management"><a class="header" href="#会话管理session-management">会话管理(Session Management)</a></h2>
+<h2 id="web-support"><a class="header" href="#web-support">Web Support</a></h2>
+<h2 id="缓存caching"><a class="header" href="#缓存caching">缓存(Caching)</a></h2>
+<h2 id="concurrency"><a class="header" href="#concurrency">Concurrency</a></h2>
+<h2 id="测试testing"><a class="header" href="#测试testing">测试(Testing)</a></h2>
+<h2 id="run-as"><a class="header" href="#run-as">Run As</a></h2>
+<h2 id="remember-me"><a class="header" href="#remember-me">Remember Me</a></h2>
+<h2 id="代码"><a class="header" href="#代码">代码</a></h2>
+<h3 id="使用ini模拟登录"><a class="header" href="#使用ini模拟登录">使用ini模拟登录</a></h3>
+<ul>
+<li>Main.java</li>
+</ul>
+<pre><code class="language-java">import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.config.IniSecurityManagerFactory;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.subject.Subject;
+
+public class Main {
+    public static void main(String[] args) {
+        IniSecurityManagerFactory factory = new IniSecurityManagerFactory();
+        SecurityManager instance = factory.getInstance();
+        SecurityUtils.setSecurityManager(instance);
+
+        Subject subject = SecurityUtils.getSubject();
+
+        UsernamePasswordToken admin = new UsernamePasswordToken(&quot;admin&quot;, &quot;123456&quot;);
+
+        try {
+            subject.login(admin);
+            System.out.println(&quot;登录成功&quot;);
+        } catch (AuthenticationException e) {
+            System.out.println(&quot;用户名或密码错误&quot;);
+            throw new RuntimeException(e);
+        }
+    }
+}
+</code></pre>
+<ul>
+<li>resources目录下新建shiro.ini</li>
+</ul>
+<pre><code class="language-ini">[users]
+admin=123456
+</code></pre>
+<h3 id="使用ini文件模拟鉴权"><a class="header" href="#使用ini文件模拟鉴权">使用ini文件模拟鉴权</a></h3>
+<ul>
+<li>Main.java</li>
+</ul>
+<pre><code class="language-java">import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.config.IniSecurityManagerFactory;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.subject.Subject;
+
+public class Main {
+    public static void main(String[] args) {
+        IniSecurityManagerFactory factory = new IniSecurityManagerFactory();
+        SecurityManager instance = factory.getInstance();
+        SecurityUtils.setSecurityManager(instance);
+
+        Subject subject = SecurityUtils.getSubject();
+
+        UsernamePasswordToken user = new UsernamePasswordToken(&quot;admin&quot;, &quot;123456&quot;);
+//        UsernamePasswordToken user = new UsernamePasswordToken(&quot;zs&quot;, &quot;123&quot;);
+
+        try {
+            subject.login(user);
+            System.out.println(&quot;登录成功&quot;);
+
+            // 角色校验
+            boolean isAdmin = subject.hasRole(&quot;administrator&quot;);
+            if (isAdmin){
+                System.out.println(&quot;管理员登录&quot;);
+            }else{
+                System.out.println(&quot;非管理员登录&quot;);
+            }
+
+            // 权限校验
+            if (subject.isPermitted(&quot;user:view&quot;)) {
+                System.out.println(&quot;允许查看用户&quot;);
+            }
+
+            if (subject.isPermitted(&quot;user:delete&quot;)){
+                System.out.println(&quot;允许删除用户&quot;);
+            }
+
+        } catch (AuthenticationException e) {
+            System.out.println(&quot;用户名或密码错误&quot;);
+            throw new RuntimeException(e);
+        }
+    }
+}
+</code></pre>
+<ul>
+<li>resources目录下新建shiro.ini</li>
+</ul>
+<pre><code class="language-ini">[users]
+admin=123456,administrator
+zs=123,user
+
+[roles]
+administrator=user:view,user:insert,user:update,user:delete
+user=user:view,user:update
+</code></pre>
+<h3 id="shiro加密"><a class="header" href="#shiro加密">Shiro加密</a></h3>
+<pre><code class="language-java">import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.apache.shiro.crypto.hash.SimpleHash;
+
+public class ShiroPassword {
+    public static void main(String[] args) {
+
+        String password = &quot;password&quot;;
+
+        // sha加密
+        Sha256Hash enc1 = new Sha256Hash(password);
+        System.out.println(&quot;enc1 = &quot; + enc1);
+
+        // 加盐加密
+        Sha256Hash enc2 = new Sha256Hash(password, &quot;12345431&quot;);
+        System.out.println(&quot;enc2 = &quot; + enc2);
+
+        // 多次加密
+        Sha256Hash enc3 = new Sha256Hash(password, &quot;1231&quot;, 4);
+        System.out.println(&quot;enc3 = &quot; + enc3);
+
+        // 选择加密方式加密
+        SimpleHash enc4 = new SimpleHash(&quot;MD5&quot;, password);
+        System.out.println(&quot;enc4 = &quot; + enc4);
+
+    }
+}
+</code></pre>
+<h3 id="使用自定义realm进行认证操作"><a class="header" href="#使用自定义realm进行认证操作">使用自定义Realm进行认证操作</a></h3>
+<ul>
+<li>CustomRealm.java</li>
+</ul>
+<pre><code class="language-java">import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.credential.Sha256CredentialsMatcher;
+import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.util.ByteSource;
+
+
+public class CustomRealm extends AuthenticatingRealm{
+
+
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+        // 获取用户名（身份）
+        String username = token.getPrincipal().toString();
+
+        // 获取密码（凭证）
+        String password = String.valueOf(token.getCredentials());
+
+        System.out.println(&quot;用户：&quot; + username + &quot;正在登录，密码为：&quot; + password);
+        String passwdFromDB = null;
+        // 从数据库获取密码进行匹配
+        if (&quot;admin&quot;.equals(username)){
+            passwdFromDB = &quot;4c2d82a2242bfb84249e563f5c9922e77ed6bd06683a37b2247d05fa63355235&quot;;
+        } else if (&quot;zs&quot;.equals(username)){
+            passwdFromDB = &quot;87109e4282dc3e6463bf06c66d3313c0c4137036b33ef0bf600262d1c8b8415a&quot;;
+        }
+
+       return new SimpleAuthenticationInfo(token.getPrincipal(), passwdFromDB, ByteSource.Util.bytes(&quot;abc&quot;), username);
+    }
+}
+</code></pre>
+<ul>
+<li>resources目录下新建shiro.ini</li>
+</ul>
+<pre><code class="language-ini">[main]
+# 密码匹配器
+cm = org.apache.shiro.authc.credential.HashedCredentialsMatcher
+# 加密算法
+cm.hashAlgorithmName = SHA-256
+# 加密迭代次数
+cm.hashIterations = 5
+# 是否保存为16进制编码方式
+cm.storedCredentialsHexEncoded = true
+
+# 自定义Realm
+customRealm=com.demo.CustomRealm
+customRealm.credentialsMatcher=$cm
+
+securityManager.realms=$customRealm
+
+[users]
+admin=4c2d82a2242bfb84249e563f5c9922e77ed6bd06683a37b2247d05fa63355235,administrator
+zs=87109e4282dc3e6463bf06c66d3313c0c4137036b33ef0bf600262d1c8b8415a,user
+
+[roles]
+administrator=user:view,user:insert,user:update,user:delete
+user=user:view,user:update
+</code></pre>
+<ul>
+<li>在之前的main方法内测试</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../java/project/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../java/netty/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../java/project/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../java/netty/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
