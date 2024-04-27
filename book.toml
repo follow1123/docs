@@ -1,0 +1,10 @@
+[book]
+authors = ["yf"]
+language = "zh"
+multilingual = false
+src = "src"
+title = "文档"
+
+[output.html]
+# 渲染的table默认居中，修改为偏左样式
+additional-css = ["custom.css"]
