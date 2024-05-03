@@ -195,6 +195,48 @@ git config –global http.postBuffer 1024000000
 
   * 删除所有子模块 `git submodule deinit -f --all`
 
+## git commit 提交规范参考
+
+> 参考：[如何写出干净的 Git Commit](https://mp.weixin.qq.com/s?__biz=Mzg4MjY3NTk5OA==&mid=2247484976&idx=1&sn=63ef68b9eb8c76f048809026ee48ca44&chksm=cf525e41f825d7571d4aaefcf3595ce91e1d3268934340fabdc0118d7797da486495a44f041a&scene=90&subscene=245&sessionid=1714743143&clicktime=1051534&enterid=1051534&ascene=56&fasttmpl_type=0&fasttmpl_fullversion=7185892-zh_CN-zip&fasttmpl_flag=0&realreporttime=1714743485555&devicetype=android-30&version=28002c51&nettype=WIFI&abtest_cookie=AAACAA%3D%3D&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQujZ49ALiz1b2lAHlSpFXHRLcAQIE97dBBAEAAAAAAMlhBc%2FBdTAAAAAOpnltbLcz9gKNyK89dVj0f0rgg4PuZXnCh6Cj4xkhWRbID1qy2a4q9hJh%2FmqGguBwNDK0CujFrUmRh9Rrdxrqv6F4LUcVfkoR6SD0f42%2FO7DqtiwXfeT7%2BkC96Oj2TFZygMcKEFpT%2BPkjDHlqTx%2BgcTGrgcUaKaJ9Ssspu8CWCIaWG7hJUaPYMCDZC3TGuX23uYg6qfE3K9BNNyrAbu5DPdjBGyZ0yai8yAdjyTjS9I9xvfsNnHPoA3P5CA48jKhWr8H31V8%3D&pass_ticket=au9gdHuUfoKzzjLeSGcY27eaxRYcdNltC%2FoyQc9revXol%2Fe%2BRvchc2yC1r3VcdABrODy5HQGUb5CSn5XS%2FfwOQ%3D%3D&wx_header=3)
+
+### commit组成部分
+
+    * header 是必要的
+    * body 也是必要的，除了类型为 docs 之外，body 的内容必须大于 20 个字符
+    * footer 是可选的，比如放置引用的 issue
+
+```txt
+<header>
+<空一行>
+<body>
+<空一行>
+<footer>
+```
+
+* 示例
+
+```txt
+fix: 简要说明
+
+详细说明
+
+关闭某个pr
+```
+
+### commit的header类型
+
+| 类型 | 描述 |
+| --- | :-- |
+| build	| 影响构建系统或外部依赖的更改 (示例范围：gulp, broccoli, npm) |
+| ci | 对CI配置文件和脚本的更改 (示例：CircleCi, SauceLabs, GitHub Workflow) |
+| docs | 仅文档更改 |
+| feat | 新功能 |
+| fix | 错误修复 |
+| perf | 改善性能的代码更改 |
+| refactor | 既不修复错误也不添加功能的代码更改 |
+| test | 添加缺失测试或更正现有测试 |
+
+
 # git相关操作
 
 ## 将历史某一次提交删除
