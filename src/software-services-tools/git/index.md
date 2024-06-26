@@ -121,6 +121,10 @@ git checkout -b 分支名
 * 输入 `git reflog` 显示提交信息
 * 输入 `git reset --hard [reflog里面的id]` 还原
 
+## Tag
+
+* 删除远程仓库上的tag `git push origin --delete <tag_name>`
+ 
 ## 日志
 
 * 查看日志 `git log`、`git reflog`
