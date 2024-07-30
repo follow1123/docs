@@ -15,6 +15,7 @@ cp README.md ./book
 
 git checkout main
 cp -r book/* ./
+rm -rf ./book
 ```
 
 * Windows
@@ -28,4 +29,5 @@ cp README.md ./book
 
 git checkout main
 cp -Recurse -Force book/* ./
+rm -Force .\book
 ```
