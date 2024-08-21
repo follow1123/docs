@@ -25,12 +25,12 @@ module com.demo{
 * 开放反射权限，标记`open`关键字
 
 ```java
-// 开放整个模块
+// 开放整个模块的反射权限
 open module com.demo{
   requires java.se;
 }
 
-// 开放部分包
+// 开放部分包的反射权限
 open module com.demo{
     opens 包名;
 }
@@ -204,14 +204,274 @@ System.out.println(str);
 }
 ```
 
-* 空指针报错优化
+* 空指针报错优化，异常信息更准确
 
-* Record类，替换Lombok
+* Record类，替换Lombok(jave16)
 
 ### java17
 
-* 密封类型
+#### 密封类型
 
+* 使用final关键字表示A类无法被其他类继承
+
+```java
+public final class A {
+
+}
+```
+
+* 使用sealed关键字修饰并使用permits指定某些类，表示只允许指定的某些类继承
+
+* 想要继承使用sealed修饰的类当前类必须使用`final` `sealed` `no-sealed`修饰
+    * `final` 无法被其他类继承
+    * `sealed` 当前类也变成密封类
+    * `no-sealed` 当前类恢复为默认类，可以被其他任何类继承
+    
+
+```java
+public sealed class A permits B {
+
+}
+
+public [final/sealed/no-sealed] class B extends A {
+
+}
+```
+### java18
+
+* 默认使用UTF-8编码
+
+* `jwebserver`命令简单web服务器
+
+* `@snippet` 文档内的代码预览，使用`javadoc`命令生成文档
+
+```java
+public class Text {
+    /**
+     * {@snippet
+     * int c = a + b;
+     * }
+     */
+    public int add(int a, int b) {
+        int c = a + b;
+        return c;
+    }
+}
+```
+
+### java19
+
+#### 虚拟线程
+
+* 使用线程池方式
+
+```java
+public void ThreadTest() {
+    ExecutorService executor = Executors.newCachedThreadPool();
+    try(executor){
+        IntStream.range(1, 10000).forEach(i -> executor.submit(() -> {
+            try {
+                Thread.sleep(1000);
+                System.out.println("execute: " + i );
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+        }));
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+}
+```
+
+* 使用虚拟线程方式，只需要将`newCachedThreadPool`修改为`newVirtualThreadPerTaskExecutor`，速度就会明显提升
+
+* 需要同步代码块时尽量使用`ReentrantLock`替代`synchronized`
+
+* 虚拟线程时守护线程，无法修改为未守护线程
+
+* 虚拟线程默认优先级是5，无法修改
+
+* 虚拟线程不支持`stop()`, `suspend()`, `resume()`方法
+
+#### 创建虚拟线程的方式
+
+* 方式1
+
+```java
+Runnable task = () -> {
+    System.out.println("run task");
+};
+Thread.startVirtualThread(task);
+try {
+    Thread.sleep(100);
+} catch (InterruptedException e) {
+    throw new RuntimeException(e);
+}
+```
+* 方式2
+
+```java
+Runnable task = () -> {
+    System.out.println("run task");
+};
+// Thread virtualThread = Thread.ofVirtual().name("virtualThreadName").start(task);
+Thread virtualThread = Thread.ofVirtual().name("virtualThreadName").unstarted(task);
+virtualThread.start();
+try {
+    Thread.sleep(100);
+} catch (InterruptedException e) {
+    throw new RuntimeException(e);
+}
+```
+* 方式3 就是使用创建线程池
+
+* 使用`Thread`对象内的`isVirtual()`方法判断是否为虚拟线程
+
+### java21
+
+* 虚拟线程成为正式版
+
+* 字符串模板（预览）
+
+```java
+String zs = "zs";
+String str = STR."my name is \{zs}";
+System.out.println(str);
+```
+
+#### scoped values 隐藏的方法参数（预览）
+
+    * 一般用于代替ThreadLocal
+
+
+```java
+public class ScopedValuesTest {
+
+    public static void main(String[] args) {
+         new ScopedValuesTest().set();
+    }
+    
+    private ScopedValue<String> value = ScopedValue.newInstance();
+
+    public void set(){
+        ScopedValue.where(value, "111").run(() -> get());
+    }
+
+    public void get(){
+        System.out.println(value.get());
+    }
+}
+```
+* 多线程方式
+
+```java
+public class ScopedValuesMultithreadTest {
+
+    public static void main(String[] args) {
+        ExecutorService pool = Executors.newCachedThreadPool();
+        ScopedValuesMultithreadTest test = new ScopedValuesMultithreadTest();
+        for (int i = 0; i < 10; i++) {
+            pool.submit(() -> test.set());
+        }
+        pool.shutdown();
+
+    }
+
+    private ScopedValue<String> value = ScopedValue.newInstance();
+
+    public void set(){
+        ScopedValue.where(value, Thread.currentThread().getName()).run(() -> get());
+    }
+
+    public void get(){
+        System.out.println(value.get());
+    }
+}
+```
+
+#### Record Pattern（预览）
+
+```java
+public class RecordPatternTest {
+    public static void main(String[] args) {
+        Object o = new Person("zs", 18);
+        printObj(o);
+    }
+
+    public static void printObj(Object o){
+        if (o instanceof Person(String name, int age)){
+            System.out.println("name = " + name);
+            System.out.println("age = " + age);
+        }
+    }
+
+}
+
+record Person(String name, int age){}
+```
+
+#### switch表达式
+
+* 临时变量
+
+```java
+public class SwitchTest1 {
+
+    public static void main(String[] args) {
+        int i = 100;
+        System.out.println(getValue(i));
+    }
+
+    public static String getValue(Object o){
+       return switch (o){
+           case null -> "null object";
+           case Integer i -> "integer: " + i;
+           case String str -> "string: " + str;
+           default -> o.toString();
+       };
+    }
+}
+```
+
+* `when`关键字
+
+```java
+public class SwitchTest2 {
+
+    public static void main(String[] args) {
+        int score = 10;
+        test(score);
+    }
+
+    public static void test(Object o){
+       switch (o){
+           case Integer i when i <= 60 -> {
+               System.out.println("not great");
+           }
+           case Integer i when i <= 100 -> {
+               System.out.println("great");
+           }
+           default -> {
+               System.out.println("error");
+           }
+       };
+
+    }
+}
+```
+
+#### 简化版main方法（预览）
+
+```java
+void main(){
+    System.out.println("Hello world!");
+}
+```
+
+#### 结构化并发，`StructuredTaskScope`类的使用
+
+## 常见问题
 
 ### 后端解决跨域的三种方式
 
