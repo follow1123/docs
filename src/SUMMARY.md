@@ -28,6 +28,7 @@
             * [Mybatis](programming-language/java/framework/mybatis/index.md)
             * [Spring Security](programming-language/java/framework/spring-security/index.md)
             * [Shiro](programming-language/java/framework/shiro/index.md)
+            * [RabbitMQ](programming-language/java/framework/rabbitmq/index.md)
             * [Netty](programming-language/java/framework/netty/index.md)
 * [前端](frontend/index.md)
     * [HTML](frontend/html.md)
