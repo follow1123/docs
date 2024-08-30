@@ -653,3 +653,108 @@ public class RabbitMQConfig {
     * 保证消费者业务幂等性也可以通过业务内的状态判断
 * 如果以上方法都无法保证消息的可靠性，则可以使用其他方式
     * 假如支付业务通知消息失败，则可以使用定时任务主动向支付服务获取支付状态
+
+### 延时消息
+
+* 生产者发送消息时指定一个时间，消费者不会立刻收到消息，而是在指定时间之后才收到消息。
+    * 购物软件购买商品时，需要在一定时间内支付的逻辑
+
+#### 死信交换机
+
+* 当一个队列中的消息满足下列情况之一时，就会成为*死信（dead letter）*
+    * 消费者使用basic.reject或basic.nack声明消费失败，并且消息的requeue参数设置为false
+    * 消息是一个过期的消息（达到了队列或消息本身设置的过期时间），超时无人消费
+    * 要投递的队列消息堆积满了，最早的消息可能成为死信
+如果队列通过dead-letter-exchange属性指定了一个交换机，那么该队列中的死信就会投递到这个交换机中。
+这个交换机称为**死信交换机（Dead Letter Exchange，简称DLX）。
+
+##### 使用死信交换机实现延时消息
+
+* 新建`simple.queue2`队列，指定`x-dead-letter-exchange=dlx.direct`属性，属性值是死信交换机的名称
+* 新建`simple.direct2`交换机，绑定`simple.queue2`队列，Routing设置为dlx
+* 新建`dlx.queue`队列
+* 新建`dlx.direct`交换机，绑定`dlx.queue`，Routing设置为dlx
+
+###### 代码
+
+* publisher
+
+```java
+@SpringBootTest
+public class DeadLetterTest {
+
+    @Autowired
+    public RabbitTemplate rabbitTemplate;
+
+    @Test
+    public void testSendSimpleMessage() {
+        rabbitTemplate.convertAndSend("simple.direct2", "dlx", "test dlx", message -> {
+            message.getMessageProperties().setExpiration("10000");
+            return message;
+        });
+    }
+}
+```
+
+* consumer
+
+```java
+@Component
+public class DeadLetterListener {
+
+    @RabbitListener(queues = "dlx.queue")
+    public void listenDLX(String message){
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
+        System.out.println("message received: " + message);
+    }
+}
+```
+
+#### 延时消息插件
+
+* RabbitMQ官方推出了一个插件，原生支持延时消息功能。该插件的原理是设计了一种支持延时消息功能的交换机，
+当消息投递到交换机后可以暂存一定时间，到期后再投递到队列。
+
+##### 安装插件
+
+* [插件github地址](https://github.com/rabbitmq/rabbitmq-delayed-message-exchange)，直接下载.ez文件
+* 使用`rabbitmq-plugins directories -s`命令查询插件目录，第一个就是，默认`/opt/rabbitmq/plugins`
+* 将ez文件放入插件目录后执行`rabbitmq-plugins enable rabbitmq_delayed_message_exchange`，重启rabbitmq即可
+
+##### 代码
+
+* publisher
+
+```java
+@SpringBootTest
+public class DelayTest {
+    @Autowired
+    public RabbitTemplate rabbitTemplate;
+
+    @Test
+    public void testSendDelayMessage() {
+        rabbitTemplate.convertAndSend("delay.direct", "delay", "test delay", message -> {
+            message.getMessageProperties().setDelayLong(10000L);
+            return message;
+        });
+    }
+}
+```
+
+* consumer
+
+```java
+@Component
+public class DelayListener {
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "delay.queue", durable = "true"),
+            exchange = @Exchange(name = "delay.direct", delayed = "true"),
+            key = "delay"
+    ))
+    public void listenDelayMessage(String message) {
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
+        System.out.println("message received: " + message);
+    }
+}
+```
