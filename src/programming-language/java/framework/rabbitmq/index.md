@@ -1,5 +1,7 @@
 # RabbitMQ
 
+> [demo地址](https://github.com/follow1123/rabbitmq-demo)
+
 * 三个角色
     * 消息发送者：投递消息的人，就是调用方
     * 消息代理：管理、暂存、转发消息
