@@ -2,11 +2,29 @@
 
 > [demo地址](https://github.com/follow1123/rabbitmq-demo)
 
+## 目录
+1. <a href="#core-concept">核心概念</a>
+2. <a href="#rabbitmq-management">rabbitmq管理页面</a>
+3. <a href="#java-client">java客户端</a>
+    1. <a href="#exchange">交换机</a>
+        1. <a href="#fanout">广播</a>
+        2. <a href="#direct">定向</a>
+        3. <a href="#topic">话题</a>
+    2. <a href="#message-converter">消息转换器</a>
+4. <a href="#rabbitmq-advanced">MQ高级</a>
+    1. <a href="#producer-reliability">生产者可靠性</a>
+    2. <a href="#rabbitmq-reliability">MQ可靠性</a>
+    3. <a href="#consumer-reliability">消费者可靠性</a>
+5. <a href="#delayed-message">延时消息</a>
+    1. <a href="#dead-letter">死信交换机</a>
+    2. <a href="#delayed-message-plugin">延时消息插件</a>
+
 * 三个角色
     * 消息发送者：投递消息的人，就是调用方
     * 消息代理：管理、暂存、转发消息
     * 消息接收者：接收和处理消息的人，就是服务提供方
 
+<a id="core-concept"></a>
 ## 核心概念
 
 * publisher: 消息发送者
@@ -43,6 +61,7 @@ f --> h
 
 ---
 
+<a id="rabbitmq-management"></a>
 ## RabbitMQ管理页面
 
 使用docker安装以`-management`结尾的版本会带一个web管理页面</br>
@@ -72,6 +91,7 @@ f --> h
 
 ---
 
+<a id="java-client"></a>
 ## Java客户端
 
 * **AMQP**(Advanced Message Queuing Protocol)
@@ -121,8 +141,10 @@ public class AMQPListener {
 
 ---
 
+<a id="exchange"></a>
 ### 交换机(exchange)
 
+<a id="fanout"></a>
 #### Fanout(广播)
 
 * Fanout Exchange会将接收到的消息广播到每一个跟其绑定的queue
@@ -171,7 +193,7 @@ public class FanoutListener {
 }
 ```
 
-
+<a id="direct"></a>
 #### Direct(定向)
 
 * Direct Exchange 会将接收到的消息根据规则路由到指定的queue
@@ -225,6 +247,7 @@ public class DirectListener {
 }
 ```
 
+<a id="topic"></a>
 #### Topic(话题)
 
 * TopoicExchange与DirectExchange类似，区别在于routingKey可以是多个单词的列表，并且以`.`分割
@@ -342,7 +365,7 @@ public class DirectAnnoListener {
 ```
 
 ---
-
+<a id="message-converter"></a>
 ### 消息转换器
 
 * 用于编解码消息
@@ -355,9 +378,10 @@ public MessageConverter messageConverter(){
     return new Jackson2JsonMessageConverter();
 }
 ```
-
+<a id="rabbitmq-advanced"></a>
 ## MQ高级
 
+<a id="producer-reliability"></a>
 ### 生产者可靠性
 
 #### 生产者重连
@@ -453,6 +477,7 @@ public class PublisherConfirmTest {
 * 使用PublisherReturn和PublisherConfirm机制需要额外的网络资源开销
 * 大部分情况下处理的是nack问题，如果需要消息发送的可靠性，只需要开启PublisherConfirm机制即可
 
+<a id="rabbitmq-reliability"></a>
 ### MQ可靠性
 
 * 在默认情况下，RabbitMQ会将接收到的消息保存在内存中以降低消息收发的延时。这样会导致下面两个问题：
@@ -523,6 +548,7 @@ public void listenDirect1Exchange(String msg){
 }
 ```
 
+<a id="consumer-reliability"></a>
 ### 消费者可靠性
 
 #### 消费者确认机制
@@ -656,11 +682,13 @@ public class RabbitMQConfig {
 * 如果以上方法都无法保证消息的可靠性，则可以使用其他方式
     * 假如支付业务通知消息失败，则可以使用定时任务主动向支付服务获取支付状态
 
+<a id="delayed-message"></a>
 ### 延时消息
 
 * 生产者发送消息时指定一个时间，消费者不会立刻收到消息，而是在指定时间之后才收到消息。
     * 购物软件购买商品时，需要在一定时间内支付的逻辑
 
+<a id="dead-letter"></a>
 #### 死信交换机
 
 * 当一个队列中的消息满足下列情况之一时，就会成为*死信（dead letter）*
@@ -712,6 +740,7 @@ public class DeadLetterListener {
 }
 ```
 
+<a id="delayed-message-plugin"></a>
 #### 延时消息插件
 
 * RabbitMQ官方推出了一个插件，原生支持延时消息功能。该插件的原理是设计了一种支持延时消息功能的交换机，
