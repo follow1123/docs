@@ -1,4 +1,191 @@
-# Java Basics
+# Java基础
+
+> [官方文档](https://docs.oracle.com/javase/tutorial/reallybigindex.html)
+
+## JDK和JRE
+
+* **JDK**(Java Development Kit)：是Java程序开发工具包，包含JRE和开发人员使用工具
+* **JRE**(Java Runtime Environment)：是Java程序的运行时环境，包含JVM和运行时所下需要的核心库
+* java长期支持版本8、11、17、21
+* 使用包管理器或压缩包安装
+
+## Hello World
+
+* 找一个目录，新建一个`HelloWorld.java`文件
+* 使用`javac HelloWorld.java`命令编译文件生成`HelloWorld.class`文件
+* 使用`java HelloWorld`命令执行
+
+```java
+public class HelloWorld {
+	public static void main(String[] args) {
+		System.out.println("Hello World!");
+	}
+}
+```
+
+## 注释
+
+* 使用`javadoc -encoding UTF-8 -author -version -d comment Comments.java`生成对应文档
+
+```java
+/**
+ * 文档注释
+ * @author a
+ * @version 1.0
+ */
+public class Comments {
+
+    /*
+    多行注释
+    多行注释
+    多行注释
+    */
+    public static void main(String[] args) {
+        // 单行注释
+        System.out.println("Hello World!");
+    }
+}
+```
+
+## 变量
+
+### 数据类型
+
+| 数据类型    | 默认值    | 范围    | 占用存储空间 |
+|---------------- | --------------- | --------------- | --- |
+| byte    | 0    | -128~127    | 1字节=8bit |
+| short    | 0    | -32,768~32,767    | 2字节 |
+| int    | 0    | -2^31~2^31-1    | 4字节 |
+| long    | 0L    | -2^63~2^63-1    | 8字节 |
+| <a href="#data-type-float">float</a> | 0.0f    | -3.403E38~3.403E38(3.403E38表示3.403x10^38)    | 4字节 |
+| double    | 0.0d    | -1.798E308~1.798E308 | 8字节 |
+| char    | '\u0000'    | '\u0000'~'\uffff'| 2字节 |
+| boolean    | false    | true/false | 根据JVM规范 |
+
+* 代码示例
+
+```java
+boolean result = true;
+
+char c1 = 'C';
+char c2 = 65; // 等同于A
+char c3 = '\u221a'; // 等同于√
+char c4 = '\t'; // 制表符
+
+byte b = 100;
+short s = 10000;
+int i = 100000;
+
+// 数值较大可以使用下划线分割
+long creditCardNumber = 1234_5678_9012_3456L;
+long socialSecurityNumber = 999_99_9999L;
+float pi =  3.14_15F;
+long hexBytes = 0xFF_EC_DE_5E; // 十六进制表示
+long hexWords = 0xCAFE_BABE;
+long maxLong = 0x7fff_ffff_ffff_ffffL;
+byte nybbles = 0b0010_0101; // 二进制表示
+long bytes = 0b11010010_01101001_10010100_10010010;
+double d = 1.797E308; // 科学计数法表示
+```
+
+#### 基本数据类型的自动类型提升
+
+```mermaid
+flowchart LR
+a(byte,short,char) --> b(int)
+b --> c(long)
+c --> d(float)
+d --> e(double)
+```
+
+* 范围小的数据类型默认可以赋值给范围大的数据类型
+* 其中byte,short,char之间相互操作后的结果默认是int类型，由于这三个数据类型的范围太小，
+相互操作很可能超出范围
+* 整型字面量默认是int类型，浮点型字面量默认是double类型
+
+```java
+int i1 = 100;
+long l1 = i1;
+float f1 = l1;
+double d1 = f1;
+
+
+byte b1 = 1;
+// byte b2 = b1 + 1; // 编译不通过
+int i2 = b1 + 1;
+
+short s1 = 434;
+short s2 = 4543;
+// short s3 = s1 + s2; // 编译不通过
+
+char c1 = 'a';
+int i3 = c1 + 1; // 98
+```
+
+#### 基本数据类型的强制类型转换
+
+* 浮点型强转为整型小数部分会丢失
+* 范围大的数据类型强转为范围小的数据类型时，正数可能变为负数，负数可能变为正数
+
+```java
+long l1 = 34;
+// int i1 = l1; // 编译不通过
+int i1 = (int) l1;
+
+float f1 = 1.9F;
+int i2 = (int) f1; // 1
+
+long l2 = 128;
+byte b1 = (byte) l2; // -128
+
+long l3 = -130;
+byte b2 = (byte) l3; // 126
+```
+
+<a id="data-type-float"></a>
+#### Float
+
+##### 精度说明
+
+* 并不是所有的小数都可能精确的用二进制浮点数表示。二进制浮点数不能精确的表示
+0.1、0.01、0.001这样10的负次幂。
+* 浮点类型float、double的数据不适合在**不容许舍入误**差的金融计算领域。如果需要**精确**
+数字计算或保留指定位数的精度，需要使用`BigDecimal`类
+
+##### 问题测试
+
+```java
+System.out.println(0.1 + 0.2); // 0.30000000000000004
+
+float ff1 = 123123123F;
+float ff2 = ff1 + 1;
+System.out.println(ff1); // 1.2312312E8
+System.out.println(ff1); // 1.2312312E8
+System.out.println(ff1 == ff2); // true
+```
+
+#### String
+
+* String是引用类型
+* String和其他基本数据类型进行`+`操作结果都是String
+* 多个数值类型和String相加，如果String放在最后面则前面数值类型全部相加后再拼接为字符串，
+如果String放在最前面则全部数值都拼接为字符串
+
+```java
+int i1 = 234;
+float f1 = 34.55F;
+boolean b1 = true;
+String s1 = "str";
+
+String s2 = s1 + i1; // str234
+String s3 = s1 + f1; // str34.55
+String s4 = s1 + b1; // strtrue
+
+String s5 = i1 + f1 + s1; // 268.55str
+
+String s6 = s1 + f1 + i1; // str34.55234
+```
+
 
 ## java.util
 

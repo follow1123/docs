@@ -1,10 +1,44 @@
-# Java
+# java各版本新特性
 
-## 新特性
+## 目录
+1. <a href="#java9">java9</a>
+    1. <a href="#module">模块机制</a>
+    2. <a href="#collection-enhancement">集合类的工厂方法</a>
+    3. <a href="#stream-enhancement">Stream增强</a>
+    4. <a href="#others">其他</a>
+2. <a href="#java10">java10</a>
+3. <a href="#java11">java11</a>
+    1. <a href="#var-keyword">var关键字</a>
+    2. <a href="#stream-enhancement">字符串增强</a>
+    3. <a href="#httpclient">HttpClient</a>
+4. <a href="#java12-16">java12-16</a>
+    1. <a href="#switch-expression">switch表达式</a>
+    2. <a href="#text-block">文本块</a>
+    3. <a href="#instanceof-enhancement">instanceof增强</a>
+    4. <a href="#null-pointer-optimization">空指针优化</a>
+    5. <a href="#record-class">Record类</a>
+5. <a href="#java17">java17</a>
+    1. <a href="#sealed-class">密封类型</a>
+6. <a href="#java18">java18</a>
+    1. <a href="#default-encode">默认使用UTF-8编码</a>
+    2. <a href="#jwebserver-command">jwebserver命令</a>
+    3. <a href="#javadoc-snippet">Java文档生成代码片段</a>
+7. <a href="#java19">java19</a>
+    1. <a href="#virtualThread">虚拟线程</a>
+8. <a href="#java21">java21</a>
+    1. <a href="#string-template">字符串模板</a>
+    2. <a href="#scoped-values">隐藏方法参数</a>
+    3. <a href="#record-pattern">RecordPattern</a>
+    4. <a href="#switch-when-keyword">switch表达式when关键字</a>
+    5. <a href="#simple-main">简化版main方法</a>
+    6. <a href="#structured-task">结构化并发</a>
+    
 
-### java9
+<a id="java9"></a>
+## java9
 
-#### 模块机制
+<a id="module"></a>
+### 模块机制
 
 * 在项目目录下新建module-info.java文件
 
@@ -54,11 +88,12 @@ module module.a{
 
 ```
 
-#### 接口内可以定义private方法
+### 接口内可以定义private方法
 
 > 定义接口的的公共方法
 
-#### 集合类的工厂方法
+<a id="collection-enhancement"></a>
+### 集合类的工厂方法
 
 > 快速创建集合，这种方法创建的集合都是只读的
 
@@ -72,8 +107,8 @@ List.of("value1", "value2");
 // Set
 Set.of("value1", "value2");
 ```
-
-#### Stream增强
+<a id="stream-enhancement"></a>
+### Stream增强
 
 ```java
 // 创建Stream空指针判断方法
@@ -91,7 +126,8 @@ Stream.iterate(0, i -> i < 10, i -> i = i + 1)
   .forEach(System.out::println);
 ```
 
-#### 其他
+<a id="others"></a>
+### 其他
 
 * try-with-resource语法优化
 
@@ -119,12 +155,15 @@ Optional.ofNullable(null)
   });
 ```
 
-### java10 
+<a id="java10"></a>
+## java10 
 
 * 添加`var`关键字用于类型推断，只适用与局部变量
 
-### java11
+<a id="java11"></a>
+## java11
 
+<a id="var-keyword"></a>
 * var 关键字可以用于lambda参数内
 
 ```java
@@ -135,6 +174,7 @@ Consumer<String> consumer = (var s) -> {
 consumer.accept("123");
 ```
 
+<a id="string-enhancement"></a>
 * String增强
 
 ```java
@@ -165,10 +205,14 @@ System.out.println(s4.strip().length()); // 7
 System.out.println(s4.stripLeading().length()); // 8
 System.out.println(s4.stripTrailing().length()); // 8
 ```
+
+<a id="httpclient"></a>
 * HttpClient 全新Http客户端
 
-### java12-16
+<a id="java12-16"></a>
+## java12-16
 
+<a id="switch-expression"></a>
 * switch表达式
 
 ```java
@@ -183,6 +227,7 @@ String a = switch (i){
 };
 ```
 
+<a id="text-block"></a>
 * 文本快
 
 ```java
@@ -194,6 +239,7 @@ qweqwe
 System.out.println(s);
 ```
 
+<a id="instanceof-enhancement"></a>
 * instanceof增强
 
 ```java
@@ -204,13 +250,17 @@ System.out.println(str);
 }
 ```
 
+<a id="null-pointer-optimization"></a>
 * 空指针报错优化，异常信息更准确
 
+<a id="record-class"></a>
 * Record类，替换Lombok(jave16)
 
-### java17
+<a id="java17"></a>
+## java17
 
-#### 密封类型
+<a id="sealed-class"></a>
+### 密封类型
 
 * 使用final关键字表示A类无法被其他类继承
 
@@ -237,12 +287,17 @@ public [final/sealed/no-sealed] class B extends A {
 
 }
 ```
-### java18
 
+<a id="java18"></a>
+## java18
+
+<a id="default-encode"></a>
 * 默认使用UTF-8编码
 
+<a id="jwebserver-command"></a>
 * `jwebserver`命令简单web服务器
 
+<a id="javadoc-snippet"></a>
 * `@snippet` 文档内的代码预览，使用`javadoc`命令生成文档
 
 ```java
@@ -259,9 +314,11 @@ public class Text {
 }
 ```
 
-### java19
+<a id="java19"></a>
+## java19
 
-#### 虚拟线程
+<a id="virtualThread"></a>
+### 虚拟线程
 
 * 使用线程池方式
 
@@ -294,7 +351,7 @@ public void ThreadTest() {
 
 * 虚拟线程不支持`stop()`, `suspend()`, `resume()`方法
 
-#### 创建虚拟线程的方式
+### 创建虚拟线程的方式
 
 * 方式1
 
@@ -328,10 +385,12 @@ try {
 
 * 使用`Thread`对象内的`isVirtual()`方法判断是否为虚拟线程
 
-### java21
+<a id="java21"></a>
+## java21
 
 * 虚拟线程成为正式版
 
+<a id="string-template"></a>
 * 字符串模板（预览）
 
 ```java
@@ -340,7 +399,8 @@ String str = STR."my name is \{zs}";
 System.out.println(str);
 ```
 
-#### scoped values 隐藏的方法参数（预览）
+<a id="scoped-values"></a>
+### scoped values 隐藏的方法参数（预览）
 
     * 一般用于代替ThreadLocal
 
@@ -390,7 +450,8 @@ public class ScopedValuesMultithreadTest {
 }
 ```
 
-#### Record Pattern（预览）
+<a id="record-pattern"></a>
+### Record Pattern（预览）
 
 ```java
 public class RecordPatternTest {
@@ -411,8 +472,9 @@ public class RecordPatternTest {
 record Person(String name, int age){}
 ```
 
-#### switch表达式
+### switch表达式
 
+<a id="switch-temp-variables"></a>
 * 临时变量
 
 ```java
@@ -434,6 +496,7 @@ public class SwitchTest1 {
 }
 ```
 
+<a id="switch-when-keyword"></a>
 * `when`关键字
 
 ```java
@@ -461,7 +524,8 @@ public class SwitchTest2 {
 }
 ```
 
-#### 简化版main方法（预览）
+<a id="simple-main"></a>
+### 简化版main方法（预览）
 
 ```java
 void main(){
@@ -469,58 +533,5 @@ void main(){
 }
 ```
 
-#### 结构化并发，`StructuredTaskScope`类的使用
-
-## 常见问题
-
-### 后端解决跨域的三种方式
-
-* 1. 方法上添加`@CrossOrigin`注解
-
-```java
-@PostMapping("/testCors")
-@CrossOrigin
-public Map<String, String> testCors(){
-    return Map.of("name", "123", "age", "123");
-}
-```
-
-* 2. 配置`CorFilter`滤器
-
-```java
-@Configuration
-public class CorsConfig {
-
-    @Bean
-    public CorsFilter corsFilter(){
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.addAllowedMethod("*");
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration);
-        return new CorsFilter(source);
-    }
-}
-```
-
-* 3. 实现`WebMvcConfigurer`接口的`addCorsMappings`方法进行配置
-
-```java
-@Configuration
-public class CorsConfigure implements WebMvcConfigurer {
-
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOriginPatterns("*")
-                .allowedHeaders("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowCredentials(false)
-                .maxAge(3600);
-    }
-}
-```
-
-* 配合安全框架的情况下推荐使用`CorFilter`的方式，过滤器会最先执行
+<a id="structured-task"></a>
+### 结构化并发，`StructuredTaskScope`类的使用
