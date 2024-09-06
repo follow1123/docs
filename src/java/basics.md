@@ -17,9 +17,9 @@
 
 ```java
 public class HelloWorld {
-	public static void main(String[] args) {
-		System.out.println("Hello World!");
-	}
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+    }
 }
 ```
 
@@ -186,331 +186,1075 @@ String s5 = i1 + f1 + s1; // 268.55str
 String s6 = s1 + f1 + i1; // str34.55234
 ```
 
+## 进制
 
-## java.util
+* **十进制**，0-9组成，满十进一
+* **二进制**，0-1组成，满二进一，以`0b`或`0B`开头
+* **八进制**，0-7组成，满八进一，以`0`开头
+* **十六进制**，0-9，a-f组成，满十六进一，以`0x`或`0X`开头
 
-### ArrayList
+```java
+int n1 = 2134; // 十进制
+int n2 = 0b1011; // 二进制
+int n3 = 033; // 八进制
+int n4 = 0xfa33; // 十六进制
+```
+### 进制之间的换算
 
-* 初始化
+| 十进制    | 二进制    | 八进制    | 十六进制    |
+|---------------- | --------------- | --------------- | --------------- |
+| 0    | 0    | 0    | 0    |
+| 1    | 1   | 1   | 1   |
+| 2   | 10   | 2   | 2   |
+| 3   | 11   | 3   | 3   |
+| 4   | 100   | 4   | 4   |
+| 5   | 101   | 5   | 5   |
+| 6   | 110   | 6   | 6   |
+| 7   | 111   | 7   | 7   |
+| 8   | 1000   | 10   | 8   |
+| 9   | 1001   | 11   | 9   |
+| 10   | 1010   | 12   | A   |
+| 11   | 1011   | 13   | B   |
+| 12   | 1100   | 14   | C   |
+| 13   | 1101   | 15   | D   |
+| 14   | 1110   | 16   | E   |
+| 15   | 1111   | 17   | F   |
+| 16   | 10000   | 20   | 10   |
 
-  * 初始化为一个空的Object数组
-  
-* 添加元素
+### 二进制转换
 
-  * 添加第一个元素时将elementData初始化为长度为10的object数组才加入元素
-  
-  * 在添加元素是会先判断数组的容量够不够，不够这会进行扩容
-  
-  * 方式
-  
-    * 当添加到数组最后一个位置前进行扩容
-    * 新长度为旧长度+（旧长度右移一位）
-    * 使用System.arrayCopy()进行操作
-  
-    ```java
-    //旧数组
-    int[] is = {1, 2, 3, 4, 5, 6, 7, 8, 9, 123, 321, 4324, 432, 34, 43, 3};
-    //新数组
-    int[] newIs = new int[is.length + (is.length >> 1)];
-  //扩容操作
-    System.arraycopy(is, 0, newIs, 0, is.length);
-    ```
-  
-    
-  
-* 删除元素
+* 计算机数据的存储使用二进制**补码**形式存储，并且**最高位是符号位**
+    * 正数最高位是`0`，负数最高位是`1`
+* 正数的补码与反码、原码一样，称为**三码合一**
+* 负数的补码与反码、原码不一样
+    * 负数的**原码**：把十进制转为二进制，然后最高位设置为1
+    * 负数的**反码**：在原码的基础上，最高位不变，其余为取反
+    * 负数的**补码**：反码+1
 
-  * 使用数组拷贝方式
-  * 使用System.arrayCopy()进行操作
+#### 二进制转十进制
 
-  ```java
-  int[] is = {1, 2, 3, 4, 5, 6, 7, 8, 9, 123, 321, 4324, 432, 34, 43, 3};
-  //拷贝操作
-  System.arraycopy(is, 3 + 1, is, 3, is.length - 4);
-  //数组最后一位置空
-  is[is.length - 1] = 0;
-  ```
+* 正整数：`00001011`的十进制是`11`
 
-### LinkedList
+<table>
+    <tbody>
+        <tr>
+            <td>二进制</td>
+            <td>0(符号位)</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>2的次方</td>
+            <td></td>
+            <td>2^6</td>
+            <td>2^5</td>
+            <td>2^4</td>
+            <td>2^3</td>
+            <td>2^2</td>
+            <td>2^1</td>
+            <td>2^0</td>
+        </tr>
+        <tr>
+            <td>十进制</td>
+            <td></td>
+            <td>64</td>
+            <td>32</td>
+            <td>16</td>
+            <td>8</td>
+            <td>4</td>
+            <td>2</td>
+            <td>1</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="1">+</td>
+            <td colspan="7" style="text-align:center">8+2+111</td>
+        </tr>
+    </tfoot>
+</table>
 
-* 插入元素
+* 负整数：补码`11110101`的十进制是`-11`
 
-  * 默认使用尾插法
+<table>
+    <tbody>
+        <tr>
+            <td>补码</td>
+            <td>1(符号位)</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>反码</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>0</td>
+        </tr>
+        <tr>
+            <td>原码</td>
+            <td>1</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>2的次方</td>
+            <td></td>
+            <td>2^6</td>
+            <td>2^5</td>
+            <td>2^4</td>
+            <td>2^3</td>
+            <td>2^2</td>
+            <td>2^1</td>
+            <td>2^0</td>
+        </tr>
+        <tr>
+            <td>十进制</td>
+            <td></td>
+            <td>64</td>
+            <td>32</td>
+            <td>16</td>
+            <td>8</td>
+            <td>4</td>
+            <td>2</td>
+            <td>1</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="1">-</td>
+            <td colspan="7" style="text-align:center">8+2+1=11</td>
+        </tr>
+    </tfoot>
+</table>
 
-  ```java
-  void linkLast(E e) {
-      //获取last对象的指针
-      final Node<E> l = last;
-      //创建一个新的节点对象
-      //传入previous节点，赋值
-      final Node<E> newNode = new Node<>(l, e, null);
-      //last指针指向新的对象
-      last = newNode;
-      //判断l指针指向的对象是否为空
-      if (l == null)
-          //为空说明链表为空，将first指针指向这个新的对象
-          first = newNode;
-      else
-          //否则将原last对象的last指针指向这个新的对象
-          l.next = newNode;
-      //链表的大小加一
-      size++;
-      modCount++;
-  }
-  ```
+#### 十进制转二进制
 
-* 获取元素
+* 除2取余的逆
+* `13`的二进制是`1101`
 
-  ```java
-  //根据下标查找
-  public E get(int index) {
-      //	判断下标是否合法
-      checkElementIndex(index);
-      		//根据index查值
-      return node(index).item;
-  }
-  //根据index查值
-  Node<E> node(int index) {
-  	//如果下标小于链表的大小除2则从前往后找
-      if (index < (size >> 1)) {
-          Node<E> x = first;
-          for (int i = 0; i < index; i++)
-              x = x.next;
-          return x;
-          //否则从后往前找
-      } else {
-          Node<E> x = last;
-          for (int i = size - 1; i > index; i--)
-              x = x.prev;
-          return x;
-      }
-  }
-  
-  ```
+<table>
+    <thead>
+        <tr>
+            <th>商</th>
+            <th>余数</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>13/2</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>6/2</td>
+            <td>0</td>
+        </tr>
+        <tr>
+            <td>3/2</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>1/2</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td>结果</td>
+            <td>1101</td>
+        </tr>
+    </tfoot>
+</table>
 
-* 删除元素
+#### 二进制与八进制、十六进制之间的转换
 
-  ```java
-  public E remove(int index) {
-      //	判断下标是否合法
-      checkElementIndex(index);
-      //找到下表为index的节点并移除
-      return unlink(node(index));
-  }
-  //移除
-  E unlink(Node<E> x) {
-      // assert x != null;
-      final E element = x.item;
-      final Node<E> next = x.next;
-      final Node<E> prev = x.prev;
-  	//该节点的prev节点为空说明该节点就是first节点
-      if (prev == null) {
-          //将first指针指向next节点
-          first = next;
-      } else {
-          //否则将prev节点的next指针指向next对象
-          prev.next = next;
-          //该节点的prev对象置空
-          x.prev = null;
-      }
-  	//该节点的prev节点为空说明该节点就是last节点
-      if (next == null) {
-          //将last指针指向prev节点
-          last = prev;
-      } else {
-          //否则将next节点的prev指针指向prev对象
-          next.prev = prev;
-          该节点的next对象置空
-          x.next = null;
-      }
-  	//该节点的数据置空
-      x.item = null;
-      //该链表的大小减一
-      size--;
-      modCount++;
-      return element;
-  }
-  ```
-
-### HashMap
-
-* HashMap是由数组链表和红黑树（8加入）组成
-
-* 初始化
-  * 将默认负载因子初始化为0.75
-* 添加元素
-  * 方式一：
-    * 获取key的hashcode将其%数组的长度旧可以得到对应的下标
-    * 将元素存入数组对应下标的链表内，（7 使用的是头插法， 8 使用的是尾插法）
+* 八进制：十进制`233`对应的八进制是`351`
 
 
+<table>
+    <tbody>
+        <tr>
+            <td>二进制</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>每3位转十进制对应八进制</td>
+            <td colspan="2" style="text-align:center">3</td>
+            <td colspan="3" style="text-align:center">5</td>
+            <td colspan="3" style="text-align:center">1</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="8" style="text-align:center">351</td>
+        </tr>
+    </tfoot>
+</table>
 
-# JVM
+* 十六进制：十进制`233`对应的十六进制是`E9`
 
-## 类加载过程
+<table>
+    <tbody>
+        <tr>
+            <td>二进制</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>每4位转十进制对应十六进制</td>
+            <td colspan="4" style="text-align:center">E</td>
+            <td colspan="4" style="text-align:center">9</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="8" style="text-align:center">E9</td>
+        </tr>
+    </tfoot>
+</table>
 
-* 加载
-  * 将class文件字节码内容加载到内存中，并将这些静态数据转换成方法区中的运行时数据结构，在堆中生成一个代表这个类的java.lang.Class对象，作为方法区类数据访问入口。（这个过程需要类加载器参与）
-* 链接：将java类的二进制代码合并到JVM的运行状态中的过程
-  * 验证：确保加载的类信息符合JVM规范，没有安全方面的问题
-  * 准备：正式为类变量（static变量）分配内存并设置类变量的初始值阶段，这些内存都在方法区中进行分配
-  * 解析：虚拟机常量池的符号引用替换为直接引用的过程
-* 初始化
-  * 初始化阶段是执行类构造器<clinit>()方法的过程，；类构造器<clinit>()方法是由编译器自动收集所有类变量的赋值动作和静态语句块（static块）中的语句合并产生的
-  * 当初始化一个类的时候，如果发现其父类还没有进行初始化，则需要先初始化其父类
-  * 虚拟机会保证一个类的<clinit>()方法在多线程环境中正确加锁和同步
-  * 当访问一个java类的静态域时，只有真正声明这个域的类才会被初始化 
+## 运算符
 
-* 类的主动引用（一定会发生类的初始化）
-  * new一个类的对象
-  * 调用类的金泰成员（除final常量）和静态方法
-  * 对该类进行发射调用时
-  * 当虚拟机启动，java Hello，则一定会初始化Hello类，就是先启动main方法所在的类
-  * 当初始化一个类，如果其父类没有被初始化，则会初始化其父类
-* 类的被动引用（不会发生类的初始化）
-  * 当访问一个静态域时，只有真正声明这个与的类才会被初始化
-    * 通过子类引用父类的静态域，不会导致子类会被初始化
-  * 通过数组定义类引用，不会初始化该类
-  * 引用常量不会初始化该类（）常量在编译阶段旧存入调用类的常量池中了
+| 分类   | 运算符    |
+|--------------- | --------------- |
+| 算术运算符（7个）   | `+` `-` `*` `/` `%` `++` `--`   |
+| 赋值运算符（12个）   | `=` `+=` `-=` `*=` `/=` `%=` `>>=` `<<=` `>>>=` `&=` <code>&#124;=</code> `^=` |
+| 比较（或关系）运算符（6个）   | `>` `>=` `<` `<=` `==` `!=`   |
+| 逻辑运算符（6个） | `&` <code>&#124;</code> `^` `!` `&&` <code>&#124;&#124;</code> |
+| 位运算符（7个）| `&` <code>&#124;</code> `^` `~` `<<` `>>` `>>>` |
+| 条件运算符（1个）| (条件表达式)?结果1:结果2 |
+| Lambda运算符（1个）| `->` |
 
-## 类加载器
+### 算数运算符
 
-* 作用：
-  * 将class文件字节码内容加载到内存中，并将这些静态数据转换成方法区中的运行时数据结构，在堆中生成一个代表这个类的java.lang.Class对象，作为方法区类数据访问入口
-* 类缓存
-  * 标准的javaSE类加载器可以按要求查找类，但一旦某一个类被加载到在加载器中，它将维持加载（缓存）一段时间，不过，JVM垃圾收集器可以回收这些Class对象
 
-## 类加载器的层次结构（树状结构）
+| 运算符   | 运算    |
+|--------------- | --------------- |
+| `+`   | 正号   |
+| `-`   | 负号   |
+| `+`   | 加     |
+| `-`   | 减     |
+| `*`   | 乘     |
+| `/`   | 除     |
+| `%`   | 取模（取余）     |
+| `++`   | 自增（前）：先运算后取值     |
+| `++`   | 自增（后）：先取值后运算     |
+| `--`   | 自减（前）：先运算后取值     |
+| `--`   | 自减（后）：先取值后运算     |
+| `+`   | 字符串连接     |
 
-* 引导类加载器（bootstrap class loader）
-  * 它用来加载java的核心库（JAVA_HOME/jre/lib/rt.jar,或sun.boot.class.path路径下的内容），是用原生代码实现的，并不是继承java.lang.ClassLoader
-  * 加载扩展类和应用程序类加载器，并指定他们的父类加载器
-* 扩展类加载器（extensions class loader）
-  * 用来加载java的扩展库（JAVA_HOME/jre/ext/*.jar,或java.ext.dirs路径下的内容），Java虚拟机的实现会提供一个 扩展库目录。该类加载器在此目录里面查找并加载Java类
-  * 一由sun.misc.Launcher$ExtClassLoader实现
-* 应用程序加载器( application class loader )
-  * 一它根据Java应用的类路径( classpath，java.class.path路径的类，一般来说 , Java应用的类都是由它来完成加载的。
-  * 一由sun.misc.Launcher$AppClassLoader实现
-* 自定义类加载器
-  * 一开发人员可以通过继承java.lang.ClassLoader类的方式，实现自己的类加载器,以满足一-些特殊的需求。
+```java
+// 正号
+System.out.println(+3); // 3
+// 负号
+int i1 = 4;
+System.out.println(-i1); // -4
+// 加
+System.out.println(5+5); // 10
+// 减
+System.out.println(6-4); // 2
+// 乘
+System.out.println(3*4); // 12
+// 除
+System.out.println(5/5); // 1
+// 取模（取余）
+System.out.println(7%5); // 2
+// 自增（前）：先运算后取值
+int i2 = 2;
+int i3 = ++i2;
+System.out.println(i2); // 3
+System.out.println(i3); // 3
+// 自增（后）：先取值后运算
+int i4 = 2;
+int i5 = i4++;
+System.out.println(i4); // 3
+System.out.println(i5); // 2
+// 自减（前）：先运算后取值
+int i6 = 2;
+int i7 = --i6;
+System.out.println(i6); // 1
+System.out.println(i7); // 1
+// 自减（后）：先取值后运算
+int i8 = 2;
+int i9 = i8--;
+System.out.println(i8); // 1
+System.out.println(i9); // 2
+// 字符串连接
+System.out.println("He" + "llo"); // Hello
+```
 
-## java.class.ClassLoader类介绍
+### 赋值运算符
 
-* 作用：
-  * java.lang.ClassLoader类的基本职责就是根据-个指定的类的名称，找到或者生成其对应的字节代码,然后从这些字节代码中定义出一个Java类,即java.lang.Class类的一个实例。
-  * 除此之外, ClassLoader还负责加载Java应用所需的资源,如图像文件和配置文件等。
-* 相关方法
-  * getParent()	返回该类加载器的父类加载器。
-  * loadClass(String name) 加载名称为name的类,返回的结果是java.lang.Class类的实例。
-  * findClass(String name) 查找名称为name的类,返回的结果是java.lang.Class类的实例。
-  * findLoadedClass(String name) 查找名称为name的已经被加载过的类,返回的结果是java.lang.Class类的实例。
-  * defineClass(String name, byte[] b, int off, int len) 把字节数组 b中的内容转换成Java类,返回的结果是java.lang.Class类的实例。这个方法被声明为final的。
-  * resolveClass(Class<?> c)链接指定的 Java类。
-  * 对于以上给出的方法,表示类名称的name参数的值是类的二进制名称。需要注意的是内部类的表示,如com.example.Sample$1和com.example.Sample$Inner等表示方式。
+```java
+// 将5赋值给变量i1
+int i1 = 5;
+i1 += 1; // 等同于 i1 = i1 + 1
+System.out.println(i1); // 6
+i1 -= 1; // 等同于 i1 = i1 - 1
+System.out.println(i1); // 5
+i1 *= 2; // 等同于 i1 = i1 * 2
+System.out.println(i1); // 10
+i1 /= 2; // 等同于 i1 = i1 / 2
+System.out.println(i1); // 5
+i1 %= 2; // 等同于 i1 = i1 % 2
+System.out.println(i1); // 1
+// 其他类似
+```
 
-## 类加载器的代理模式
+### 比较（关系）运算符
 
-* 代理模式
-  * 一交给其他加载器来加载指定的类
-* 双亲委托机制
-  * 就是某个特定的类加载器在接到加载类的请求时，首先将加载任务委托给父类加载器,依次追溯，直到最高的爷爷辈的,如果父类加载器可以完成类加载任务,就成功返回;只有父类加载器无法完成此加载任务时,才洎己去加载。
-  * 双亲委托机制是为了保证Java核心库的类型安全
-    * 这种机制就保证不会出现用户自己能定义java.lang.Object类的情况。
-  * 类加载器除了用于加载类,也是安全的最基本的屏障
-* 双亲委托机制是代理模式的一种
-  * 并不是所有的类加载器都采用双亲委托机制
-  * -tomcat服务器类加载器也使用代理模式,所不同的是它是首先尝试去加载某个类,如果找不到再代理给父类加载器。这与一般类加载器的顺序是相反的
+| 运算符   | 运算    |
+|--------------- | --------------- |
+| `==`   | 相等于   |
+| `!=`   | 不等于   |
+| `<`   | 小于   |
+| `>`   | 大于   |
+| `<=`   | 小于等于   |
+| `>=`   | 大于等于   |
+| `instanceof`   | 检查是否为类的对象   |
 
-## 自定义类加载器
+* 比较运算符的结果都是`boolean`类型：`true`/`false`
+* `>` `<` `>=` `<=`只适用于基本数据类型（除boolean外），
+`==` `!=`适用于基本数据类型和引用数据类型
+* `==` `!=`在比较引用数据类型是对比的是对象的地址，如果需要比较两个对象推荐使用`equals`方法
 
-* 自定义类加载器的流程:
+```java
+System.out.println(4==3); // false
+System.out.println(4!=3); // true
+System.out.println(4<3); // false
+System.out.println(4>3); // true
+System.out.println(4<=3); // false
+System.out.println(4>=3); // true
+System.out.println("Hello" instanceof String); // true
+```
 
-  * 首先检查请求的类型是否E经被这个类装载器装载到命名空间中了，如果E经装载,直接返回;
-  * 委派类加载请求给父类加载器,如果父类加载器能够完成,则返回父加载器加载的Class实例;
-  * 调用本数载器的findClass ()方法,试图获取对应的字节码,如果获取的到,则调用defineClass 导入类型到方法区;如果获取不到对应的字节码或者其他原因失败,返回异常给loadClass转抛异常,终止加载过程
-  * 注意:
-    * 被两个类加载器加载的同-个类, JVM不认为是相同的类。
+### 逻辑运算符
 
-  ```java
-  //自定义加载类
-  public class FileClassLoader extends ClassLoader {
-      private String root;
-      public FileClassLoader(String root) {
-          this.root = root;
-      }
-      //重写findClass方法
-      @Override
-      protected Class<?> findClass(String name) throws ClassNotFoundException {
-          //查找该类是否已经被加载
-          Class<?> aClass = findLoadedClass(name);
-          if (aClass == null){
-              try {
-                  //没被加载先给父类加载进加载
-                  aClass = getParent().loadClass(name);
-              }catch (Exception e){
-                  aClass = null;
-              }
-              //判断父类加载器是否加载成功
-              if (aClass == null){
-                  //否者自己加载
-                  byte[] classData = getClassFromDir(name);
-                  aClass = defineClass(name, classData, 0, classData.length);
-                  if (aClass == null){
-                      throw new ClassNotFoundException();
-                  }
-              }
-          }
-          return aClass;
-      }
-      //根据root目录获取class文件的byte数据
-      private byte[] getClassFromDir(String className){
-          String path = root + "/" + className.replace(".", "/")+".class";
-          FileInputStream fis = null;
-          ByteArrayOutputStream baos = null;
-          try{
-              baos = new ByteArrayOutputStream();
-              fis = new FileInputStream(path);
-              byte[] buffer = new byte[1024];
-              int len = 0;
-              while ((len = fis.read(buffer)) > 0){
-                  baos.write(buffer, 0, len);
-              }
-              baos.flush();
-              return baos.toByteArray();
-          }catch (Exception e){
-              e.printStackTrace();
-              return null;
-          }finally {
-              if (fis != null){
-                  try {
-                      fis.close();
-                  } catch (IOException e) {
-                      e.printStackTrace();
-                  }
-              }
-              if (baos != null){
-                  try {
-                      baos.close();
-                  } catch (IOException e) {
-                      e.printStackTrace();
-                  }
-              }
-          }
-      }
-  }
-  ```
+| a | b | a&b | a&&b | a&#124;b | a&#124;&#124;b | !a | a^b |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| true | true | true | true | true | true | false | false |
+| true | false | false | false | true | true | false | true |
+| false | true | false | false | true | true | true | true |
+| false | false | false  | false | false | false | true | false |
 
-* 可以自定义当前线程的类加载器
+* `&`和`&&`表示**且**，两边都是true时，结果为true，否则为false
+* <code>&#124;</code>和<code>&#124;&#124;</code>表示**或**，两边其中有一边是true，结果为true，两边都是false时，结果为false
+* `!`表示**非**，结果取反
+* `^`表示异或，两边结果不同时为true，两边结果相同时为false
 
-  ```java
-  Thread.currentThread().setContextClassLoader(自定义的类加载器);
-  ```
+```java
+boolean a1 = true;
+boolean b1 = true;
+System.out.println(a1 & b1); // true
+System.out.println(a1 && b1); // true
+System.out.println(a1 | b1); // true
+System.out.println(a1 || b1); // true
+System.out.println(!a1); // false
+System.out.println(a1 ^ b1); // false
+System.out.println("-----------");
+boolean a2 = true;
+boolean b2 = false;
+System.out.println(a2 & b2); // false
+System.out.println(a2 && b2); // false
+System.out.println(a2 | b2); // true
+System.out.println(a2 || b2); // true
+System.out.println(!a2); // false
+System.out.println(a2 ^ b2); // true
+System.out.println("-----------");
+boolean a3 = false;
+boolean b3 = true;
+System.out.println(a3 & b3); // false
+System.out.println(a3 && b3); // false
+System.out.println(a3 | b3); // true
+System.out.println(a3 || b3); // true
+System.out.println(!a3); // true
+System.out.println(a3 ^ b3); // true
+System.out.println("-----------");
+boolean a4 = false;
+boolean b4 = false;
+System.out.println(a4 & b4); // false
+System.out.println(a4 && b4); // false
+System.out.println(a4 | b4); // false
+System.out.println(a4 || b4); // false
+System.out.println(!a4); // true
+System.out.println(a4 ^ b4); // false
+```
 
-## TOMCAT服务器的类加载机制
+#### `&`和`&&`，<code>&#124;</code>和<code>&#124;&#124;</code>之间的关系
+* `&&`表示**短路且**
+    * 当符号左边是true时，`&`和`&&`一样
+    * 当符号左边是false时，`&`会执行符号右边的操作，而`&&`不会
+* <code>&#124;&#124;</code>表示**短路或**
+    * 当符号左边是false时，<code>&#124;</code>和<code>&#124;&#124;</code>一样
+    * 当符号左边是true时，<code>&#124;</code>会执行符号右边的操作，而<code>&#124;&#124;</code>不会
 
-* TOMCAT不能使用系统默认的类加载器。
-  * 如果TOMCAT跑你的WEB项目使用系统的类加载器那是相当危险的,你可以直接是无忌惮是操作系统的各个目录了。
-  * 对于运行在Java EE”容器中的Web应用来说,类如载器的实现方式与一般的Java应用有所不同。
-  * 每个Web应用都有一个对应的类加载器实例。该类加载器也使用代理模式(不同于前面说的双亲委托机制) ,所不同的是它是首先尝试去加载某个类，如果找不到再代理给父类加载器。这与一般类加载器的顺序是相反的但也是为了保证安全，这样核心库就不在查询范围之内。
-* 为了安全TOMCAT需要实现自己的类加载器。
-  * 我可以限制你只能把类写在指定的地方,否则我不给你加载!
+```java
+// &和&&，|和||之间的关系
+int i = 3;
+boolean bool = true;
+if (bool & (++i > 3)){
+   System.out.println();
+}
+System.out.println(i); // 4
+
+i = 3;
+bool = false;
+if (bool && (++i > 3)){
+   System.out.println();
+}
+System.out.println(i); // 3
+
+i = 3;
+bool = true;
+if (bool | (++i > 3)){
+   System.out.println();
+}
+System.out.println(i); // 4
+
+i = 3;
+bool = true;
+if (bool || (++i > 3)){
+   System.out.println();
+}
+System.out.println(i); // 3
+```
+
+### 位运算符
+
+* 位运算操作可以理解为将十进制的数转换为二进制后，对二进制的相关操作
+
+| 运算符   | 运算    |
+|--------------- | --------------- |
+| <<   | 左移   |
+| >>   | 右移   |
+| >>>   | 无符号右移   |
+| &   | 与运算   |
+| &#124;   | 或运算   |
+| ^   | 异或运算   |
+| ~   | 取反运算   |
+
+#### 左移
+
+* 将左边的高位移出去后右边的空位补零
+* `11`左移2位是`44`
+
+<table>
+    <tbody>
+        <tr>
+            <td>二进制</td>
+            <td></td>
+            <td></td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>左移两位</td>
+            <td style="background-color:#db5c5c">0</td>
+            <td style="background-color:#db5c5c">0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>高位丢弃，低位补零</td>
+            <td></td>
+            <td></td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+            <td style="background-color:#57965c">0</td>
+            <td style="background-color:#57965c">0</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="12" style="text-align:center">44</td>
+        </tr>
+    </tfoot>
+</table>
+
+```java
+System.out.println(11 << 2); // 44
+System.out.println(-11 << 2); // -44
+```
+
+#### 右移
+
+* 如果是正数，左边空位补零
+* 如果是负数，左边空位补一
+* `11`右移2位是`2`
+<table>
+    <tbody>
+        <tr>
+            <td>二进制</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>右移两位</td>
+            <td></td>
+            <td></td>
+            <td>0(符号位)</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td style="background-color:#db5c5c">1</td>
+            <td style="background-color:#db5c5c">1</td>
+        </tr>
+        <tr>
+            <td>低位丢弃，高位补零</td>
+            <td style="background-color:#57965c">0</td>
+            <td style="background-color:#57965c">0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="12" style="text-align:center">2</td>
+        </tr>
+    </tfoot>
+</table>
+
+* `-11`右移2位是`-3`
+<table>
+    <tbody>
+        <tr>
+            <td>二进制</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>右移两位</td>
+            <td></td>
+            <td></td>
+            <td>1(符号位)</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td style="background-color:#db5c5c">0</td>
+            <td style="background-color:#db5c5c">1</td>
+        </tr>
+        <tr>
+            <td>低位丢弃，高位补一</td>
+            <td style="background-color:#57965c">1</td>
+            <td style="background-color:#57965c">1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>原码</td>
+            <td>1</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="12" style="text-align:center">-3</td>
+        </tr>
+    </tfoot>
+</table>
+
+```java
+System.out.println(11 >> 2); // 2
+System.out.println(-11 >> 2); // -3
+```
+
+#### 无符号右移
+
+* 无论是正数还是负数，被移出的高位都补零
+* `-11`无符号右移2位是`61`
+* 由于java内没有无符号类型，需要将`-11`的补码当作原码存入int内操作，将`-11`和`0xFF`进行**与**操作即可
+
+<table>
+    <tbody>
+        <tr>
+            <td>二进制</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>右移两位</td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td style="background-color:#db5c5c">0</td>
+            <td style="background-color:#db5c5c">1</td>
+        </tr>
+        <tr>
+            <td>低位丢弃，高位补零</td>
+            <td style="background-color:#57965c">0</td>
+            <td style="background-color:#57965c">0</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="12" style="text-align:center">61</td>
+        </tr>
+    </tfoot>
+</table>
+
+```java
+/*
+无符号右移
+                         11110101 b1 -11
+                         11111111 & 0xFF
+00000000 00000000 00000000 11110101 i1
+00000000 00000000 00000000 00111101 61
+*/
+byte b1 = -11;
+int i1 = b1 & 0xFF;
+i1 >>>= 2;
+System.out.println(i1); // 61
+```
+#### 与、或、异或、取反
+
+* 操作相同，以与为例，`11`与`19`结果为`3`
+
+<table>
+    <tbody>
+        <tr>
+            <td>11</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>19</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+        </tr>
+    </tbody>
+</table>
+
+```java
+/*
+00001011
+00010011
+00000011 3
+
+00001011
+00010011
+00011011 27
+
+00001011
+00010011
+00011000 24
+
+00001011
+11110100
+10001011
+10001100 -12
+
+*/
+System.out.println(11 & 19); // 3
+System.out.println(11 | 19); // 27
+System.out.println(11 ^ 19); // 24
+System.out.println(~11); // -12
+```
+
+#### 条件运算符（三元运算符）
+
+* 格式：`(条件表达式) ? 表达式1 : 表达式2`
+
+```java
+String a = "Hello";
+String b = "Wrold!";
+boolean c = true;
+System.out.println(c ? a : b); // Hello
+```
+## 流程控制
+
+* **顺序结构**：程序从上到下逐行执行，中间没有任何判断和跳转
+* **分支结构**
+    * 根据条件，选择性地执行某段代码
+    * `if...else`和`switch-case`
+* **循环结构**
+    * 根据循环条件，重复性的执行某段代码
+    * `for`、`while`、`do-while`。`foreach`（jdk5新增）遍历集合和数组
+
+### 分支结构
+
+#### if...else
+
+```java
+int i1 = 0;
+if (i1 > 0) {
+    i1--;
+}
+System.out.println(i1); // 0
+if (i1 > 0) {
+    i1--;
+}else {
+    i1++;
+}
+System.out.println(i1); // 1
+if (i1 > 1) {
+    i1--;
+} else if (i1 == 1) {
+    i1 = 0;
+}
+System.out.println(i1); // 0
+```
+
+#### switch-case
+
+* switch中的表达式只能是特定的类型：byte，short，char，int，枚举（jdk5），String（jdk7）
+* switch中必须要有一个default分支用于处理未匹配到的情况
+* switch中的每一对case必须对应一个break，如果忘写break则会穿透到下一个分支
+
+```java
+int week = 5;
+String weekStr;
+switch (week) {
+    case 1:
+        weekStr = "Monday";
+        break;
+    case 2:
+        weekStr = "Tuesday";
+        break;
+    case 3:
+        weekStr = "Wednesday";
+        break;
+    case 4:
+        weekStr = "Thursday";
+        break;
+    case 5:
+        weekStr = "Friday";
+        break;
+    case 6:
+        weekStr = "Saturday";
+        break;
+    case 7:
+        weekStr = "Sunday";
+        break;
+    default:
+        weekStr = "error";
+        break;
+}
+System.out.println(weekStr); // Friday
+
+// case 5 未加上break
+switch (week) {
+    case 1:
+        weekStr = "Monday";
+        break;
+    case 2:
+        weekStr = "Tuesday";
+        break;
+    case 3:
+        weekStr = "Wednesday";
+        break;
+    case 4:
+        weekStr = "Thursday";
+        break;
+    case 5:
+        weekStr = "Friday";
+        // break;
+    case 6:
+        weekStr = "Saturday";
+        break;
+    case 7:
+        weekStr = "Sunday";
+        break;
+    default:
+        weekStr = "error";
+        break;
+}
+System.out.println(weekStr); // Saturday
+```
+
+### 循环结构
+* 循环结构四要素：
+    * 初始化部分
+    * 循环条件部分
+    * 循环体部分
+    * 迭代部分
+
+#### for循环
+
+* 执行过程
+
+```mermaid
+flowchart LR
+a(初始化) --> b(循环条件)
+b --> c(循环体)
+c --> d(迭代)
+d --> b
+```
+
+```java
+/*
+ for(初始化; 循环条件; 迭代){
+    循环体
+ }
+
+ 依次输出1到10
+ */
+for (int i = 1; i <= 10; i++) {
+    System.out.println(i);
+}
+```
+
+#### while循环
+
+* 执行过程，和for循环一样
+
+```java
+/*
+ 初始化
+ while(循环条件){
+     循环体
+     迭代
+ }
+
+ 依次输出1到10
+ */
+int i = 1;
+while (i <= 10) {
+    System.out.println(i);
+    i++;
+}
+```
+
+#### do-while循环
+
+* 执行过程
+
+```mermaid
+flowchart LR
+a(初始化) --> b(循环体)
+b --> c(迭代)
+c --> d(循环条件)
+d --> b
+```
+
+* do-while循环至少执行一次循环
+
+```java
+/*
+ 初始化
+ do {
+     循环体
+     迭代
+ }while(循环条件)
+
+ 依次输出1到10
+ */
+int i = 1;
+do {
+    System.out.println(i);
+    i++;
+}while (i <= 10);
+
+/*
+ 初始化
+ do {
+     循环体
+     迭代
+ }while(循环条件)
+
+ 依次输出1到10
+ */
+int i1 = 1;
+do {
+    System.out.println(i1);
+    i1++;
+    break;
+}while (i1 <= 10);
+System.out.println(i1); // 2
+```
+
+#### 无限循环
+
+* for实现：`for(;;) {}`
+* while实现：`while(true) {}`
+
+#### break和continue关键字
+
+<table>
+    <thead>
+        <tr>
+            <th>关键字</th>
+            <th>适用范围</th>
+            <th>作用</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan="2" style="vertical-align: middle">break</td>
+            <td>switch-case</td>
+            <td>跳出分支</td>
+        </tr>
+        <tr>
+            <td>循环结构</td>
+            <td>跳出当前循环</td>
+        </tr>
+        <tr>
+            <td>continue</td>
+            <td>循环条件</td>
+            <td>提前进入下一次循环</td>
+        </tr>
+    </tbody>
+</table>
+
+```java
+// 跳出循环
+for (int i = 1; i <= 10; i++) {
+    if (i > 4){
+        break;
+    }
+    System.out.println(i);
+}
+
+System.out.println("---");
+
+// 跳过偶数
+for (int i = 1; i <= 10; i++) {
+    if (i % 2 == 0){
+        continue;
+    }
+    System.out.println(i);
+}
+```
