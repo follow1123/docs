@@ -1689,14 +1689,14 @@ System.out.println(Arrays.toString(newArr)); // 打印
 * **类**：具有相同特征的事物的抽象描述，是抽象的、概念上的定义
 * **对象**：实际存在的该类事物的每个个体，是具体的，也称为**实例(instance)**
 
-### 类的成员
+#### 类的成员
 
 * Java中用类class来描述事务，类是一组相关**属性**和**行为**的集合，这也是类最基本的两个成员
     * **属性**：该类事物的状态。对应类中的**成员变量(属性、Method)**
     * **行为**：该类事物要做什么操作，或者基于事物的状态能做什么。对应类中的**成员方法（函数、Field）**
 
 
-#### 定义一个类并且使用
+##### 定义一个类并且使用
 
 * 定义
 
@@ -1730,13 +1730,13 @@ public static void main(String[] args) {
 }
 ```
 
-### 属性（成员变量）和局部变量
+## 属性（成员变量）和局部变量
 
 * 变量声明的格式相同：`数据类型 变量名 = 变量值`
 * 变量都有其有效的作用域，出作用域就失效
 * 变量必须先声明，后赋值，再使用
 
-#### 成员变量和局部变量的区别
+### 成员变量和局部变量的区别
 
 | 不同点 | 属性（成员变量） | 局部变量 |
 | --- | --- | --- |
@@ -1762,7 +1762,7 @@ public class Employee {
 }
 ```
 
-### 方法
+## 方法（Method）
 
 * **方法**是类或对象行为特征的抽象，用来完成某个功能的操作。
 在某些语言中也成为**函数**或**过程**
@@ -1771,7 +1771,7 @@ public class Employee {
 * 方法内可以调用本类中的**其他**方法或属性
 * 方法内不能定义方法
 
-#### 方法声明的格式说明
+### 方法声明的格式说明
 
 ```java
 权限修饰符 [其他修饰符] 返回值类型 方法名(形参列表) [throws 异常类型]{ // 方法头
@@ -1812,7 +1812,7 @@ public class Person {
 
 }
 ```
-#### return关键字
+### return关键字
 
 * 结束一个方法
 * 结束一个方法的同时可以返回数据给调用者
@@ -1826,13 +1826,13 @@ for (int i = 0; i < 10; i++) {
 System.out.println("方法结束"); // 未输出
 ```
 
-#### 方法调用内存解析
+### 方法调用内存解析
 
 * 调用方法时，堆空间会新入栈一个栈帧
 * 方法的形参和局部变量会保存在这个栈帧内
 * 方法结束时，栈帧会弹出，对应的形参和局部变量会销毁
 
-#### 方法的重载(overload)
+### 方法的重载(overload)
 
 * **方法的重载**：在同一个类中，允许存在一个以上的同名方法，只要它们的形参列表不同即可
 * **重载的特点**：与修饰符、返回值类型无关，只看参数列表，且参数列表必须不同，（参数个数或类型）
@@ -1877,7 +1877,7 @@ private double add(double a, double b, double c){
 }
 ```
 
-#### 可变个数形参的方法(jdk5)
+### 可变个数形参的方法(jdk5)
 
 * 在调用方法时，可能会出现方法形参类型确定，但个数不确定，此时，我们可以使用可变个数形参的方法
 * 格式`(参数类型... 参数名)`
@@ -1924,7 +1924,7 @@ public boolean equalsAll(long a, int... nums){
 // }
 ```
 
-#### 方法的值传递机制
+### 方法的值传递机制
 
 * 对于方法内声明的局部变量来说，如果出现赋值操作
     * 基本数据类型，将变量保存的数据值传递出去
@@ -1980,7 +1980,7 @@ public void testReferenceDataType() {
 }
 ```
 
-#### 递归方法
+### 递归方法
 
 * 方法内自己调用自己的现象就成为递归
 * **递归的分类**：直接递归，间距递归
@@ -1990,7 +1990,7 @@ public void testReferenceDataType() {
     * 递归调用会占用大量系统堆栈，内存耗用多，在递归调用层次多时速度要比循环慢，使用递归时要谨慎
     * 在要求高性能的情况下尽量避免使用递归，考虑循环迭代
 
-##### 代码示例
+#### 代码示例
 
 * 直接递归
 
@@ -2040,4 +2040,667 @@ public void testSum() {
 
     System.out.println(getSum(100));
 }
+```
+
+## package和import
+
+### package(包)
+
+* 用于指明该文件中定义的类、接口等结构所在的包
+* 语法：`package 顶层包名 子包名;`
+* 说明
+    * 一个源文件只能有一个声明包的package语句
+    * package语句作为java源文件的第一条语句出现。若缺省该语句，则指定为无名包
+    * 包名，属于标识符，满足标识符命名规则和规范（全部小写）、见名知意
+        * 包通常使用所在公司域名的倒置
+* 作用
+    * 包可以包含类和子包，划分项目层次，便于管理
+    * 帮助管理大型软件系统，将功能相近的类划分到同一个包内
+    * 解决类命名冲突问题
+    * 控制访问权限
+
+### import关键字
+
+* 为了使用定义在其他包内的java类，需要使用import语句显示引入指定包下的需要的类。
+相当于import语句告诉编译器到哪里去找这个类
+* 语法：`import 包名.类名;`
+* 说明
+    * import语句声明在包的声明和类的声明之间
+    * 导入多个类或接口，直接写多个import语句
+    * 一次性导入某个包下的所有类或接口可以使用`import a.*;`
+    * 如果导入的类或接口是java.lang包下的，或者是当前包下的，则可以省略此import语句
+    * 导入`java.a`包下的某个类后，如果需要导入`java.a.b`包下的某个类仍需要导入
+    * 如果有两个同名的类在不同包下，都需要使用的话，需要将其中一个使用全类名方式声明`a.b.c.People people = new a.b.c.People()`
+    * `import static`组合使用可以导入指定类下的静态属性或方法
+
+## 封装性（Encapsulation）
+
+* 面向对象的开发原则要遵循**高内聚**、**低耦合**
+    * **高内聚**：类的内部数据操作细节自己完成，不允许外部干涉
+    * **低耦合**：尽量暴露少量的方法给外部使用，尽量方便外部调用
+* 封装就是把客观的事物抽象概念的类，并且类可以把自己的数据和方法只向可信的类或对象开放，向没必要开放的类或对象隐藏信息
+
+### Java实现封装性
+
+* 实现封装就是控制类或成员的可见性范围。需要访问控制修饰符，也称权限修饰符
+* 权限修饰符：`public`、`protected`、`缺省`、`private`
+
+| 修饰符    | 本类内部    | 本包内    | 其他包的子类    | 其他包的非子类    |
+|---------------- | --------------- | --------------- | --------------- | --------------- |
+| private    | √    | ×    | ×    | ×   |
+| 缺省   | √   | √   | ×   | ×   |
+| protected   | √   | √   | √   | ×   |
+| public   | √   | √   | √   | √   |
+
+* 修饰的结构
+    * 外部类只能使用`public`和`缺省`两种权限修饰符
+    * 成员变量、成员方法、构造器、成员内部类可以使用所有权限修饰符
+
+#### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/encapsulation/A.java)
+
+* 定义一个`A`类，定义4个属性，分别有4种不同的权限修饰符
+
+```java
+/**
+ * 测试权限修饰符类
+ */
+public class A {
+    /**
+     * 私有属性
+     */
+    private int privateField;
+
+    /**
+     * 缺省属性
+     */
+    int defaultField;
+
+    /**
+     * protected数字
+     */
+    protected int protectedField;
+
+    /**
+     * 公开属性
+     */
+    public int publicField;
+}
+```
+
+* 在`A`类相同包下定义一个`B`类，使用main方法访问`A`类的所有属性
+
+```java
+/**
+ * 和A类处在相同的包下
+ */
+public class B {
+    public static void main(String[] args) {
+        A a = new A();
+        // int privateField a.privateField; // 无法访问
+        int defaultField = a.defaultField;
+        int protectedField = a.protectedField;
+        int publicField = a.publicField;
+    }
+}
+```
+
+* 在`A`类的子包下定义一个`packag1.C`类，并继承`A`类，使用方法访问`A`类的所有属性
+
+```java
+/**
+ * 和A类处在不同的包下，但是是A类的子类
+ */
+public class C extends A {
+    public void cMethod(){
+        // int privateField super.privateField; // 无法访问
+        // int defaultField = super.defaultField; // 不在相同包内，无法访问
+        int protectedField = super.protectedField;
+        int publicField = super.publicField;
+    }
+}
+```
+
+* 在`A`类的子包下定义一个`packag2.D`类，使用main方法访问`A`类的所有属性
+
+```java
+/**
+ * 和A类处在不同的包下，不是A类的子类
+ */
+public class D {
+
+    public static void main(String[] args) {
+        A a = new A();
+        // int privateField a.privateField; // 无法访问
+        // int defaultField = a.defaultField; // 不在相同包内，无法访问
+        // int protectedField = a.protectedField; // 不在相同包内并且不是子类，无法访问
+        int publicField = a.publicField;
+    }
+}
+```
+
+## 构造器（constructor）
+
+* 构造器搭配`new`关键字使用，用于创建类的对象
+* 在创建对象的同时，可以给对象相关属性赋值
+* 说明
+    * 格式：`权限修饰符 类名(形参列表){}`
+    * 创建类后，在没有显示提供任何构造器的情况下，系统会默认提供一个空参构造器，构造器权限修饰符与类声明的权限相同
+    * 一旦类中显示声明了构造器，系统就不再提供默认的空参构造器
+    * 一个类可以声明多个构造器，彼此之间构成重载
+
+### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/constructor)
+
+* 默认构造器
+
+```java
+/**
+ * 默认构造器
+ */
+public class DefaultConstructorClass {
+
+    public static void main(String[] args) {
+        DefaultConstructorClass defaultConstructorClass = new DefaultConstructorClass();
+    }
+}
+```
+
+* 自定义构造器
+
+```java
+/**
+ * 自定义构造器
+ */
+public class CustomConstructorClass {
+
+    String name;
+
+    int age;
+
+    public CustomConstructorClass(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public static void main(String[] args) {
+        CustomConstructorClass zs = new CustomConstructorClass("zs", 11);
+
+        // CustomConstructorClass zs1 = new CustomConstructorClass() // 没有无参构造器，编译不通过
+
+        // 给对象的属性赋值
+        System.out.println(zs.name); // zs
+        System.out.println(zs.age); // 11
+    }
+}
+```
+
+* 构造器重载
+
+```java
+/**
+ * 构造器重载
+ */
+public class OverloadConstructorClass {
+
+    String name;
+
+    int age;
+
+    /**
+     * 只有age的构造器
+     */
+    public OverloadConstructorClass(int age) {
+        this.age = age;
+    }
+
+    /**
+     * 全部参数构造器
+     */
+    public OverloadConstructorClass(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public static void main(String[] args) {
+        OverloadConstructorClass zs = new OverloadConstructorClass("zs", 11);
+        System.out.println(zs.name); // zs
+        System.out.println(zs.age); // 11
+        OverloadConstructorClass zs1 = new OverloadConstructorClass(11);
+        System.out.println(zs1.name); // null
+        System.out.println(zs1.age); // 11
+    }
+}
+```
+
+## 类中属性赋值过程
+
+* 在类的属性中，给属性赋值的位置
+    1. 默认赋值
+    2. 显示赋值
+    3. 构造器赋值
+    4. `对象.方法`赋值
+    5. `对象.属性`赋值
+* 这些位置赋值的顺序：1，2，3，4/5
+* 这些位置的执行次数
+    * 1、2、3只能执行一次
+    * 4、5可以执行多次
+
+### 代码示例
+
+```java
+/**
+ * 测试属性赋值顺序
+ */
+public class AssignmentOrder {
+
+    // int integer; // 默认赋值
+    int integer = 1; // 显示赋值
+
+    public AssignmentOrder(){}
+
+    public AssignmentOrder(int i){
+        integer = i;
+    }
+
+    /**
+     * 方法赋值
+     */
+    public void setInteger(int i){
+        integer = i;
+    }
+
+    public static void main(String[] args) {
+        AssignmentOrder assignmentOrder = new AssignmentOrder();
+        // 打开默认赋值代码注释
+        // System.out.println(assignmentOrder.integer); // 0
+
+        // 打开显示赋值注释
+        System.out.println(assignmentOrder.integer); // 1
+
+        // 构造器赋值
+        AssignmentOrder ao2 = new AssignmentOrder(2);
+        System.out.println(ao2.integer); // 2
+
+        // 对象.属性赋值可以赋值多次
+        ao2.integer = 3;
+        ao2.integer = 4;
+        System.out.println(ao2.integer); // 4
+
+        // 对象.方法赋值可以赋值多次
+        ao2.setInteger(5);
+        ao2.setInteger(6);
+        System.out.println(ao2.integer); // 6
+    }
+}
+```
+
+## JavaBean
+
+* JavaBean是一种java语言写的可重用组件
+* 符合以下标准的类
+    * 类是公共的
+    * 有一个无参的公共构造器
+    * 有属性，且有对应的get，set方法
+
+## this关键字
+
+* 在方法中（非static方法）内部使用，表示调用该方法的对象
+* 在构造器中，表示该构造器正在初始化的对象
+* 使用`this(形参列表)`可以调用构造器
+    * 使用这种方式调用构造器必须声明在构造器的首行
+
+```java
+/**
+ * 测试this调用构造器
+ */
+public class ThisClass {
+
+    private String name;
+
+    private int age;
+
+    public ThisClass(){
+        System.out.println("初始化代码执行");
+    }
+
+    public ThisClass(String name) {
+        this();
+        this.name = name;
+    }
+
+    public ThisClass(String name, int age) {
+        this();
+        this.name = name;
+        this.age = age;
+    }
+
+    public static void main(String[] args) {
+        // 下面三行都会输出 初始化代码执行
+        ThisClass thisClass = new ThisClass();
+        ThisClass thisClass1 = new ThisClass("zs");
+        ThisClass thisClass2 = new ThisClass("zs", 11);
+    }
+}
+```
+
+## 继承（inheritance）
+
+* 在定义类时发现要定义的类与之前的类有相似点，可以考虑继承之前的类，或将相同点抽象出来一个类并继承
+* 继承的好处
+    * 继承的出现减少了代码的冗余，提高了代码的复用性
+    * 继承的出现有利于功能的扩展
+    * 继承的出现让类和类之间产生了`is-a`的关系，为多态的使用提供了前提。
+        * 描述事物之间的所属关系，这种关系是`is-a`的关系，父类更通用，子类更具体
+
+### 语法
+
+* 通过`extends`关键字实现
+* 描述
+    * 类A：父类、superClass、超类、基类
+    * 类B：子类、subClass、派生类
+
+```java
+[修饰符] class 类A {
+    ...
+}
+
+[修饰符] class 类B extends 类A {
+    ...
+}
+```
+
+### 继承的功能
+
+* 子类可以获取到父类中的属性和方法（受封装性影响）
+* 子类继承父类之后，可以扩展自己特有的功能（添加属性或方法）
+
+### Java继承体系
+
+* Java中声明的类，如果没有显式的声明其父类时，默认继承与`java.lang.Object`
+* 一个类可以同时拥有多个子类
+* 一个类不可以同时继承多个父类（Java只支持单继承，不支持多继承）
+
+### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/inheritance/InheritanceTest.java)
+
+* 定义一个父类
+
+```java
+/**
+ * 人
+ */
+public class Person {
+
+    String name;
+
+    int age;
+
+    public void eat(){
+        System.out.println("吃饭");
+    }
+}
+```
+
+* 定义一个子类
+
+```java
+/**
+ * 学生
+ */
+public class Student extends Person{
+
+    public Student() {
+    }
+
+    public Student(String name, int age){
+        this.name = name;
+        this.age = age;
+    }
+
+
+    public void study(){
+        System.out.println("学习");
+    }
+}
+```
+
+* 测试
+
+```java
+Student student = new Student("zs", 11);
+
+// 调用父类中的属性
+System.out.println(student.name);
+System.out.println(student.age);
+
+// 调用父类中的方法
+student.eat();
+// 调用自己的方法
+student.study();
+```
+
+## 方法的重写（override）
+
+* 子类对父类继承过来的方法进行覆写的操作，就称为方法的重写
+
+### 方法重写的规则
+
+* 子类重写父类的方法，方法的命令，形参列表必须相同
+* 权限不能小于父类方法的修饰符
+* 返回值
+    * 父类的返回值时void，子类也必须是void
+    * 返回值是基本数据类型，子类必须相同
+    * 返回值是引用数据类型，子类可以相同，或是其子类
+* 异常：子类重写方法抛出的异常必须和父类方法抛出的异常相同或则是其子类
+* 方法体没有要求
+
+### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/override/OverrideTest.java)
+
+* 定义父类
+
+```java
+/**
+ * 人
+ */
+public class Person {
+
+    String name;
+
+    int age;
+
+    public void eat(){
+        System.out.println("吃饭");
+    }
+
+    public void read(String word){
+        System.out.println("说话：" + word);
+    }
+
+    public void sleep(int hour){
+        System.out.println("先睡" + hour + "小时");
+    }
+
+    public String info(){
+        return name + ":" + age;
+    }
+
+}
+```
+
+* 定义子类
+
+```java
+/**
+ * 学生
+ */
+public class Student extends Person {
+
+    public Student() {
+    }
+
+    public Student(String name, int age){
+        this.name = name;
+        this.age = age;
+    }
+
+
+    @Override
+    public void eat() {
+        System.out.println(name + "正在吃饭");
+    }
+
+    @Override
+    public void read(String word) {
+        System.out.println(name + "读" + word);
+    }
+
+    @Override
+    public void sleep(int hour) {
+        System.out.println(name + "准备睡" + hour + "小时");
+    }
+
+    @Override
+    public String info() {
+        return "姓名：" + name + "\t年龄" + age + "岁";
+    }
+
+    public void study(){
+        System.out.println("学习");
+    }
+}
+```
+
+* 测试
+
+```java
+// 调用父类的方法
+Person person = new Person();
+person.name = "人";
+person.age = 11;
+person.eat();
+person.read("123");
+person.sleep(21);
+System.out.println(person.info());
+
+System.out.println("---");
+// 调用子类重写后的方法
+Student student = new Student("sz", 12);
+student.eat();
+student.read("书");
+student.sleep(6);
+System.out.println(student.info());
+```
+
+## super关键字
+
+* 子类继承父类后重写了父类的某个方法，但是需要调用这个被重写的方法，可以使用`super.方法`
+* 子类继承父类后，定义了一个与父类重名的属性，需要使用父类的这个属性，可以使用`super.属性`
+    * 子类出现父类相同的属性是不会覆盖父类的属性，两个属性同时存在
+* 子类继承父类后，在初始化该对象时需要调用父类的构造器，可以使用`super(形参列表)`
+    * `super(形参列表)`必须声明在构造器的首行
+    * `super(形参列表)`和`this(形参列表)`只能二选一
+    * 如果首行没有显示调用this或super构造器，则默认调用`super()`空参构造器
+
+### super调用属性、方法
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/keywords/super_keyword/SuperTest.java)
+
+* 定义父类
+
+```java
+/**
+ * 人
+ */
+public class Person {
+
+    int id;
+
+    String name;
+
+    int age;
+
+    public Person() {
+        System.out.println("初始化Person");
+    }
+
+    public Person(int id, String name, int age) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+    }
+
+    public void eat(){
+        System.out.println("吃饭");
+    }
+
+}
+```
+
+* 定义子类
+
+```java
+/**
+ * 学生
+ */
+public class Student extends Person {
+
+    int id;
+
+    public Student() {
+    }
+
+    public Student(int id, String name, int age) {
+        super(id, name, age);
+        this.id = id + 1;
+    }
+
+    public void showId(){
+        System.out.println(this.id);
+        System.out.println(super.id);
+    }
+
+    @Override
+    public void eat() {
+        System.out.println(name + "正在吃饭");
+        super.eat();
+    }
+
+
+    public void study(){
+        System.out.println("学习");
+    }
+}
+```
+
+* 测试
+
+```java
+Student zs = new Student(1, "zs", 11);
+
+// 子类重写方法后调用父类的方法
+zs.eat();
+
+// 子类打印属性后打印父类的同名属性
+zs.showId();
+```
+
+### super调用构造器
+
+* 测试（父类子类代码和上面一样）
+
+```java
+// 调用子类无参构造器会默认调用父类无参构造器，打印里面的信息
+Student student = new Student();
+
+
+// 使用super(形参列表)会初始化父类里面的属性
+Student zs = new Student(1, "zs", 11);
+// 由于Student有一个同名的属性，只初始化了父类的属性，两个id属性的值不同
+zs.showId();
 ```
