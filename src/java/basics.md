@@ -2704,3 +2704,622 @@ Student zs = new Student(1, "zs", 11);
 // 由于Student有一个同名的属性，只初始化了父类的属性，两个id属性的值不同
 zs.showId();
 ```
+
+
+## 多态性
+
+* 对象的多态性：父类的引用指向子类对象
+* 格式：`父类类型 变量名 = 子类对象`
+* 前提
+    * 要有类的继承关系
+    * 要有方法的重写
+* 多态只适用于方法，不适用于属性
+* 好处：极大的减少了代码的冗余，不需要定义多个重载的方法
+* 弊端：在多态的场景下，创建了子类的对象，也加载了子类特有的方法和属性，
+由于声明的是父类的引用，无法直接调用子类的特有方法
+
+### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/polymorphism/PolymorphismTest.java)
+
+* 定义一个父类
+
+```java
+/**
+ * 人
+ */
+public class Person {
+
+    int id = 1;
+
+    public void eat() {
+        System.out.println("吃饭");
+    }
+
+    public void doWork() {
+        System.out.println("工作");
+    }
+}
+```
+
+* 定义一个子类
+
+```java
+/**
+ * 男人
+ */
+public class Man extends Person{
+
+    int id = 2;
+    @Override
+    public void eat() {
+        System.out.println("吃一大碗");
+    }
+
+    @Override
+    public void doWork() {
+        super.doWork();
+    }
+
+    /**
+     * 模拟子类特殊操作
+     */
+    public void a(){
+        System.out.println("a");
+    }
+}
+```
+* 另一个子类
+
+```java
+/**
+ * 女人
+ */
+public class Woman extends Person {
+    int id = 3;
+    @Override
+    public void eat() {
+        System.out.println("吃一碗");
+    }
+
+
+    @Override
+    public void doWork() {
+        super.doWork();
+    }
+}
+```
+
+* 测试
+
+```java
+public class PolymorphismTest {
+
+    @Test
+    public void testPolymorphism1() {
+        Person person = new Person();
+
+        Person woman = new Woman();
+
+        Person man = new Man();
+
+
+        person.eat();
+
+        // 多态，实际调用子类方法，这种方式称为虚方法
+        woman.eat();
+        man.eat();
+
+        // 属性不适用与多态
+
+        System.out.println(person.id); // 1
+        System.out.println(woman.id); // 1
+        System.out.println(man.id); // 1
+    }
+
+
+    /**
+     * 模拟招聘
+     */
+    private void recruitment(Person person){
+        person.doWork();
+    }
+
+    /**
+     * 多态的好处
+     */
+    @Test
+    public void testPolymorphism2() {
+        // 男人女人都能用
+        recruitment(new Woman());
+        recruitment(new Man());
+    }
+
+    /**
+     * 多态的弊端
+     */
+    @Test
+    public void testPolymorphism3() {
+        Person man = new Man();
+        // man.a(); // 无法调用子类的特殊操作
+    }
+
+}
+```
+
+### 向上转型和向下转型
+
+* instanceof关键字：在类型强转前判断甚至是其子类，增加程序的健壮性
+
+```java
+@Test
+public void testClassCast() {
+
+    Person man = new Man();
+
+    // 使用强转操作调用子类的特殊方法
+    Man m = (Man) man;
+    m.a();
+}
+
+@Test
+public void testInstanceof() {
+    Person man = new Man();
+
+    // 错误的强转会报错
+    Woman woman = (Woman) man;
+
+    // 使用instanceof判断
+    if (man instanceof Man){
+        Man m = (Man) man;
+    }
+
+}
+```
+
+## Object类
+
+* 类`java.lang.Object`是类层次结构的根类，即所有其他类的父类。每个类都使用`Object`作为超类
+* Object类型的变量与除Object以外的任意引用数据类型的对象都存在多态引用
+
+### Object类的方法
+
+#### equals()方法
+
+* 自定义类在没有重写Object的equals()方法的情况下，调用的就是Object类中声明的equals()方法，
+比较两个对象的引用地址是否相同
+* 在需要判断自定义类内的多个属性是否相同的情况下可以使用
+
+##### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/object/equals/EqualsTest.java)
+
+* 定义一个类
+
+```java
+public class User {
+
+    private String name;
+
+    private int age;
+
+    public User(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj instanceof User){
+            User user = (User) obj;
+            return this.age == user.age && this.name.equals(user.name);
+        }
+        return false;
+    }
+}
+```
+
+* 测试
+
+```java
+User user1 = new User("zs", 11);
+User user2 = new User("zs", 11);
+
+// 重写equals方法前，比较对象地址
+System.out.println(user1.equals(user2)); // false
+
+// 重写equals方法前后，比较对象内的属性
+System.out.println(user1.equals(user2)); // true
+```
+
+#### toString()方法
+
+* toString()方法默认返回当前对象的类名加地址
+* `System.out.println()`方法就是使用`toString()`打印
+* 用于自定义输出类里面的信息
+
+##### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/object/tostring/ToStringTest.java)
+
+* 定义一个类
+
+```java
+public class User {
+
+    String name;
+
+    int age;
+
+    public User(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+* 测试
+
+```java
+User zs = new User("zs", 11);
+System.out.println(zs);
+```
+
+#### clone()和finalize()方法
+
+* clone()
+
+* 定义一个类，实现Cloneable接口
+
+```java
+public class Person implements Cloneable{
+
+    private String name;
+
+    public Person(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+}
+```
+
+* 测试
+
+```java
+Person zs = new Person("zs");
+Person zsCopy = (Person) zs.clone();
+
+// 克隆后两个对象并不是同一个
+System.out.println(zs == zsCopy);
+
+// 克隆后修改原始对象内的基本数据类型的属性，不会改变克隆对象内的基本数据类型属性
+zs.setName("zhangsan");
+System.out.println(zs.getName());
+System.out.println(zsCopy.getName());
+```
+* finalize()
+
+```java
+/**
+ * 测试finalize方法，（jdk9被废弃了，不推荐使用）
+ */
+@Test
+public void testFinalize() {
+    Person zs = new Person("zs");
+    zs = null; // 将引用指向为null表示这个对象是垃圾了，等待被回收，但时间不确定
+
+    System.gc(); // 强制释放空间
+
+}
+```
+
+## static关键字
+
+* 如果想让一个成员变量被类的所有实例所共享，就用`static`修饰即可，称为类变量（或类属性）
+
+### static修饰属性
+
+* 使用static修饰的成员变量也叫静态变量或类变量
+* 静态变量和实例变量的对比
+
+|     | 静态变量    | 实例变量    |
+|---------------- | --------------- | --------------- |
+| **个数**    | 内存空间中只有一份，被多个对象共享    | 类的每一个实例都保存这自己的实例变量    |
+| **内存位置**   | jdk6及之前存在方法区，jdk7及之后存在堆空间    | 存在堆空间的对象实体中    |
+| **加载时机** | 随着类的加载而加载，由于类只会加载一次，所有静态变量只有一份 | 随着对象的创建而加载，每个对象拥有一份实例变量 |
+| **调用者** | 可以被类之间调用，也可以被对象调用 | 只能被对象调用 |
+| **消亡时机** | 随着类的卸载而消亡 | 随着对象的消亡而消亡 |
+
+#### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/keywords/static_keyword/StaticTest.java)
+
+* 定义类
+
+```java
+public class Chinese {
+    String name;
+
+    int age;
+
+    public static String nation = "中国";
+
+    public Chinese(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public void eat(){
+        System.out.println("吃饭");
+    }
+
+    public static void show_nation(){
+        System.out.println("我的国际是：" + nation);
+
+        // eat(); // 无法调用实例方法，编译不通过
+    }
+
+    public void show_info(){
+        System.out.println("我的名字是：" + name);
+        show_nation(); // 可以调用静态方法
+    }
+
+}
+```
+
+* 测试
+
+```java
+// 在对象创建之前就可以使用
+System.out.println(Chinese.nation);
+
+Chinese zs = new Chinese("zs", 11);
+Chinese ls = new Chinese("ls", 12);
+
+// 一个对象修改了实例变量，所有对象都生效
+zs.nation = "china";
+System.out.println(zs.nation); // china
+System.out.println(ls.nation); // china
+```
+
+### static修饰方法
+
+* static修饰的方法也叫静态方法或类方法
+* 静态方法内不用调用对象的实例方法，但实例方法可以调用静态方法
+* 静态方法内不能使用`this`或`super`关键字，因为静态方法调用时，对象可能没创建
+
+```java
+Chinese.show_nation();
+
+Chinese zs = new Chinese("zs", 11);
+
+// 实例方法内调用静态方法
+zs.show_info();
+```
+
+## 代码块
+
+* 用来初始化类或对象的成员变量
+* 代码块又分为静态代码块和非静态代码块
+    * 静态代码块随着类的加载而执行，只会执行一次
+    * 非静态代码块随着对象的创建而执行，执行时机是在构造器的前面
+    * 多个静态代码块或非静态代码块之间的执行顺序是根据代码块声明的位置而定
+    * 静态代码块和非静态代码块调用属性和方法的规则与成员方法和静态方法规则相同
+* 父类的代码块加载时机永远在子类之前
+
+### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/block/BlockTest.java)
+
+* 定义父类
+
+```java
+public class Person {
+    String name;
+
+    static String info = "123";
+
+    public Person(String name) {
+        System.out.println("构造器执行");
+        this.name = name;
+    }
+
+    public void eat(){
+        System.out.println("吃饭");
+    }
+
+    {
+        System.out.println("代码块执行2");
+    }
+    {
+        System.out.println("代码块执行1");
+    }
+
+    static {
+        System.out.println("静态代码块执行1");
+    }
+    static {
+        System.out.println("静态代码块执行2");
+    }
+}
+```
+
+* 定义子类
+
+```java
+public class Man extends Person{
+
+    {
+        System.out.println("2 代码块执行");
+    }
+
+    static {
+        System.out.println("2 静态代码块执行");
+    }
+
+    static int a;
+    public Man(String name) {
+        super(name);
+    }
+}
+```
+
+* 测试
+
+```java
+public class BlockTest {
+    @Test
+    public void testBlock() {
+        System.out.println(Person.info);
+
+        Person zs = new Person("zs");
+    }
+
+    @Test
+    public void testBlockWithExtends() {
+        // 加载子类，会先执行父类的静态代码块再执行子类的静态代码块
+        System.out.println(Man.a);
+
+        System.out.println("---");
+
+        // 创建子类会先执行父类的代码块，再执行父类构造方法，最后执行子类代码块
+        Man zs = new Man("zs");
+
+    }
+}
+```
+
+## final关键字
+
+* `final`可以用来修饰：**类**、**方法**、**变量**
+* 用`final`修饰**类**表示类不能被继承
+* 用`final`修饰**方法**表示方法不能被重写
+* 用`final`修饰变量
+    * 可以修饰**成员变量**，**局部变量**，**形参**
+    * 修饰这些变量之后都表示变量不能被修改了，也称为常量
+    * `final`配合`static`修饰**成员变量**后称为全局常量
+
+## abstract关键字（抽象类或抽象方法）
+
+* 我们声明的一些几何图形类中：圆、矩形，三角形等，这些类之间都有共同特征，求面积、周长等，
+这些共同的特征可以抽取到一个公共的父类中，但这些方法在父类中**无法给出具体的实现**，
+而是交给子类各自自己实现。那么父类在声明这些方法时，**就只有方法签名，没有方法体**，
+我们把没有方法体的方法称为**抽象方法**，Java语法规定，包含抽象方法的类必须时**抽象类**
+* 格式
+    * **抽象类**：被`abstract`修饰的类
+    * **抽象方法**：被`abstract`修饰没有方法体的方法
+
+```java
+public abstract class AbstractClass {
+    abstract void abstractMethod();
+}
+```
+* 抽象类
+    * 抽象类不能实例化
+    * 抽象类可以没有抽象方法，但抽象方法声明所在的类必须是抽象类
+* 抽象方法
+    * 抽象方法只有方法声明，没有方法体
+    * 子类继承抽象类后必须重写父类的所有抽象方法，否则子类也必须要使用`abstract`修饰（编译器会检查）
+* `abstract`不能修饰属性、构造器、代码块等
+* `abstract`不能与私有方法、静态方法、final方法、final类共用
+    * 私有方法不能被子类访问到所以不能共用
+    * 避免静态类调用静态方法，静态方法未实现
+    * final方法不能被重写
+    * final类不能被继承
+
+### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/abstract_class/AbstractTest.java)
+
+* 定义几何图形抽象类
+
+```java
+/**
+ * 几何图形类
+ */
+public abstract class Geometry {
+    /**
+     * 获取几何图形的面积
+     */
+    abstract double getArea();
+}
+```
+
+* 定义圆形
+
+```java
+/**
+ * 圆形
+ */
+public class Circle extends Geometry{
+    int radius;
+    @Override
+    double getArea() {
+        return Math.PI * (radius * radius);
+    }
+}
+```
+
+* 定义正方形
+
+```java
+/**
+ * 正方形
+ */
+public class Square extends Geometry{
+    int side;
+    @Override
+    double getArea() {
+       return side * side;
+    }
+}
+```
+
+* 测试
+
+```java
+Circle circle = new Circle();
+circle.radius = 5;
+System.out.println(circle.getArea());
+
+Square square = new Square();
+square.side = 5;
+System.out.println(square.getArea());
+```
