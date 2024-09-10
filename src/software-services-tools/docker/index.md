@@ -125,7 +125,7 @@ f --不能--> i[返回失败错误,查不到该镜像]
 | **docker --help** | docker帮助文档 |
 | **docker 具体命令 --help** | docker命令帮助文档 |
 
-### 镜像
+### 镜像相关
 
 | 命令   | 描述    |
 |--------------- | --------------- |
@@ -135,16 +135,36 @@ f --不能--> i[返回失败错误,查不到该镜像]
 | **docker system df** | 查看镜像/容器/数据卷所占用空间 |
 | <a href="#commands-rmi">docker rmi</a> | 删除镜像 |
 
-### 容器
+<a id="command-volume"></a>
+### 容器相关
+
 | 命令   | 描述    |
 |--------------- | --------------- |
 | <a href="#commands-run">docker run</a>   | 新建+启动容器   |
 | <a href="#commands-ps">docker ps</a>   | 列出当前所有正在运行的容器 |
-| **docker start 容器名称或id** | 启动容器 |
-| **docker restart 容器名称或id** | 重启容器 |
-| **docker stop 容器名称或id** | 停止容器 |
-| **docker kill 容器名称或id** | 强制停止容器 |
+| **docker start** | 启动容器 |
+| **docker restart** | 重启容器 |
+| **docker stop** | 停止容器 |
+| **docker kill** | 强制停止容器 |
 | <a href="#commands-rm">docker rm</a>   | 删除已经停止的容器 |
+| <a href="#commands-logs">docker logs</a>   | 查看容器日志信息 |
+| **docker top** | 查看容器内部运行的进程 |
+| **docker inspect** | 查看容器内部细节 |
+| <a href="#commands-exec">docker exec</a>   | 进入正在运行的容器以命令行交互 |
+| **docker attach** | 进入正在运行的容器以命令行交互，退出时会之间停止容器 |
+| <a href="#commands-cp">docker cp</a>   | 将容器内文件复制到主机下 |
+| <a href="#commands-export">docker export</a>   | 导出容器 |
+| <a href="#commands-import">docker import</a>   | 导入镜像 |
+| <a href="#commands-commit">docker commit</a>   | 将容器打包为镜像并提交到本地 |
+
+### 数据卷关
+
+| 命令   | 描述    |
+|--------------- | --------------- |
+| **docker volume ls**   | 列出数据卷   |
+| **docker volume create**   | 新建数据卷   |
+| **docker volume inspect**   | 显示数据卷详细信息   |
+| **docker volume rm**   | 删除数据卷   |
 
 ### 命令详情
 
@@ -230,10 +250,18 @@ docker rmi -f $(docker images -qa)
     * `-p`：指定端口映射，小写p
     * `-i`：以交互模式运行容器，通常与`-t`同时使用
     * `-t`：为容器重新分配一个伪终端，通常与`-i`同时使用
+    * `-v`：指定目录映射
+    * `-volumes-from`：继承某个容器的目录映射关系
 
 ```bash
-# 后台启动容器并指定一个名称
+# 后台启动容器并指定一个名称（启动守护式容器）
 docker run -d --name='debian1' debian
+
+# 后台启动容器并将容器的/usr/share/nginx目录映射到主机的/usr/local/web目录
+docker run -d -v /usr/local/web:/usr/share/nginx --name='nginx' nginx
+
+# 后台启动名称为n2的nginx容器，目录关系继承至nginx容器
+docker run -d -volumes-from nginx --name n2 nginx
 
 # 启动容器并运行容器内的shell与容器进行交互
 docker run -it debian /bin/bash
@@ -256,6 +284,9 @@ docker ps -n 3
 
 # 显示所有容器的编号
 docker ps -q
+
+# 查看所以从debian镜像启动的容器 
+docker ps -af ancestor=debian -q
 ```
 
 <a id="commands-rm"></a>
@@ -271,6 +302,97 @@ docker rm -f f7d0a5ed08a2
 # 强制删除所有容器
 docker rm -f $(docker ps -a -q)
 ```
+<a id="commands-logs"></a>
+#### docker logs
+
+```bash
+# 查看指定id容器的日志
+docker logs f7d0a5ed08a2
+
+# 查看容器日志最后5行
+docker logs -n 5 f7d0a5ed08a2 
+
+# 类似linux的tail -f命令
+docker logs -f f7d0a5ed08a2
+```
+<a id="commands-exec"></a>
+#### docker exec
+
+* 和`docker attach`的区别是：`docker exec`进入容器后退出不会关闭容器，而`docker attach`会
+
+```bash
+# 以交互式命令行进入容器内部
+docker exec -it debian1 /bin/bash
+```
+<a id="commands-cp"></a>
+#### docker cp
+
+```bash
+# 将debian容器内/tmp目录下的a.txt文件复制到当前目录下
+docker cp debian1:/tmp/a.txt ./a.txt
+```
+<a id="commands-export"></a>
+#### docker export
+
+* 将运行中的容器导出为文件
+* 可以保存容器内程序生产的内容
+
+```bash
+# 将这个容器导出为debian1.tar文件
+docker export debian1 > debian1.tar
+```
+
+<a id="commands-import"></a>
+#### docker import
+
+* 配合`docker export`使用
+* 导入后会生成一个新的镜像
+
+```bash
+# 导入镜像，导入的镜像名称custom/debian2版本为1.0
+docker import debian1.tar custom/debian2:1.0
+```
+<a id="commands-commit"></a>
+#### docker commit
+
+```bash
+# 将之间的镜像新加一个软件后提交到本地 
+docker commit -m "add new software" -a "y" debian1 y/deb:1.1
+```
+
+## docker镜像
+
+* 镜像是一种轻量级、可执行的独立软件包，包含运行某个软件所需的所有内容，
+我们把应用程序和配置依赖打包好形成一个可交付的运行环境（包括代码、运行时需要的库、
+环境变量和配置文件等），这个打包好的运行环境就是image镜像文件
+
+* docker镜像是由层级文件系统（UnionFS）组成
+* docker最底层是由bootfs+rootfs组成，rootfs就是不同的Linux发行版，这些发行版都是最精简的
+* 每一个应用程序镜像都是多个镜像组成，例如nginx是由**底层操作系统**+**nginx软件**组成
+* docker镜像层都是只读的，容器层是可写的
+    * 启动容器后，由于容器是基于镜像启动的，所有在镜像之上叫容器层
+* 新建自己的镜像可以从底层开始构建也可以使用<a href="#commands-commit">docker commit</a>命令基于某个镜像构建
+
+## 本地镜像发布到云端流程
+
+* 和git类似先commit到本地再push到远程
+
+### docker私有库
+
+* 下载私有库服务`docker pull registry`后进行配置
+
+## Docker容器数据卷
+
+* 将docker容器内的数据保存进宿主机的磁盘中
+* 运行一个带有容器数据卷功能的容器实例，参考<a href="#commands-run">docker run</a>
+* 使用`-v`参数创建的目录映射关系默认是匿名的，使用<a href="#command-volume">数据卷</a>相关命令管理数据卷
+
+
+
+
+
+
+
 
 ## 常见问题
 
@@ -278,33 +400,14 @@ docker rm -f $(docker ps -a -q)
 
 * 仓库名和标签都是`<none>`
 
-### 容器
+### docker挂载主机目录访问如果出现cannot open directory .: Permission denied
 
-* `docker ps -a` 查看所有容器
-* `docker rm` 删除容器
-    * 删除某个镜像对应的所有容器
-    ```powershell
-    docker rm $(docker ps -af ancestor=image_name -q)
-    ``` 
-* `docker run image_name` 运行容器
-    * `-d` 后台运行
-    * `-it` 交互式运行容器命令最后接需要执行的交互式命令，通常是bash
+* 在挂在目录后加`--privileged=true`参数即可
 
-* `docker exec` 在容器内执行命令
-    * `-it` 交互式
 
-* `docker logs container_id` 查看容器的命令
-    * `-f` 监听日志
 
-* `docker cp container_id:path path` 复制容器内的文件到本地，反过来一样
 
-* `docker stop container_id` 停止容器
 
-* `docker start container_id` 启动容器
-
-## 数据卷
-
-* `docker volume`
 
 ## 网络
 
