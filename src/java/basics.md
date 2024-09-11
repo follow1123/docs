@@ -3323,3 +3323,260 @@ Square square = new Square();
 square.side = 5;
 System.out.println(square.getArea());
 ```
+
+## interface（接口）
+
+* 接口就是规范，定义的是一组规则，**继承**是一个“是不是”的`is-a`关系，而接口实现则是“能不能”的`has-a`关系
+* 格式：
+```java
+public interface Interface{
+    void abstractMethod();
+}
+```
+* 接口结构说明：
+    * 可以声明属性，但必须使用`public static final`修饰
+    * 方法：
+        * jdk8前只能声明抽象方法
+        * jdk8后可以声明**静态方法**和**默认方法**
+        * jdk9可以声明**私有方法**
+    * 接口内不能又构造器、代码块等
+* 接口与类的关系
+    * B类继承A类，那么B为A类的子类
+    * B类实现A类，那么B为A类的实现类
+* 类可以实现多个接口
+* 类必实现接口后必须将接口内的所有抽象方法都重写
+* 接口与接口之间的关系：继承关系，接口之间可以多继承
+
+### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/interface_test/InterfaceTest.java)
+
+* 测试
+
+```java
+public class InterfaceTest {
+    @Test
+    public void testInterface() {
+        Plane plane = new Plane();
+        plane.fly();
+        plane.attack();
+
+        Kite kite = new Kite();
+        kite.fly();
+    }
+
+    @Test
+    public void testInterfaceExtends() {
+
+        Gunship gunship = new Gunship();
+        // Gunship未实现Flyable接口，也可以调用fly方法，因为Hovering接口继承了Flyable接口
+        gunship.fly();
+        gunship.hover();
+        gunship.attack();
+    }
+
+    private void fly(Flyable flyable){
+        flyable.fly();
+    }
+    
+    @Test
+    public void testAnonymousInterface() {
+       fly(new Kite());
+
+        Flyable flyable = new Flyable() {
+            @Override
+            public void fly() {
+                System.out.println("飞");
+            }
+        };
+
+        fly(flyable);
+    }
+}
+```
+
+### 接口新特性
+
+* **静态方法**（jdk8）
+    * 实现类无法调用接口的静态方法
+* **默认方法**（jdk8）
+    * 如果一个**类**实现的两个**接口**都有**同名同参**的**默认方法**，那么这个实现类必须重写这个方法
+        * 重写后想要调用其中一个接口的同名方法的话使用`接口名.super.方法`调用
+    * 如果一个类**继承了一个父类**并**实现了一个接口**，这个**父类**和**接口**内都有同名同参的方法，
+    则默认调用父类的同名同参方法，**类优先原则**
+* **私有方法**（jdk9）
+    * 供接口内的默认方法使用，抽出接口内默认方法内的公共逻辑
+
+
+#### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/interface_test/new_methods/InterfaceTest.java)
+
+* 测试静态方法默认方法
+
+```java
+/**
+ * 测试接口
+ *      静态方法默认方法（jdk8添加）
+ *      私有方法（jkd9添加）
+ */
+public class InterfaceTest {
+
+    /**
+     * 测试静态方法
+     */
+    @Test
+    public void testStaticMethod() {
+        A.a1();
+        // B.a1(); // 实现类无法调用接口的静态方法，编译不通过
+    }
+
+    /**
+     * 测试默认方法
+     */
+    @Test
+    public void testDefaultMethod() {
+
+        B b = new B();
+        b.a2(); // 调用A接口内的默认方法
+
+
+        // B类实现了两个接口A、C，这两个接口都实现了同名同参的默认方法common1，实现类必须重写这个方法，否则会报错
+        b.common1();
+
+        // 子类或实现类继承了父类并实现类了接口，父类和接口内都声明了同名同参的方法，子类没重写这个方法的情况下默认调用的是父类的方法，类有优先则
+        b.common2();
+    }
+}
+```
+
+* 测试调用多个接口内的同名同参方法
+
+```java
+public class B extends D implements A, C{
+
+    public void b1(){
+        System.out.println("b3");
+    }
+
+    @Override
+    public void common1() {
+        System.out.println("common1 in b");
+    }
+
+
+    public void b2(){
+        common1(); // 调用自己的方法
+
+        super.common2(); // 调用父类的同名同参方法
+
+        common1(); // 调用自己类中的同名同参方法
+        A.super.common1(); // 调用接口A的同名同参方法
+        C.super.common1(); // 调用接口C的同名同参方法
+    }
+
+}
+```
+
+## 内部类（InnerClass）
+
+* 将A类定义在B类里面，里面的A类就称为**内部类（InnerClass）**，类B则称为**外部类（OutClass）**
+* 当事物A的内部，还有一个部分需要一个完整的结构B进行描述，而这个内部的完整的结构B又只为外部事物A提供服务，
+不在其他地方单独使用，那么整个内部的完整结构B最好使用内部类
+* 例子：
+    * `Thread`内的`State`表示线程的生命周期
+    * `HashMap`内的`Node`表示每个键值对的节点
+* 内部类分类（和变量分类类似）
+    * 成员内部类：静态成员内部类，非静态成员内部类
+    * 局部内部类（声明在方法、构造器、代码块内部）：匿名局部内部类，非匿名局部内部类
+
+#### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/innerclass/InnerClassTest.java)
+
+* 定义一个类
+
+```java
+public class Person {
+
+    String name = "person";
+    int age;
+
+    static class Dog{
+
+    }
+
+    class Bird{
+
+        String name = "bird";
+        
+        public void show(String name){
+            System.out.println("age = " + age); // 调用外部内的属性
+            System.out.println("name = " + name); // 调用形参
+            System.out.println("this.name = " + this.name); // 调用内部类的成员变量
+            System.out.println("Person.this.name = " + Person.this.name); // 调用外部类的成员变量
+
+        }
+
+    }
+
+    public void method(){
+        class InnerClass1{
+
+        }
+    }
+
+    public Person(){
+        class InnerClass1{
+
+        }
+    }
+
+    {
+        class InnerClass1{
+
+        }
+    }
+}
+```
+
+* 测试
+
+```java
+public class InnerClassTest {
+    @Test
+    public void testInnerClass() {
+
+        // 创建静态成员内部类
+        Person.Dog dog = new Person.Dog();
+
+        // 创建非静态成员内部类
+        Person.Bird bird = new Person().new Bird();
+        // 或
+        Person person = new Person();
+        Person.Bird bird1 = person.new Bird();
+    }
+
+    /**
+     * 测试内部内调用外部类属性
+     */
+    @Test
+    public void testInnerClassFields() {
+        Person.Bird bird = new Person().new Bird();
+        bird.show("new bird");
+    }
+
+    @Test
+    public void testLocalInnerClass() {
+        class Task implements Runnable{
+            @Override
+            public void run() {
+                System.out.println("run");
+            }
+        }
+
+        Task task = new Task();
+        task.run();
+    }
+}
+```
