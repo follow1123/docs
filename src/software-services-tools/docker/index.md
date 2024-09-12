@@ -157,7 +157,7 @@ f --不能--> i[返回失败错误,查不到该镜像]
 | <a href="#commands-import">docker import</a>   | 导入镜像 |
 | <a href="#commands-commit">docker commit</a>   | 将容器打包为镜像并提交到本地 |
 
-### 数据卷关
+### 数据卷相关
 
 | 命令   | 描述    |
 |--------------- | --------------- |
@@ -165,6 +165,19 @@ f --不能--> i[返回失败错误,查不到该镜像]
 | **docker volume create**   | 新建数据卷   |
 | **docker volume inspect**   | 显示数据卷详细信息   |
 | **docker volume rm**   | 删除数据卷   |
+
+<a id="command-network"></a>
+### 网络相关
+
+| 命令   | 描述    |
+|--------------- | --------------- |
+| **docker network ls**   | 列出网络   |
+| **docker network create**   | 新建网络   |
+| **docker network inspect**   | 显示网络详细信息   |
+| **docker network rm**   | 删除网络   |
+| **docker network connect**   | 将一个容器连接到某个网络上   |
+| **docker network disconnect**   | 将一个容器从某个网络上断开   |
+| **docker network prune**   | 删除未使用的网络   |
 
 ### 命令详情
 
@@ -251,7 +264,8 @@ docker rmi -f $(docker images -qa)
     * `-i`：以交互模式运行容器，通常与`-t`同时使用
     * `-t`：为容器重新分配一个伪终端，通常与`-i`同时使用
     * `-v`：指定目录映射
-    * `-volumes-from`：继承某个容器的目录映射关系
+    * `--volumes-from`：继承某个容器的目录映射关系
+    * `--network`：指定容器的网络模式
 
 ```bash
 # 后台启动容器并指定一个名称（启动守护式容器）
@@ -387,12 +401,111 @@ docker commit -m "add new software" -a "y" debian1 y/deb:1.1
 * 运行一个带有容器数据卷功能的容器实例，参考<a href="#commands-run">docker run</a>
 * 使用`-v`参数创建的目录映射关系默认是匿名的，使用<a href="#command-volume">数据卷</a>相关命令管理数据卷
 
+## Dockerfile
+
+* Dockerfile是用来构建docker镜像的文本文件，是由一条条构建镜像所需的指令和参数构成的脚本。
+
+### Dockerfile指令
+
+* 每个指令必须为大写
+* 指令从上到下顺序执行
+* `#`表示注释
 
 
+| 指令   | 说明    |
+|--------------- | --------------- |
+| **FROM**   | 基础镜像，当前新镜像是基于哪个镜像构建的，指定一个已存在的镜像作为模板，第一条必须是FROM   |
+| **MAINTAINER** | 镜像维护者的姓名和邮箱 |
+| **RUN** | 容器构建时需要运行的命令 |
+| **EXPOSE** | 当前容器对外暴露的端口 |
+| **WORKDIR** | 指定容器创建后，终端默认登录进来的目录 |
+| **USER** | 指定镜像以什么用户执行，默认root |
+| **ENV** | 用来在构建镜像过程中设置环境变量 |
+| **ADD** | 将宿主机下的文件拷贝进镜像内，如果是tar文件则会自动解压，支持URL地址下载文件 |
+| **COPY** | 拷贝文件或目录到镜像内 |
+| **VOLUME** | 容器数据卷 |
+| <a href="#dockerfile-instruction-cmd">CMD</a> | 指定容器启动后执行的命令 |
+| <a href="#dockerfile-instruction-entrypoint">ENTRYPOINT</a> | 也是用来指定容器启动后执行的命令 |
 
+#### 指令详情
 
+<a id="dockerfile-instruction-cmd"></a>
+##### CMD
 
+* 有两种格式：
+    * shell格式：`CMD 命令 参数1 参数2`
+    * exec格式：`CMD ["可执行文件" "参数1" "参数2"]`
+* 配合<a href="#dockerfile-instruction-entrypoint">ENTRYPOINT</a>则CMD后接参数：`CMD ["参数1" "参数2"]`
+* Dockerfile中只能有一条CMD指令。如果编写了多个CMD指令，则只有最后一个生效。
+* CMD会被`docker run`命令最后一个命令参数覆盖
+* CMD在`docker run`的时候执行，RUN是在`docker build`时执行
 
+<a id="dockerfile-instruction-entrypoint"></a>
+##### ENTRYPOINT
+
+* 类似CMD指令，但是不会被`docker run`后面的命令覆盖，`docker run`后面的命令会被当作ENTRYPOINT执行可执行程序的参数
+* ENTRYPOINT与CMD命令配合则ENTRYPOINT为指定**可执行命令**，而CMD指定**命令的参数**
+
+#### 构建测试
+
+* 基于ubuntu:24.0.4构建一个带jdk17的镜像
+* 将jdk压缩包和Dockerfile放在同一个目录下
+
+```Dockerfile
+FROM ubuntu:24.04
+
+WORKDIR /usr/local/jdk
+
+ADD ./jdk-17.0.11_linux-x64_bin.tar.gz /usr/local/jdk
+
+ENV JAVA_HOME /usr/local/jdk/jdk-17.0.11
+ENV PATH $PATH:$JAVA_HOME/bin
+
+RUN java -version
+
+CMD /bin/bash
+```
+
+#### 虚悬镜像
+
+* 测试构建一个虚悬镜像
+* Dockerfile
+
+```Dockerfile
+FROM ubuntu:24.04
+CMD echo 123
+```
+
+* 执行`docker build .`命令就会生成一个虚悬镜像
+* 使用`docker images -f dangling=true`命令查询所以的虚悬镜像
+* 使用`docker rmi $(docker images -qf dangling=true)`命令删除所有的虚悬镜像
+
+## Docker网络（network）
+
+> <a href="#command-network">docker网络命令参考</a>
+
+* 进行容器之间的互联和通信以及端口映射
+* 容器ip变动时可以通过服务名连接，通信不受影响 
+
+### Docker网络模式
+
+* docker会在宿主机虚拟一个网桥（docker0），启动一个容器时docker会根据这个虚拟网桥的网段分配给容器一个ip。
+可以将虚拟网桥（docker0）理解为一个交换机，宿主机通过这个交换机连接到每一个容器
+
+| 网络模式   | 简介    |
+|--------------- | --------------- |
+| bridge   | 为每一个容器都分配一个虚拟网络、设置ip等，并将容器连接到一个docker0。虚拟网桥，默认就是这个模式   |
+| host | 使用宿主机的ip和端口 |
+| none | 不进行任何网络设置 |
+| container | 创建的容器和指定的容器共享ip、端口等 |
+
+### bridge
+
+* 将容器的网络连接到虚拟网桥（docker0）上，根据虚拟网桥的的网段分配一个ip给容器
+
+### host
+
+* 直接使用宿主机的ip与外界通信
 
 ## 常见问题
 
@@ -403,30 +516,3 @@ docker commit -m "add new software" -a "y" debian1 y/deb:1.1
 ### docker挂载主机目录访问如果出现cannot open directory .: Permission denied
 
 * 在挂在目录后加`--privileged=true`参数即可
-
-
-
-
-
-
-## 网络
-
-* `docker network`
-
-`docker build -t 镜像名称:镜像标签 Dockerfile目录` 制作镜像   
-
-## 其他
-
-###
-### docker gitlab备份
-
-* `docker ps`获取 container id
-* `docker exec -i -t （这里填container id） /bin/bash`
-
-* `gitlab-rake gitlab:backup:create`
-* 输出`Creating backup archive xxx_xxx.tar`备份成功
-* 文件在创建容器的命令映射的gitlab数据路径下`data/backups`下
-
-## 参考
-
-* 参考https://blog.csdn.net/weixin_43961117/article/details/126125976教程
