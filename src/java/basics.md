@@ -3408,7 +3408,7 @@ public class InterfaceTest {
     * 供接口内的默认方法使用，抽出接口内默认方法内的公共逻辑
 
 
-#### 代码示例
+### 代码示例
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/interface_test/new_methods/InterfaceTest.java)
 
@@ -3490,7 +3490,7 @@ public class B extends D implements A, C{
     * 成员内部类：静态成员内部类，非静态成员内部类
     * 局部内部类（声明在方法、构造器、代码块内部）：匿名局部内部类，非匿名局部内部类
 
-#### 代码示例
+### 代码示例
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/innerclass/InnerClassTest.java)
 
@@ -3580,3 +3580,594 @@ public class InnerClassTest {
     }
 }
 ```
+
+## 枚举类
+
+* 枚举类本质上也是一种对象，只不过这个类的对象是有限的、固定的几个，不能随意创建
+* 比如**星期（7个）**，**月份（12个）**
+* 在jdk5之后使用`enum`关键字定义枚举类
+* 如果枚举类的实现只有一个，则可以看作单例的实现方式
+* 使用`enum`关键字定义的枚举类默认父类是`java.lang.Enum`
+    * Enum父类中的常用方法：`toString()`, `static values()`, `static valueOf()`, `name()`, `ordinal()`
+* 枚举类可以继承接口，继承接口后所以实例共用定义时重写的方法，如果需要每个实例单独重写方法的逻辑，
+则可以在定义枚举实例时重写
+
+
+### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/oop/enum_class/EnumTest.java)
+
+* jdk5前定义枚举类的方式
+
+```java
+public class SeasonBefore {
+
+    private final String seasonName;
+
+    private SeasonBefore(String seasonName){
+        this.seasonName = seasonName;
+    }
+
+    public String getSeasonName() {
+        return seasonName;
+    }
+
+    public static final SeasonBefore SPRING = new SeasonBefore("春天");
+    public static final SeasonBefore SUMMER = new SeasonBefore("夏天");
+    public static final SeasonBefore AUTUMN = new SeasonBefore("秋天");
+    public static final SeasonBefore WINTER = new SeasonBefore("冬天");
+
+    @Override
+    public String toString() {
+        return "SeasonBefore{" +
+                "seasonName='" + seasonName + '\'' +
+                '}';
+    }
+}
+```
+
+* jdk5后定义枚举的方式
+
+```java
+public enum Season {
+    SPRING("春天"),
+    SUMMER("夏天"),
+    AUTUMN("秋天"),
+    WINTER("冬天");
+
+
+    private final String seasonName;
+
+    private Season(String seasonName){
+        this.seasonName = seasonName;
+    }
+
+    public String getSeasonName() {
+        return seasonName;
+    }
+
+    @Override
+    public String toString() {
+        return "Season{" +
+                "seasonName='" + seasonName + '\'' +
+                '}';
+    }
+}
+```
+
+* 枚举类定义接口操作
+
+```java
+public enum SeasonWithInterface implements Runnable{
+    // 枚举实例自己实现对应的逻辑
+    SPRING("春天"){
+        @Override
+        public void run() {
+            System.out.println("春天 run");
+        }
+    },
+    SUMMER("夏天"),
+    AUTUMN("秋天"){
+        @Override
+        public void run() {
+            System.out.println("秋天 run");
+        }
+    },
+    WINTER("冬天");
+
+
+    private final String seasonName;
+
+    private SeasonWithInterface(String seasonName){
+        this.seasonName = seasonName;
+    }
+
+    public String getSeasonName() {
+        return seasonName;
+    }
+
+    @Override
+    public String toString() {
+        return "Season{" +
+                "seasonName='" + seasonName + '\'' +
+                '}';
+    }
+
+    @Override
+    public void run() {
+        System.out.println("季节");
+    }
+}
+```
+
+* 测试
+
+```java
+public class EnumTest {
+
+    @Test
+    public void testEnumBefore() {
+        System.out.println(SeasonBefore.SPRING);
+        System.out.println(SeasonBefore.SUMMER);
+        System.out.println(SeasonBefore.AUTUMN);
+        System.out.println(SeasonBefore.WINTER);
+    }
+
+    @Test
+    public void testEnum() {
+        // 由于* 使用`enum`关键字定义的枚举类默认父类是`java.lang.Enum`，toString方法默认会输出实例对象的命令
+        System.out.println(Season.SPRING);
+        System.out.println(Season.SUMMER);
+        System.out.println(Season.AUTUMN);
+        System.out.println(Season.WINTER);
+
+        System.out.println("--");
+        // Enum父类中的常用方法
+        // name() 返回实例的名称
+        System.out.println(Season.WINTER.name());
+
+        // 静态方法values
+        Season[] values = Season.values();
+        for (int i = 0; i < values.length; i++) {
+            System.out.println(values[i]);
+        }
+
+        // 静态方法valueOf
+        System.out.println(Season.valueOf("SPRING")); // 根据命令获取枚举实例
+        // System.out.println(Season.valueOf("SPRING1")); // 命令写错则会报错，IllegalArgumentException
+
+        // ordinal返回当前枚举实例在枚举类中的位置索引
+        System.out.println(Season.WINTER.ordinal());
+    }
+
+    @Test
+    public void testEnumWithInterface() {
+        // 继承至Runnable接口实现run方法
+        // 未主动重写run方法，使用类重写的run方法
+        SeasonWithInterface.SUMMER.run();
+        SeasonWithInterface.WINTER.run();
+
+        // 定义时重写自己的run方法
+        SeasonWithInterface.SPRING.run();
+        SeasonWithInterface.AUTUMN.run();
+    }
+}
+```
+
+## 注解（Annotation）
+
+* 注解是jdk5引入，以`@注解名`存在与代码中
+* Annotation可以像修饰符一样使用，可以用于修饰包、类、构造器、方法、成员变量、参数、局部变量的声明
+* 注解可以在类编译、运行时进行加载，体现不同的功能
+* 注解与注释的区别
+    * **注释**主要是给程序员看的
+    * **注解**可以给程序员看，可以被编译器读取，实现一些特定的功能
+* java基础常见的注解：
+    * `@Override`：限定重写父类的方法，该注解只能用于方法
+    * `@Deprecated`：表示修饰的元素（类、方法等）以过时，不推荐使用或有更好的选择
+    * `@SuppressWarnings`：抑制编译器警告
+
+### 注解的定义
+
+```java
+public @interface MyAnnotation {
+    String value() default "123";
+}
+```
+
+### 元注解
+
+* 对现有注解进行解释说明的注解
+* 说明：
+    * `@Target`：用于描述注解的使用范围，可以通过枚举类`ElementType`的对象来指定
+    * `@Retention`：用于描述注解的声明周期，通过枚举类`RetentionPolicy`的对象来指定
+        * `SOURCE`、`CLASS`、`RUNTIME`
+        * 只用`RUNTIME`阶段才能被反射读取
+    * `@Documented`：表示这个注解应该被`javadoc`工具记录
+    * `@Inherited`：运行子类继承父类的注解
+
+## 包装类
+
+* Java对八种基本数据类型定义了对应的引用类型，**包装类**
+* 基本数据类型中，数值类型的父类都是`Number`
+
+| 基本数据类型   | 包装类    |
+|--------------- | --------------- |
+| byte   | Byte   |
+| short   | Short   |
+| int   | Integer   |
+| long   | Long   |
+| float   | Float   |
+| double   | Double   |
+| boolean   | Boolean   |
+| char   | Character   |
+
+### 基本数据类型与包装类型之间的转换
+
+* 基本数据类型转包装类，**成员变量定义为包装类后默认值会变为null**
+
+```java
+int i = 1;
+Integer integer = Integer.valueOf(i);
+
+float f = 1.1F;
+Float float_value = Float.valueOf(f);
+
+boolean b = true;
+Boolean.valueOf(b);
+```
+
+* 包装类转基本数据类型
+
+```java
+Integer i = Integer.valueOf(1);
+int int_value = i.intValue();
+
+Double d = Double.valueOf(1.1);
+double double_value = d.doubleValue();
+
+Boolean b = Boolean.valueOf(true);
+boolean bool = b.booleanValue();
+```
+
+* 自动装箱和拆箱（jdk5）
+
+```java
+Integer i = 1;
+Double d = 2.2;
+Boolean b = false;
+
+int i1 = i;
+double d1 = d;
+boolean b1 = b;
+```
+
+### String与基本数据类型和包装类型之间的转换
+
+* 基本数据类型、包装类转String，**调用String.valueOf()及其重载方法**
+ 
+```java
+// 调用String.valueOf()方法
+int i = 1;
+String s1 = String.valueOf(i);
+
+double d = 2.2;
+String s2 = String.valueOf(d);
+
+boolean b = true;
+String s3 = String.valueOf(b);
+
+// 或直接拼接空串
+String s4 = i + "";
+String s5 = d + "";
+String s6 = b + "";
+```
+
+* String转基本数据类型、包装类，**调用各个包装类的parseXXX方法**
+
+```java
+String s1 = "132";
+int i1 = Integer.parseInt(s1);
+String s2 = "132abc";
+// int i2 = Integer.parseInt(s2); // 不是数值无法转换，报错NumberFormatException
+
+String s3 = "true";
+Boolean b1 = Boolean.valueOf(s3);
+
+String s4 = "TrUe";
+Boolean b2 = Boolean.valueOf(s4); // boolean转换时可以无视大小写
+```
+
+### 自动装箱相关问题
+
+* 以下两处自动装箱为什么结果不一样
+* 因为自动装箱底层调用的是valueOf方法，而方法内对应-128~127之间的数直接会在内部缓存中取，
+而超过这个范围后会直接new一个新对象，所以下面一对比较时为false
+* 因为实际开开发时使用的这个范围的数据很多，所以直接存放在缓存内
+
+```java
+Integer i1 = 1;
+Integer i2 = 1;
+System.out.println(i1 == i2); // true
+
+Integer i3 = 128;
+Integer i4 = 128;
+System.out.println(i3 == i4); // false
+```
+
+#### 包装类缓存对象
+
+| 包装类   | 缓存对象    |
+|--------------- | --------------- |
+| Byte   | -128~127   |
+| Short   | -128~127   |
+| Integer   | -128~127   |
+| Long   | -128~127   |
+| Float   | 没有   |
+| Double   | 没有  |
+| Character| 0~127  |
+| Boolean   | true和false  |
+
+
+## 异常处理
+
+* 在使用计算机语言进行项目开发的过程中，即使程序员把代码写的尽善尽美，
+在系统运行过程中任然会遇到一些问题，因为很多问题不是能靠代码避免的，比如：客户输入的数据格式问题、
+读取文件是否存在，网络是否通畅等
+* **异常**：指的是程序在运行的过程中，出现了非正常的情况，如果不处理最终会导致JVM的非正常停止
+* Java中异常的抛出机制
+    * java中把不同的异常用不同的类表示，一旦发生某种异常，就创建该类异常类型的对象，并且抛出（throw）。
+    然后程序员可以捕获（catch）到这个异常类，并处理；如果没有捕获（catch）这个异常类，
+    那么这个异常对象会导致程序终止
+
+### Java异常体系
+
+#### Throwable
+
+* `java.lang.Throwable`类是java程序执行过程中发生的异常事件对应的类的根父类。
+* Throwable中的常用方法：
+    * `printStackTrace()`：打印异常的详细信息
+    * `getMessage()`：获取发生异常的原因
+
+#### Error和Exception
+
+* Throwable可以分为两类：Error和Exception。分别对应`java.lang.Error`和`java.lang.Exception`两个类
+* **Error**：java虚拟机无法解决的严重问题。如：JVM系统内部错误、资源耗尽等严重情况。一般不编写针对性的代码进行处理
+    * 例如：`StackOverflowError`（栈内存溢出）和`OutOfMemoryError`（堆内存溢出，简称OOM）
+* **Exception**：其他因编程错误或偶然的外在因素导致的一般性问题，需要使用针对性代码进行处理，
+使程序继续运行，否则一旦出现异常，程序也会挂掉。例如：
+    * 空指针访问，试图读取不存在的文件，网络连接中断等
+
+##### Error
+
+* 模拟错误
+
+```java
+public static void main(String[] args) {
+    // 模拟StackOverflowError错误
+    // main(args);
+
+    // 模拟OutOfMemoryError错误
+    int[] ints = new int[100000000 * 100000000];
+}
+```
+
+##### Exception
+
+###### 编译时异常和运行时异常
+
+* java程序的执行分为编译时过程和运行时过程。有的错误只有在运行时才会发生。
+
+```mermaid
+flowchart LR
+a(Java源程序) --javac--> b(字节码文件)
+b --java--> c(在内存中加载或运行类)
+```
+
+* 根据异常可能出现的阶段分为：
+    * **编译时异常**（即checked异常、受检异常）：在代码编译阶段，
+    编译器就能明确警示当前代码可能发生（不一定发生）xx异常，并明确督促程序员提前编写处理它的代码。
+    如果程序员没有编写对应的异常处理代码，则编译器就会直接判定编译失败，从而不能生成字节码文件
+    * **运行时异常**（即runtime异常、unchecked异常、非受检异常）：在代码的编译阶段，编译器完全不做任何检查，
+    无论该异常是否会发生，编译器都不给出任何提示。只有等代码运行起来并确实发生了xx异常，它才能被发现。
+    通常这类异常时程序员编写代码不当引起，只要编写时判断就可以大部分避免
+        * 在java中`java.lang.RuntimeException`类及它的子类都是运行时异常
+
+###### 代码示例
+
+* 运行时异常
+
+```java
+/**
+ * 测试ArrayIndexOutOfBoundsException
+ */
+@Test
+public void testArrayIndexOutOfBoundsException() {
+    int[] ints = new int[4];
+    System.out.println(ints[4]);
+}
+
+/**
+ * 测试NullPointerException
+ */
+@Test
+public void testNullPointerException() {
+    String name = "zs";
+    name = null;
+    System.out.println(name.length());
+}
+
+/**
+ * 测试ClassCastException
+ */
+@Test
+public void testClassCastException() {
+    Object o = new Object();
+    Date date = (Date) o;
+    System.out.println(date);
+}
+
+/**
+ * 测试NumberFormatException
+ */
+@Test
+public void testNumberFormatException() {
+    String number = "132abc";
+    Integer integer = Integer.valueOf(number);
+    System.out.println(integer);
+}
+
+/**
+ * 测试ArithmeticException
+ */
+@Test
+public void testArithmeticException() {
+    System.out.println(10 / 0);
+}
+```
+
+* 编译时异常
+
+```java
+/**
+ * 测试ClassNotFoundException编译时异常
+ */
+@Test
+public void testClassNotFoundException() {
+    // Class.forName("a.b.c").var
+}
+
+/**
+ * 测试FileNotFoundException和IOException编译时异常
+ */
+@Test
+public void testFileNotFoundExceptionAndIOException() {
+    // FileNotFoundException
+    // FileInputStream fis = new FileInputStream("a.txt");
+    // IOException
+    // fis.close();
+}
+```
+
+### Java异常的处理
+
+* java采用的异常处理机制，是将异常处理和程序代码集中在一起，与正常的程序代码分开，时程序简洁、易于维护
+* java异常处理的方式
+    * `try-catch-finally`
+    * `throws+异常类型`
+
+#### 捕获异常（try-catch-finally）
+
+* 基本结构：
+
+```java
+try{
+    // 可能产生异常的代码
+}catch(异常类型1 e){
+    // 当产生异常类型1时的处理措施
+}catch(异常类型2 e){
+    // 当产生异常类型2时的处理措施
+}finally{
+    // 无论是否发生异常，都无条件执行的语句
+}
+```
+* finally语句和catch语句是可选的，但finally不能单独使用
+* 如果声明了多个catch结构，不同异常类型在不存在父子类关系的情况下，声明的顺序无所谓，
+如果多个异常满足父子类关系，则子类catch必须声明在父类的上面，否则报错
+* catch中异常处理的方式：
+    * 自己编写输出语句
+    * 使用printStackTrace打印信息
+    * 使用getMessage获取异常的原因
+
+* 对应运行时异常不进行显示的处理，对应编译时异常一定要处理，否则编译不通过
+
+##### 代码示例
+
+```java
+public class TryCatchFinallyTest {
+    
+    @Test
+    public void testTryCatch() {
+        String s = "123abc";
+        try {
+            Integer integer = Integer.valueOf(s);
+            System.out.println(integer);
+        }catch (NumberFormatException e){
+            System.out.println("程序出错");
+        }catch (NullPointerException e){ // NumberFormatException与NullPointerException异常是并列关系，所以捕获的顺序无所谓
+            System.out.println("程序出错");
+        }catch (RuntimeException e){ // RuntimeException是上面两个异常的父类，必须放在最后，如果放在第一个，则表示把子类异常一起捕获了
+            System.out.println("运行时异常");
+        }
+        System.out.println("程序结束");
+    }
+
+    @Test
+    public void testTryCatchAndPrintStackTrace() {
+        String s = "123abc";
+        try {
+            Integer integer = Integer.valueOf(s);
+            System.out.println(integer);
+        }catch (NumberFormatException e){
+            e.printStackTrace();
+        }
+        System.out.println("程序结束");
+    }
+
+    private int strToInt(String str){
+        try {
+            Integer integer = Integer.valueOf(str);
+            return integer;
+        }catch (NumberFormatException e){
+            return -1;
+        }finally {
+            System.out.println("程序执行完成");
+        }
+    }
+
+    @Test
+    public void testTryCatchFinally() {
+        System.out.println(strToInt("123abc"));
+    }
+}
+```
+
+#### 抛出异常（throws）
+
+* 格式：
+
+```java
+public void method() throws 异常1, 异常2 {
+    // 可能有移除的代码
+}
+```
+* 使用throws并不是真正处理了异常，对**使用者**来说是没有异常了，但是对于**调用者**来说还是要处理异常
+
+##### 代码示例
+
+```java
+public class ThrowsTest {
+
+    public void method() throws IOException {
+        FileInputStream fis = new FileInputStream("a.txt");
+        fis.close();
+    }
+
+    @Test
+    public void testThrows() {
+        try {
+            method();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+#### 两种异常处理方式的选择
+
+* 如果程序代码中，涉及到资源的调用（流、数据库连接、网络连接等），
+则必须考虑使用`try-catch-finally`来处理，保证不出现内存泄露
+* 如果父类被重写的方法没有`throws`异常类型，子类重写的方法内出现了异常，只能使用`try-catch-finally`进行处理
+* 如果方法a是使用者，方法b、c是被使用者，那边如果方法b、c方法内如果出现了异常可以使用`throws`方式，
+方法a内的异常可以使用`try-catch-finally`处理
