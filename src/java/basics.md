@@ -3,6 +3,111 @@
 > [官方文档](https://docs.oracle.com/javase/tutorial/reallybigindex.html)</br>
 > [详细代码地址](https://github.com/follow1123/java-basics)
 
+## 目录
+1. <a href="#comments">注释</a>
+2. <a href="#variables">变量</a>
+    1. <a href="#variables-data-type">数据类型</a>
+        1. <a href="#variables-auto-type-promotion">基本数据类型的自动类型提升</a>
+        2. <a href="#variables-type-conversion">基本数据类型的强制类型转换</a>
+        3. <a href="#data-type-float">Float</a>
+        4. <a href="#data-type-string">String</a>
+3. <a href="#base">进制</a>
+    1. <a href="#base-conversion-table">进制之间的换算</a>
+    2. <a href="#base-conversion">二进制转换</a>
+        1. <a href="#binary-to-decimal">二进制转十进制</a>
+        2. <a href="#decimal-to-binary">十进制转二进制</a>
+        3. <a href="#binary-octal-and-hexadecimal">二进制与八进制、十六进制之间的转换</a>
+4. <a href="#operators">运算符</a>
+    1. <a href="#arithmetic-operators">算数运算符</a>
+    2. <a href="#assignment-operators">赋值运算符</a>
+    3. <a href="#comparison-operators">比较（关系）运算符</a>
+    4. <a href="#logical-operators">逻辑运算符</a>
+    5. <a href="#bitwise-operators">位运算符</a>
+        1. <a href="#left-shift">左移</a>
+        2. <a href="#right-shift">右移</a>
+        3. <a href="#unsigned-right-shift">无符号右移</a>
+        4. <a href="#and-or-xor-not">与、或、异或、取反</a>
+    6. <a href="#conditional-operators">条件运算符（三元运算符）</a>
+5. <a href="#control-flow">流程控制</a>
+    1. <a href="#if-else">if...else</a>
+    2. <a href="#switch-case">switch-case</a>
+    3. <a href="#loop-structure">循环结构</a>
+        1. <a href="#for-loop">for循环</a>
+        2. <a href="#while-loop">while循环</a>
+        3. <a href="#do-while-loop">do-while循环</a>
+        4. <a href="#infinite-loop">无限循环</a>
+        5. <a href="#break-and-contiune">break和continue关键字</a>
+6. <a href="#arrays">数组</a>
+    1. <a href="#one-dimensional-array">一维数组</a>
+    2. <a href="#two-dimensional-array">二维数组</a>
+    3. <a href="#array-related-operations">数组相关操作</a>
+        1. <a href="#array-max">最大值</a>
+        2. <a href="#array-minimum">最小值</a>
+        3. <a href="#array-sum">求和</a>
+        4. <a href="#array-average">平均数</a>
+        5. <a href="#array-pascal-triangle">杨辉三角</a>
+        6. <a href="#array-number-of-loops">回形数</a>
+        7. <a href="#array-reverse">数组翻转</a>
+        8. <a href="#array-scaling">数组扩容</a>
+    4. <a href="#array-algorithm">数组相关算法</a>
+        1. <a href="#array-linear-search">线性查找</a>
+        2. <a href="#array-binary-search">二分查找</a>
+        3. <a href="#array-bubble-sort">冒泡排序</a>
+        4. <a href="#array-quick-sort">快速排序</a>
+    5. <a href="#array-utils">Arrsys工具类</a>
+7. <a href="#object-oriented">面向对象</a>
+    1. <a href="#oop-field">属性（成员变量）和局部变量</a>
+        1. <a href="#oop-member-variables-and-local-variables">成员变量和局部变量的区别</a>
+    2. <a href="#oop-method">方法（Method）</a>
+        1. <a href="#oop-return-keyword">return关键字</a>
+        2. <a href="#oop-variable-parameters">可变个数形参的方法(jdk5)</a>
+        3. <a href="#oop-method-value-passing-mechanism">方法的值传递机制</a>
+        4. <a href="#oop-recursive-methods">递归方法</a>
+    3. <a href="#oop-package-and-import">package和import</a>
+    4. <a href="#oop-encapsulation">封装性（Encapsulation）</a>
+        1. <a href="#oop-permission-modifiers">权限修饰符</a>
+        2. <a href="#oop-constructor">构造器（constructor）</a>
+        3. <a href="#oop-assignment-process">类中属性赋值过程</a>
+        4. <a href="#oop-java-bean">JavaBean</a>
+        5. <a href="#oop-this-keyword">this关键字</a>
+    9. <a href="#oop-inheritance">继承（inheritance）</a>
+        1. <a href="#oop-methods-override">方法的重写（override）</a>
+        2. <a href="#oop-super-keyword">super关键字</a>
+    10. <a href="#oop-polymorphism">多态性（Polymorphism）</a>
+        1. <a href="#oop-upward-and-downward-transformation">向上转型和向下转型</a>
+    11. <a href="#oop-object-class">Object类</a>
+        1. <a href="#oop-object-equals">equals()方法</a>
+        2. <a href="#oop-object-tostring">toString()方法</a>
+        3. <a href="#oop-object-clone-finalize">clone()和finalize()方法</a>
+    12. <a href="#oop-static-keyword">static关键字</a>
+        1. <a href="#oop-static-field">static修饰属性</a>
+        2. <a href="#oop-static-method">static修饰方法</a>
+    13. <a href="#oop-code-block">代码块</a>
+    14. <a href="#oop-final-keyword">final关键字</a>
+    15. <a href="#oop-abstract-keyword">abstract关键字（抽象类或抽象方法）</a>
+    16. <a href="#oop-interface">interface（接口）</a>
+        1. <a href="#oop-interface-features">接口新特性</a>
+    17. <a href="#oop-inner-class">内部类（InnerClass）</a>
+    18. <a href="#oop-enum-class">枚举类</a>
+    19. <a href="#oop-annotation">注解（Annotation）</a>
+        1. <a href="#oop-meta-annotation">元注解</a>
+    20. <a href="#oop-wrapper">包装类</a>
+        1. <a href="#oop-basic-data-and-wrapper-class">基本数据类型与包装类型之间的转换</a>
+            1. <a href="#oop-basic-data-to-wrapper-class">基本数据类型转包装类</a>
+            2. <a href="#oop-wrapper-class-to-basic-data">包装类转基本数据类型</a>
+            3. <a href="#oop-auto-boxing-unboxing">自动装箱和拆箱（jdk5）</a>
+        2. <a href="#oop-string-to-basic-data-and-wrapper-class">String与基本数据类型和包装类型之间的转换</a>
+        3. <a href="#oop-auto-boxing-issues">自动装箱相关问题</a>
+            1. <a href="#oop-wrapper-cache-object">包装类缓存对象</a>
+8. <a href="#exceptions">异常处理</a>
+    1. <a href="#compile-time-and-runtime-exception">编译时异常和运行时异常</a>
+    2. <a href="#java-exception-handing">Java异常的处理</a>
+        1. <a href="#try-catch-finally">捕获异常（try-catch-finally）</a>
+        2. <a href="#throws">抛出异常（throws）</a>
+        3. <a href="#exceptions-choice">两种异常处理方式的选择</a>
+    3. <a href="#throwing-exception-manually">手动抛出异常</a>
+    4. <a href="#custom-exception">自定义异常</a>
+
 ## JDK和JRE
 
 * **JDK**(Java Development Kit)：是Java程序开发工具包，包含JRE和开发人员使用工具
@@ -23,7 +128,7 @@ public class HelloWorld {
     }
 }
 ```
-
+<a id="comments"></a>
 ## 注释
 
 * 使用`javadoc -encoding UTF-8 -author -version -d comment Comments.java`生成对应文档
@@ -48,6 +153,7 @@ public class Comments {
 }
 ```
 
+<a id="variables"></a>
 ## 变量
 
 <a id="variables-data-type"></a>
@@ -90,6 +196,7 @@ long bytes = 0b11010010_01101001_10010100_10010010;
 double d = 1.797E308; // 科学计数法表示
 ```
 
+<a id="variables-auto-type-promotion"></a>
 #### 基本数据类型的自动类型提升
 
 ```mermaid
@@ -124,6 +231,7 @@ char c1 = 'a';
 int i3 = c1 + 1; // 98
 ```
 
+<a id="variables-type-conversion"></a>
 #### 基本数据类型的强制类型转换
 
 * 浮点型强转为整型小数部分会丢失
@@ -166,6 +274,7 @@ System.out.println(ff1); // 1.2312312E8
 System.out.println(ff1 == ff2); // true
 ```
 
+<a id="data-type-string"></a>
 #### String
 
 * String是引用类型
@@ -188,6 +297,7 @@ String s5 = i1 + f1 + s1; // 268.55str
 String s6 = s1 + f1 + i1; // str34.55234
 ```
 
+<a id="base"></a>
 ## 进制
 
 * **十进制**，0-9组成，满十进一
@@ -201,6 +311,8 @@ int n2 = 0b1011; // 二进制
 int n3 = 033; // 八进制
 int n4 = 0xfa33; // 十六进制
 ```
+
+<a id="base-conversion-table"></a>
 ### 进制之间的换算
 
 | 十进制    | 二进制    | 八进制    | 十六进制    |
@@ -223,6 +335,7 @@ int n4 = 0xfa33; // 十六进制
 | 15   | 1111   | 17   | F   |
 | 16   | 10000   | 20   | 10   |
 
+<a id="base-conversion"></a>
 ### 二进制转换
 
 * 计算机数据的存储使用二进制**补码**形式存储，并且**最高位是符号位**
@@ -233,6 +346,7 @@ int n4 = 0xfa33; // 十六进制
     * 负数的**反码**：在原码的基础上，最高位不变，其余为取反
     * 负数的**补码**：反码+1
 
+<a id="binary-to-decimal"></a>
 #### 二进制转十进制
 
 * 正整数：`00001011`的十进制是`11`
@@ -351,6 +465,7 @@ int n4 = 0xfa33; // 十六进制
     </tfoot>
 </table>
 
+<a id="decimal-to-binary"></a>
 #### 十进制转二进制
 
 * 除2取余的逆
@@ -393,6 +508,7 @@ int n4 = 0xfa33; // 十六进制
     </tfoot>
 </table>
 
+<a id="binary-octal-and-hexadecimal"></a>
 #### 二进制与八进制、十六进制之间的转换
 
 * 八进制：十进制`233`对应的八进制是`351`
@@ -455,6 +571,7 @@ int n4 = 0xfa33; // 十六进制
     </tfoot>
 </table>
 
+<a id="operators"></a>
 ## 运算符
 
 | 分类   | 运算符    |
@@ -467,6 +584,7 @@ int n4 = 0xfa33; // 十六进制
 | 条件运算符（1个）| (条件表达式)?结果1:结果2 |
 | Lambda运算符（1个）| `->` |
 
+<a id="arithmetic-operators"></a>
 ### 算数运算符
 
 
@@ -525,6 +643,7 @@ System.out.println(i9); // 2
 System.out.println("He" + "llo"); // Hello
 ```
 
+<a id="assignment-operators"></a>
 ### 赋值运算符
 
 ```java
@@ -543,6 +662,7 @@ System.out.println(i1); // 1
 // 其他类似
 ```
 
+<a id="comparison-operators"></a>
 ### 比较（关系）运算符
 
 | 运算符   | 运算    |
@@ -570,6 +690,7 @@ System.out.println(4>=3); // true
 System.out.println("Hello" instanceof String); // true
 ```
 
+<a id="logical-operators"></a>
 ### 逻辑运算符
 
 | a | b | a&b | a&&b | a&#124;b | a&#124;&#124;b | !a | a^b |
@@ -661,6 +782,7 @@ if (bool || (++i > 3)){
 System.out.println(i); // 3
 ```
 
+<a id="bitwise-operators"></a>
 ### 位运算符
 
 * 位运算操作可以理解为将十进制的数转换为二进制后，对二进制的相关操作
@@ -675,6 +797,7 @@ System.out.println(i); // 3
 | ^   | 异或运算   |
 | ~   | 取反运算   |
 
+<a id="left-shift"></a>
 #### 左移
 
 * 将左边的高位移出去后右边的空位补零
@@ -735,6 +858,7 @@ System.out.println(11 << 2); // 44
 System.out.println(-11 << 2); // -44
 ```
 
+<a id="right-shift"></a>
 #### 右移
 
 * 如果是正数，左边空位补零
@@ -859,6 +983,7 @@ System.out.println(11 >> 2); // 2
 System.out.println(-11 >> 2); // -3
 ```
 
+<a id="unsigned-right-shift"></a>
 #### 无符号右移
 
 * 无论是正数还是负数，被移出的高位都补零
@@ -928,6 +1053,8 @@ int i1 = b1 & 0xFF;
 i1 >>>= 2;
 System.out.println(i1); // 61
 ```
+
+<a id="and-or-xor-not"></a>
 #### 与、或、异或、取反
 
 * 操作相同，以与为例，`11`与`19`结果为`3`
@@ -996,6 +1123,7 @@ System.out.println(11 ^ 19); // 24
 System.out.println(~11); // -12
 ```
 
+<a id="conditional-operators"></a>
 #### 条件运算符（三元运算符）
 
 * 格式：`(条件表达式) ? 表达式1 : 表达式2`
@@ -1006,6 +1134,8 @@ String b = "Wrold!";
 boolean c = true;
 System.out.println(c ? a : b); // Hello
 ```
+
+<a id="control-flow"></a>
 ## 流程控制
 
 * **顺序结构**：程序从上到下逐行执行，中间没有任何判断和跳转
@@ -1018,6 +1148,7 @@ System.out.println(c ? a : b); // Hello
 
 ### 分支结构
 
+<a id="if-else"></a>
 #### if...else
 
 ```java
@@ -1040,6 +1171,7 @@ if (i1 > 1) {
 System.out.println(i1); // 0
 ```
 
+<a id="switch-case"></a>
 #### switch-case
 
 * switch中的表达式只能是特定的类型：byte，short，char，int，枚举（jdk5），String（jdk7）
@@ -1107,6 +1239,7 @@ switch (week) {
 System.out.println(weekStr); // Saturday
 ```
 
+<a id="loop-structure"></a>
 ### 循环结构
 * 循环结构四要素：
     * 初始化部分
@@ -1114,6 +1247,7 @@ System.out.println(weekStr); // Saturday
     * 循环体部分
     * 迭代部分
 
+<a id="for-loop"></a>
 #### for循环
 
 * 执行过程
@@ -1139,6 +1273,7 @@ for (int i = 1; i <= 10; i++) {
 }
 ```
 
+<a id="while-loop"></a>
 #### while循环
 
 * 执行过程，和for循环一样
@@ -1160,6 +1295,7 @@ while (i <= 10) {
 }
 ```
 
+<a id="do-while-loop"></a>
 #### do-while循环
 
 * 执行过程
@@ -1208,11 +1344,13 @@ do {
 System.out.println(i1); // 2
 ```
 
+<a id="infinite-loop"></a>
 #### 无限循环
 
 * for实现：`for(;;) {}`
 * while实现：`while(true) {}`
 
+<a id="break-and-contiune"></a>
 #### break和continue关键字
 
 <table>
@@ -1261,6 +1399,7 @@ for (int i = 1; i <= 10; i++) {
 }
 ```
 
+<a id="arrays"></a>
 ## 数组
 
 * 数组（Array），是多个相同类型数据按一定循序排列的集合，并使用一个名字命名，
@@ -1277,6 +1416,7 @@ for (int i = 1; i <= 10; i++) {
    * 创建数组对象会在内存中开辟一整块**连续的空间**。占用空间的大小，
    取决于数组的长度和数组中元素的类型
 
+<a id="one-dimensional-array"></a>
 ### 一维数组
 
 #### 声明数组
@@ -1356,6 +1496,7 @@ arr2 = new String[3];
 ```
 ![内存图](./assets/Snipaste_2024-09-07_15-33-16.png)
 
+<a id="two-dimensional-array"></a>
 ### 二维数组
 
 * 二维数组就是一维数组中的元素又是一维数组
@@ -1395,10 +1536,12 @@ for (int i = 0; i < classroom.length; i++) {
 }
 ```
 
+<a id="array-related-operations"></a>
 ### 数组相关操作
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/syntax/arrays/ArrayOperator.java)
 
+<a id="array-max"></a>
 * 最大值
 
 ```java
@@ -1414,6 +1557,7 @@ printArray(array);
 System.out.println(max);
 ```
 
+<a id="array-minimum"></a>
 * 最小值
 
 ```java
@@ -1429,6 +1573,7 @@ printArray(array);
 System.out.println(min);
 ```
 
+<a id="array-sum"></a>
 * 求和
 
 ```java
@@ -1442,6 +1587,7 @@ printArray(array);
 System.out.println(count);
 ```
 
+<a id="array-average"></a>
 * 平均数
 
 ```java
@@ -1455,6 +1601,7 @@ printArray(array);
 System.out.println(count / array.length);
 ```
 
+<a id="array-pascal-triangle"></a>
 * 杨辉三角
 
 ```java
@@ -1478,6 +1625,7 @@ for (int i = 0; i < arrays.length; i++) {
 }
 ```
 
+<a id="array-number-of-loops"></a>
 * 回形数
 
 ```java
@@ -1542,6 +1690,7 @@ while ((num = scanner.nextInt()) != 0) {
 }
 ```
 
+<a id="array-reverse"></a>
 * 数组翻转
 
 ```java
@@ -1563,6 +1712,7 @@ for (int i = 0; i < halfLen; i++) {
 printArray(arr);
 ```
 
+<a id="array-scaling"></a>
 * 数组扩容
 
 ```java
@@ -1581,11 +1731,12 @@ newArr[arr.length + 2] = 26;
 
 printArray(newArr);
 ```
-
+<a id="array-algorithm"></a>
 ### 数组相关算法
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/syntax/arrays/ArrayAlgorithm.java)
 
+<a id="array-linear-search"></a>
 * 线性查找
 
 ```java
@@ -1597,6 +1748,7 @@ for (int i = 0; i < arr.length; i++) {
 return -1;
 ```
 
+<a id="array-binary-search"></a>
 * 二分查找
 
 ```java
@@ -1615,6 +1767,7 @@ while (head <= tail){
 return -1;
 ```
 
+<a id="array-bubble-sort"></a>
 * 冒泡排序
 
 ```java
@@ -1630,6 +1783,7 @@ for (int i = 0; i < arr.length; i++) {
 }
 ```
 
+<a id="array-quick-sort"></a>
 * 快速排序
 
 ```java
@@ -1660,6 +1814,7 @@ private void quickSort(int[] arr, int start, int end){
 }
 ```
 
+<a id="array-utils"></a>
 ### Arrsys工具类
 
 ```java
@@ -1677,6 +1832,7 @@ int[] newArr = Arrays.copyOf(arr, arr1.length + 3); // 扩容
 System.out.println(Arrays.toString(newArr)); // 打印
 ```
 
+<a id="object-oriented"></a>
 ## 面向对象
 
 * Java类及类的成员：属性、方法、构造器；代码块、内部类 
@@ -1730,12 +1886,14 @@ public static void main(String[] args) {
 }
 ```
 
+<a id="oop-field"></a>
 ## 属性（成员变量）和局部变量
 
 * 变量声明的格式相同：`数据类型 变量名 = 变量值`
 * 变量都有其有效的作用域，出作用域就失效
 * 变量必须先声明，后赋值，再使用
 
+<a id="oop-member-variables-and-local-variables"></a>
 ### 成员变量和局部变量的区别
 
 | 不同点 | 属性（成员变量） | 局部变量 |
@@ -1762,6 +1920,7 @@ public class Employee {
 }
 ```
 
+<a id="oop-method"></a>
 ## 方法（Method）
 
 * **方法**是类或对象行为特征的抽象，用来完成某个功能的操作。
@@ -1812,6 +1971,7 @@ public class Person {
 
 }
 ```
+<a id="oop-return-keyword"></a>
 ### return关键字
 
 * 结束一个方法
@@ -1877,6 +2037,7 @@ private double add(double a, double b, double c){
 }
 ```
 
+<a id="oop-variable-parameters"></a>
 ### 可变个数形参的方法(jdk5)
 
 * 在调用方法时，可能会出现方法形参类型确定，但个数不确定，此时，我们可以使用可变个数形参的方法
@@ -1924,6 +2085,7 @@ public boolean equalsAll(long a, int... nums){
 // }
 ```
 
+<a id="oop-method-value-passing-mechanism"></a>
 ### 方法的值传递机制
 
 * 对于方法内声明的局部变量来说，如果出现赋值操作
@@ -1980,6 +2142,7 @@ public void testReferenceDataType() {
 }
 ```
 
+<a id="oop-recursive-methods"></a>
 ### 递归方法
 
 * 方法内自己调用自己的现象就成为递归
@@ -2042,6 +2205,7 @@ public void testSum() {
 }
 ```
 
+<a id="oop-package-and-import"></a>
 ## package和import
 
 ### package(包)
@@ -2073,6 +2237,7 @@ public void testSum() {
     * 如果有两个同名的类在不同包下，都需要使用的话，需要将其中一个使用全类名方式声明`a.b.c.People people = new a.b.c.People()`
     * `import static`组合使用可以导入指定类下的静态属性或方法
 
+<a id="oop-encapsulation"></a>
 ## 封装性（Encapsulation）
 
 * 面向对象的开发原则要遵循**高内聚**、**低耦合**
@@ -2084,6 +2249,8 @@ public void testSum() {
 
 * 实现封装就是控制类或成员的可见性范围。需要访问控制修饰符，也称权限修饰符
 * 权限修饰符：`public`、`protected`、`缺省`、`private`
+
+<a id="oop-permission-modifiers"></a>
 
 | 修饰符    | 本类内部    | 本包内    | 其他包的子类    | 其他包的非子类    |
 |---------------- | --------------- | --------------- | --------------- | --------------- |
@@ -2180,6 +2347,7 @@ public class D {
 }
 ```
 
+<a id="oop-constructor"></a>
 ## 构造器（constructor）
 
 * 构造器搭配`new`关键字使用，用于创建类的对象
@@ -2275,6 +2443,7 @@ public class OverloadConstructorClass {
 }
 ```
 
+<a id="oop-assignment-process"></a>
 ## 类中属性赋值过程
 
 * 在类的属性中，给属性赋值的位置
@@ -2337,6 +2506,7 @@ public class AssignmentOrder {
 }
 ```
 
+<a id="oop-java-bean"></a>
 ## JavaBean
 
 * JavaBean是一种java语言写的可重用组件
@@ -2345,6 +2515,7 @@ public class AssignmentOrder {
     * 有一个无参的公共构造器
     * 有属性，且有对应的get，set方法
 
+<a id="oop-this-keyword"></a>
 ## this关键字
 
 * 在方法中（非static方法）内部使用，表示调用该方法的对象
@@ -2386,6 +2557,7 @@ public class ThisClass {
 }
 ```
 
+<a id="oop-inheritance"></a>
 ## 继承（inheritance）
 
 * 在定义类时发现要定义的类与之前的类有相似点，可以考虑继承之前的类，或将相同点抽象出来一个类并继承
@@ -2483,6 +2655,7 @@ student.eat();
 student.study();
 ```
 
+<a id="oop-methods-override"></a>
 ## 方法的重写（override）
 
 * 子类对父类继承过来的方法进行覆写的操作，就称为方法的重写
@@ -2597,6 +2770,7 @@ student.sleep(6);
 System.out.println(student.info());
 ```
 
+<a id="oop-super-keyword"></a>
 ## super关键字
 
 * 子类继承父类后重写了父类的某个方法，但是需要调用这个被重写的方法，可以使用`super.方法`
@@ -2705,8 +2879,8 @@ Student zs = new Student(1, "zs", 11);
 zs.showId();
 ```
 
-
-## 多态性
+<a id="oop-polymorphism"></a>
+## 多态性（Polymorphism）
 
 * 对象的多态性：父类的引用指向子类对象
 * 格式：`父类类型 变量名 = 子类对象`
@@ -2847,6 +3021,7 @@ public class PolymorphismTest {
 }
 ```
 
+<a id="oop-upward-and-downward-transformation"></a>
 ### 向上转型和向下转型
 
 * instanceof关键字：在类型强转前判断甚至是其子类，增加程序的健壮性
@@ -2877,6 +3052,7 @@ public void testInstanceof() {
 }
 ```
 
+<a id="oop-object-class"></a>
 ## Object类
 
 * 类`java.lang.Object`是类层次结构的根类，即所有其他类的父类。每个类都使用`Object`作为超类
@@ -2884,6 +3060,7 @@ public void testInstanceof() {
 
 ### Object类的方法
 
+<a id="oop-object-equals"></a>
 #### equals()方法
 
 * 自定义类在没有重写Object的equals()方法的情况下，调用的就是Object类中声明的equals()方法，
@@ -2949,6 +3126,7 @@ System.out.println(user1.equals(user2)); // false
 System.out.println(user1.equals(user2)); // true
 ```
 
+<a id="oop-object-tostring"></a>
 #### toString()方法
 
 * toString()方法默认返回当前对象的类名加地址
@@ -2990,6 +3168,7 @@ User zs = new User("zs", 11);
 System.out.println(zs);
 ```
 
+<a id="oop-object-clone-finalize"></a>
 #### clone()和finalize()方法
 
 * clone()
@@ -3050,10 +3229,12 @@ public void testFinalize() {
 }
 ```
 
+<a id="oop-static-keyword"></a>
 ## static关键字
 
 * 如果想让一个成员变量被类的所有实例所共享，就用`static`修饰即可，称为类变量（或类属性）
 
+<a id="oop-static-field"></a>
 ### static修饰属性
 
 * 使用static修饰的成员变量也叫静态变量或类变量
@@ -3119,6 +3300,7 @@ System.out.println(zs.nation); // china
 System.out.println(ls.nation); // china
 ```
 
+<a id="oop-static-method"></a>
 ### static修饰方法
 
 * static修饰的方法也叫静态方法或类方法
@@ -3134,6 +3316,7 @@ Chinese zs = new Chinese("zs", 11);
 zs.show_info();
 ```
 
+<a id="oop-code-block"></a>
 ## 代码块
 
 * 用来初始化类或对象的成员变量
@@ -3226,6 +3409,7 @@ public class BlockTest {
 }
 ```
 
+<a id="oop-final-keyword"></a>
 ## final关键字
 
 * `final`可以用来修饰：**类**、**方法**、**变量**
@@ -3236,6 +3420,7 @@ public class BlockTest {
     * 修饰这些变量之后都表示变量不能被修改了，也称为常量
     * `final`配合`static`修饰**成员变量**后称为全局常量
 
+<a id="oop-abstract-keyword"></a>
 ## abstract关键字（抽象类或抽象方法）
 
 * 我们声明的一些几何图形类中：圆、矩形，三角形等，这些类之间都有共同特征，求面积、周长等，
@@ -3324,6 +3509,7 @@ square.side = 5;
 System.out.println(square.getArea());
 ```
 
+<a id="oop-interface"></a>
 ## interface（接口）
 
 * 接口就是规范，定义的是一组规则，**继承**是一个“是不是”的`is-a`关系，而接口实现则是“能不能”的`has-a`关系
@@ -3395,6 +3581,7 @@ public class InterfaceTest {
 }
 ```
 
+<a id="oop-interface-features"></a>
 ### 接口新特性
 
 * **静态方法**（jdk8）
@@ -3478,6 +3665,7 @@ public class B extends D implements A, C{
 }
 ```
 
+<a id="oop-inner-class"></a>
 ## 内部类（InnerClass）
 
 * 将A类定义在B类里面，里面的A类就称为**内部类（InnerClass）**，类B则称为**外部类（OutClass）**
@@ -3581,6 +3769,7 @@ public class InnerClassTest {
 }
 ```
 
+<a id="oop-enum-class"></a>
 ## 枚举类
 
 * 枚举类本质上也是一种对象，只不过这个类的对象是有限的、固定的几个，不能随意创建
@@ -3754,6 +3943,7 @@ public class EnumTest {
 }
 ```
 
+<a id="oop-annotation"></a>
 ## 注解（Annotation）
 
 * 注解是jdk5引入，以`@注解名`存在与代码中
@@ -3775,6 +3965,7 @@ public @interface MyAnnotation {
 }
 ```
 
+<a id="oop-meta-annotation"></a>
 ### 元注解
 
 * 对现有注解进行解释说明的注解
@@ -3786,6 +3977,7 @@ public @interface MyAnnotation {
     * `@Documented`：表示这个注解应该被`javadoc`工具记录
     * `@Inherited`：运行子类继承父类的注解
 
+<a id="oop-wrapper"></a>
 ## 包装类
 
 * Java对八种基本数据类型定义了对应的引用类型，**包装类**
@@ -3802,8 +3994,10 @@ public @interface MyAnnotation {
 | boolean   | Boolean   |
 | char   | Character   |
 
+<a id="oop-basic-data-and-wrapper-class"></a>
 ### 基本数据类型与包装类型之间的转换
 
+<a id="oop-basic-data-to-wrapper-class"></a>
 * 基本数据类型转包装类，**成员变量定义为包装类后默认值会变为null**
 
 ```java
@@ -3817,6 +4011,7 @@ boolean b = true;
 Boolean.valueOf(b);
 ```
 
+<a id="oop-wrapper-class-to-basic-data"></a>
 * 包装类转基本数据类型
 
 ```java
@@ -3830,6 +4025,7 @@ Boolean b = Boolean.valueOf(true);
 boolean bool = b.booleanValue();
 ```
 
+<a id="oop-auto-boxing-unboxing"></a>
 * 自动装箱和拆箱（jdk5）
 
 ```java
@@ -3842,6 +4038,7 @@ double d1 = d;
 boolean b1 = b;
 ```
 
+<a id="oop-string-to-basic-data-and-wrapper-class"></a>
 ### String与基本数据类型和包装类型之间的转换
 
 * 基本数据类型、包装类转String，**调用String.valueOf()及其重载方法**
@@ -3878,6 +4075,7 @@ String s4 = "TrUe";
 Boolean b2 = Boolean.valueOf(s4); // boolean转换时可以无视大小写
 ```
 
+<a id="oop-auto-boxing-issues"></a>
 ### 自动装箱相关问题
 
 * 以下两处自动装箱为什么结果不一样
@@ -3895,6 +4093,7 @@ Integer i4 = 128;
 System.out.println(i3 == i4); // false
 ```
 
+<a id="oop-wrapper-cache-object"></a>
 #### 包装类缓存对象
 
 | 包装类   | 缓存对象    |
@@ -3909,6 +4108,7 @@ System.out.println(i3 == i4); // false
 | Boolean   | true和false  |
 
 
+<a id="exceptions"></a>
 ## 异常处理
 
 * 在使用计算机语言进行项目开发的过程中，即使程序员把代码写的尽善尽美，
@@ -3954,6 +4154,7 @@ public static void main(String[] args) {
 
 ##### Exception
 
+<a id="compile-time-and-runtime-exception"></a>
 ###### 编译时异常和运行时异常
 
 * java程序的执行分为编译时过程和运行时过程。有的错误只有在运行时才会发生。
@@ -4049,6 +4250,7 @@ public void testFileNotFoundExceptionAndIOException() {
 }
 ```
 
+<a id="java-exception-handing"></a>
 ### Java异常的处理
 
 * java采用的异常处理机制，是将异常处理和程序代码集中在一起，与正常的程序代码分开，时程序简洁、易于维护
@@ -4056,6 +4258,7 @@ public void testFileNotFoundExceptionAndIOException() {
     * `try-catch-finally`
     * `throws+异常类型`
 
+<a id="try-catch-finally"></a>
 #### 捕获异常（try-catch-finally）
 
 * 基本结构：
@@ -4132,6 +4335,7 @@ public class TryCatchFinallyTest {
 }
 ```
 
+<a id="throws"></a>
 #### 抛出异常（throws）
 
 * 格式：
@@ -4164,6 +4368,7 @@ public class ThrowsTest {
 }
 ```
 
+<a id="exceptions-choice"></a>
 #### 两种异常处理方式的选择
 
 * 如果程序代码中，涉及到资源的调用（流、数据库连接、网络连接等），
@@ -4171,3 +4376,152 @@ public class ThrowsTest {
 * 如果父类被重写的方法没有`throws`异常类型，子类重写的方法内出现了异常，只能使用`try-catch-finally`进行处理
 * 如果方法a是使用者，方法b、c是被使用者，那边如果方法b、c方法内如果出现了异常可以使用`throws`方式，
 方法a内的异常可以使用`try-catch-finally`处理
+
+<a id="throwing-exception-manually"></a>
+### 手动抛出异常
+
+* 格式：`throw 异常对象`
+* 在实际开发中，如果出现不满足具体场景的代码问题，我们就可以手动抛出异常
+* `throw`和`throws`的区别
+    * `throws`用于声明方法可能抛出的异常，而`throw`是直接抛出具体的异常
+
+#### 代码示例
+
+```java
+public class ThrowTest {
+
+    public void setAge(int age){
+        if (age < 0){
+            throw new RuntimeException("年龄不能为负数");
+        }
+        System.out.println(age);
+    }
+
+    /**
+     * 测试手动抛出运行时异常
+     */
+    @Test
+    public void testThrowRuntimeException() {
+        setAge(10);
+
+        setAge(-10); // 报错
+    }
+
+    public void setPhone(String phone) throws Exception {
+        if (phone.length() != 11){
+            throw new Exception("电话号码必须为11位");
+        }
+        System.out.println(phone);
+    }
+
+    /**
+     * 测试手动抛出编译时异常
+     */
+    @Test
+    public void testThrowException() {
+        try {
+            setPhone("12345678901");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+<a id="custom-exception"></a>
+### 自定义异常
+
+* 自定义异常类步骤
+    1. 继承现有的异常体系，`RuntimeException`或`Exception`
+    2. 提供几个重载的构造器
+    3. 提供一个全局常量，声明为：`static final long serialVersionUID`
+* 自定义异常类要做到**见名知意**，程序运行过程中出现异常后可以根据异常的命名快速定位问题
+
+#### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/exceptions/custom_exception/CustomExceptionTest.java)
+
+* 定义异常
+
+```java
+/**
+ * 错误年龄异常
+ */
+public class WrongAgeException extends RuntimeException{
+
+    @java.io.Serial
+    private static final long serialVersionUID = -7034897290745766939L;
+
+    public WrongAgeException(String message) {
+        super(message);
+    }
+
+    public WrongAgeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}
+```
+
+* 定义另一个异常
+
+```java
+/**
+ * 错误手机号异常
+ */
+public class WrongPhoneNumberException extends RuntimeException{
+
+    @java.io.Serial
+    private static final long serialVersionUID = -7034997290745766939L;
+
+    public WrongPhoneNumberException(String message) {
+        super(message);
+    }
+
+    public WrongPhoneNumberException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}
+```
+
+* 测试
+
+```java
+public class CustomExceptionTest {
+
+    public void setAge(int age) {
+        if (age < 0) {
+            throw new WrongAgeException("年龄不能为负数");
+        }
+        System.out.println(age);
+    }
+
+    /**
+     * 测试手动抛出自定义WrongAgeException运行时异常
+     */
+    @Test
+    public void testThrowRuntimeException() {
+        setAge(10);
+
+        setAge(-10); // 报错
+    }
+
+    public void setPhone(String phone) throws WrongPhoneNumberException {
+        if (phone.length() != 11) {
+            throw new WrongPhoneNumberException("电话号码必须为11位");
+        }
+        System.out.println(phone);
+    }
+
+    /**
+     * 测试手动抛出WrongPhoneNumberException编译时异常
+     */
+    @Test
+    public void testThrowException() {
+        try {
+            setPhone("123456789011");
+        } catch (WrongPhoneNumberException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
