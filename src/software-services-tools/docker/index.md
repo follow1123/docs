@@ -499,13 +499,99 @@ CMD echo 123
 | none | 不进行任何网络设置 |
 | container | 创建的容器和指定的容器共享ip、端口等 |
 
-### bridge
+#### bridge
 
 * 将容器的网络连接到虚拟网桥（docker0）上，根据虚拟网桥的的网段分配一个ip给容器
 
-### host
+```bash
+# 模式就是bridge网络模式，使用宿主机ip+8080访问
+docker run -d --name n3 --network bridge -p 8080:80 nginx
+```
+
+#### host
+
+> docker desktop在4.34之前无法支持host模式
+
+```bash
+# 使用宿主机ip+80访问
+docker run -d --name n3 --network host nginx
+```
 
 * 直接使用宿主机的ip与外界通信
+
+#### none
+
+* 禁用网络
+
+```bash
+# 宿主机无法通过网络访问容器
+docker run -d --name n3 --network none nginx
+```
+
+#### container
+
+* 新建的容器和指定的容器共享ip配置
+* **使用问题**
+    * `docker run`时`--network container:容器名`参数无法和`-p`参数一起使用
+    * 由于两个容器使用同一个网络配置，如果两个容器内服务默认端口相同，后启动的容器因为端口冲突无法启动
+
+##### nginx代理tomcat
+
+> 启动nginx和tomcat两个容器，tomcat共享nginx的网络，实现nginx代理tomcat服务
+
+* 启动两个容器
+
+```bash
+# 启动nginx容器映射到宿主机的80端口
+docker run -d --name n1 -p 80:80 nginx
+# 启动tomcat容器并和nginx容器共享网络
+docker run -d --name t1 --network container:n1 tomcat
+```
+
+* 测试两个容器是否可以互相访问
+
+```bash
+# 在nginx容器内执行curl命令访问tomcat服务
+docker exec -it n1 curl http://localhost:8080
+
+# 在tomcat容器内执行curl命令访问nginx服务
+docker exec -it n1 curl http://localhost:80
+```
+
+* 添加自定义tomcat首页
+
+```bash
+# 进入tomcat容器内
+docker exec -it t1 bash
+
+# 由于容器默认就在tomcat相关目录下所以之间进入项目目录
+cd webapps
+
+# 创建文件夹并新建简单的html文件
+mkdir myapp
+cd myapp
+touch index.html
+tee index.html <<eof
+<h1>Hello Tomcat!</h1>
+eof
+```
+
+* 配置nginx代理tomcat地址
+* 在nginx容器内`/etc/nginx/conf.d/default.conf`文件内server代码块内添加以下内容
+* 执行`nginx -s reload`重新加载nginx配置
+
+```bash
+location /myapp/ {
+    proxy_pass http://localhost:8080;
+}
+```
+
+* 最后访问`localhost:80/myapp`即可
+* 两个容器共享网络的情况下如果nginx容器重启了，tomcat容器必须也重启，不然无法访问
+
+#### 自定义网络
+
+
 
 ## 常见问题
 
@@ -516,3 +602,52 @@ CMD echo 123
 ### docker挂载主机目录访问如果出现cannot open directory .: Permission denied
 
 * 在挂在目录后加`--privileged=true`参数即可
+
+### 没有ip或ifconfig等查看网络命令怎么查看linux的ip
+
+* 使用`cat /proc/net/fib_trie`查看
+* 以下面文本为例，这个容器的ip为`127.17.0.2`，在Local内的倒数第四行
+
+```txt
+Main:
+  +-- 0.0.0.0/0 3 0 5
+     |-- 0.0.0.0
+        /0 universe UNICAST
+     +-- 127.0.0.0/8 2 0 2
+        +-- 127.0.0.0/31 1 0 0
+           |-- 127.0.0.0
+              /8 host LOCAL
+           |-- 127.0.0.1
+              /32 host LOCAL
+        |-- 127.255.255.255
+           /32 link BROADCAST
+     +-- 172.17.0.0/16 2 0 2
+        +-- 172.17.0.0/30 2 0 2
+           |-- 172.17.0.0
+              /16 link UNICAST
+           |-- 172.17.0.2
+              /32 host LOCAL
+        |-- 172.17.255.255
+           /32 link BROADCAST
+Local:
+  +-- 0.0.0.0/0 3 0 5
+     |-- 0.0.0.0
+        /0 universe UNICAST
+     +-- 127.0.0.0/8 2 0 2
+        +-- 127.0.0.0/31 1 0 0
+           |-- 127.0.0.0
+              /8 host LOCAL
+           |-- 127.0.0.1
+              /32 host LOCAL
+        |-- 127.255.255.255
+           /32 link BROADCAST
+     +-- 172.17.0.0/16 2 0 2
+        +-- 172.17.0.0/30 2 0 2
+           |-- 172.17.0.0
+              /16 link UNICAST
+           |-- 172.17.0.2
+              /32 host LOCAL
+        |-- 172.17.255.255
+           /32 link BROADCAST
+```
+
