@@ -3,6 +3,43 @@
 * **系统平滑移植**，**容器虚拟化技术**
 * docker可以通过镜像（image）将操作系统核心除外，运行程序所需要的系统环境，由下而上打包，达到跨平台无缝接轨运行，代替程序即应用的观念
 
+## 目录
+
+1. <a href="#install-docker">docker安装</a>
+2. <a href="#docker-components">docker组成</a>
+3. <a href="#docker-principle">docker工作原理</a>
+4. <a href="#docker-image-source">添加镜像源</a>
+5. <a href="#docker-commands">常用命令</a>
+    1. <a href="#command-help">帮助启动相关</a>
+    2. <a href="#command-images">镜像相关</a>
+    3. <a href="#command-container">容器相关</a>
+    4. <a href="#command-images">镜像相关</a>
+    5. <a href="#command-container">容器相关</a>
+    6. <a href="#command-volume">数据卷相关</a>
+    7. <a href="#command-network">网络相关</a>
+    8. <a href="#command-compose">容器编排相关</a>
+6. <a href="#command-images-desc">docker镜像</a>
+7. <a href="#dockerfile">Dockerfile</a>
+    1. <a href="#dockerfile-instructions">Dockerfile指令</a>
+    2. <a href="#dockerfile-dangling">虚悬镜像</a>
+8. <a href="#docker-network-desc">Docker网络（network）</a>
+    1. <a href="#docker-network-modes">Docker网络模式</a>
+        1. <a href="#docker-network-bridge">bridge</a>
+        2. <a href="#docker-network-host">host</a>
+        3. <a href="#docker-network-none">none</a>
+        4. <a href="#docker-network-container">container</a>
+            1. <a href="#docker-network-container-demo">nginx代理tomcat</a>
+        5. <a href="#docker-network-custom">自定义网络</a>
+            1. <a href="#docker-network-custom-demo-before">nignx代理2个tomcat，不使用自定义网络</a>
+            2. <a href="#docker-network-custom-demo-after">使用自定义网络</a>
+9. <a href="#docker-compose">Docker-Compose（容器编排）</a>
+    1. <a href="#docker-compose-demo">nignx代理2个tomcat，使用docker-compose进行容器编排</a>
+10. <a href="#docker-tools">docker相关工具</a>
+11. <a href="#docker-troubleshooting">常见问题</a>
+    1. <a href="#docker-troubleshooting-1">docker虚悬镜像是什么</a>
+    2. <a href="#docker-troubleshooting-2">docker挂载主机目录访问如果出现cannot open directory .: Permission denied</a>
+    3. <a href="#docker-troubleshooting-3">没有ip或ifconfig等查看网络命令怎么查看linux的ip</a>
+
 ## 传统虚拟机与容器的对比
 
 ### 虚拟机
@@ -43,6 +80,7 @@
 | 部署速度 | 快速，秒级 | 较慢，10s以上 |
 
 
+<a id="install-docker"></a>
 ## docker安装
 
 > [官网](https://www.docker.com)</br>
@@ -52,6 +90,7 @@
 * 在Docker手册上查找安装的方式
 
 
+<a id="docker-components"></a>
 ## docker组成
 
 * 镜像（image）
@@ -71,6 +110,7 @@
 
 * 集中存放镜像文件的位置，类似Maven存放jar包
 
+<a id="docker-principle"></a>
 ## docker工作原理
 
 * docker是一个client-server结构的系统，docker守护进程运行在主机上，
@@ -91,7 +131,8 @@ f --不能--> i[返回失败错误,查不到该镜像]
 
 ```
 
-## 添加镜像
+<a id="docker-image-source"></a>
+## 添加镜像源
 
 * 新建文件`/etc/docker/daemon.json`
 
@@ -109,10 +150,11 @@ f --不能--> i[返回失败错误,查不到该镜像]
 
 * Docker Desktop可以在设置里的Docker Engine选项内添加
 
-
+<a id="docker-commands"></a>
 ## 常用命令
 
-### 帮助启动类
+<a id="command-help"></a>
+### 帮助启动相关
 
 | 命令   | 描述    |
 |--------------- | --------------- |
@@ -125,6 +167,7 @@ f --不能--> i[返回失败错误,查不到该镜像]
 | **docker --help** | docker帮助文档 |
 | **docker 具体命令 --help** | docker命令帮助文档 |
 
+<a id="command-images"></a>
 ### 镜像相关
 
 | 命令   | 描述    |
@@ -135,7 +178,7 @@ f --不能--> i[返回失败错误,查不到该镜像]
 | **docker system df** | 查看镜像/容器/数据卷所占用空间 |
 | <a href="#commands-rmi">docker rmi</a> | 删除镜像 |
 
-<a id="command-volume"></a>
+<a id="command-container"></a>
 ### 容器相关
 
 | 命令   | 描述    |
@@ -146,6 +189,7 @@ f --不能--> i[返回失败错误,查不到该镜像]
 | **docker restart** | 重启容器 |
 | **docker stop** | 停止容器 |
 | **docker kill** | 强制停止容器 |
+| **docker stats** | 查看运行中容器的状态 |
 | <a href="#commands-rm">docker rm</a>   | 删除已经停止的容器 |
 | <a href="#commands-logs">docker logs</a>   | 查看容器日志信息 |
 | **docker top** | 查看容器内部运行的进程 |
@@ -157,6 +201,7 @@ f --不能--> i[返回失败错误,查不到该镜像]
 | <a href="#commands-import">docker import</a>   | 导入镜像 |
 | <a href="#commands-commit">docker commit</a>   | 将容器打包为镜像并提交到本地 |
 
+<a id="command-volume"></a>
 ### 数据卷相关
 
 | 命令   | 描述    |
@@ -178,6 +223,24 @@ f --不能--> i[返回失败错误,查不到该镜像]
 | **docker network connect**   | 将一个容器连接到某个网络上   |
 | **docker network disconnect**   | 将一个容器从某个网络上断开   |
 | **docker network prune**   | 删除未使用的网络   |
+
+<a id="command-compose"></a>
+### 容器编排相关
+
+> docker compose 相关命令都需要在`docker-compose.yaml`文件同级目录下执行
+
+| 命令   | 描述    |
+|--------------- | --------------- |
+| **docker compose up**   | 启动所有服务   |
+| **docker compose down**   | 停止并删除容器、网络、数据卷、镜像   |
+| **docker compose exec**   | 进入指定容器内部   |
+| **docker compose ps**   | 显示所有编排的容器   |
+| **docker compose top**   | 显示所有编排的容器内的进程   |
+| **docker compose logs**   | 查看指定容器内日志   |
+| **docker compose config**   | 查看配置   |
+| **docker compose start**   | 启动服务   |
+| **docker compose restart**   | 重启服务   |
+| **docker compose stop**   | 停止服务   |
 
 ### 命令详情
 
@@ -266,6 +329,7 @@ docker rmi -f $(docker images -qa)
     * `-v`：指定目录映射
     * `--volumes-from`：继承某个容器的目录映射关系
     * `--network`：指定容器的网络模式
+    * `--restart=always`：docker程序启动后自动启动这个容器
 
 ```bash
 # 后台启动容器并指定一个名称（启动守护式容器）
@@ -374,6 +438,7 @@ docker import debian1.tar custom/debian2:1.0
 docker commit -m "add new software" -a "y" debian1 y/deb:1.1
 ```
 
+<a id="command-images-desc"></a>
 ## docker镜像
 
 * 镜像是一种轻量级、可执行的独立软件包，包含运行某个软件所需的所有内容，
@@ -401,6 +466,7 @@ docker commit -m "add new software" -a "y" debian1 y/deb:1.1
 * 运行一个带有容器数据卷功能的容器实例，参考<a href="#commands-run">docker run</a>
 * 使用`-v`参数创建的目录映射关系默认是匿名的，使用<a href="#command-volume">数据卷</a>相关命令管理数据卷
 
+<a id="dockerfile"></a>
 ## Dockerfile
 
 * Dockerfile是用来构建docker镜像的文本文件，是由一条条构建镜像所需的指令和参数构成的脚本。
@@ -411,6 +477,7 @@ docker commit -m "add new software" -a "y" debian1 y/deb:1.1
 * 指令从上到下顺序执行
 * `#`表示注释
 
+<a id="dockerfile-instructions"></a>
 
 | 指令   | 说明    |
 |--------------- | --------------- |
@@ -466,6 +533,7 @@ RUN java -version
 CMD /bin/bash
 ```
 
+<a id="dockerfile-dangling"></a>
 #### 虚悬镜像
 
 * 测试构建一个虚悬镜像
@@ -480,6 +548,7 @@ CMD echo 123
 * 使用`docker images -f dangling=true`命令查询所以的虚悬镜像
 * 使用`docker rmi $(docker images -qf dangling=true)`命令删除所有的虚悬镜像
 
+<a id="docker-network-desc"></a>
 ## Docker网络（network）
 
 > <a href="#command-network">docker网络命令参考</a>
@@ -487,6 +556,7 @@ CMD echo 123
 * 进行容器之间的互联和通信以及端口映射
 * 容器ip变动时可以通过服务名连接，通信不受影响 
 
+<a id="docker-network-modes"></a>
 ### Docker网络模式
 
 * docker会在宿主机虚拟一个网桥（docker0），启动一个容器时docker会根据这个虚拟网桥的网段分配给容器一个ip。
@@ -499,6 +569,7 @@ CMD echo 123
 | none | 不进行任何网络设置 |
 | container | 创建的容器和指定的容器共享ip、端口等 |
 
+<a id="docker-network-bridge"></a>
 #### bridge
 
 * 将容器的网络连接到虚拟网桥（docker0）上，根据虚拟网桥的的网段分配一个ip给容器
@@ -508,6 +579,7 @@ CMD echo 123
 docker run -d --name n3 --network bridge -p 8080:80 nginx
 ```
 
+<a id="docker-network-host"></a>
 #### host
 
 > docker desktop在4.34之前无法支持host模式
@@ -519,6 +591,7 @@ docker run -d --name n3 --network host nginx
 
 * 直接使用宿主机的ip与外界通信
 
+<a id="docker-network-none"></a>
 #### none
 
 * 禁用网络
@@ -528,6 +601,7 @@ docker run -d --name n3 --network host nginx
 docker run -d --name n3 --network none nginx
 ```
 
+<a id="docker-network-container"></a>
 #### container
 
 * 新建的容器和指定的容器共享ip配置
@@ -535,6 +609,7 @@ docker run -d --name n3 --network none nginx
     * `docker run`时`--network container:容器名`参数无法和`-p`参数一起使用
     * 由于两个容器使用同一个网络配置，如果两个容器内服务默认端口相同，后启动的容器因为端口冲突无法启动
 
+<a id="docker-network-container-demo"></a>
 ##### nginx代理tomcat
 
 > 启动nginx和tomcat两个容器，tomcat共享nginx的网络，实现nginx代理tomcat服务
@@ -577,32 +652,258 @@ eof
 ```
 
 * 配置nginx代理tomcat地址
-* 在nginx容器内`/etc/nginx/conf.d/default.conf`文件内server代码块内添加以下内容
-* 执行`nginx -s reload`重新加载nginx配置
 
 ```bash
-location /myapp/ {
-    proxy_pass http://localhost:8080;
-}
+docker run -d --name n1 -p 80:80 nginx
+
+# 进入容器内部
+docker exec -it n1 bash
+
+# 添加tomcat代理配置
+sed -i '12i\
+location /myapp/ {\
+    proxy_pass http://localhost:8080;\
+}' /etc/nginx/conf.d/default.conf
+
+# 重新加载nginx配置
+nignx -s reload
 ```
 
 * 最后访问`localhost:80/myapp`即可
 * 两个容器共享网络的情况下如果nginx容器重启了，tomcat容器必须也重启，不然无法访问
 
+<a id="docker-network-custom"></a>
 #### 自定义网络
 
+<a id="docker-network-custom-demo-before"></a>
+##### nignx代理2个tomcat，不使用自定义网络
+
+* 启动并配置两个tomcat
+
+```bash
+# 配置第一个tomcat
+docker run -d --name t1 -p 8081:8080 tomcat:9.0
+docker exec -it t1 bash
+mkdir webapps/app1 && touch webapps/app1/index.html && tee webapps/app1/index.html <<eof
+<h1>Tomcat1</h1>
+eof
+
+# 退出容器
+exit
+
+# 配置第二个tomcat
+docker run -d --name t2 -p 8082:8080 tomcat:9.0
+docker exec -it t2 bash
+mkdir webapps/app2 && touch webapps/app2/index.html && tee webapps/app2/index.html <<eof
+<h1>Tomcat2</h1>
+eof
+```
+
+* 启动并配置代理两个tomcat
+* 使用`http://localhost/app1/`访问Tomcat1，使用`http://localhost/app2/`访问Tomcat2
+
+```bash
+docker run -d --name n1 -p 80:80 nginx
+docker exec -it n1 bash
+# 下面的ip根据自己容器内ip填写
+sed -i '12i\
+location /app1/ {\
+    proxy_pass http://172.17.0.2:8080;\
+}\
+location /app2/ {\
+    proxy_pass http://172.17.0.3:8080;\
+}' /etc/nginx/conf.d/default.conf
+
+nginx -s reload
+```
+
+* 如果此时将t2停止启动一个t3，t3访问地址和t2一样
+* 此时访问`http://localhost/app2/`就会出现Tomcat3的内容
+
+```bash
+# 停止t2容器
+docker stop t2
+
+# 启动并配置t3容器
+docker run -d --name t3 -p 8083:8080 tomcat:9.0
+docker exec -it t3 bash
+mkdir webapps/app2 && touch webapps/app2/index.html && tee webapps/app2/index.html <<eof
+<h1>Tomcat3</h1>
+eof
+```
+
+<a id="docker-network-custom-demo-after"></a>
+##### 使用自定义网络
+
+* 新建自定义网络
+
+```bash
+docker network create custom_network
+```
+
+* 使用自定义网络启动
+
+```bash
+# 断开之前的网络配置，也可以再容器创建时加上--network custom_network指定自定义网络
+docker network disconnect bridge t1
+docker network disconnect bridge t2
+docker network disconnect bridge n1
+
+# 连接自定义网络配置
+docker network connect custom_network t1
+docker network connect custom_network t2
+docker network connect custom_network n1
 
 
+# 进入nginx容器内并删除之前的配置
+docker exec -it n1 bash
+sed -i '12,17d' /etc/nginx/conf.d/default.conf
+
+# 使用容器名替换ip
+sed -i '12i\
+location /app1/ {\
+    proxy_pass http://t1:8080;\
+}\
+location /app2/ {\
+    proxy_pass http://t2:8080;\
+}' /etc/nginx/conf.d/default.conf
+
+nginx -s reload
+```
+
+* 此时再关闭t2启动t3后，`http://localhost/app2/`就无法访问
+
+<a id="docker-compose"></a>
+## Docker-Compose（容器编排）
+
+* docker-compose负责实现对容器集群的快速编排，通过定义`docker-compose.yaml`文件，
+写好多个容器之间的调用关系，只需要一个命令就能同时启动或关闭这些容器
+
+<a id="docker-compose-demo"></a>
+### nignx代理2个tomcat，使用docker-compose进行容器编排
+
+* 准备一个nginx镜像和tomcat镜像
+* 按以下结构创建目录
+
+```txt
+docker-compose-demo
+│
+├─nginx-apps
+│ │
+│ └─Dockerfile
+│
+├─tomcat-app1
+│ │
+│ └─Dockerfile
+│
+├─tomcat-app2
+│ │
+│ └─Dockerfile
+│
+└─docker-compose.yaml
+```
+
+* `nignx-apps/Dockerfile`
+
+```Dockerfile
+FROM nginx
+
+RUN sed -i '12i\
+location /app1/ {\
+    proxy_pass http://tomcat-app1:8080;\
+}\
+location /app2/ {\
+    proxy_pass http://tomcat-app2:8080;\
+}' /etc/nginx/conf.d/default.conf
+```
+
+* `tomcat-app1/Dockerfile`
+
+```Dockerfile
+FROM tomcat:9.0
+
+RUN mkdir webapps/app1
+RUN touch webapps/app1/index.html
+RUN tee webapps/app1/index.html <<eof
+<h1>Tomcat1</h1>
+eof
+```
+
+* `tomcat-app2/Dockerfile`
+
+```Dockerfile
+FROM tomcat:9.0
+
+RUN mkdir webapps/app2
+RUN touch webapps/app2/index.html
+RUN tee webapps/app2/index.html <<eof
+<h1>Tomcat2</h1>
+eof
+```
+
+* `docker-compose.yaml`
+
+```yaml
+version: "1"
+
+services:
+  nginx-apps:
+    # image: nginx-apps
+    build: ./nginx-apps
+    container_name: nginx-apps
+    ports:
+      - "80:80"
+    networks:
+        - my_network
+    depends_on:
+      - tomcat-app1
+      - tomcat-app2
+  tomcat-app1:
+    # image: tomcat-app1
+    build: ./tomcat-app1
+    container_name: tomcat-app1
+    ports:
+      - "8081:8080"
+    networks:
+        - my_network
+  tomcat-app2:
+    # image: tomcat-app2
+    build: ./tomcat-app2
+    container_name: tomcat-app2
+    ports:
+      - "8082:8080"
+    networks:
+        - my_network
+networks:
+  my_network:
+    name: my_metwork
+```
+
+* `docker compose`相关命令都要在`docker-compose.yaml`文件同级目录下执行
+* 执行`docker compose config -q`检查`docker-compose.yaml`文件格式
+* 执行`docker compose up -d`，一键从镜像构建到容器启动
+
+
+<a id="docker-tools"></a>
+## docker相关工具
+
+* 可视化工具[portainer](https://www.portainer.io/)
+* 容器监控**cAdvisor**+**InfluxDB**+**Granfana**
+
+<a id="docker-troubleshooting"></a>
 ## 常见问题
 
+<a id="docker-troubleshooting-1"></a>
 ### docker虚悬镜像是什么
 
 * 仓库名和标签都是`<none>`
 
+<a id="docker-troubleshooting-2"></a>
 ### docker挂载主机目录访问如果出现cannot open directory .: Permission denied
 
 * 在挂在目录后加`--privileged=true`参数即可
 
+<a id="docker-troubleshooting-3"></a>
 ### 没有ip或ifconfig等查看网络命令怎么查看linux的ip
 
 * 使用`cat /proc/net/fib_trie`查看
