@@ -1,213 +1,294 @@
-# git
+# Git
 
 * [官网](https://git-scm.com/)
 * [下载地址](https://git-scm.com/downloads)
+* 推荐使用[Lazygit](https://github.com/jesseduffield/lazygit)工具
 
-## 远程
+## 目录
 
-* 查看远程信息： `git remote -v`
+1. <a href="#commands">常用命令</a>
+2. <a href="#submodules">子模块</a>
+3. <a href="#operation-examples">git操作示例</a>
+    1. <a href="#example-1">删除切换分支时后之前分支的空文件夹</a>
+    2. <a href="#example-2">将历史某一次提交删除</a>
+    3. <a href="#example-3">使用token推送到github</a>
+    4. <a href="#example-4">删除远程仓库上的tag</a>
+4. <a href="#commit-specification">commit规范参考</a>
+    1. <a href="#commit-components">commit组成部分</a>
+    2. <a href="#commit-headers-type">commit的header类型</a>
+5. <a href="#troubleshooting">常见问题</a>
+    1. <a href="#troubleshooting-1">设置git日志输出的编码格式</a>
+    2. <a href="#troubleshooting-2">解除SSL验证</a>
+    3. <a href="#troubleshooting-3">设置项目push时buffer的大小</a>
+6. <a href="#references">参考</a>
 
-* 删除远程：`git remote rm 远程名`
-* 重命名远程：`git remote rename 远程名 新远程名`
-* 使用token push 到github
+
+<a id="commands"></a>
+## 常用命令
+
+
+| 命令   | 描述    |
+|--------------- | --------------- |
+| <a href="#command-remote">git remote</a>   | 远程相关   |
+| <a href="#command-pull">git pull</a>   | 拉取相关   |
+| <a href="#command-push">git push</a>   | 推送相关   |
+| <a href="#command-clone">git clone</a>   | 克隆相关   |
+| <a href="#command-add">git add</a>   | 添加到暂存区   |
+| <a href="#command-commit">git commit</a>   | 提交代码到本地仓库   |
+| <a href="#command-rm">git rm</a>   | 删除相关   |
+| <a href="#command-log">git log</a>   | 日志相关   |
+| <a href="#command-reflog">git reflog</a>   | 操作日志相关   |
+| <a href="#command-branch">git branch</a>   | 分支相关   |
+| <a href="#command-merge">git merge</a>   | 分支合并相关   |
+| <a href="#command-diff">git diff</a>   | 版本对比相关   |
+| <a href="#command-checkout">git checkout</a>   | 切换分支或恢复文件   |
+| <a href="#command-reset">git reset</a>   | 重置相关   |
+| <a href="#command-config">git config</a>   | 配置相关   |
+| <a href="#command-submodule">git submodule</a>   | 子模块相关相关   |
+
+### 命令详情
+
+<a id="command-remote"></a>
+#### git remote
 
 ```bash
-git remote add origin https://oauth2:[token]@github.com/follow1123/ide_configs.git
+# 查看远程信息
+git remote -v
+
+# 删除远程地址
+git remote rm 远程名
+
+# 重命名远程
+git remote rename 远程名 新远程名
 ```
 
-### 拉取
-
-* 直接从远程拉取文件：`git pull`
-* 从远程拉取某个分支并新建这个分支：`git checkout -b 本地分支名 m/远程分支名`
-* 指定分支或tag拉取 `git clone -b 分支名、tag名 url` 
-
-### 提交
-
-* 添加到暂存区 
+<a id="command-pull"></a>
+#### git pull
 
 ```bash
+# 直接从远程拉取文件
+git pull
+
+# 从远程拉取某个分支并新建这个分支
+git checkout -b 本地分支名 远程分支名
+```
+
+<a id="command-push"></a>
+#### git push
+
+```bash
+```
+
+<a id="command-clone"></a>
+#### git clone
+
+```bash
+# 指定分支或tag拉取
+git clone -b 分支名或tag名 url
+```
+
+<a id="command-add"></a>
+#### git add
+
+```bash
+# 添加到暂存区
 git add .
 ```
-* 提交
+
+<a id="command-commit"></a>
+#### git commit
 
 ```bash
+# 提交到本地仓库
 git commit -m "备注"
 ```
-* git停止跟踪一个文件
+
+<a id="command-rm"></a>
+#### git rm
 
 ```bash
+# git停止跟踪一个文件
 git rm --cached 文件名
+
+# 从本地库中删除文件
+git rm 文件名
 ```
 
-* 设置提交的用户信息
+<a id="command-log"></a>
+#### git log
 
 ```bash
+# 显示提交日志
+git log
+
+# 显示提交流程线
+git log --graph 
+
+# 显示简化日志
+git log --oneline
+```
+
+<a id="command-reflog"></a>
+#### git reflog
+
+```bash
+# 显示操作日志
+git reflog
+```
+
+<a id="command-branch"></a>
+#### git branch
+
+```bash
+# 查看分支
+git branch
+
+# 修改分支名称
+git branch -M 新名称
+
+# 删除分支
+git branch -d 分支名
+```
+
+<a id="command-merge"></a>
+#### git merge
+
+```bash
+# 合并分支，先切换到一个需要被合并的分支
+git merge 分支名
+```
+
+<a id="command-diff"></a>
+#### git diff
+
+```bash
+# 查看版本差异
+git diff commit_id1 commit_id1 file
+```
+
+<a id="command-checkout"></a>
+#### git checkout
+
+```bash
+# 切换分支
+git checkout 分支名
+
+# 切换分支，没有则新建一个
+git checkout -b 分支名
+
+# 恢复删除的文件
+git checkout -- 文件名
+```
+
+<a id="command-reset"></a>
+#### git reset
+
+```bash
+# 将当前工作区文件的版本还原到指定的版本，版本号使用git log可以获取
+git reset 版本号 文件名
+
+# 撤掉操作
+git reset --hard reflog_id
+```
+
+<a id="command-config"></a>
+#### git config
+
+```bash
+# 查看系统配置
+git config --system --list
+
+# 查看全局配置
+git config --global --list
+
+# 查看本地配置
+git config --local --list
+
+# 设置全局提交的用户信息
 git config --global user.name ""
 git config --global user.email ""
 ```
 
-* 提交日志
+<a id="command-reset"></a>
+#### git reset
 
 ```bash
-git log
-# 显示提交流程线
-git log --graph 
-# 简化日志
-git log --oneline
-```
-
-删除
-
-* 从本地库中删除文件
-
-```bash
-git rm 文件名
-```
-## 还原
-
-* 恢复删除的文件
-
-```bash
-git checkout -- 文件名
-```
-
-* 还原文件版本
-
-```bash
-# 版本号 使用 git log名称可以获取，如果还原从本地库删除的文件还需要使用 git checkout -- 名称还原文件
+# 将当前工作区文件的版本还原到指定的版本，版本号使用git log可以获取
 git reset 版本号 文件名
-```
-## 分支
 
-* 查看分支
+# 撤掉操作
+git reset --hard reflog_id
+```
+
+<a id="command-submodule"></a>
+#### git submodule
 
 ```bash
-git branch
+# 初始化子模块
+git submodule init 
+
+# 添加子模块
+git submodule add https://github.com/example/scripts.git scripts
+
+# 删除所有子模块
+git submodule deinit -f --all
 ```
 
-* 修改分支名称
+---
 
-```bash
-git branch -M 新名称
-```
-
-* 查看版本差异
-
-```bash
-git diff 版本号1 版本号2 文件名
-```
-
-
-* 删除分支
-
-```bash
-git branch -d 分支名
-```
-
-* 切换分支，没有则新建一个
-
-```bash
-git checkout -b 分支名
-```
-
-### 合并分支
-
-*  合并分支
-  * 先切换到一个需要被合并的分支
-  * 输入 `git merge 合并的分支`
-
-### 还原合并的分支
-
-* 输入 `git reflog` 显示提交信息
-* 输入 `git reset --hard [reflog里面的id]` 还原
-
-## Tag
-
-* 删除远程仓库上的tag `git push origin --delete <tag_name>`
- 
-## 日志
-
-* 查看日志 `git log`、`git reflog`
-
-
-
-* 设置 git 的日志输出的编码格式
-
-```bash
-git config --global core.quotepath false          # 显示 status 编码 
-git config --global gui.encoding utf-8            # 图形界面编码 
-git config --global i18n.commit.encoding utf-8    # 处理提交信息编码 
-git config --global i18n.logoutputencoding utf-8  # 输出 log 编码 
-# export LESSCHARSET=utf-8  
-```
-
-* 查看配置信息
-
-```bash
-# 系统
-git config --system --list
-# 全局
-git config --global --list
-# 本地
-git config --local --list
-```
-
-* 解除SSL验证
-
-```bash
-git config --global http.sslVerify false
-```
-
-* 设置单独项目push buffer的大小
-
-```bash
-git config http.postBuffer 1024000000
-```
-
-* 设置全局项目push buffer的大小
-
-```bash
-git config –global http.postBuffer 1024000000
-```
-
+<a id="submodules"></a>
 ## 子模块
 
-* ~~在git根目录下新建.gitmodules文件（和.gitignore同一个目录）~~
+* 位于仓库下的`.gitmodules`文件
+```txt
+[submodule "子模块名称"]
+    path = "子模块名称"
+    url = "子模块git url"
+    active = true
+    ignore = all
+```
 
-  ```
-  [submodule "子模块名称"]
-  	path = "子模块名称"
-  	url = "子模块git url"
-  	active = true
-  	ignore = all
-  ```
+<a id="operation-examples"></a>
+## git操作示例
 
-* ~~初始化子模块：`git submodule init`~~
+<a id="example-1"></a>
+### 删除切换分支时后之前分支的空文件夹
 
-* ~~更新子模块：`git submodule update`~~
+* 使用`git clean -df`删除
 
-* ~~初始化并更新子模块：`git submodule update --init`~~
+<a id="example-2"></a>
+### 将历史某一次提交删除
 
-* 以上方法添加子模块可能有问题
+* 假如对分支A进行操作，需要删除提交m
+* 先将基于当前分支创建一个新分支B
+* 将分支A重置到m提交前一次提交`git reset --hard`
+* 再将分支B内m提交后所有提交摘取到分支A上
+  * `git cherry-pick 提交id`摘取一个提交
+  * `git cherry-pick 提交idA..提交idB`摘取从A到B所有提交，不包括提交A
+  * `git cherry-pick 提交idA^..提交idB`摘取从A到B所有提交，包括提交A
 
-* 使用命令直接添加
+<a id="example-3"></a>
+### 使用token推送到github
 
-  ```bash
-  git submodule init --初始化子模块
-  git submodule add https://github.com/example/scripts.git scripts --直接添加子模块
-  ```
+* `git remote add origin https://oauth2:[token]@github.com/<user_name>/<repo_name>.git`
 
-  * 删除所有子模块 `git submodule deinit -f --all`
+<a id="example-4"></a>
+### 删除远程仓库上的tag
 
-## git commit 提交规范参考
+* `git push origin --delete <tag_name>`
 
-> 参考：[如何写出干净的 Git Commit](https://mp.weixin.qq.com/s?__biz=Mzg4MjY3NTk5OA==&mid=2247484976&idx=1&sn=63ef68b9eb8c76f048809026ee48ca44&chksm=cf525e41f825d7571d4aaefcf3595ce91e1d3268934340fabdc0118d7797da486495a44f041a&scene=90&subscene=245&sessionid=1714743143&clicktime=1051534&enterid=1051534&ascene=56&fasttmpl_type=0&fasttmpl_fullversion=7185892-zh_CN-zip&fasttmpl_flag=0&realreporttime=1714743485555&devicetype=android-30&version=28002c51&nettype=WIFI&abtest_cookie=AAACAA%3D%3D&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQujZ49ALiz1b2lAHlSpFXHRLcAQIE97dBBAEAAAAAAMlhBc%2FBdTAAAAAOpnltbLcz9gKNyK89dVj0f0rgg4PuZXnCh6Cj4xkhWRbID1qy2a4q9hJh%2FmqGguBwNDK0CujFrUmRh9Rrdxrqv6F4LUcVfkoR6SD0f42%2FO7DqtiwXfeT7%2BkC96Oj2TFZygMcKEFpT%2BPkjDHlqTx%2BgcTGrgcUaKaJ9Ssspu8CWCIaWG7hJUaPYMCDZC3TGuX23uYg6qfE3K9BNNyrAbu5DPdjBGyZ0yai8yAdjyTjS9I9xvfsNnHPoA3P5CA48jKhWr8H31V8%3D&pass_ticket=au9gdHuUfoKzzjLeSGcY27eaxRYcdNltC%2FoyQc9revXol%2Fe%2BRvchc2yC1r3VcdABrODy5HQGUb5CSn5XS%2FfwOQ%3D%3D&wx_header=3)
+---
 
+<a id="commit-specification"></a>
+## commit规范参考
+
+
+<a id="commit-components"></a>
 ### commit组成部分
 
-    * header 是必要的
-    * body 也是必要的，除了类型为 docs 之外，body 的内容必须大于 20 个字符
-    * footer 是可选的，比如放置引用的 issue
+* header 是必要的
+* body 也是必要的，除了类型为 docs 之外，body 的内容必须大于 20 个字符
+* footer 是可选的，比如放置引用的 issue
 
 ```txt
 <header>
@@ -221,12 +302,11 @@ git config –global http.postBuffer 1024000000
 
 ```txt
 fix: 简要说明
-
 详细说明
-
 关闭某个pr
 ```
 
+<a id="commit-headers-type"></a>
 ### commit的header类型
 
 | 类型 | 描述 |
@@ -241,14 +321,35 @@ fix: 简要说明
 | test | 添加缺失测试或更正现有测试 |
 
 
-# git相关操作
+---
 
-## 将历史某一次提交删除
+<a id="troubleshooting"></a>
+## 常见问题
 
-* 假如对分支A进行操作，需要删除提交m
-* 先将基于当前分支创建一个新分支B
-* 将分支A重置到m提交前一次提交`git reset --hard`
-* 再将分支B内m提交后所有提交摘取到分支A上
-  * `git cherry-pick 提交id`摘取一个提交
-  * `git cherry-pick 提交idA..提交idB`摘取从A到B所有提交，不包括提交A
-  * `git cherry-pick 提交idA^..提交idB`摘取从A到B所有提交，包括提交A
+<a id="troubleshooting-1"></a>
+### 设置git日志输出的编码格式
+
+```bash
+git config --global core.quotepath false          # 显示 status 编码 
+git config --global gui.encoding utf-8            # 图形界面编码 
+git config --global i18n.commit.encoding utf-8    # 处理提交信息编码 
+git config --global i18n.logoutputencoding utf-8  # 输出 log 编码 
+```
+
+<a id="troubleshooting-2"></a>
+### 解除SSL验证
+
+* `git config --global http.sslVerify false`
+
+<a id="troubleshooting-3"></a>
+### 设置项目push时buffer的大小
+
+* 本地仓库配置：`git config http.postBuffer 1024000000`
+* 全局配置：`git config –global http.postBuffer 1024000000`
+
+---
+
+<a id="references"></a>
+## 参考
+
+* [如何写出干净的 Git Commit](https://mp.weixin.qq.com/s?__biz=Mzg4MjY3NTk5OA==&mid=2247484976&idx=1&sn=63ef68b9eb8c76f048809026ee48ca44&chksm=cf525e41f825d7571d4aaefcf3595ce91e1d3268934340fabdc0118d7797da486495a44f041a&scene=90&subscene=245&sessionid=1714743143&clicktime=1051534&enterid=1051534&ascene=56&fasttmpl_type=0&fasttmpl_fullversion=7185892-zh_CN-zip&fasttmpl_flag=0&realreporttime=1714743485555&devicetype=android-30&version=28002c51&nettype=WIFI&abtest_cookie=AAACAA%3D%3D&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQujZ49ALiz1b2lAHlSpFXHRLcAQIE97dBBAEAAAAAAMlhBc%2FBdTAAAAAOpnltbLcz9gKNyK89dVj0f0rgg4PuZXnCh6Cj4xkhWRbID1qy2a4q9hJh%2FmqGguBwNDK0CujFrUmRh9Rrdxrqv6F4LUcVfkoR6SD0f42%2FO7DqtiwXfeT7%2BkC96Oj2TFZygMcKEFpT%2BPkjDHlqTx%2BgcTGrgcUaKaJ9Ssspu8CWCIaWG7hJUaPYMCDZC3TGuX23uYg6qfE3K9BNNyrAbu5DPdjBGyZ0yai8yAdjyTjS9I9xvfsNnHPoA3P5CA48jKhWr8H31V8%3D&pass_ticket=au9gdHuUfoKzzjLeSGcY27eaxRYcdNltC%2FoyQc9revXol%2Fe%2BRvchc2yC1r3VcdABrODy5HQGUb5CSn5XS%2FfwOQ%3D%3D&wx_header=3)
