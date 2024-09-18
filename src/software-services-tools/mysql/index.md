@@ -671,6 +671,7 @@ ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY(外键字段名) REFE
 
 ---
 
+<a id="multi-table-query"></a>
 ## 多表查询
 
 * 项目开发中，在进行数据库表结构设计时，会根据业务需求及业务模块之间的关系，
@@ -686,50 +687,244 @@ ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY(外键字段名) REFE
         * 用户可用户详细：用于单表拆分，将一张表的基础字段放在一张表中，其他详情字段放在另一种表中，提升效率
         * 在任意一方加入外键，关联另一方的主键，并且设置外键为唯一的（UNIQUE）
 
+### 笛卡尔积
+
+* 笛卡尔积是指在数学中，两个集合A集合和B集合的所有组合情况（在多表查询时，需要消除无效的笛卡尔积）
+
+#### 示例
+
+* 准备SQL
+
+```sql
+DROP TABLE IF EXISTS DEPT;
+CREATE TABLE DEPT(
+    ID INT AUTO_INCREMENT COMMENT 'ID' PRIMARY KEY,
+    NAME VARCHAR(50) NOT NULL COMMENT '部门名'
+)COMMENT '部门表';
+
+INSERT INTO DEPT (ID, NAME) VALUES
+(1, '研发部'),(2, '市场部'), (3, '财务部'), (4, '销售部'), (5, '总经办');
+
+DROP TABLE IF EXISTS EMP;
+CREATE TABLE EMP(
+    ID INT AUTO_INCREMENT COMMENT 'ID' PRIMARY KEY,
+    NAME VARCHAR(50) NOT NULL COMMENT '姓名',
+    AGE INT COMMENT '年龄',
+    JOB VARCHAR(20) COMMENT '职位',
+    DEPT_ID INT COMMENT '部门ID',
+)COMMENT '员工表';
+
+INSERT INTO EMP(ID, NAME, AGE, JOB, DEPT_ID) VALUES
+(1, '1', 66, '1', 5), (2, '2', 20, '2', 1), (3, '3', 33, '3', 1),
+(4, '4', 48, '4', 1), (5, '5', 43, '5', 1), (6, '6', 19, '6', 1);
+
+ALTER TABLE EMP ADD CONSTRAINT FK_EMP_DEPT_ID FOREIGN KEY(DEPT_ID) REFERENCES DEPT(ID);
+```
+
+* 使用`SELECT * FROM EMP, DEPT;`语句查询两个表就会出现笛卡尔积
+* 只需要添加`WHERE`条件关联两个表的就可以消除笛卡尔积
+* 如果不满足`WHERE`关联条件的数据就不会被查询到
+
+```java
+SELECT * FROM EMP, DEPT
+WHERE EMP.DEPT_ID = DEPT.ID;
+```
+
 ### 内连接
+
+* 内连接查询的是两张表**交集**部分
+
+```sql
+-- 隐式内连接
+SELECT 字段列表 FROM 表1, 表2 WHERE 条件;
+
+-- 显示内连接
+SELECT 字段列表 FROM 表1 [INNER] JOIN 表2 ON 连接条件;
+```
+
 ### 外连接
+
+* 外连接有分**左外连接**和**右外连接**，查询**左表或右表的全部数据**和两张表的**交集**部分
+
+```sql
+-- 左外连接，查询表1的全部数据和表1和表2的交集部分数据
+SELECT 字段列表 FROM 表1 LEFT [OUTER] JOIN 表2 ON 连接条件;
+
+-- 右外连接，查询表2的全部数据和表1和表2的交集部分数据
+SELECT 字段列表 FROM 表1 RIGHT [OUTER] JOIN 表2 ON 连接条件;
+```
+
 ### 自连接
+
+* 自连接就是**自己连接自己**，连接可以是内连接也可以是外连接
+
+```sql
+SELECT 字段列表 FROM 表A 别名A JOIN 表A 别名B ON 连接条件;
+```
+
+### 联合查询
+
+* 把多次查询的结果合并起来，形成一个新的查询结果集，使用`union [all]`实现
+* 联合查询中多个表的列数必须保持一致，列的字段类型也必须一致
+* `union all`会将全部的数据直接合并在一起，`union`会对合并之后的数据去重
+
+```sql
+SELECT 字段列表 FROM 表1 ...;
+UNION [ALL]
+SELECT 字段列表 FROM 表2 ...;
+```
+
 ### 子查询
+
+* SQL语句中嵌套SELECT语句，称为**嵌套查询**，又称为**子查询**
+
+```sql
+SELECT * FROM T1 WHERE COLUMN1 = (SELECT COLUMN1 FROM T2)
+```
+
+* 子查询的外部语句可以是`INSERT`、`UPDATE`、`DELETE`、`SELECT`中的任意一个
+* 子查询的位置可以在下面几个位置：
+    * **WHERE**后：`SELECT * FROM T1 WHERE COLUMN1 = (SELECT COLUMN1 FROM T2)`
+    * **FROM**后：`SELECT * FROM (SELECT 字段1, 字段2, ... FROM 表1) 别名 WHERE 查询条件`
+    * **SELECT**后：`SELECT 字段1, (SELECT count(*) FORM 表2 WHERE 表2.字段2 = 表1.字段1) 求和字段 FROM 表1 WHERE 查询条件`
+
+#### 标量子查询
+
+* 子查询返回的结果为单个值（数字、字符串、日期等）
+* 常用操作符：`=` `<>` `>` `>=` `<` `<=` 
+
+#### 列子查询
+
+* 子查询返回的结果是一列（可以是多行）
+* 列子查询常用操作符：
+
+| 操作符   | 描述    |
+|--------------- | --------------- |
+| IN   | 在指定集合范围之内，多选一   |
+| NOT IN | 不在指定的集合范围之内 |
+| ANY | 子查询返回的列表中，有任意一个满足即可 |
+| SOME | 和ANY等同 |
+| ALL | 子查询返回列表的所有值都必须满足 |
+
+
+```sql
+-- 字段1必须大于表2内所有的字段2
+SELECT 字段列表 FROM 表1 WHERE 字段1 > ALL(SELECT 字段2 FROM 表2);
+
+-- 字段1可以比表2内任意一个字段2大
+SELECT 字段列表 FROM 表1 WHERE 字段1 > ANY(SELECT 字段2 FROM 表2);
+```
+
+#### 行子查询
+
+* 子查询返回的结果是一行（可以是多列）
+* 常用操作符：`=` `<>` `IN` `NOT IN`
+
+```sql
+-- 多个条件查询
+SELECT 字段列表 FORM 表1 WHERE 字段1 = 值1 AND 字段2 = 值2;
+
+-- 以上条件可以写成这种方式
+SELECT 字段列表 FORM 表1 WHERE (字段1, 字段2) = (值1, 值2);
+
+-- 如果子查询的返回结果刚好是一行两列，则直接可以使用以下写法
+SELECT 字段列表 FORM 表1 WHERE (字段1, 字段2) = (SELECT 字段3, 字段4 FROM 表2 WHERE 查询条件);
+```
+
+#### 表子查询
+
+* 子查询返回的结果是多行多列
+* 常用操作符：`IN`
+
+```sql
+/* 
+和行子查询类似
+如果此时字段1，和字段2都需要匹配多个值，
+那么可以使用IN接表子查询返回的多行两列的表结果
+*/
+SELECT 字段列表 FORM 表1 WHERE (字段1, 字段2) IN (SELECT 字段3, 字段4 FROM 表2 WHERE 查询条件);
+```
 
 ---
 
+## 事务
 
-* 连表查询 JOIN
+* **事务**是一组操作的集合，它是一个不可分割的工作单位，事务会把所有的操作作为一个整体一起向系统提交或撤销操作请求，
+即这些操作**要么同时成功，要么同时失败**
+* **MySQL的事务默认是自动提交的**，也就是当执行一条DML语句，MySQL会立即隐式提交事务
 
-|操作|描述|
-|----|----|
-|inner join|如果表中至少有一个匹配则返回该行|
-|left join|会从左表中返回所有的值，即使右表中没有匹配|
-|right join|会从右表中返回所有的值，即使左表中没有匹配|
+### 事务操作
 
-* 自连接
-
-```
-
-* 子查询
-    * where 的条件里面嵌套另一个查询语句
 
 ```sql
--- 查询预订号小于4000，gate 为'G33'的乘客的姓名
--- 联表查询方式
-SELECT distinct  u.UserId, CONCAT(u.FirstName,' ', u.LastName) AS 联表
-FROM users u 
-JOIN flightreservation f ON u.UserId = f.UserId
-JOIN `schedule` s ON f.ScheduleId = s.ScheduleId WHERE f.ReservationId < 4000
-AND	s.Gate = 'G33'
-ORDER BY u.UserId;
--- 子查询方式
-SELECT UserId, CONCAT(FirstName,' ', LastName) AS 子查询 FROM users
-WHERE UserId IN	(
-    SELECT UserId FROM flightreservation
-    WHERE ReservationId < 4000
-    AND ScheduleId IN (
-        SELECT ScheduleId FROM `schedule`
-        WHERE Gate = 'G33'
-    )
-)
-ORDER BY UserId
+-- 查看默认事务提交方式
+SELECT @@autocommit;
+
+-- 修改默认事务提交方式
+SET @@autocommit = 0;
+
+-- 开启事务，或者使用BEGIN;
+START TRANSACTION;
+
+-- 提交事务
+COMMIT;
+
+-- 回滚事务
+ROLLBACK;
+
+-- 其他事务操作
+
+-- 保存存档点
+SAVEPOINT 存档点名称;
+
+-- 回滚到指定的存档点，此时事务还未完成
+ROLLBACK TO 存档点名称;
+
+-- 删除存档点
+RELEASE SAVEPOINT 存档点名称;
 ```
+
+#### 示例
+
+* 准备SQL
+
+```sql
+CREATE TABLE account(
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    name VARCHAR(10) COMMENT '姓名',
+    money INT COMMENT '余额'
+) COMMENT '账户表';
+
+INSERT INTO account VALUES (NULL, '张三', 2000), (NULL, '李四', 2000);
+```
+
+* 转账逻辑，张三向李四转账1000元
+
+```sql
+-- 开启事务
+START TRANSACTION;
+
+-- 张三扣除1000元
+update account set money = money - 1000 where name = '张三';
+
+-- 李四新增1000元
+update account set money = money + 1000 where name = '李四';
+
+-- 提交事务，如果SQL正常执行则提交事务
+COMMIT;
+
+-- 回滚，如果SQL执行过程出现异常，则回滚事务
+ROLLBACK;
+```
+
+### 事务四大特性
+
+### 并发事务问题
+
+### 事务隔离级别
+
+---
+
 
 ### 数据表的类型
 
@@ -787,73 +982,6 @@ mysql的默认编码是Latin1，可以在mysql目录下的my.ini文件里添加`
         * 不可重复读：在一个事务内读取表中的某一行数据，多次读取的结果不同。（这不是错误，只是某些场合不对）
         * 幻读：指一个事务读取到了另一个事务所插入的数据，导致前后读取不一致
         
-```sql
--- mysql时默认开启事务自动提交的
-SET autocommit=0 -- 关闭自动提交事务
-SET autocommit=1 -- 开启自动提交事务
-
-
--- 手动处理事务
-SET autocommit=0 -- 关闭自动提交事务
-
--- 开启事务 
-START TRANSACTION -- 标记一个事务的开启，从这之后的sql都在同一个事务内
-/*
-sql语句
-...
-...
-*/
--- 提交：持久化 (如果成功)
-COMMIT
--- 回滚：回到最开始的位置 (如果失败)
-ROLLBACK
-
--- 事务结束
--- STOP TRANSACTION
-SET autocommit=1 -- 开启自动提交事务
-
-
--- 其他
-
-SAVEPOINT 保存点名 -- 设置事务保存点
-
-ROLLBACK SAVEPOINT 保存点名 -- 回滚到设置好的事务保存点
-
-RELEASE SAVEPOINT 保存点名 -- 撤销事务保存点
-```
-
-* 模拟事务：李四给王五转账500元
-
-```sql
--- 创建表
-CREATE TABLE `accountInfo`(
-        id int not null auto_increment comment '用户id',
-        `name` varchar(30) not null comment '用户姓名',
-        `password` varchar(50) default MD5('123456') comment '用户密码',
-        amount int default 0 comment '用户金额',
-        primary key(`id`)
-      )engine=innodb default charset=utf8;
--- 插入数据  
-insert into `accountInfo` (`name`, `password`, amount) values
-('张三', MD5('zhangsan'), 2000),
-('李四', MD5('lisi'), 8000),
-('王五', MD5('wangwu'), 500);
--- 模拟事务场景
-SET autocommit=0; -- 关闭自动提交事务
-START TRANSACTION;
--- 李四给王五转账500元
-UPDATE accountInfo SET amount= amount-500 WHERE id = 2;
-UPDATE accountInfo SET amount= amount+500 WHERE id = 3;
--- 提交事务
-COMMIT;
--- 回滚
-ROLLBACK;
-
-set autocommit=1;  -- 开启自动提交事务
-
-SELECT * FROM accountInfo;
-
-```
 
 ### 索引
 * mysql官方对索引的定义：索引（index）是帮助mysql高效获取数据的数据结构
