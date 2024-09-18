@@ -1,4 +1,161 @@
-# 并发
+# 多线程
+
+## 程序、进程和线程
+
+* **程序（program）**：为完成特定的任务，用某种语言编写的一组指令的集合。及指**一段静态的代码**
+* **进程（process）**：程序的一次执行过程，或是正在内存中运行的应用程序
+    * 每个进程都有一个独立的内存空间，系统运行一个程序既是一个进程从创建、运行到消亡的过程（生命周期）
+    * 程序时静态的，进程是动态的
+    * 进程作为**操作系统调度和分配资源的最小单位**（系统运行程序的基本单位），
+    系统在运行时会为每个进程分配不同的内存区域
+* **线程（thread）**：进程可进一步细化为线程，是程序内部的一条执行路径，一个进程中至少有一个线程
+    * 一个进程同一时间若**并行**执行多个线程，就是支持多线程的。
+    * 线程作为**CPU调度和执行的最小单位**
+    * 一个进程中多个线程共享相同的内存单元，但多个线程操作共享的系统资源可能就会带来安全隐患
+    * JVM就是一个进程，JVM内部的**虚拟机栈**、**本地方法栈**、**程序计数器**每个线程各有一份，
+    只有**方法区**和**堆**是线程共享的
+
+### 线程调度
+
+* **分时调度**：所有线程轮流使用CPU的使用权，并且平均分配每个线程占用CPU的时间
+* **抢占式调度**：让**优先级高**的线程以较大的概率优先使用CPU。如果线程的优先级相同，
+那么会随机选择一个（线程随机性），java使用的为抢占式调度
+
+### 并行与并发
+
+* **并行（parallel）**：指两个或多个事件在**同一时刻**发生（同时发生）。
+有多条指令在多个CPU上同时执行。
+* **并发（concurrency）**：指两个或多个时间在**同一时间段内**发生。
+有多条指令在单个CPU上快速轮换、交替执行，使得在宏观上具有多个进程同时执行的效果
+
+---
+
+## Java内创建和使用线程
+
+* java语言的JVM运行程序运行多个线程，使用`java.lang.Thread`类代表**线程**，
+所有线程对象必须是`Thread`类或其子类的实例
+* 每个线程都是通过某个特定`Thread`对象的`run()`方法来完成操作的，因此`run()`方法称为线程执行体
+* 通过该`Thread`对象的`start()`方法来启动这个线程，而非直接调用`run()`
+
+### 继承Thread类
+
+* 继承`Thread`类并重写`run()`方法，实例化后调用`start()`方法
+    * 也可以创建`Thread`类的匿名子类对象使用
+* 线程的`start()`方法不能重复调用，否则报错**IllegalThreadStateException**，
+必须重新创建线程对象再调用`start()`方法
+
+#### 代码实例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/creation_method/extends_thread/ExtendsThreadTest.java)
+
+* 创建线程
+
+```java
+public class PrintNumber extends Thread{
+
+    @Override
+    public void run() {
+        for (int i = 1; i <= 100; i++) {
+            if (i % 2 == 0){
+                System.out.println(Thread.currentThread().getName() + ": " + i);
+            }
+        }
+    }
+}
+```
+
+* 测试
+
+```java
+public static void main(String[] args) {
+    // 创建对象
+    PrintNumber printNumber = new PrintNumber();
+    printNumber.start();
+
+    System.out.println(Thread.currentThread().getName() + " main");
+
+    // 创建Thread类的匿名子类对象使用
+    new Thread(){
+        @Override
+        public void run() {
+            for (int i = 1; i <= 100; i++) {
+                if (i % 2 == 0){
+                    System.out.println(Thread.currentThread().getName() + ": " + i);
+                }
+            }
+        }
+    }.start();
+
+}
+```
+
+### 实现Runnable接口
+
+* 实现`Runnable`接口并实现`run()`方法，在`new Thread()`时传入该对象
+    * 也可以创建`Runnalbe`接口的匿名实现类使用
+
+#### 代码实例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/creation_method/impl_runnable/ImplRunnableTest.java)
+
+* 创建线程
+
+```java
+public class PrintNumber implements Runnable{
+
+    @Override
+    public void run() {
+        for (int i = 1; i <= 100; i++) {
+            if (i % 2 == 0){
+                System.out.println(Thread.currentThread().getName() + ": " + i);
+            }
+        }
+    }
+}
+```
+
+* 测试
+
+```java
+public static void main(String[] args) {
+
+    // 使用实现Runnable接口的类实现
+    PrintNumber printNumber = new PrintNumber();
+
+    new Thread(printNumber).start();
+
+    System.out.println(Thread.currentThread().getName() + "main thread");
+
+    // 提供Runnable接口的匿名实现类实现
+    new Thread(new Runnable() {
+        @Override
+        public void run() {
+            for (int i = 1; i <= 100; i++) {
+                if (i % 2 != 0){
+                    System.out.println(Thread.currentThread().getName() + ": " + i);
+                }
+            }
+        }
+    }).start();
+}
+```
+
+### 几种创建线程方式之间的区别
+
+* 继承Thread类和实现Runnable接口的区别
+    * 相同点：都是使用`Thread`对象的`start()`方法启动线程，创建的线程对象都是`Thread`类或其子类
+    * 不同点：一个是继承类，一个是实现接口
+        * 实现`Runnable`接口的好处：避免了java单基础的局限性，更适合处理共享数据问题
+    * `Thread`类其实实现了`Runnable`接口，并且`Thread`内部有一个`Runnable`类型的`target`属性，
+    当使用继承的方式时，重写从`Runnable`接口内实现的`run()`方法，而当使用实现接口的方式时，
+    `Thread`内部的`run()`方法就会调用`target`的`run()`方法，这种方法是代理模式
+
+
+---
+
+
+
+## JUC
 
 ## 共享模型
 
