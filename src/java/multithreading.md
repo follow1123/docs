@@ -94,7 +94,7 @@ public static void main(String[] args) {
 * 实现`Runnable`接口并实现`run()`方法，在`new Thread()`时传入该对象
     * 也可以创建`Runnalbe`接口的匿名实现类使用
 
-#### 代码实例
+#### 代码示例
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/creation_method/impl_runnable/ImplRunnableTest.java)
 
@@ -150,10 +150,165 @@ public static void main(String[] args) {
     当使用继承的方式时，重写从`Runnable`接口内实现的`run()`方法，而当使用实现接口的方式时，
     `Thread`内部的`run()`方法就会调用`target`的`run()`方法，这种方法是代理模式
 
+## Thread类
+
+* 构造器
+    * `Thread(String name)`：创建线程并指定线程名
+    * `Thread(Runnable target)`：创建线程并目标对象
+    * `Thread(Runnable target, String name)`：创建线程并目标对象，并指定线程名
+* 常用方法
+    * `start()`：启动线程，调用线程的`run()`方法
+    * `run()`：线程执行的操作声明处
+    * `static currentThread()`：获取当前执行代码对应的线程
+    * `getName()`：获取线程名
+    * `setName()`：设置线程名
+    * `static sleep(long millis)`：使当前线程睡指定毫秒
+    * `static yield()`：主动释放CPU的执行权
+    * `join()`：在a线程内调用`b.join()`后，a线程会等b线程执行完成后在继续执行，
+    如果使用带时间参数的`join(long millis)`则会等待对应的时间
+    * `isAlive()`：判断线程是否存活
+* 过时方法
+    * `stop()`：强行停止线程执行
+    * `suspend()`：暂停线程
+    * `resume()`：恢复线程
+* 线程优先级
+    * `getPriority()`：获取线程的优先级
+    * `setPriority(int newPriority)`：设置线程的优先级，默认为5，设置范围1~10，
+    可以用`Thread`类的三个常量配置
+        * `Thread.MIN_PRIORITY`:1 `Thread.NORM_PRIORITY`:5 `Thread.MAX_PRIORITY`:10
+
+### 代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_methods/ThreadMethodsTest.java)
+
+```java
+public class ThreadMethodsTest {
+    
+    @Test
+    public void testCurrentThread() {
+        // 打印线程名
+        System.out.println(Thread.currentThread().getName());
+
+        // 修改线程名
+        Thread.currentThread().setName("主线程");
+
+        try {
+            // 当前线程休眠1秒
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 打印线程名
+        System.out.println(Thread.currentThread().getName());
+    }
+    
+    
+    @Test
+    public void testYield() {
+        // 子线程打印偶数
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                for (int i = 1; i <= 100; i++) {
+                    if (i % 2 == 0) {
+                        System.out.println(Thread.currentThread().getName() + "==" + i);
+                    }
+                    // 当i为10的倍数是主动释放CPU的执行权
+                    if (i % 10 == 0){
+                        Thread.yield();
+                    }
+                }
+            }
+        }, "sub-thread").start();
+
+        // 主线程打印奇数
+        for (int i = 1; i <= 100; i++) {
+            if (i % 2 != 0) {
+                System.out.println(Thread.currentThread().getName() + "==" + i);
+            }
+        }
+    }
+
+    @Test
+    public void testJoin() {
+        // 子线程打印偶数
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 1; i <= 100; i++) {
+                    if (i % 2 == 0) {
+                        System.out.println(Thread.currentThread().getName() + "==" + i);
+                    }
+                }
+            }
+        }, "sub-thread");
+
+        thread.start();
+
+        System.out.println("子线程是否存活：" + thread.isAlive());
+        // 主线程打印奇数
+        for (int i = 1; i <= 100; i++) {
+            if (i % 2 != 0) {
+                System.out.println(Thread.currentThread().getName() + "==" + i);
+            }
+            // 当主线程打印到25时等待子线程完成后在执行
+            if (i == 25){
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        System.out.println("子线程是否存活：" + thread.isAlive());
+    }
+
+    @Test
+    public void testPriority() {
+        // 子线程打印偶数
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 1; i <= 100; i++) {
+                    if (i % 2 == 0) {
+                        System.out.println(Thread.currentThread().getName() + "==" +
+                                Thread.currentThread().getPriority() + "==" + i);
+                    }
+                }
+            }
+        }, "sub-thread");
+
+        // 设置子线程为最小优先级
+        thread.setPriority(Thread.MIN_PRIORITY);
+        thread.start();
+
+        // 设置主线程为最大优先级
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+
+        // 主线程打印奇数
+        for (int i = 1; i <= 100; i++) {
+            if (i % 2 != 0) {
+                System.out.println(Thread.currentThread().getName() + "==" +
+                        Thread.currentThread().getPriority() + "==" + i);
+            }
+        }
+    }
+
+}
+```
+
+## 线程的生命周期
+
+### JDK1.5之前
+
+* 线程的生命周期有5种状态：**新建（New）**、**就绪（Runnable）**、**运行（Running）**、
+**阻塞（Blocked）**、**死亡（Dead）**。
+
+![jdk1.5前的线程生命周期](./assets/Snipaste_2024-09-19_16-46-46.png)
+
 
 ---
-
-
 
 ## JUC
 
