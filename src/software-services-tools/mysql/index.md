@@ -919,9 +919,190 @@ ROLLBACK;
 
 ### 事务四大特性
 
+* **原子性（Atomicity）**：事务是不可分割的最小单元，要么全部成功，要么全部失败
+* **一致性（Consistency）**：事务完成时，必须使所有的数据都保持一致的状态
+* **隔离性（Isolation）**：数据库提供的隔离机制，保证事务在不受外部并发操作影响的独立环境下运行
+* **持久性（Durability）**：事务一旦提交或回滚，它对数据库中的数据的改变就是永久的
+
 ### 并发事务问题
 
+| 问题   | 描述    |
+|--------------- | --------------- |
+| **脏读**   | 一个事务读取到另一个事务还没有提交的数据   |
+| **不可重复读** | 一个事务先后读取同一条数据，但两次读取的数据不同，称为不可重复读 |
+| **幻读** | 一个事务按照条件查询数据时，没有对应的数据，但是在插入数据时，又发现这行数据已经存在了，好像出现了“幻影” |
+
+<a id="transaction-isolation"></a>
 ### 事务隔离级别
+
+* MySQL数据库的默认隔离级别是**Repeatable Read**
+* Oracle数据库的默认隔离级别是**Read Committed**
+
+| 隔离级别    | 脏读    | 不可重复读    | 幻读    |
+|---------------- | --------------- | --------------- | --------------- |
+| **Read Uncommitted**    | √    | √    | √    |
+| **Read Committed**    | ×   | √   | √   |
+| **Repeatable Read(默认)**  | ×   | ×   | √   |
+| **Serializable** | ×   | ×   | ×   |
+
+```sql
+-- 查看事务隔离级别
+SELECT @@TRANSACTION_ISOLATION;
+
+-- 设置事务隔离级别，SESSION当前会话内有效，GLOBAL全局有效
+SET [SESSION|GLOBAL] TRANSACTION ISOLATION LEVEL { READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SERIALIZABLE };
+```
+
+#### 示例
+
+<a id="transaction-isolation-demo-sql"></a>
+* 准备SQL
+
+```sql
+CREATE TABLE account(
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    name VARCHAR(10) COMMENT '姓名',
+    money INT COMMENT '余额'
+) COMMENT '账户表';
+
+INSERT INTO account VALUES (NULL, '张三', 2000), (NULL, '李四', 2000);
+```
+
+##### 脏读问题
+
+* 准备<a href="#transaction-isolation-demo-sql">SQL</a>或重置数据：
+`UPDATE account SET money = 2000 WHERE name = '张三' OR name = '李四';`
+* 将事务隔离级别设置为`READ UNCOMMITTED`
+* 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
+* 以下左边为**session1**，右边为**session2**
+
+<div style="display: flex;">
+    <pre style="flex: 1;margin: 0 2px 0 0;">
+        <code>
+-- 使用指定的数据库
+USE db_name;</br>
+-- 设置事务隔离级别为READ UNCOMMITTED
+SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;</br>
+-- 以下操作按左右框内的序号执行</br>
+-- 1.开启事务
+START TRANSACTION;</br>
+-- 3.查询账户表，此时张三的余额是2000
+SELECT * FROM account;</br>
+-- 5.此时再查询账户表，张三的余额为1000，这就出现了脏读
+SELECT * FROM account;</br>
+-- 提交事务
+COMMIT;
+        </code>
+    </pre>
+    <pre style="flex: 1;margin: 0 0 0 2px;">
+        <code>
+-- 使用指定的数据库
+USE db_name;</br>
+-- 以下操作按左右框内的序号执行</br>
+-- 2.开启事务
+START TRANSACTION;</br>
+-- 4.张三余额扣除1000元
+UPDATE account SET money = money - 1000 WHERE name = '张三';</br>
+-- 提交事务
+COMMIT;
+        </code>
+    </pre>
+</div>
+
+* 以上问题可以将事务隔离级别设置为`READ COMMITTED`及以上级别解决
+    * `SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;`
+
+##### 不可重复读问题
+
+* 准备<a href="#transaction-isolation-demo-sql">SQL</a>或重置数据：
+`UPDATE account SET money = 2000 WHERE name = '张三' OR name = '李四';`
+* 将事务隔离级别设置为`READ COMMITTED`
+* 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
+* 以下左边为**session1**，右边为**session2**
+
+<div style="display: flex;">
+    <pre style="flex: 1;margin: 0 2px 0 0;">
+        <code>
+-- 使用指定的数据库
+USE db_name;</br>
+-- 设置事务隔离级别为READ COMMITTED
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;</br>
+-- 以下操作按左右框内的序号执行</br>
+-- 1.开启事务
+START TRANSACTION;</br>
+-- 3.查询账户表，此时张三的余额是2000
+SELECT * FROM account;</br>
+-- 6.此时再查询账户表，张三的余额为1000，这就出现了不可重复读
+SELECT * FROM account;</br>
+-- 提交事务
+COMMIT;
+        </code>
+    </pre>
+    <pre style="flex: 1;margin: 0 0 0 2px;">
+        <code>
+-- 使用指定的数据库
+USE db_name;</br>
+-- 以下操作按左右框内的序号执行</br>
+-- 2.开启事务
+START TRANSACTION;</br>
+-- 4.张三余额扣除1000元
+UPDATE account SET money = money - 1000 WHERE name = '张三';</br>
+-- 5.提交事务
+COMMIT;
+        </code>
+    </pre>
+</div>
+
+* 以上问题可以将事务隔离级别设置为`REPEATABLE READ`及以上级别解决
+    * `SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;`
+
+##### 幻读问题
+
+* 准备<a href="#transaction-isolation-demo-sql">SQL</a>或重置数据：
+`DELETE FROM account WHERE id <> 1 AND id <> 2;`
+* 将事务隔离级别设置为`REPEATABLE READ`
+* 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
+* 以下左边为**session1**，右边为**session2**
+
+<div style="display: flex;">
+    <pre style="flex: 1;margin: 0 2px 0 0;">
+        <code>
+-- 使用指定的数据库
+use db_name;</br>
+-- 设置事务隔离级别为REPEATABLE READ
+SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;</br>
+-- 以下操作按左右框内的序号执行</br>
+-- 1.开启事务
+START TRANSACTION;</br>
+-- 3.查询账户表，此时表内没有id为3的账户
+SELECT * FROM account WHERE id = 3;</br>
+-- 6.此时新增一个id为3的账户就会出现id重复的错误
+INSERT INTO account (id, name, money) VALUES (3, '王五1', 2000);</br>
+-- 7.但是根据id为3的条件还是无法查询到数据，这就是幻读
+SELECT * FROM account WHERE id = 3;</br>
+-- 提交事务
+COMMIT;
+        </code>
+    </pre>
+    <pre style="flex: 1;margin: 0 0 0 2px;">
+        <code>
+-- 使用指定的数据库
+USE db_name;</br>
+-- 以下操作按左右框内的序号执行</br>
+-- 2.开启事务
+START TRANSACTION;</br>
+-- 4.新增一条id为3的账户
+INSERT INTO account (id, name, money) VALUES (3, '王五', 1000);</br>
+-- 5.提交事务
+COMMIT;
+        </code>
+    </pre>
+</div>
+
+* 以上问题可以将事务隔离级别设置为`SERIALIZABLE`及以上级别解决
+    * `SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;`
+* `SERIALIZABLE`隔离级别下，**后开启的事务**会等**先开启的事务**执行完成后才能执行，
+会出现执行SQL卡住的问题
 
 ---
 
@@ -963,25 +1144,6 @@ ROLLBACK;
 不设置的话创建的表就是mysql的默认编码，
 mysql的默认编码是Latin1，可以在mysql目录下的my.ini文件里添加`character-set-server=utf8`
 建议在创建表的时候加默认编码
-
-
-### 事务
-
-* **要么都成功，要么都失败**
-* 事务原则：ACID原则 原子性、一致性、隔离性、持久性 （脏读、幻读、不可重复读）
-* 原子性（Atomicity）
-    * 要么都成功，要么都失败
-* 一致性（Consistency）
-    * 事务前后的数据完整性要保证一致
-* 持久性（Durability）
-    * 事务一旦提交就不可逆，被持久化到数据库内
-* 隔离性（Isolation）
-    * 事务的隔离性是多个用户并发访问数据库时，数据库为每一个用户开启的事务，不能被其他事务操作数据所干扰，多个事务之间要相互隔离
-    * 隔离所导致的问题‘
-        * 脏读：指一个事务读取到了另一个事务未提交的数据
-        * 不可重复读：在一个事务内读取表中的某一行数据，多次读取的结果不同。（这不是错误，只是某些场合不对）
-        * 幻读：指一个事务读取到了另一个事务所插入的数据，导致前后读取不一致
-        
 
 ### 索引
 * mysql官方对索引的定义：索引（index）是帮助mysql高效获取数据的数据结构
