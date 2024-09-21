@@ -298,6 +298,8 @@ public class ThreadMethodsTest {
 }
 ```
 
+---
+
 ## 线程的生命周期
 
 ### JDK1.5之前
@@ -489,6 +491,191 @@ public class ThreadLifecycleTest {
 ```
 
 ---
+
+## 线程安全问题
+
+* 当我们使用多个线程访问**同一资源**（可以是同一变量，同一个文件，同一条记录等）的时候，
+若多个线程只有**读操作**，那么不会发生线程安全问题。但是如果多个线程对资源有**读和写**操作，
+就容易出现线程安全问题
+
+### 模拟三个窗口同时出售票
+
+* 此时就会出现票重复出售的问题
+
+```java
+Runnable runnable = new Runnable() {
+    private int tickets = 100;
+
+    @Override
+    public void run() {
+        while(true){
+            if (tickets > 0){
+                System.out.println(Thread.currentThread().getName() + "售出一张票，剩余：" + tickets);
+                tickets--;
+            }else {
+                break;
+            }
+        }
+    }
+};
+
+Thread window1 = new Thread(runnable, "窗口1");
+Thread window2 = new Thread(runnable, "窗口2");
+Thread window3 = new Thread(runnable, "窗口3");
+
+window1.start();
+window2.start();
+window3.start();
+```
+
+### synchronized同步代码块
+
+* 格式
+
+```java
+synchronized(同步监视器){
+    // 需要被同步的代码
+}
+```
+
+* 需要被同步的代码就是需要操作共享数据的代码
+* 需要被同步的代码，在被`synchronized`包裹后，就使得一个线程再操作这些代码的过程中，其他线程必须等待
+* 同步监视器（锁）。哪个线程获得了锁，哪个线程就能执行需要被同步的代码
+* 同步监视器可以使用任何一个类的对象来充当，但是多个线程必须共用一个同步监视器
+* 在实现`Runnable`接口的方式中，同步监视器可以考虑使用`this`
+* 在继承`Thread`类的方式中，慎用`this`作为同步监视器，可以使用`当前类.class`对象
+
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_safe/synchronized_block/SynchronizedBlockTest.java)
+
+```java
+/**
+ * 用实现Runnable接口的方式实现synchronized同步代码块解决重复卖票问题
+ */
+public static void testSynchronizedBlockWhitRunnable() {
+    System.out.println("runnable接口方式");
+    Runnable runnable = new Runnable() {
+        private int tickets = 1000;
+
+        private Object lock = new Object();
+
+        @Override
+        public void run() {
+            while(true){
+                // 这里可以使用this当同步监视器
+                synchronized (lock){
+                    if (tickets > 0){
+                        System.out.println(Thread.currentThread().getName() + "售出一张票，剩余：" + tickets);
+                        tickets--;
+                    }else {
+                        break;
+                    }
+                }
+            }
+        }
+    };
+
+    Thread window1 = new Thread(runnable, "窗口1");
+    Thread window2 = new Thread(runnable, "窗口2");
+    Thread window3 = new Thread(runnable, "窗口3");
+
+    window1.start();
+    window2.start();
+    window3.start();
+
+}
+/**
+ * 用继承Thread类的方式实现synchronized同步代码块解决重复卖票问题
+ */
+public static void testSynchronizedBlockWhitThread() {
+
+    System.out.println("继承Thread类方式");
+    TicketWindow w1 = new TicketWindow();
+    TicketWindow w2 = new TicketWindow();
+    TicketWindow w3 = new TicketWindow();
+    w1.setName("窗口1");
+    w2.setName("窗口2");
+    w3.setName("窗口3");
+
+    w1.start();
+    w2.start();
+    w3.start();
+}
+```
+
+### 同步方法
+
+* 如果操作共享数据的代码完整的声明在一个方法中，那这个方法就可以声明为同步方法
+* 格式
+
+```java
+public synchronized void methodName(){
+    // 需要被同步的代码
+}
+```
+
+* 非静态的同步方法，默认的同步监视器是`this`
+* 静态的同步方法，默认的同步监视器是`当前类.class`
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_safe/synchronized_method/SynchronizedMethodTest.java)
+
+```java
+/**
+ * 用实现Runnable接口的方式实现同步方法解决重复卖票问题
+ */
+public static void testSynchronizedMethodWhitRunnable() {
+    System.out.println("runnable接口方式");
+    Runnable runnable = new Runnable() {
+        private int tickets = 1000;
+
+        public synchronized void sale(){
+            if (tickets > 0){
+                System.out.println(Thread.currentThread().getName() + "售出一张票，剩余：" + tickets);
+                tickets--;
+            }
+        }
+
+        @Override
+        public void run() {
+            while(true){
+                this.sale();
+            }
+        }
+    };
+
+    Thread window1 = new Thread(runnable, "窗口1");
+    Thread window2 = new Thread(runnable, "窗口2");
+    Thread window3 = new Thread(runnable, "窗口3");
+
+    window1.start();
+    window2.start();
+    window3.start();
+
+}
+
+/**
+ * 用继承Thread类的方式实现方法解决重复卖票问题
+ */
+public static void testSynchronizedMethodWhitThread() {
+
+    System.out.println("继承Thread类方式");
+    TicketWindow w1 = new TicketWindow();
+    TicketWindow w2 = new TicketWindow();
+    TicketWindow w3 = new TicketWindow();
+    w1.setName("窗口1");
+    w2.setName("窗口2");
+    w3.setName("窗口3");
+
+    w1.start();
+    w2.start();
+    w3.start();
+}
+```
+
+
+
+---
+
 
 ## JUC
 
