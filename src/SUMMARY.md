@@ -29,6 +29,7 @@
         * [Spring MVC](java/framework/spring-mvc/index.md)
         * [Mybatis](java/framework/mybatis/index.md)
         * [Spring Security](java/framework/spring-security/index.md)
+        * [Spring Cloud](java/framework/spring-cloud/index.md)
         * [Shiro](java/framework/shiro/index.md)
         * [RabbitMQ](java/framework/rabbitmq/index.md)
         * [Netty](java/framework/netty/index.md)
