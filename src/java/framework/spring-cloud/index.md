@@ -52,12 +52,30 @@ select * from t_pay;
 <pre>
     <code>
 <a href="#parent">spring-cloud-demo</a>
-├─<a href="#submodule-code-generator">code-generator</a>
+│
+├─<a href="#submodule-code-generator">code-generator</a> # 代码生成器子模块
 │  ├─src/main/java/cn.y.demo
 │  │  └─<a href="#submodule-code-generator-main-java">Main.java</a>
 │  ├─src/main/resources
 │  │  └─<a href="#submodule-code-generator-resources-config-properties">config.properties</a>
 │  └─<a href="#submodule-code-generator-pom-xml">pom.xml</a>
+│
+├─<a href="#submodule-cloud-api-commons">cloud-api-commons</a> # 通用API子模块
+│  ├─src/main/java/cn.y.demo
+│  │  ├─exceptions
+│  │  │  └─<a href="#submodule-cloud-api-commons-global-exception-handler">GlobalExceptionHandler.java</a>
+│  │  └─exceptions
+│  │     ├─<a href="#submodule-cloud-api-commons-result-data">ResultData.java</a>
+│  │     └─<a href="#submodule-cloud-api-commons-return-code-enum">ReturnCodeEnum.java</a>
+│  └─<a href="#submodule-cloud-api-commons-pom-xml">pom.xml</a>
+│
+├─<a href="#submodule-cloud-provider-payment">cloud-provider-payment</a> # 微服务子模块
+│  ├─src/main/java/cn.y.demo
+│  │  ├─<a href="#submodule-cloud-provider-payment-provider-payment">ProviderPayment.java</a>
+│  ├─src/main/resources
+│  │  └─<a href="#submodule-cloud-provider-payment-resources-application-yaml">application.yaml</a>
+│  └─<a href="#submodule-cloud-provider-payment-pom-xml">pom.xml</a>
+│
 ├─<a href="#parent-gitignore">.gitignore</a>
 └─<a href="#parent-pom-xml">pom.xml</a>
     </code>
@@ -238,7 +256,7 @@ code-generator/src/main/resources/config.properties
 <a id="submodule-code-generator"></a>
 ### 创建代码生成器子模块
 
-1. 邮件父模块文件夹 > New > Module
+1. 右键父模块文件夹 > New > Module
 2. New Module弹框和<a href="#new-project-panel">New Project</a>弹框类似，修改名称即可
     * 在idea内新建模块会自动在父项目的`pom.xml`内生成子模块配置，如果没用则添加`modules`标签即可
 <a id="submodule-code-generator-pom-xml"></a>
@@ -371,6 +389,359 @@ public class Main {
                             .enableRestStyle();
                 })
                 .execute();
+    }
+}
+```
+
+<a id="submodule-cloud-api-commons"></a>
+### 创建通用API子模块
+
+1. 右键父模块文件夹 > New > Module
+2. New Module弹框和<a href="#new-project-panel">New Project</a>弹框类似，修改名称即可
+<a id="submodule-cloud-api-commons-pom-xml"></a>
+3. 修改`pom.xml`文件
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.y.demo</groupId>
+        <artifactId>spring-cloud-demo</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>cloud-api-commons</artifactId>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+</project>
+```
+4. 在**src/main/java**目录下新建包名**cn.y.demo**
+5. 在**cn.y.demo**目录下新建**resp**文件夹并添加`ResultData.java`文件和`ReturnCodeEnum.java`文件
+
+<a id="submodule-cloud-api-commons-result-data"></a>
+**ResultData.java**
+
+```java
+package cn.y.demo.resp;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+@Data
+@Accessors(chain = true)
+public class ResultData<T> {
+
+    private String code;
+
+    private String message;
+
+    private T data;
+
+    private long timestamp;
+
+    public ResultData() {
+        this.timestamp = System.currentTimeMillis();
+    }
+
+    public static <T> ResultData<T> success(T data) {
+        return new ResultData<T>()
+                .setCode(ReturnCodeEnum.RC200.getCode())
+                .setMessage(ReturnCodeEnum.RC200.getMessage())
+                .setData(data);
+    }
+
+    public static <T> ResultData<T> fail(String code, String message) {
+        return new ResultData<T>()
+                .setCode(code)
+                .setMessage(message)
+                .setData(null);
+    }
+
+}
+```
+
+<a id="submodule-cloud-api-commons-return-code-enum"></a>
+**ReturnCodeEnum.java**
+
+```java
+package cn.y.demo.resp;
+
+import lombok.Getter;
+
+import java.util.stream.Stream;
+
+@Getter
+public enum ReturnCodeEnum {
+
+    RC999("999", "操作失败"),
+    RC200("200", "操作成功"),
+    RC400("400", "请求错误"),
+    RC500("500", "服务员异常");
+
+
+    private String code;
+
+    private String message;
+
+    ReturnCodeEnum(String code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    public static ReturnCodeEnum getReturnCodeEnum(String code){
+        return Stream.of(values()).filter(v -> v.getCode().equals(code)).findFirst().orElse(null);
+    }
+}
+```
+
+<a id="submodule-cloud-api-commons-global-exception-handler"></a>
+6. 在**cn.y.demo**目录下新建**exceptions**文件夹并添加`GlobalExceptionHandler.java`文件
+
+```java
+package cn.y.demo.exceptions;
+
+import cn.y.demo.resp.ResultData;
+import cn.y.demo.resp.ReturnCodeEnum;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResultData<String> exception(Exception e){
+        log.error("全局异常信息{}", e.getMessage(), e);
+        return ResultData.fail(ReturnCodeEnum.RC500.getCode(), e.getMessage());
+    }
+}
+```
+
+<a id="submodule-cloud-provider-payment"></a>
+### 创建微服务子模块
+
+1. 右键父模块文件夹 > New > Module
+2. New Module弹框和<a href="#new-project-panel">New Project</a>弹框类似，修改名称即可
+<a id="submodule-cloud-provider-payment-pom-xml"></a>
+3. 修改`pom.xml`文件
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.y.demo</groupId>
+        <artifactId>spring-cloud-demo</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>cloud-provider-payment01</artifactId>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${swagger3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>${fastjson2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring.boot.test.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>cn.y.demo</groupId>
+            <artifactId>cloud-api-commons</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+<a id="submodule-cloud-provider-payment-resources-application-yaml"></a>
+4. 添加`application.yaml`文件
+
+```yaml
+server:
+  port: 8001
+spring:
+  application:
+    name: cloud-payment-service
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/clouddb?useUnicode=true&characterEncoding=UTF-8&nullCatalogMeansCurrent=true&useSSL=false&serverTimezone=GMT%2B8
+    username: 用户名
+    password: 密码
+
+mybatis-plus:
+  type-aliases-package: cn.y.demo.entity
+  configuration:
+    map-underscore-to-camel-case: true
+```
+
+<a id="submodule-cloud-provider-payment-provider-payment"></a>
+5. 在**src/main/java**目录下新建包名**cn.y.demo**并添加`ProviderPayment.java`文件
+
+```java
+package cn.y.demo;
+
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+@MapperScan("cn.y.demo.mapper")
+public class ProviderPayment {
+    public static void main(String[] args) {
+        SpringApplication.run(ProviderPayment.class, args);
+    }
+}
+```
+
+6. 最后使用<a href="#submodule-code-generator">code-generator</a>生成表结构代码放进项目内即可
+
+## Consul(服务注册与发现)
+
+* 服务发现，分布式配置管理
+
+### 安装
+
+> 以windows下安装为例
+
+* [官网下载](https://developer.hashicorp.com/consul/install#windows) 
+* 使用`scoop`包管理器直接安装：`scoop install consul`
+
+### 使用
+
+* 运行`consul agent -dev`
+* 打开Consul首页：__http://localhost:8500__
+
+#### 配置微服务模块加入Consul
+
+1. 添加`pom.xml`内依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+</dependency>
+```
+
+2. 添加`application.yaml`配置
+
+```yaml
+spring:
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery: # 开启端口
+        heartbeat:
+          enabled: true
+```
+
+3. 主启动内添加`@EnableDiscoveryClient`
+
+```java
+@EnableDiscoveryClient
+@SpringBootApplication
+@MapperScan("cn.y.demo.mapper")
+public class ProviderPayment01 {
+    public static void main(String[] args) {
+        SpringApplication.run(ProviderPayment01.class, args);
     }
 }
 ```
