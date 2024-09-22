@@ -672,6 +672,241 @@ public static void testSynchronizedMethodWhitThread() {
 }
 ```
 
+---
+
+## 线程同步机制
+
+### 单例模式的线程安全问题
+
+* **饿汉式**不存在线程安全问题，主要说明**懒汉式**
+
+#### 懒汉式线程安全问题
+
+* 如果获取实例的方法内部有耗时操作，此时多个线程进入这个方法时都会进入为空判断，
+卡在耗时操作处，最后创建多个实例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_safe/singleton/SingletonTest.java)
+
+* 单例类
+
+```java
+public class SingletonObj {
+
+    private SingletonObj(){}
+
+    private static SingletonObj instance;
+
+    public static SingletonObj getInstance(){
+        if(instance == null){
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            instance = new SingletonObj();
+        }
+
+        return instance;
+    }
+}
+```
+
+* 测试
+
+```java
+/**
+ * 测试懒汉式线程安全问题
+ */
+@Test
+public void testSingletonNotSafe() {
+    SingletonObj[] singletonObjs = new SingletonObj[2];
+
+    Thread thread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            singletonObjs[0] = SingletonObj.getInstance();
+        }
+    });
+    thread.start();
+
+    singletonObjs[1] = SingletonObj.getInstance();
+
+
+    // 等待子线程执行完
+    try {
+        thread.join();
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+    // 判断子线程和主线程创建的两个对象是否相同
+    System.out.println(Arrays.toString(singletonObjs));
+    System.out.println(singletonObjs[0] == singletonObjs[1]);
+}
+```
+
+#### 解决懒汉式线程安全问题的方式
+
+##### 同步方法
+
+* 直接将获取实例的方法声明为同步方法
+* 这种方式效率较低
+
+
+##### 双重检测锁
+
+* 这种方式就是细化同步代码块，使同步代码块只包裹到需要同步的代码
+* 进入方法时先判断实例是否为空，有则直接返回，没有才进入同步代码块
+* 进入同步代码块内再判断一次实例是否为空，以防有线程已经过了第一道检测等在同步代码块外面
+* 相比同步方法提高了效率
+* 使用这种方式需要在实例属性上添加`volatile`关键字，防止**指令重排**
+    * 创建对象时在JVM层面会执行多个步骤，有可能对象已经实例化，但没执行`init`方法，
+    这样获取到的对象就有问题，所以需要添加`volatile`关键字将创建对象的步骤原子化
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_safe/singleton/SingletonTest.java)
+
+* 单例类
+
+```java
+public class SingletonObjDCL {
+
+    private SingletonObjDCL() {
+    }
+
+    /*
+    这里需要加上volatile关键字
+    创建对象时在JVM层面会执行多个步骤，有可能对象已经实例化，但没执行<init>方法
+    这样获取到的对象就有问题，所以需要添加volatile关键字将创建对象的步骤原子化
+     */
+    private static volatile SingletonObjDCL instance;
+
+    public static synchronized SingletonObjDCL getInstance() {
+        if (instance == null) {
+            synchronized (SingletonObjDCL.class) {
+                if (instance == null) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    instance = new SingletonObjDCL();
+                }
+            }
+        }
+
+        return instance;
+    }
+}
+```
+
+### 死锁
+
+* 不同的线程分别占用对方需要的同步资源不放弃，都在等待对方放弃自己需要的同步资源，
+就形成了线程的死锁
+* 一旦出现了死锁，整个程序既不会发生异常，也不会给出任何提示，只是所有线程处于阻塞状态，无法继续
+
+#### 诱发死锁的原因以及解决方式
+
+* 这4个条件同时出现就会触发死锁：**互斥条件**，**占用且等待**，**不可抢夺**，**循环等待**
+* 解决方式：
+    * **互斥条件**：基本上无法破坏
+    * **占用且等待**：考虑一次性申请所有需要的资源，就不用等待
+    * **不可抢夺**：已经占用了部分资源再申请另一部分资源时，如果申请不到就主动释放已经占用的资源
+    * **循环等待**：考虑将申请资源改为线性顺序
+
+#### 死锁代码示例
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_safe/deadlock/DeadLockTest.java)
+
+```java
+public class DeadLockTest {
+
+    private static void sleep(long millis){
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void main(String[] args) {
+
+        Object[] locks = new Object[]{new Object(), new Object()};
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (locks[0]){
+                    sleep(100); // 模拟耗时操作
+                    synchronized (locks[1]){
+                        System.out.println(Thread.currentThread().getName() + "执行");
+                    }
+                }
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (locks[1]){
+                    sleep(100); // 模拟耗时操作
+                    synchronized (locks[0]){
+                        System.out.println(Thread.currentThread().getName() + "执行");
+                    }
+                }
+            }
+        }).start();
+
+    }
+}
+```
+
+### Lock使用（jdk5新增）
+
+* 创建Lock实例
+* 执行`lock()`方法，锁定对共享资源的调用
+* `unlock()`方法，释放对共享资源的锁定
+* 通常配合`try-finally`结构使用
+
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_safe/lock/LockTest.java)
+
+```java
+public static void main(String[] args) {
+
+    ReentrantLock lock = new ReentrantLock();
+    Runnable runnable = new Runnable() {
+        private int tickets = 100;
+
+        @Override
+        public void run() {
+            while(true){
+                try{
+                    lock.lock();
+                    if (tickets > 0){
+                        System.out.println(Thread.currentThread().getName() + "售出一张票，剩余：" + tickets);
+                        tickets--;
+                    }else {
+                        break;
+                    }
+                }finally {
+                    lock.unlock();
+                }
+            }
+        }
+    };
+
+    Thread window1 = new Thread(runnable, "窗口1");
+    Thread window2 = new Thread(runnable, "窗口2");
+    Thread window3 = new Thread(runnable, "窗口3");
+
+    window1.start();
+    window2.start();
+    window3.start();
+}
+```
+
+
+
 
 
 ---
