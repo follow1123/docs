@@ -1,5 +1,36 @@
 # 多线程
 
+## 目录
+
+1. <a href="#introduction-threads">程序、进程和线程</a>
+2. <a href="#creation-methods">Java内创建和使用线程</a>
+    1. <a href="#method-extend-thread">继承Thread类</a>
+    2. <a href="#method-impl-runnable">实现Runnable接口</a>
+    3. <a href="#method-impl-callable">实现Callable(jdk5新增)</a>
+    4. <a href="#method-use-thread-pool">使用线程池</a>
+    5. <a href="#method-difference">几种创建线程方式之间的区别</a>
+3. <a href="#thread-class">Thread类</a>
+4. <a href="#thread-lifecycle">线程的生命周期</a>
+    1. <a href="#thread-lifecycle-before-jdk5">JDK1.5之前</a>
+    2. <a href="#thread-lifecycle-after-jdk5">JDK1.5及之后</a>
+5. <a href="#thread-safe">线程安全问题</a>
+    1. <a href="#thread-safe-synchronized-block">synchronized同步代码块</a>
+    2. <a href="#thread-safe-sync-method">同步方法</a>
+6. <a href="#thread-sync-mechanism">线程同步机制</a>
+    1. <a href="#thread-sync-mechanism-singleton">单例模式的线程安全问题</a>
+        1. <a href="#thread-sync-mechanism-lazy">懒汉式线程安全问题</a>
+        2. <a href="#thread-sync-mechanism-lazy-solution">解决懒汉式线程安全问题的方式</a>
+            1. <a href="#thread-sync-mechanism-lazy-solution-sync-method">同步方法</a>
+            2. <a href="#thread-sync-mechanism-lazy-solution-dcl">双重检测锁</a>
+    2. <a href="#thread-sync-mechanism-dead-lock">死锁</a>
+    3. <a href="#thread-sync-mechanism-lock-class">Lock使用（jdk5新增）</a>
+7. <a href="#thread-communication">线程通信</a>
+    1. <a href="#thread-communication-wait-notify">等待唤醒机制</a>
+        1. <a href="#thread-communication-wait-notify-print-number">两个线程依次打印数字</a>
+        2. <a href="#thread-communication-wait-notify-producer-consumer">生产者消费者</a>
+8. <a href="#juc">JUC（之前整理的文档）</a>
+
+<a id="introduction-threads"></a>
 ## 程序、进程和线程
 
 * **程序（program）**：为完成特定的任务，用某种语言编写的一组指令的集合。及指**一段静态的代码**
@@ -30,6 +61,7 @@
 
 ---
 
+<a id="creation-methods"></a>
 ## Java内创建和使用线程
 
 * java语言的JVM运行程序运行多个线程，使用`java.lang.Thread`类代表**线程**，
@@ -37,6 +69,7 @@
 * 每个线程都是通过某个特定`Thread`对象的`run()`方法来完成操作的，因此`run()`方法称为线程执行体
 * 通过该`Thread`对象的`start()`方法来启动这个线程，而非直接调用`run()`
 
+<a id="method-extend-thread"></a>
 ### 继承Thread类
 
 * 继承`Thread`类并重写`run()`方法，实例化后调用`start()`方法
@@ -89,6 +122,7 @@ public static void main(String[] args) {
 }
 ```
 
+<a id="method-impl-runnable"></a>
 ### 实现Runnable接口
 
 * 实现`Runnable`接口并实现`run()`方法，在`new Thread()`时传入该对象
@@ -140,6 +174,109 @@ public static void main(String[] args) {
 }
 ```
 
+<a id="method-impl-callable"></a>
+### 实现Callable(jdk5新增)
+
+* `call()`方法可以有返回值，可以使用泛型指定返回值类型
+* `call()`方法可以抛出异常
+* 可以使用`FutureTask`内的`get()`方法获取线程执行的结果，这个操作会阻塞当前线程
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/creation_method/impl_callable/CallableTest.java)
+
+```java
+public static void main(String[] args) {
+
+    // 实现call方法
+    Callable callable = new Callable() {
+        @Override
+        public Object call() throws Exception {
+            int sum = 0;
+            for (int i = 1; i <= 100; i++) {
+                sum += i;
+            }
+            return sum;
+        }
+    };
+
+    // 创建FutureTask类包装Callable
+    FutureTask futureTask = new FutureTask(callable);
+
+    // 将futureTask传入Thread内
+    Thread thread = new Thread(futureTask);
+    thread.start();
+
+    try {
+        // 获取线程内执行的结果，这个操作会阻塞当前线程
+        Object o = futureTask.get();
+        System.out.println(o);
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    } catch (ExecutionException e) {
+        throw new RuntimeException(e);
+    }
+
+}
+```
+
+<a id="method-use-thread-pool"></a>
+### 使用线程池
+
+* 如果并发的线程数量很多，并且每个线程都执行一个时间很短的任务就结束了，
+这样频繁的创建线程就会大大降低系统的效率，因为频繁创建线程和销毁线程需要时间
+* 提前创建好多个线程，放入线程池中，使用时直接获取，使用完放回池中。可以避免频繁的创建销毁、
+实现重复利用
+
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/creation_method/thread_pool/ThreadPoolTest.java)
+
+```java
+public static void main(String[] args) {
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            for (int i = 0; i < 100; i++) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println(Thread.currentThread().getName() + "---" + i);
+            }
+        }
+    };
+
+    Runnable runnable1 = new Runnable() {
+        @Override
+        public void run() {
+            for (int i = 0; i < 100; i++) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println(Thread.currentThread().getName() + "---" + i);
+            }
+        }
+    };
+
+    // 创建线程池
+    ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+    // 设置线程池最大线程数量
+    pool.setMaximumPoolSize(16);
+
+    // 提交任务，实现Runnable接口的任务
+    pool.execute(runnable);
+    pool.execute(runnable1);
+
+    // 提交任务，实现Callable接口的任务
+    // pool.submit(callable)
+
+    // 关闭线程池
+    pool.shutdown();
+}
+```
+
+<a id="method-difference"></a>
 ### 几种创建线程方式之间的区别
 
 * 继承Thread类和实现Runnable接口的区别
@@ -150,6 +287,7 @@ public static void main(String[] args) {
     当使用继承的方式时，重写从`Runnable`接口内实现的`run()`方法，而当使用实现接口的方式时，
     `Thread`内部的`run()`方法就会调用`target`的`run()`方法，这种方法是代理模式
 
+<a id="thread-class"></a>
 ## Thread类
 
 * 构造器
@@ -300,8 +438,10 @@ public class ThreadMethodsTest {
 
 ---
 
+<a id="thread-lifecycle"></a>
 ## 线程的生命周期
 
+<a id="thread-lifecycle-before-jdk5"></a>
 ### JDK1.5之前
 
 * 线程的生命周期有5种状态：**新建（New）**、**就绪（Runnable）**、**运行（Running）**、
@@ -309,6 +449,7 @@ public class ThreadMethodsTest {
 
 ![jdk1.5前的线程生命周期](./assets/Snipaste_2024-09-19_16-46-46.png)
 
+<a id="thread-lifecycle-after-jdk5"></a>
 ### JDK1.5及之后
 
 * 六种状态，在`java.lang.Thread.State`的枚举类中定义
@@ -492,6 +633,7 @@ public class ThreadLifecycleTest {
 
 ---
 
+<a id="thread-safe"></a>
 ## 线程安全问题
 
 * 当我们使用多个线程访问**同一资源**（可以是同一变量，同一个文件，同一条记录等）的时候，
@@ -528,6 +670,7 @@ window2.start();
 window3.start();
 ```
 
+<a id="thread-safe-synchronized-block"></a>
 ### synchronized同步代码块
 
 * 格式
@@ -603,6 +746,7 @@ public static void testSynchronizedBlockWhitThread() {
 }
 ```
 
+<a id="thread-safe-sync-method"></a>
 ### 同步方法
 
 * 如果操作共享数据的代码完整的声明在一个方法中，那这个方法就可以声明为同步方法
@@ -674,12 +818,15 @@ public static void testSynchronizedMethodWhitThread() {
 
 ---
 
+<a id="thread-sync-mechanism"></a>
 ## 线程同步机制
 
+<a id="thread-sync-mechanism-singleton"></a>
 ### 单例模式的线程安全问题
 
 * **饿汉式**不存在线程安全问题，主要说明**懒汉式**
 
+<a id="thread-sync-mechanism-lazy"></a>
 #### 懒汉式线程安全问题
 
 * 如果获取实例的方法内部有耗时操作，此时多个线程进入这个方法时都会进入为空判断，
@@ -744,14 +891,16 @@ public void testSingletonNotSafe() {
 }
 ```
 
+<a id="thread-sync-mechanism-lazy-solution"></a>
 #### 解决懒汉式线程安全问题的方式
 
+<a id="thread-sync-mechanism-lazy-solution-sync-method"></a>
 ##### 同步方法
 
 * 直接将获取实例的方法声明为同步方法
 * 这种方式效率较低
 
-
+<a id="thread-sync-mechanism-lazy-solution-dcl"></a>
 ##### 双重检测锁
 
 * 这种方式就是细化同步代码块，使同步代码块只包裹到需要同步的代码
@@ -798,6 +947,7 @@ public class SingletonObjDCL {
 }
 ```
 
+<a id="thread-sync-mechanism-dead-lock"></a>
 ### 死锁
 
 * 不同的线程分别占用对方需要的同步资源不放弃，都在等待对方放弃自己需要的同步资源，
@@ -860,6 +1010,7 @@ public class DeadLockTest {
 }
 ```
 
+<a id="thread-sync-mechanism-lock-class"></a>
 ### Lock使用（jdk5新增）
 
 * 创建Lock实例
@@ -905,13 +1056,86 @@ public static void main(String[] args) {
 }
 ```
 
+---
+
+<a id="thread-communication"></a>
+## 线程通信
+
+当我们需要多个线程来共同完成一件任务，并且我们希望它们有规律的执行，那么多线程之间需要一些通信机制，
+可以协调它们的工作，以此实现多线程共同操作一份数据
 
 
+<a id="thread-communication-wait-notify"></a>
+### 等待唤醒机制
 
+* 在一个线程满足某个条件时，就会进入等待状态（`wait()/wait(time)`），
+等待其它线程执行完它们指定代码过后再将其唤醒（`notify()`）；或可以指定等待的时间，
+等时间到了自动唤醒；有多个线程进行等待时，如果需要，可以使用`notifyAll()`来唤醒所以的等待线程。
+**wait/notify**就是线程间的一种协作机制
+    * **wait()**：线程不再活动，不在参与调度，进入wait set中，因此不会浪费CPU资源，
+    也不会去竞争锁了，这时的线程状态是**WAITING**或**TIMED_WAITING**。它还要等着别的线程执行一个特别的动作，
+    即notify或等待时间到，在这个对象上等待的线程从wait set中释放出来，重新进入到调度队列ready queue中
+    * **notify()**：选取wait set中的一个线程释放
+    * **notifyAll()**：选取wait set中的所有线程释放
+    * 这三个方法的使用必须在同步代码块中使用
+    * 这三个方法的调用者必须是同步监视器（锁）
+* `wait()`和`sleep()`的区别
+    * `wait()`必须在同步代码块内使用，`sleep()`可以在任意位置使用
+    * `wait()`等待后会释放同步监视器（锁），`sleep()`睡眠后不会释放
+
+<a id="thread-communication-wait-notify-print-number"></a>
+#### 两个线程依次打印数字
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_communication/ThreadCommunicationTest.java)
+
+```java
+public static void main(String[] args) {
+
+    Runnable runnable = new Runnable() {
+        private int number = 1;
+
+        @Override
+        public void run() {
+            while(true){
+                synchronized (this) {
+                    notify(); //  唤醒等待中的线程
+                    if (number <= 100){
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        System.out.println(Thread.currentThread().getName() + "---" + number);
+                        number++;
+                        try {
+                            wait(); // 释放同步监视器（锁）并进入WAITING状态
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }else {
+                        break;
+                    }
+                }
+            }
+        }
+    };
+
+    Thread thread1 = new Thread(runnable, "线程1");
+    Thread thread2 = new Thread(runnable, "线程2");
+    thread1.start();
+    thread2.start();
+}
+```
+
+<a id="thread-communication-wait-notify-producer-consumer"></a>
+#### 生产者消费者
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_communication/producer_comsumer/ProducerConsumerTest.java)
 
 ---
 
 
+<a id="juc"></a>
 ## JUC
 
 ## 共享模型
