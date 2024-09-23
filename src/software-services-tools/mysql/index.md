@@ -1397,8 +1397,160 @@ b2 --> c6(1000, 1200)
 * 相对于Hash索引，B+Tree支持方位匹配及排序操作
 
 ## 索引分类
+
+| 分类    | 含义    | 特点    | 关键字    |
+|---------------- | --------------- | --------------- | --------------- |
+| 主键索引    | 针对表中主键创建的索引    | 默认自动创建，只能有一个    | PRIMARY    |
+| 唯一索引    | 避免同一个表中某数据列中的值重复   | 可以有多个   | UNIQUE   |
+| 常规索引   | 快速定位特定的数据   | 可以有多个   |    |
+| 全文索引 | 全文索引查找的是文本中的关键字，而不是比较索引中的值| 可以有多个 | FULLTEXT |
+
+* 在InnoDB存储引擎中，根据索引的存储形式，又可以分为以下两种
+
+| 分类    | 含义    | 特点    |
+|---------------- | --------------- | --------------- |
+| 聚集索引（Clustered Index）    | 将数据存储与索引放在一块，索引结构的叶子节点保存了行数据    | 必须又，而且只有一个    |
+| 二级索引（Secondary Index）    | 将数据与索引分开存储，索引结构的叶子节点关联的是对应的主键    | 可以存在多个    |
+
+* 聚集索引选取规则：
+    * 如果存在主键，主键索引就是聚集索引
+    * 如果不存在主键，将使用第一个唯一（UNIQUE）索引作为聚集索引
+    * 如果既没有主键，也没有唯一索引，则InnoDB会自动生成一个rowid作为隐藏的聚集索引
+
+### 回表查询
+
+* 有一张用户表`user`，表内有`id`、`name`两个字段
+    * 其中`id`字段是主键，也就是聚集索引
+    * `name`字段创建了索引，也就是二级索引
+* `SELECT * FROM user WHERE name = 'zs';`
+    * 这样一条sql会先走二级索引，找到`name`对应的`id`
+    * 再根据`id`走聚集索引，找到这行的数据
+    * 这个过程就叫**回表查询**
+
+### InnoDB主键索引的B+Tree高度和数据量直接的关系
+
+* 假设一行数据为1k，一页（默认大小为16k）可以存储16行这样的数据。InnoDB的指针占用6个字节，
+主键为bigint，占用8个字节
+* 如果树的高度为2
+    * 设一页可以存放的主键个数为n
+    * n * 8 + (n + 1) * 6 = 16 * 1024
+    * 可以得出n约为1170，所以一页（默认16k）可以存储1170个主键，和1171个指针
+    * 1171指针又指向1171个页
+    * 所以高度为2的B+Tree大约可以存储1171 * 16 = 18736条数据
+
 ## 索引语法
+
+```sql
+-- 创建索引，如果同时填写多个字段，则创建的索引为联合索引
+CREATE [UNIQUE | FULLTEXT] INDEX index_name ON table_name(col_name1, col_name2, ...);
+
+-- 查看索引
+SHOW INDEX FROM table_name;
+
+-- 删除索引
+DROP INDEX index_name ON table_name;
+```
+<a id="sql-performance-analysis"></a>
 ## SQL性能分析
+
+### SQL执行频率
+
+* MYSQL客户端连接成功后，通过`SHOW [SESSION | GLOBAL] STATUS`命令可以查询服务器状态信息
+* `SHOW GLOBAL STATUS LIKE 'Com_______';`查询全局所有INSERT、UPDATE、DELETE、SELECT的访问次数
+
+### 慢查询日志
+
+* 慢查询日志记录了所有执行时间超过指定参数（long_query_time，单位：秒，默认10秒）的所有SQL语句的日志
+* MySQL的慢查询日志默认没有开启，需要在MySQL的配置文件（/etc/my.cnf）中配置，
+使用`SHOW VARIABLES LIKE 'slow_query_log%';`查询慢查询日志相关配置
+
+```bash
+# 需要在这个标签下添加
+[mysqld]
+
+# 开启MySQL慢查询
+slow_query_log=1
+
+# 设置满日志的时间为2秒，SQL语句执行时间超过2秒，就会视为慢查询，记录慢查询日志
+long_query_time=2
+```
+
+* 配置完成后，重启MySQL服务
+* 使用`tail -f /var/lib/mysql/日志文件.log`监控日志文件
+* 使用`SELECT sleep(3);`测试
+
+### profile详情
+
+* show profile能够在做SQL优化时帮助我们了解时间都耗费在哪了
+
+```sql
+-- 查看当前MySQL是否支持profile操作
+SELECT @@have_profiling;
+
+-- 查看profile功能是否开启
+SELECT @@profiling;
+
+-- 开启profiling
+SET [SESSION | GLOBAL] profiling = 1;
+
+-- 查看每一条SQL的耗时基本情况
+SHOW PROFILES;
+
+-- 查看指定query_id的SQL语句各个阶段的耗时情况
+SHOW PROFILE FOR QUERY query_id;
+
+-- 查看指定query_id的SQL语句CPU的使用情况
+SHOW PROFILE CPU FOR QUERY query_id;
+```
+
+<a id="sql-performance-analysis-explain"></a>
+### explain执行计划
+
+* EXPLAIN或DESC命令获取MYSQL如何执行SELECT语句的信息，包括在SELECT语句执行过程中表如何连接的顺序
+
+```sql
+-- 直接在SELECT语句之间加上关键字EXLPAIN或DESC
+EXPLAIN SELECT 字段列表 FROM 表名 WHERE 条件
+```
+<a id="sql-performance-analysis-explain-fields"></a>
+### explain执行计划各字段含义
+
+| 字段   | 含义    |
+|--------------- | --------------- |
+| <a href="#sql-performance-analysis-explain-field-id">id</a>   | select查询的序号，   |
+| <a href="#sql-performance-analysis-explain-field-select-type">select_type</a> | 表示SELECT的类型，常见取值有SIMPLE、PRIMARY、UNION、SUBQUERY |
+| <a href="#sql-performance-analysis-explain-field-type">type</a> | 连接类型 |
+| possible_key | 显示可能应用在这张表上的索引，一个或多个 |
+| key | 实际使用的索引，如果为NULL，则没有使用索引 |
+| <a href="#sql-performance-analysis-explain-field-key-len">key_len</a> | 表示索引中使用的字节数 |
+| rows | MySQL认为必须要执行查询的行数，在InnoDB的表中，是一个估计值 |
+| filtered | 表示返回结果的行数占需读取行数的百分比，filtered的值越大越好 |
+
+<a id="sql-performance-analysis-explain-field-id"></a>
+#### id
+
+*  表示查询中执行的select子句或是操作表的顺序
+    * id相同，执行顺序从上到下
+    * id不同，值越大，越先执行
+
+<a id="sql-performance-analysis-explain-field-select-type"></a>
+#### select_type
+
+* **SIMPLE**：简单表，即不使用表连接或子查询
+* **PRIMARY**：主查询，即外层的查询
+* **UNION**：UNION中的第二个或者后面的查询语句
+* **SUBQUERY**：SELECT/WHERE之后包含了子查询
+
+<a id="sql-performance-analysis-explain-field-type"></a>
+#### type
+
+* 性能由好到差的连接类型为`NULL` `system` `const` `eq_ref` `ref` `range` `index` `all`
+
+<a id="sql-performance-analysis-explain-field-key-len"></a>
+#### key_len
+
+* 该值为索引字段最大可能长度，并非实际使用长度，在不损失精确性的前提下，长度越短越好
+
 ## 索引使用
 ## 索引设计原则
 
@@ -1412,66 +1564,6 @@ b2 --> c6(1000, 1200)
 不设置的话创建的表就是mysql的默认编码，
 mysql的默认编码是Latin1，可以在mysql目录下的my.ini文件里添加`character-set-server=utf8`
 建议在创建表的时候加默认编码
-
-### 索引
-* mysql官方对索引的定义：索引（index）是帮助mysql高效获取数据的数据结构
-* 提取句子的主干就可以得到索引的本质，索引就是数据结构
-* 索引的分类
-    * 主键索引（primary key）
-        * 唯一的表示，主键不可重复，只有一列能作为主键
-    * 唯一索引（unique key）
-        * 避免重复的列出现，唯一索引可以重复，多个列都可以标识为唯一索引
-    * 常规索引（key/index）
-        * 默认的，index获key关键字来修饰
-    * 全文索引（fulltext）
-        * 在特定数据库引擎才有（MYSIAM）
-        * 快速定位数据
-* 基础语法
-
-```sql
--- 索引的使用
--- 1、在创建表的时候给字段添加索引
--- 2、创建完毕后，再添加索引
-
--- 显示某个表内的所有的所有信息
-SHOW INDEX FROM 表名;
--- 方式一
--- 增加一个全文索引
-ALTER TABLE 表名 ADD FULLTEXT INDEX 索引名(列名);
--- EXPLAIN 分析sql执行的状况
-EXPLAIN SELECT * FROM 表名;
--- 设置了全文索引的分析语句
-EXPLAIN SELECT * FROM 表名 WHERE MATCH(列名) against(值);
--- 方式二
-CREATE INDEX 索引名 ON 表名(列名);
-```
-
-* 测试索引
-
-```sql
--- 查询航班预约表内电话号为767-867-1030的用户
--- 未添加索引 > 时间: 0.042s
-SELECT * FROM flightreservation WHERE Phone = '767-867-1030';
--- 未添加索引 分析查询行数57960行
-EXPLAIN SELECT * FROM flightreservation WHERE Phone = '767-867-1030';
--- 给该表内的phone字段添加索引
-CREATE INDEX flightreservation_Phone ON flightreservation(Phone);
--- 添加索引后 > 时间: 0s
-SELECT * FROM flightreservation WHERE Phone = '767-867-1030';
--- 添加索引后 分析查询行数6行
-EXPLAIN SELECT * FROM flightreservation WHERE Phone =  '767-867-1030';
-```
-
-* 索引原则
-    * 索引不是越多越好
-    * 经常变动的数据不要加索引
-    * 小数据量的表不需要加索引
-    * 索引一般加在常用来查询的字段上
-
-#### 索引的数据结构
-
-* Hash 类型
-* Btree INNODB 默认结构
 
 ### 备份
 
