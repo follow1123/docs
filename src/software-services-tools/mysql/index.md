@@ -1552,18 +1552,110 @@ EXPLAIN SELECT 字段列表 FROM 表名 WHERE 条件
 * 该值为索引字段最大可能长度，并非实际使用长度，在不损失精确性的前提下，长度越短越好
 
 ## 索引使用
+
+### 最左前缀法则
+
+* 如果索引了多列（联合索引），要遵守最左前缀法则，最左前缀法则指的是查询从索引的最左列开始，
+并且不跳过索引中的列，如果跳跃某一列，索引将部分失效（后面的字段索引失效）
+
+#### 测试
+
+```sql
+-- 创建表
+CREATE TABLE `app_user`(
+    `id` INT  NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `name` VARCHAR(50) DEFAULT '' COMMENT '用户名称',
+    `email` VARCHAR(50) NOT NULL COMMENT '邮箱',
+    `phone` VARCHAR(20) DEFAULT '' COMMENT '手机号',
+    `gender` TINYINT DEFAULT '0' COMMENT '性别（0-男  ： 1-女）',
+    `password` VARCHAR(100) NOT NULL COMMENT '密码',
+    `age` TINYINT DEFAULT '0' COMMENT '年龄',
+    `create_time` DATETIME DEFAULT NOW(),
+    `update_time` DATETIME DEFAULT NOW(),
+    PRIMARY KEY (`id`) 
+)COMMENT='用户表';
+
+INSERT INTO app_user (name,email,phone,gender,password,age,create_time,update_time) VALUES
+     ('用户0','2737973569qq.com','1839405813',1,'0f1a1342-7b3f-11ef-a986-0242ac110002',63,'2024-09-25 13:07:03','2024-09-25 13:07:03'),
+     ('用户1','2637298275qq.com','181494517358',1,'0f1a16df-7b3f-11ef-a986-0242ac110002',27,'2024-09-25 13:07:03','2024-09-25 13:07:03'),
+     ('用户2','21117464564qq.com','18227598531',1,'0f1a18c5-7b3f-11ef-a986-0242ac110002',81,'2024-09-25 13:07:03','2024-09-25 13:07:03');
+
+-- 添加联合索引
+CREATE index idx_name_age_email on app_user(name, age, email);
+
+-- 添加单列索引
+CREATE INDEX idx_phone ON app_user(phone);
+```
+
+* 此时`app_user`表内的`name`，`age`，`email`这三个字段组成了联合索引
+
+```sql
+-- 下面这三条SQL索引最左边的字段都在，都走了索引，索引长度在递减
+EXPLAIN SELECT * FROM app_user WHERE name = '用户1' AND age = 27 AND email = '2637298275qq.com';
+EXPLAIN SELECT * FROM app_user WHERE name = '用户1' AND age = 27;
+EXPLAIN SELECT * FROM app_user WHERE name = '用户1';
+
+-- 下面这两条SQL索引最左边的字段不在，没走索引，索引失效
+EXPLAIN SELECT * FROM app_user WHERE age = 27 AND email = '2637298275qq.com';
+EXPLAIN SELECT * FROM app_user WHERE age = 27;
+
+-- 下面这条SQL索引最左边的字段在，但跳过了一个字段，相当于只有name走了索引，email字段没走索引
+EXPLAIN SELECT * FROM app_user WHERE name = '用户1' AND email = '2637298275qq.com';
+
+-- 下面这条SQL的name条件在中间也走了索引，因为最左前缀法则和条件的位置没关系，只看索引最左边的字段是否存在
+EXPLAIN SELECT * FROM app_user WHERE age = 27 AND name = '用户1' AND email = '2637298275qq.com';
+```
+
+### 范围查询
+
+* 联合索引中，出现范围查询（>，<），范围查询右侧的索引列失效
+
+#### 测试
+
+```sql
+-- 使用范围查询的索引其后面的列的索引会失效，相当于只走了name和age的索引
+EXPLAIN SELECT * FROM app_user WHERE name = '用户1' AND age > 27 AND email = '2637298275qq.com';
+
+-- 在业务允许的情况下，范围的条件添加一个=可以避免这种情况
+EXPLAIN SELECT * FROM app_user WHERE name = '用户1' AND age >= 27 AND email = '2637298275qq.com';
+```
+
+### 索引失效的情况
+
+#### 索引列运算操作
+
+* 在索引列上进行运算操作，索引会失效
+
+```sql
+EXPLAIN select * FROM app_user WHERE phone = '181494517358';
+EXPLAIN SELECT * FROM app_user WHERE SUBSTR(phone, 9, 2) = '58';
+```
+
+#### 字符串不加引号
+
+* 字符串字段使用时，不加引号，索引会失效
+
+```sql
+EXPLAIN SELECT * FROM app_user WHERE phone = '181494517358';
+EXPLAIN SELECT * FROM app_user WHERE phone = 181494517358;
+```
+
+#### 模糊查询
+
+* 如果只是尾部模糊匹配，索引不会失效。如果是头部模糊匹配，索引失效
+
+```sql
+-- 索引不失效
+EXPLAIN SELECT * FROM app_user WHERE phone LIKE '18149451%';
+
+-- 索引失效
+EXPLAIN SELECT * FROM app_user WHERE phone LIKE '%94517358';
+```
+
+
 ## 索引设计原则
 
 ---
-
-        
-> 设置数据库表的字符集编码
-
-`charset=utf8`
-
-不设置的话创建的表就是mysql的默认编码，
-mysql的默认编码是Latin1，可以在mysql目录下的my.ini文件里添加`character-set-server=utf8`
-建议在创建表的时候加默认编码
 
 ### 备份
 
