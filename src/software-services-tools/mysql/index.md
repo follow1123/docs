@@ -1396,6 +1396,7 @@ b2 --> c6(1000, 1200)
 指针跟着减少，要同样白村大数据量，只能增加树的高度，导致性能降低
 * 相对于Hash索引，B+Tree支持方位匹配及排序操作
 
+<a id="index-classification"></a>
 ## 索引分类
 
 | 分类    | 含义    | 特点    | 关键字    |
@@ -1417,6 +1418,7 @@ b2 --> c6(1000, 1200)
     * 如果不存在主键，将使用第一个唯一（UNIQUE）索引作为聚集索引
     * 如果既没有主键，也没有唯一索引，则InnoDB会自动生成一个rowid作为隐藏的聚集索引
 
+<a id="index-classification-back-query"></a>
 ### 回表查询
 
 * 有一张用户表`user`，表内有`id`、`name`两个字段
@@ -1438,6 +1440,7 @@ b2 --> c6(1000, 1200)
     * 1171指针又指向1171个页
     * 所以高度为2的B+Tree大约可以存储1171 * 16 = 18736条数据
 
+<a id="index-syntax"></a>
 ## 索引语法
 
 ```sql
@@ -1450,6 +1453,7 @@ SHOW INDEX FROM table_name;
 -- 删除索引
 DROP INDEX index_name ON table_name;
 ```
+
 <a id="sql-performance-analysis"></a>
 ## SQL性能分析
 
@@ -1525,6 +1529,7 @@ EXPLAIN SELECT 字段列表 FROM 表名 WHERE 条件
 | <a href="#sql-performance-analysis-explain-field-key-len">key_len</a> | 表示索引中使用的字节数 |
 | rows | MySQL认为必须要执行查询的行数，在InnoDB的表中，是一个估计值 |
 | filtered | 表示返回结果的行数占需读取行数的百分比，filtered的值越大越好 |
+| <a href="#sql-performance-analysis-explain-field-extra">extra</a> | 表示是否用到了索引，查询的列是否被索引覆盖 |
 
 <a id="sql-performance-analysis-explain-field-id"></a>
 #### id
@@ -1551,6 +1556,16 @@ EXPLAIN SELECT 字段列表 FROM 表名 WHERE 条件
 
 * 该值为索引字段最大可能长度，并非实际使用长度，在不损失精确性的前提下，长度越短越好
 
+<a id="sql-performance-analysis-explain-field-extra"></a>
+#### extra
+
+* **null**：使用了索引，但是查询的列未被索引覆盖
+* **using index**：使用了索引，查询的列都被索引覆盖，不需要回表查询
+* **using where;using index**：查询条件不是联合索引的最左列，但是查询的列被联合索引覆盖到了，用到了联合索引
+* **using where**：用到的索引不是联合索引最左边的字段
+* **using index condition**：使用了索引，但是需要<a href="#index-classification-back-query">回表查询</a>数据
+
+<a id="index-useage"></a>
 ## 索引使用
 
 ### 最左前缀法则
@@ -1652,8 +1667,132 @@ EXPLAIN SELECT * FROM app_user WHERE phone LIKE '18149451%';
 EXPLAIN SELECT * FROM app_user WHERE phone LIKE '%94517358';
 ```
 
+#### or连接的条件
+
+* 用or分割开的条件，如果or两边条件中的如果一侧有索引，另一侧没有索引，
+那么涉及到的索引都不会被用到
+
+```sql
+-- 因为age字段没有索引，以下SQL都不会用到索引
+EXPLAIN SELECT * FROM app_user WHERE id = 1 OR age = 63;
+EXPLAIN SELECT * FROM app_user WHERE id = 1 OR age = 63 ;
+EXPLAIN SELECT * FROM app_user WHERE phone = '1839405813' OR age = 63;
+```
+
+#### 数据分布影响
+
+* 如果MySQL评估使用索引比全表更慢，则不使用索引
+
+```sql
+-- 给age字段添加索引后，查询年龄大于20岁的用户，因为数据库内大部分数据年龄都大于20岁，所以没有走索引
+explain SELECT * from app_user where age > 20;
+
+-- 年龄大于90岁的很少，所以需要走索引
+explain SELECT * from app_user where age > 90;
+```
+
+### SQL提示
+
+* SQL提示，是优化数据库的一个重要的手段，就是在SQL语句中加入一些人为的提示来达到优化操作的目的
+
+```sql
+-- 给name字段单独添加一个索引，此时name字段有一个单列索引，还有一个联合索引
+CREATE INDEX idx_name ON app_user(name);
+
+-- 在使用name单独查询时，分析中possible_key有联合索引和单列索引，但实际用的是联合索引
+EXPLAIN SELECT * FROM app_user WHERE name = '用户1';
+
+-- 建议MySQL使用name字段的单列索引
+EXPLAIN SELECT * FROM app_user USE INDEX(idx_name) WHERE name = '用户1';
+
+-- 建议MySQL忽略name字段的联合索引，此时possible_key就只有单列索引
+EXPLAIN SELECT * FROM app_user IGNORE INDEX(idx_name_age_email) WHERE name = '用户1';
+
+-- 强制MySQL使用指定的索引
+EXPLAIN SELECT * FROM app_user FORCE INDEX(idx_name_age_email) WHERE name = '用户1';
+```
+
+### 覆盖索引
+
+* 尽量使用覆盖索引（查询使用了索引，并且需要返回的列，在该索引中已经全部能找到），减少`select *`
+* explain时，<a href="#sql-performance-analysis-explain-field-extra">extra字段出现的内容</a>
+
+```sql
+-- 删除多余的索引，只保留name,age,email的联合索引
+
+-- name email age 为联合索引，而id是联合索引的叶子节点，所以不需要回表查询
+EXPLAIN SELECT id, name, age, email FROM app_user WHERE name = '用户0' AND email = '2737973569qq.com' AND age = 63;
+
+-- phone字段在联合索引内查不到，所以需要根据叶子节点的id字段在聚合索引内查询
+EXPLAIN SELECT id, name, age, email, phone FROM app_user WHERE name = '用户0' AND email = '2737973569qq.com' AND age = 63;
+```
+
+### 前缀索引
+
+* 当前字段类型为字符串（varchar, text等）时，有时候需要索引很长的字符串，
+这会让索引变得很大，浪费大量的磁盘IO，影响查询效率。此时可以只将字符串的一部分前缀建立索引，
+这样可以大大节约索引空间，从而提高索引效率
+* 语法：`CREATE INDEX index_name ON table_name(column(n)); `
+* 前缀长度：可以根据索引的**选择性**来决定，**选择性**是指**不重复的索引值（基数）**和**数据表的记录总数**的比值，
+索引选择性越高则查询效率越高，选择性越接近1，性能越好
+
+```sql
+-- 查询用户表内有多少数据
+SELECT COUNT(*) FROM app_user;
+
+-- 查询用户表内不重复的email字段有多少数据
+SELECT COUNT(DISTINCT email) FROM app_user;
+
+-- 查询email字段的选择性
+SELECT COUNT(DISTINCT email) / count(*) FROM app_user;
+
+-- 截取email字段前几个字符查询选择性，发现前8个字符的选择性和email字段的选择性差不多
+SELECT COUNT(DISTINCT SUBSTR(email, 1, 8)) / COUNT(*) FROM app_user;
+
+-- 根据email前8个字符创建索引
+CREATE INDEX idx_email_8 ON app_user(email(8));
+
+-- 使用了索引
+EXPLAIN SELECT * FROM app_user WHERE email = '2737973569qq.com';
+```
+
+* 前缀索引查询过程，以`SELECT * FROM app_user WHERE email = '2737973569qq.com';`为例
+    1. 根据查询条件的前8位走索引查询
+    2. 查询到27379735的叶子节点对应的id再走聚合索引
+    3. 根据id在聚合索引内查到对应的字段后，再比较email字段后面的字段是否对的上
+    4. 如果对的上则返回数据，继续查询
+    5. 如果对不上则返回到前缀索引上继续查询
+
+### 单列索引和联合索引
+
+* 单列索引：即一个索引只包含单个列
+* 联合索引：一个索引包含多列
+* 在业务场景中，如果存在多个查询条件，在对于查询字段建立索引时，建议建立联合索引，而非单列索引
+
+```sql
+-- app_user表中email和phone都有单独的索引
+
+-- 此时使用email和phone字段查询时，只会使用一个索引，并会进行回表查询
+EXPLAIN SELECT id, email, phone FROM app_user WHERE email = '2737973569qq.com' AND phone = '1839405813';
+
+-- 创建email和phone的联合索引
+CREATE INDEX idx_email_phone ON app_user(email, phone);
+
+-- 查询时指定使用联合索引，此时就避免了回表查询
+EXPLAIN SELECT id, email, phone FROM app_user USE INDEX(idx_email_phone) WHERE email = '2737973569qq.com' AND phone = '1839405813';
+```
 
 ## 索引设计原则
+
+* 针对数据量大（100w条以上），且查询比较频繁的表建立索引。
+* 针对于常用作为查询条件（where）、排序（order by）、分组（group by）操作的字段建立索引
+* 尽量选择区分度高的列作为索引，尽量建立唯一索引，区分度越高，使用索引的效率就越高
+* 如果是字符串类型的字段，字段的长度较长，可以针对于字段的特点，建立前缀索引
+* 尽量使用联合索引，减少单列索引，查询时，联合索引很多时候可与覆盖索引，节省存储空间，
+避免回表，提高查询效率
+* 要控制索引的数量，索引并不是越多越好，索引越多，维护索引结构的代价也就越大，会影响增删改的效率
+* 果索引列不能存储NULL值，在创建表时使用NOT NULL约束它。当优化器知道每列是否包含NULL值时，
+它可以更好地确定哪个索引最有效地用于查询
 
 ---
 
