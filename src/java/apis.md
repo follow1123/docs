@@ -1,5 +1,42 @@
 # 常用类
 
+## 目录
+
+1. <a href="#string">String</a>
+    1. <a href="#string-table">字符串常量存储的位置</a>
+    2. <a href="#string-immutability">String的不可变性</a>
+    3. <a href="#string-instance">String实例化的方式</a>
+    4. <a href="#string-concat">String的连接方式</a>
+    5. <a href="#string-constructor-methods">String的构造器和常用方法</a>
+        1. <a href="#string-constructor">构造器</a>
+        2. <a href="#string-methods">方法</a>
+    6. <a href="#string-builder-buffer">StringBuilder和StringBuffer</a>
+2. <a href="#date-time">日期时间</a>
+    1. <a href="#date-time-before-jdk8">JDK8之前的日期时间相关类</a>
+        1. <a href="#date-time-before-jdk8-system">System.currentTimeMillis()</a>
+        2. <a href="#date-time-before-jdk8-util-sql-date">java.util.Date/java.sql.Date</a>
+        3. <a href="#date-time-before-jdk8-simple-date-format">SimpleDateFormat</a>
+        4. <a href="#date-time-before-jdk8-calendar">Calendar</a>
+    2. <a href="#date-time-jdk8">JDK8的日期时间相关类</a>
+        1. <a href="#date-time-jdk8-local-date-time">LocalDate/LocalTime/LocalDateTime</a>
+        2. <a href="#date-time-jdk8-instant">Instant</a>
+        3. <a href="#date-time-jdk8-duration-period">Duration/Period</a>
+        4. <a href="#date-time-jdk8-date-time-formatter">DateTimeFormatter</a>
+        5. <a href="#date-time-jdk8-old-new-api">和旧日期时间api之间的相互转换</a>
+3. <a href="#compare">比较器</a>
+    1. <a href="#compare-comparable">Comparable接口</a>
+    2. <a href="#compare-comparator">Comparator</a>
+4. <a href="#others">其他常用类</a>
+    1. <a href="#others-system">System</a>
+    2. <a href="#others-runtime">Runtime</a>
+    3. <a href="#others-math">Math</a>
+    4. <a href="#others-math-package">java.math包</a>
+        1. <a href="#others-math-package-biginteger">BigInteger</a>
+        2. <a href="#others-math-package-bigdecimal">BigDecimal</a>
+    5. <a href="#others-ramdom">Random</a>
+
+
+<a id="string"></a>
 ## String
 
 * 使用`final`修饰，不可被继承
@@ -8,6 +45,7 @@
 * jdk8使用`char`类型数组表示数据
 * jdk9开始使用`byte`类型数组表示数据
 
+<a id="string-table"></a>
 ### 字符串常量存储的位置
 
 * 字符串常量都存储在字符串常量池（StringTable）中
@@ -23,6 +61,7 @@ String s2 = "hello";
 System.out.println(s1 == s2); // true
 ```
 
+<a id="string-immutability"></a>
 ### String的不可变性
 
 * 当对字符串变量重新赋值时，需要重新指定一个字符串常量的位置进行赋值，不能在原有的位置修改
@@ -60,6 +99,7 @@ public void testImmutable3() {
 }
 ```
 
+<a id="string-instance"></a>
 ### String实例化的方式
 
 ```java
@@ -83,6 +123,7 @@ System.out.println(s3 == s4); // false
 System.out.println(s1.equals(s3)); // true
 ```
 
+<a id="string-concat"></a>
 ### String的连接方式
 
 * String通过`+`与其他字符串进行连接
@@ -115,8 +156,10 @@ String s9 = s1.concat(s2);
 System.out.println(s3 == s9); // false
 ```
 
+<a id="string-constructor-methods"></a>
 ### String的构造器和常用方法
 
+<a id="string-constructor"></a>
 #### 构造器
 
 * 在utf-8字符集中，一个汉字占用3个字节，一个字母占用1个字节
@@ -158,6 +201,7 @@ System.out.println("使用gbk解码");
 System.out.println(new String(gbkBytes, Charset.forName("gbk")));
 ```
 
+<a id="string-methods"></a>
 #### 方法
 
 ```java
@@ -259,6 +303,7 @@ System.out.println(s19.replace("ll", "")); // heo world
 System.out.println(s19.replaceAll("o", "1")); // hell1 w1rld
 ```
 
+<a id="string-builder-buffer"></a>
 ### StringBuilder和StringBuffer
 
 * StringBuffer：可变字符序列，线程安全（jdk1）
@@ -309,6 +354,7 @@ System.out.println(sb); // ddd
 
 ---
 
+<a id="date-time"></a>
 ## 日期时间
 
 * 计算机时间的主要时间标准有
@@ -320,8 +366,10 @@ System.out.println(sb); // ddd
     * 中国标准时间（China Standard Time）：即北京时间，UTC+8
     * 中央标准时间（Central Standard Time）：主要用于美国和加拿大的中部地区，UTC-6
 
+<a id="date-time-before-jdk8"></a>
 ### JDK8之前的日期时间相关类
 
+<a id="date-time-before-jdk8-system"></a>
 #### System.currentTimeMillis()
 
 ```java
@@ -333,6 +381,7 @@ long currentTimeMillis = System.currentTimeMillis();
 System.out.println(currentTimeMillis);
 ```
 
+<a id="date-time-before-jdk8-util-sql-date"></a>
 #### java.util.Date/java.sql.Date
 
 * java.util.Date
@@ -373,6 +422,7 @@ java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
 Date date = new Date(sqlDate.getTime());
 ```
 
+<a id="date-time-before-jdk8-simple-date-format"></a>
 #### SimpleDateFormat
 
 * 用于日期格式化和解析
@@ -401,6 +451,8 @@ System.out.println(dateStr2);
 Date date4 = sdf2.parse(dateStr2);
 System.out.println(date4);
 ```
+
+<a id="date-time-before-jdk8-calendar"></a>
 #### Calendar
 
 * 日历，对日期进行修改
@@ -436,6 +488,7 @@ Date date2 = new Date();
 calendar.setTime(date2);
 ```
 
+<a id="date-time-jdk8"></a>
 ### JDK8的日期时间相关类
 
 * 之前日期设计的问题
@@ -450,6 +503,7 @@ calendar.setTime(date2);
     * `java.time.temporal`：包括底层框架和扩展性
     * `java.time.zone`：包含时区支持的类
 
+<a id="date-time-jdk8-local-date-time"></a>
 #### LocalDate/LocalTime/LocalDateTime
 
 * LocalDate：日期
@@ -492,6 +546,7 @@ System.out.println(localDateTime4);
 System.out.println(localDateTime5);
 ```
 
+<a id="date-time-jdk8-instant"></a>
 #### Instant
 
 * 瞬时，时间戳
@@ -512,6 +567,7 @@ long epochMilli = instant2.toEpochMilli();
 System.out.println(epochMilli);
 ```
 
+<a id="date-time-jdk8-duration-period"></a>
 #### Duration/Period
 
 * Duration：时间段
@@ -527,6 +583,7 @@ Period period = Period.between(LocalDate.now(), LocalDate.now().minusDays(3));
 System.out.println(period.getDays());
 ```
 
+<a id="date-time-jdk8-date-time-formatter"></a>
 #### DateTimeFormatter
 
 * 日期时间格式化
@@ -543,6 +600,7 @@ LocalDateTime localDateTime = LocalDateTime.from(ta);
 System.out.println(localDateTime);
 ```
 
+<a id="date-time-jdk8-old-new-api"></a>
 #### 和旧日期时间api之间的相互转换
 
 ```java
@@ -587,3 +645,279 @@ Format format = dateTimeFormatter.toFormat();
 ```
 
 ---
+
+<a id="compare"></a>
+## 比较器
+
+<a id="compare-comparable"></a>
+### Comparable接口
+
+* 实现`Comparable`接口，并实现里面的`compareTo(Object o)`方法
+* `compareTo(Object o)`方法返回一个int，比较规则如下：
+    * 如果返回值是正数，当前对象大
+    * 如果返回值是负数，当前对象小
+    * 如果返回值是0，一样大
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/api/comparable/ComparableTest.java)
+
+* 定义对象并实现`Comparable`接口
+
+```java
+public class Product implements Comparable {
+
+    private String name;
+    private double price;
+
+    public Product(String name, double price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "name='" + name + '\'' +
+                ", price=" + price +
+                '}';
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (this == o) return 0;
+        if (o instanceof Product){
+            Product p = (Product) o;
+            int v = Double.compare(this.price, p.price);
+            if (v != 0) return v;
+            // 如果price相同，则比较name的大小
+            return this.name.compareTo(p.name);
+        }
+        throw new RuntimeException("类型不匹配");
+    }
+}
+```
+
+* 测试
+
+```java
+public class ComparableTest {
+
+    @Test
+    public void testCompareString() {
+        String[] strings = {"f", "g", "d", "e", "p"};
+
+        Arrays.sort(strings);
+
+        System.out.println(Arrays.toString(strings));
+    }
+
+    @Test
+    public void testCompareObj() {
+        Product[] products = new Product[3];
+
+        products[0] = new Product("vde", 1000);
+        products[1] = new Product("ads", 2000);
+        products[2] = new Product("zdd", 1000);
+
+        Arrays.sort(products);
+
+        for (Product product : products) {
+            System.out.println(product);
+        }
+    }
+}
+```
+
+<a id="compare-comparator"></a>
+### Comparator
+
+* 使用场景
+    * 当元素的类型没有实现`Comparable`接口，而又不方便修改代码时
+    * 如果有一个类，实现了`Comparable`接口，指定了比较大小的规则，但我不想安装它预定义的方法比较大小，
+    又不能随意修改类时
+* 创建一个实现了`Comparator`接口的类，实现`compare(Object o1, Object o2)`方法
+* 将实现了排序方法逻辑的类传入`Arrays.sort(value, comparator)`方法内实现自定义排序
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/api/comparable/ComparatorTest.java)
+
+```java
+Product[] products = new Product[4];
+
+products[0] = new Product("vde", 1000);
+products[1] = new Product("ads", 2000);
+products[2] = new Product("zdd", 1000);
+products[3] = new Product("zdd", 5000);
+
+Arrays.sort(products, new Comparator() {
+    @Override
+    public int compare(Object o1, Object o2) {
+        if(o1 == o2) return 0;
+
+        if(o1 instanceof Product && o2 instanceof Product){
+            Product p1 = (Product) o1;
+            Product p2 = (Product) o2;
+            // 先按name从小到大的排序
+            int v = p1.getName().compareTo(p2.getName());
+            if (v != 0) return v;
+
+            // name相同再按price从大到小排序
+            return -Double.compare(p1.getPrice(), p2.getPrice());
+
+        }
+        throw new RuntimeException("类型不匹配");
+    }
+});
+
+for (Product product : products) {
+    System.out.println(product);
+}
+```
+
+<a id="others"></a>
+## 其他常用类
+
+<a id="others-system"></a>
+### System
+
+```java
+// 获取当前毫秒数
+System.out.println(System.currentTimeMillis());
+
+// 请求系统进行垃圾回收，看系统执行情况是否执行
+System.gc();
+
+// 获取系统属性
+System.out.println(System.getProperty("java.version")); // java版本
+System.out.println(System.getProperty("java.home")); // jdk路径
+System.out.println(System.getProperty("os.name")); // 系统名称
+System.out.println(System.getProperty("os.version")); // 系统版本
+System.out.println(System.getProperty("user.name")); // 用户名
+System.out.println(System.getProperty("user.home")); // 用户家目录
+System.out.println(System.getProperty("user.dir")); // 当前项目路径
+```
+
+<a id="others-runtime"></a>
+### Runtime
+
+* 获取JVM运行时相关数据
+
+```java
+Runtime runtime = Runtime.getRuntime();
+
+// 获取JVM运行时相关数据
+System.out.println(runtime.totalMemory()); // 总内存，单位byte
+System.out.println(runtime.maxMemory()); // 最大内存，单位byte
+System.out.println(runtime.freeMemory()); // 可用内存，单位byte
+```
+
+<a id="others-math"></a>
+### Math
+
+* 数学运算操作
+
+```java
+// 数学运算操作
+// 绝对值
+System.out.println(Math.abs(-1));  // 1
+// 向上取整
+System.out.println(Math.ceil(1.3)); // 2
+// 向下取整
+System.out.println(Math.floor(1.9)); // 1
+// 四舍五入
+System.out.println(Math.round(1.4)); // 1
+```
+
+<a id="others-math-package"></a>
+### java.math包
+
+<a id="others-math-package-biginteger"></a>
+#### BigInteger
+
+* 不可变的任意精度整数
+
+```java
+// 不可变的任意精度整数
+BigInteger bi = BigInteger.valueOf(15);
+// 绝对值
+System.out.println(bi.abs()); // 15
+// 加
+System.out.println(bi.add(BigInteger.valueOf(10))); // 25
+// 减
+System.out.println(bi.subtract(BigInteger.valueOf(10))); // 5
+// 乘
+System.out.println(bi.multiply(BigInteger.valueOf(10))); // 150
+// 除
+System.out.println(bi.divide(BigInteger.valueOf(5))); // 3
+// 取余
+System.out.println(bi.remainder(BigInteger.valueOf(4))); // 3
+```
+
+<a id="others-math-package-bigdecimal"></a>
+#### BigDecimal
+
+* 任意精度的浮点数
+
+```java
+// 任意精度的浮点数
+BigInteger bi = new BigInteger("12433241123");
+BigDecimal bd1 = new BigDecimal("12435.351");
+BigDecimal bd2 = new BigDecimal("11");
+
+System.out.println(bi);
+
+// HALF_UP表示除不尽就四舍五入
+System.out.println(bd1.divide(bd2, RoundingMode.HALF_UP));
+// 保留小数点后10位
+System.out.println(bd1.divide(bd2, 10, RoundingMode.HALF_UP));
+```
+
+<a id="others-ramdom"></a>
+### Random
+
+* 随机数
+
+```java
+// 随机数
+
+Random random = new Random();
+// 随机boolean
+System.out.println(random.nextBoolean());
+
+// 随机byte数组
+byte[] bytes = new byte[10];
+random.nextBytes(bytes);
+System.out.println(Arrays.toString(bytes));
+
+// 随机double
+System.out.println(random.nextDouble());
+
+// 随机float
+System.out.println(random.nextFloat());
+
+// 随机高斯（正态）分布，中间数据较多
+System.out.println(random.nextGaussian());
+
+// 随机int
+System.out.println(random.nextInt());
+
+// 随机int，0-10（不包含10）
+System.out.println(random.nextInt(10));
+
+// 随机long
+System.out.println(random.nextLong());
+```
