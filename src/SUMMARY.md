@@ -13,7 +13,7 @@
     * [Nginx](software-services-tools/nginx/index.md)
     * [Vsftp](software-services-tools/vsftp/index.md)
     * [Docker](software-services-tools/docker/index.md)
-    * [Mysql](software-services-tools/mysql/index.md)
+    * [MySQL](software-services-tools/mysql/index.md)
     * [Redis](software-services-tools/redis/index.md)
 * [Java](java/index.md)
     * [基础](java/basics.md)

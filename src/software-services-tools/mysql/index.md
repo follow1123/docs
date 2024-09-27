@@ -1560,10 +1560,12 @@ EXPLAIN SELECT 字段列表 FROM 表名 WHERE 条件
 #### extra
 
 * **null**：使用了索引，但是查询的列未被索引覆盖
-* **using index**：使用了索引，查询的列都被索引覆盖，不需要回表查询
+* **using index**：使用了索引，查询的列都被索引覆盖，不需要回表查询，或order by时直接按索引顺序返回排序后的数据
 * **using where;using index**：查询条件不是联合索引的最左列，但是查询的列被联合索引覆盖到了，用到了联合索引
 * **using where**：用到的索引不是联合索引最左边的字段
 * **using index condition**：使用了索引，但是需要<a href="#index-classification-back-query">回表查询</a>数据
+* **using filesort**：通过表的索引或全表扫描，读取满足条件的数据行，然后再排序缓冲区sort buffer中完成排序操作,
+所以不是通过所以直接返回排序结果的排序都叫FileSort排序
 
 <a id="index-useage"></a>
 ## 索引使用
@@ -1573,6 +1575,7 @@ EXPLAIN SELECT 字段列表 FROM 表名 WHERE 条件
 * 如果索引了多列（联合索引），要遵守最左前缀法则，最左前缀法则指的是查询从索引的最左列开始，
 并且不跳过索引中的列，如果跳跃某一列，索引将部分失效（后面的字段索引失效）
 
+<a id="index-useage-test-sql"></a>
 #### 测试
 
 ```sql
@@ -1793,6 +1796,248 @@ EXPLAIN SELECT id, email, phone FROM app_user USE INDEX(idx_email_phone) WHERE e
 * 要控制索引的数量，索引并不是越多越好，索引越多，维护索引结构的代价也就越大，会影响增删改的效率
 * 果索引列不能存储NULL值，在创建表时使用NOT NULL约束它。当优化器知道每列是否包含NULL值时，
 它可以更好地确定哪个索引最有效地用于查询
+
+---
+
+## SQL优化
+
+### 插入优化
+
+#### insert优化
+
+* 批量插入
+
+```sql
+-- 一次批量插入的数据不建议超过1000条
+INSERT INTO table_name VALUES
+(value1, value2, ...), (value1, value2, ...),
+(value1, value2, ...), (value1, value2, ...);
+```
+
+* 手动提交事务
+
+```sql
+START TRANSACTION
+
+-- 插入1000条
+INSERT INTO table_name VALUES
+(value1, value2, ...), (value1, value2, ...),
+(value1, value2, ...), (value1, value2, ...);
+
+-- 插入1000条
+INSERT INTO table_name VALUES
+(value1, value2, ...), (value1, value2, ...),
+(value1, value2, ...), (value1, value2, ...);
+
+-- 插入1000条
+INSERT INTO table_name VALUES
+(value1, value2, ...), (value1, value2, ...),
+(value1, value2, ...), (value1, value2, ...);
+
+COMMIT;
+```
+* 主键顺序插入
+
+```sql
+INSERT INTO table_name (id, column1, column2, ...) VALUES
+(1, value1, value2, ...),
+(2, value1, value2, ...),
+(3, value1, value2, ...),
+(4, value1, value2, ...);
+```
+
+#### 大批量插入数据
+
+> 测试表<a href="#index-useage-test-sql">app_user</a>
+
+* 准备测试文件`app_user.txt`
+
+```txt
+3253452,zs,5872673547@qq.com,29743974574349,1,hgufswqer[ujiwjerj,28
+3253453,zs1,582673547@qq.com,2743974574349,0,hgufsujiwjerewrqqewj,30
+3253454,ls,587267357@qq.com,29743974349,1,hgufsuwreeqwjiwjerj,43
+3253455,ww,587267547@qq.com,9743974574349,0,hgufsujiwsdjfhjerj,20
+```
+
+* 使用`mysql --local-infile -u 用户名 -p`进入
+
+```sql
+-- 开启从本地加载文件导入数据的开关
+set global local_infile = 1;
+
+-- 使用指定数据库
+use datebase_name;
+
+-- 执行load指令将准备好的数据，加载到表结构中
+load data local infile '文件存放路径/app_user.txt' into table `app_user` fields terminated by ',' lines terminated by '\n';
+```
+
+### 主键优化
+
+* 在InnoDB存储引擎中，表数据都是根据主键顺序组织存放的，这种存储方式的表称为**索引组织表**（index organized table/IOT)
+
+#### 页分裂
+
+* 页可以为空，页可以填充一半，页可以填充1000%。每个页包含2-N行数据（如果一行数据过大，会行溢出），根据之间排列
+* 在B+Tree的特殊结构下，我们插入的数据都是根据主键顺序存放在叶子节点上的，
+而叶子节点具体是存放在Page上的，一个Page具体大小是固定的，在主键乱序插入的情况下，
+可能出现Page上的数据满了，需要往里面插入一条新数据，但Page没空间了，此时就会出现**页分裂**
+
+##### 主键顺序插入的情况
+
+* 假设每行数据的大小是一样的，每页只能保存3行数据
+* 依次插入主键为1、2、3的数据，在插入主键为4的数据时，页已经满了，
+需要新申请一页存放数据并建立两个页之间的双向指针，如下：
+
+```mermaid
+flowchart LR
+a[1, 2, 3] --> b[4]
+b --> a
+```
+
+* 依次插入主键为5、6、7、8的数据的操作和上面类似
+
+```mermaid
+flowchart LR
+a[1, 2, 3] --> b[4, 5, 6]
+b --> c[7, 8]
+b --> a
+c --> b
+```
+
+##### 主键乱序插入的情况
+
+* 假设和上面一样，但是依次插入1、5、9、23、47、50的数据后，结构如下
+
+```mermaid
+flowchart LR
+a[1, 5, 9] --> b[23, 47, 50]
+b --> a
+```
+
+* 当再插入id为11的数据时，由于第一页（包含1的是第一页，包含23的是第二页）已经满了，需要进行页分裂
+    * 将第一页后50%的数据取出， 和新插入的数据放入新分配的页内（第三页）
+    * 再修改第一页的指针指向第三页，第三页的指针指向第二页，如下
+
+```mermaid
+flowchart LR
+a[1, 5] --> b[9, 11]
+b --> a
+b --> c[23, 47, 50]
+c --> b
+```
+
+#### 页合并
+
+* 当删除一行记录是，实际上记录并没有物理删除，只是被标记（flaged）为删除并且它的空间变得允许被其他记录声明使用
+* 当页删除的记录达到`MERGE_THRESHOLD`（默认为页的50%），InnoDB会开始寻找最靠近的页（前或后）
+看看是否可以将两个页合并以优化空间使用
+     * **MERGE_THRESHOLD**：合并页阈值，可以自己设置，在创建表或创建索引时指定
+
+##### 页合并情况
+
+* 假设每行数据的大小是一样的，每页只能保存3行数据
+* 依次插入1、2、3、4、5、6、7、8
+
+```mermaid
+flowchart LR
+a[1, 2, 3] --> b[4, 5, 6]
+b --> a
+b --> c[7, 8]
+c --> b
+```
+
+* 删除5、6，此时数据不会被物理删除，而是标记删除这里我使用`x`代表
+
+```mermaid
+flowchart LR
+a[1, 2, 3] --> b[4, 5x, 6x]
+b --> a
+b --> c[7, 8]
+c --> b
+```
+
+* 由于第二页的空间小于50%，开始进行页合并
+    * 查找到后面的页（第三页）刚好可以合并，将第三页的数据合并进来，覆盖之前标记删除的数据
+    * 此时第三页不会被释放，只是数据为空，等待后续数据插入
+
+```mermaid
+flowchart LR
+a[1, 2, 3] --> b[4, 7, 8]
+b --> a
+b --> c[空]
+c --> b
+```
+
+#### 主键设计原则
+
+* 满足业务需求情况下，尽量降低主键长度
+* 插入数据时，尽量选择顺序插入，选择使用**AUTO_INCREMENT**自增主键
+* 尽量不要使用UUID做主键或者是其他自然主键，如身份证号
+* 业务操作时，避免对主键进行修改
+
+### order by优化
+
+> 测试表<a href="#index-useage-test-sql">app_user</a>，只保留主键索引
+
+* 使用explain分析SQL查看<a href="#sql-performance-analysis-explain-field-extra">extra</a>的属性
+    * **using filesort**：表示需要额外的排序
+    * **using inext**：表示直接根据索引顺序完成排序
+
+```sql
+-- 根据gender,phone升序排序时，出现了using filesort
+EXPLAIN SELECT id, gender, phone FROM app_user ORDER BY gender, phone;
+
+-- 创建gender,phone的联合索引
+CREATE INDEX idx_gender_phone ON app_user(gender, phone);
+
+-- 此时再查则是using index
+EXPLAIN SELECT id, gender, phone FROM app_user ORDER BY gender, phone;
+
+-- 如果根据gender倒序和phone倒叙查询会出现：Backward index scan; Using index表示反向使用索引查找
+EXPLAIN SELECT id, gender, phone FROM app_user ORDER BY gender DESC, phone DESC;
+
+-- 如果排序时调换phone和gender的顺序会出现：Using index; Using filesort，排序也遵循最左前缀法则
+EXPLAIN SELECT id, gender, phone FROM app_user ORDER BY phone, gender;
+
+-- 如果根据gender升序排序根据phone降序排序会出现：Using index; Using filesort 
+EXPLAIN SELECT id, gender, phone FROM app_user ORDER BY gender ASC, phone DESC;
+
+-- 上面的情况需要创建根据升序的gender和降序的phone创建一个联合索引
+CREATE INDEX idx_gender_phone_ad ON app_user(gender ASC, phone DESC);
+```
+
+### group by优化
+
+> 测试表<a href="#index-useage-test-sql">app_user</a>，只保留主键索引
+
+* 使用explain分析SQL查看<a href="#sql-performance-analysis-explain-field-extra">extra</a>的属性
+    * **using temporary**：使用临时表进行分组
+    * **using inext**：使用到了索引
+* 分组操作时添加索引也可以提高效率
+* 分组操作时，索引的使用也要满足最左前缀法则
+
+```sql
+-- 在没有索引的情况下根据email分组查询时，出现了using temporary
+EXPLAIN SELECT email, COUNT(*) same_email FROM app_user GROUP BY email;
+
+-- 创建一个email和phone的联合索引
+CREATE INDEX idx_email_phone ON app_user(email, phone);
+
+-- 此时再根据email进行分组查询出现using index，使用到了联合索引的最左前缀
+EXPLAIN SELECT email, COUNT(*) same_email FROM app_user GROUP BY email;
+
+-- 使用email和phone分组查询也一样
+EXPLAIN SELECT email, phone, COUNT(*) FROM app_user GROUP BY email, phone;
+
+-- 将email作为where条件，再根据phone进行分组查询，也是using index，group by和where可以同时使用，只要遵守最左前缀法则
+EXPLAIN SELECT email, phone, COUNT(*) FROM app_user WHERE email = '2548928007qq.com' GROUP BY phone;
+```
+
+
+### limit优化
+### count优化
+### update优化
 
 ---
 
