@@ -1,4 +1,290 @@
-# Collection
+# 集合框架
+
+## 集合框架类图
+
+### java.util.Collection
+
+```mermaid
+classDiagram
+direction BT
+class AbstractCollection~E~
+class AbstractList~E~
+class ArrayList~E~
+class Collection~E~ {
+<<Interface>>
+
+}
+class HashSet~E~
+class Iterable~T~ {
+<<Interface>>
+
+}
+class LinkedHashSet~E~
+class LinkedList~E~
+class List~E~ {
+<<Interface>>
+
+}
+class TreeSet~E~
+class Vector~E~
+
+AbstractCollection~E~  ..>  Collection~E~ 
+AbstractList~E~  -->  AbstractCollection~E~ 
+AbstractList~E~  ..>  List~E~ 
+ArrayList~E~  -->  AbstractList~E~ 
+ArrayList~E~  ..>  List~E~ 
+Collection~E~  -->  Iterable~T~ 
+HashSet~E~  -->  AbstractCollection~E~ 
+HashSet~E~  ..>  Collection~E~ 
+LinkedHashSet~E~  ..>  Collection~E~ 
+LinkedHashSet~E~  -->  HashSet~E~ 
+LinkedList~E~  -->  AbstractList~E~ 
+LinkedList~E~  ..>  Collection~E~ 
+LinkedList~E~  ..>  List~E~ 
+List~E~  -->  Collection~E~ 
+TreeSet~E~  -->  AbstractCollection~E~ 
+TreeSet~E~  ..>  Collection~E~ 
+Vector~E~  -->  AbstractList~E~ 
+Vector~E~  ..>  List~E~ 
+```
+
+* List：存储有序、可重复的数据
+* Set：存储无序、不可重复的数据
+
+### java.util.Map
+
+```mermaid
+classDiagram
+direction BT
+class AbstractMap~K, V~
+class HashMap~K, V~
+class Hashtable~K, V~
+class LinkedHashMap~K, V~
+class Map~K, V~ {
+<<Interface>>
+
+}
+class Properties
+class TreeMap~K, V~
+
+AbstractMap~K, V~  ..>  Map~K, V~ 
+HashMap~K, V~  -->  AbstractMap~K, V~ 
+HashMap~K, V~  ..>  Map~K, V~ 
+Hashtable~K, V~  ..>  Map~K, V~ 
+LinkedHashMap~K, V~  -->  HashMap~K, V~ 
+LinkedHashMap~K, V~  ..>  Map~K, V~ 
+Properties  -->  Hashtable~K, V~ 
+TreeMap~K, V~  -->  AbstractMap~K, V~ 
+TreeMap~K, V~  ..>  Map~K, V~ 
+```
+
+* Map：存储key-value键值对
+
+---
+
+## java.util.Collection
+
+### 常用方法
+
+* 添加
+
+```java
+// 添加元素
+Collection c1 = new ArrayList();
+c1.add("string");
+c1.add(123);
+c1.add(new Object());
+System.out.println(c1);
+
+Collection c2 = new ArrayList();
+c2.add(1);
+c2.add(2);
+
+// 添加集合
+c1.addAll(c2);
+System.out.println(c1);
+```
+
+* 判断
+
+```java
+// 添加元素
+Collection c1 = new ArrayList();
+c1.add("string");
+c1.add(123);
+c1.add(new Object());
+System.out.println(c1);
+
+Collection c2 = new ArrayList();
+c2.add(1);
+c2.add(2);
+
+// 添加集合
+c1.addAll(c2);
+System.out.println(c1);
+
+// 获取集合内元素个数
+System.out.println(c1.size()); // 5
+
+// 判断集合是否为空
+System.out.println(c1.isEmpty()); // false
+
+// 判断集合内是否有指定的元素，如果要判断自定义类型，需要重写equals方法
+System.out.println(c1.contains(1)); // true
+
+// 判断集合内是否包含另一个集合内的所有元素
+System.out.println(c1.containsAll(c2)); // true
+
+// 判断两个集合是否相同
+System.out.println(c1.equals(c2)); // false
+```
+
+* 删除
+
+```java
+// 添加元素
+Collection c1 = new ArrayList();
+c1.add("string");
+c1.add(123);
+c1.add(1.1);
+c1.add(new Object());
+
+// 删除指定元素，删除自定义元素时也需要重写equals方法
+// 如果有多个相同的元素，只会删除一个
+c1.remove(1.1);
+System.out.println(c1);
+
+// 清空集合，遍历将集合内的所有元素都删除
+c1.clear();
+System.out.println(c1.size());
+
+// 删除当前集合内所有于另一个集合元素相同的元素
+Collection c2 = new ArrayList();
+c2.add(1);
+c2.add(2);
+c2.add(3);
+c2.add(4);
+Collection c3 = new ArrayList();
+c3.add(2);
+c3.add(3);
+
+c2.removeAll(c3);
+System.out.println(c2); // [1, 4]
+
+// 取两个集合的交集
+Collection c4 = new ArrayList();
+c4.add(1);
+c4.add(2);
+c4.add(3);
+c4.add(4);
+Collection c5 = new ArrayList();
+c5.add(3);
+c5.add(4);
+c5.add(5);
+c5.add(6);
+
+c4.retainAll(c5);
+System.out.println(c4); // [3, 4]
+```
+
+* 其他
+
+```java
+// 添加元素
+Collection c1 = new ArrayList();
+c1.add("string");
+c1.add(123);
+c1.add(1.1);
+c1.add(new Object());
+
+// 集合转换为数组
+Object[] array = c1.toArray();
+
+// 计算集合的hash值
+System.out.println(c1.hashCode());
+
+// 返回迭代器，用于遍历集合
+c1.iterator();
+```
+
+### 集合和数组的相互转换
+
+```java
+// 添加元素
+Collection c1 = new ArrayList();
+c1.add("string");
+c1.add(123);
+c1.add(1.1);
+c1.add(new Object());
+
+// 集合转换为数组
+Object[] array = c1.toArray();
+
+// 数组转换为集合
+Collection c2 = Arrays.asList(1, 2, 3, 4);
+System.out.println(c2.size()); // 4
+
+// asList方法内传入对象数组，才会作为数组，传入基本数据类型的引用只会作为一个元素
+Collection c3 = Arrays.asList(new int[]{1, 2, 3});
+System.out.println(c3.size()); // 1
+```
+
+### 集合使用说明
+
+* 放入集合内的元素需要重写`equals()`方法，因为集合内的`contains()`方法和`remove()`等方法会使用到
+
+## 迭代器（Iterator）
+
+* 用来遍历集合内的元素
+
+```java
+Collection c1 = new ArrayList();
+c1.add("string");
+c1.add(123);
+c1.add(1.1);
+c1.add(new Object());
+
+// 获取迭代器对象
+Iterator iterator = c1.iterator();
+
+// // 依次获取集合内的元素
+// System.out.println(iterator.next());
+// System.out.println(iterator.next());
+// System.out.println(iterator.next());
+// System.out.println(iterator.next());
+// // 如果超出集合内元素的个数则会报错NoSuchElementException
+// System.out.println(iterator.next());
+
+// 获取迭代器具体实现
+System.out.println(iterator.getClass());
+
+// 使用迭代器遍历集合
+while (iterator.hasNext()) {
+    System.out.println(iterator.next());
+}
+
+// 遍历时删除指定元素
+// while (iterator.hasNext()){
+//     if (iterator.next().equals(1.1)){
+//         iterator.remove();
+//     }
+// }
+```
+
+* foreach增强for循环（jdk5）
+    * 底层使用的就是迭代器
+
+```java
+Collection c1 = new ArrayList();
+c1.add("string");
+c1.add(123);
+c1.add(1.1);
+c1.add(new Object());
+
+for (Object o : c1) {
+    System.out.println(o);
+}
+```
 
 ## ArrayList
 
