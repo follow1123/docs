@@ -346,10 +346,6 @@ SELECT 字段列表 FROM 表名 WHERE 条件列表;
 | AVG | 平均值 |
 | SUM | 求和 |
 
-* `COUNT()`函数说明
-    * `COUNT(字段)`：会忽略所有的null值
-    * `COUNT(*)`：不会忽略所有的null值
-    * `COUNT(1)`：不会忽略所有的null值
 * 语法
 
 ```sql
@@ -2034,10 +2030,293 @@ EXPLAIN SELECT email, phone, COUNT(*) FROM app_user GROUP BY email, phone;
 EXPLAIN SELECT email, phone, COUNT(*) FROM app_user WHERE email = '2548928007qq.com' GROUP BY phone;
 ```
 
-
 ### limit优化
+
+* 一个常见的问题是`limit 1000000000,10`，此时需要MySQL排序前1000000010记录，
+仅仅返回1000000000 - 1000000010的记录，其他记录丢弃，查询排序的代价非常大
+* 优化思路：一般分页查询时，通过创建覆盖所有能够比较好的提高性能，
+可以通过覆盖索引加子查询的形式进行优化
+
+```sql
+-- 分页查询100万条后面的数据时非常卡
+SELECT * FROM app_user au LIMIT 1000000, 10;
+
+-- 根据id索引排序后只查询id的情况下，大概优化了40%
+SELECT id FROM app_user ORDER BY id LIMIT 1000000,10;
+
+-- 配合子查询查询每行数据
+SELECT a.* FROM app_user a, (SELECT id FROM app_user ORDER BY id LIMIT 1000000,10) b
+WHERE a.id = b.id
+```
+
 ### count优化
+
+* MyISAM引擎把一个表的总行数存在磁盘上，因此执行`COUNT(*)`的时候会直接返回这个个数，效率很高
+* InnoDB引擎它执行`COUNT(*)`的时候，需要把数据一行一行地从引擎里面读取出来，然后累计计数
+* 所以count的优化思路就是使用其他方式自己维护一个累加值
+
+#### count的用法
+
+* `COUNT()`是一个聚合函数，对于返回的结果集，一行行地判断，如果count函数的参数不是NULL，
+累计值就加一，否则不加，最后返回累计值
+* 四种用法：
+    * **COUNT(主键)**：InnoDB引擎会遍历整张表，把每一行的主键值都取出来，返回给服务层。
+    服务层拿到主键后，直接按行进行累加（主键不可能为null）
+    * **COUNT(字段)**：
+        * **没有not null约束**：InnoDB引擎会遍历整张表把每一行的字段值都取出来，
+        返回给服务层，服务层判断是否为null，不为null，计数累加
+        * **有not null约束**：InnoDB引擎会遍历整张表把每一行的字段值都取出来吗，
+        返回给服务层，直接按行进行累加
+    * **COUNT(1)**：InnoDB引擎会遍历整张表，但不取值。服务层对于返回的每一行，放一个数字1进去，
+    直接按行进行累加
+    * **COUNT(*)**：InnoDB引擎不会把全部字段取出来，而是专门做了优化，不取值，服务层直接按行进行累加
+* 按照效率排序
+    * **COUNT(*)** 约等于 **COUNT(1)** > **COUNT(主键)** > **COUNT(字段)**
+    * 所以尽量使用**COUNT(*)**
+
 ### update优化
+
+* 准备SQL
+
+```sql
+CREATE TABLE account(
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    name VARCHAR(10) COMMENT '姓名',
+    money INT COMMENT '余额'
+) COMMENT '账户表';
+
+INSERT INTO account VALUES (NULL, 'zhangsan', 2000), (NULL, 'lisi', 2000);
+```
+#### 使用主键更新数据
+
+* 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
+* 以下左边为**session1**，右边为**session2**
+
+<div style="display: flex;">
+    <pre style="flex: 1;margin: 0 2px 0 0;">
+        <code>
+-- 使用指定的数据库
+use db_name;</br>
+-- 以下操作按左右框内的序号执行</br>
+-- 1.开启事务
+START TRANSACTION;</br>
+-- 3.更新id为1的数据
+UPDATE account SET money = 1000 WHERE id = 1;</br>
+-- 提交事务
+COMMIT;
+        </code>
+    </pre>
+    <pre style="flex: 1;margin: 0 0 0 2px;">
+        <code>
+-- 使用指定的数据库
+USE db_name;</br>
+-- 以下操作按左右框内的序号执行</br>
+-- 2.开启事务
+START TRANSACTION;</br>
+-- 4.更新id为2的数据，此时正常更新
+UPDATE account SET money = 2000 WHERE id = 2;</br>
+-- 提交事务
+COMMIT;
+        </code>
+    </pre>
+</div>
+
+#### 使用其他字段更新数据（未加索引的字段）
+
+* 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
+* 以下左边为**session1**，右边为**session2**
+
+<div style="display: flex;">
+    <pre style="flex: 1;margin: 0 2px 0 0;">
+        <code>
+-- 使用指定的数据库
+use db_name;</br>
+-- 以下操作按左右框内的序号执行</br>
+-- 1.开启事务
+START TRANSACTION;</br>
+-- 3.更新name为zhangsan的数据
+UPDATE account SET money = 1000 WHERE name = 'zhangsan';</br>
+-- 提交事务
+COMMIT;
+        </code>
+    </pre>
+    <pre style="flex: 1;margin: 0 0 0 2px;">
+        <code>
+-- 使用指定的数据库
+USE db_name;</br>
+-- 以下操作按左右框内的序号执行</br>
+-- 2.开启事务
+START TRANSACTION;</br>
+-- 4.更新id为2的数据，此时会卡住，由于上一个事务更新时使用了未加索引的字段进行作为条件
+-- 导致这张表被锁了，无法更新，需要上一个事务提交后才能继续执行
+UPDATE account SET money = 2000 WHERE id = 2;</br>
+-- 提交事务
+COMMIT;
+        </code>
+    </pre>
+</div>
+
+* 从上面的例子可以看出，InnoDB的行锁是针对索引加的锁，不是针对记录加的锁，
+并且该索引不能失效，否则会从行锁升级为表锁
+* update时尽量使用主键更新，或者使用带索引的字段更新
+
+---
+
+## 视图/存储过程/触发器
+
+### 视图
+
+* 视图（View）是一种虚拟存在的表。视图中的数据并不在数据库中实际存在，
+行和列数据来自**定义视图的查询语句中使用的表**，并且是在使用视图时动态生成的
+* 视图只保存了查询的SQL逻辑，不保存查询结果。所以我们在创建视图的时候，
+主要编写的是SQL查询语句
+* 语法
+
+```sql
+-- 创建
+CREATE [OR REPLACE] VIEW 视图名称[(列名列表)] AS SELECT 语句 [WITH[CASCADED | LOCAL] CHECK OPTION];
+
+-- 查看创建视图语句
+SHOW CREATE VIEW 视图名称;
+-- 查看视图数据
+SELECT * FROM 视图名称 ...;
+
+-- 修改
+CREATE [OR REPLACE] VIEW 视图名称[(列名列表)] AS SELECT 语句 [WITH[CASCADED | LOCAL] CHECK OPTION];
+ALTER VIEW 视图名称[(列名列表)] AS SELECT语句 [WITH[CASCADED | LOCAL] CHECK OPTION];
+
+-- 删除
+DROP VIEW [IF EXISTS] 视图名称 [,视图名称] ...;
+```
+
+#### 测试
+
+> 测试表<a href="#index-useage-test-sql">app_user</a>
+
+```sql
+-- 创建视图，查询app_user表内前20条数据，只需要id,name,age这几个字段
+CREATE OR REPLACE VIEW user_v_1 AS SELECT id, name, age FROM app_user WHERE id <= 20;
+
+-- 查看创建视图语句
+SHOW CREATE VIEW user_v_1;
+
+-- 查询视图内数据
+SELECT * FROM user_v_1;
+
+-- 修改视图，添加email字段
+ALTER VIEW user_v_1 AS SELECT id, name, age, email FROM app_user WHERE id <= 20;
+
+-- 删除视图
+DROP VIEW user_v_1;
+```
+
+#### 视图检查选项
+
+* 当使用**WITH CHECK OPTION**子句创建视图时，MySQL会通过视图检查正在更改的每个行，
+例如插入，更新，删除，以使其符合视图的定义
+* MySQL允许基于另一个视图创建视图，它还会检查依赖视图中的规则以保持一致性。
+为了确定检查的范围，MySQL提供了两个选项：**CASCADED**（默认）和**LOCAL**
+
+##### CASCADED
+
+* 级联，如果当前视图依赖了其他视图，不管依赖的视图有没有检查选项，递归进行检查，
+一直查到没有依赖的视图处
+
+```sql
+-- 创建视图v1
+CREATE OR REPLACE VIEW v1 AS SELECT id, name from table where id <= 20;
+
+-- 插入成功
+INSERT INTO v1 VALUES(5, 'a');
+
+-- 插入成功，因为创建视图时没有指定检查选项，但当前视图无法查询到这个数据
+INSERT INTO v1 VALUES(25, 'a');
+
+-- 创建视图v2，依赖v1视图，加上级联检查选项
+CREATE OR REPLACE VIEW v2 AS SELECT id, name from v1 where id >= 10 WITH CASCADED CHECK OPTION;
+
+-- 插入失败，因为不满足当前视图v2的WHERE条件
+INSERT INTO v2 VALUES(7, 'a');
+
+-- 插入失败，由于添加了级联检查选项，即便v1视图没加检查选项，也会检查v1视图的WHERE条件，所以插入失败
+INSERT INTO v2 VALUES(26, 'a');
+
+-- 插入成功，既满足v2视图的WHERE条件也满足v1视图的WHERE条件
+INSERT INTO v2 VALUES(15, 'a');
+
+-- 创建视图v3，依赖v2视图，不加检查选项
+CREATE OR REPLACE VIEW v3 AS SELECT id, name from v2 where id <= 15;
+
+-- 插入成功
+INSERT INTO v3 VALUES(11, 'a');
+
+-- 插入成功，由于当前视图没加检查选项，所以不检查当前视图的WHERE条件
+-- 但是当前视图依赖了v2视图，v2视图添加了级联检查条件，所以需要检查
+-- 满足v1、v2视图的WHERE条件，所以插入成功
+INSERT INTO v3 VALUES(17, 'a');
+
+-- 插入失败，不满足视图v1的检查条件
+INSERT INTO v3 VALUES(28, 'a');
+```
+
+##### LOCAL
+
+* 只检查当前视图的WHERE条件，如果当前视图依赖了其他视图，则根据依赖视图的检查选项操作
+    * 如果依赖的视图检查选项是CASCADED，则按级联的操作递归检查
+    * 如果也是LOCAL，重读这块说明
+    * 如果没加检查选项，则不检查
+
+```sql
+-- 创建视图v1，不加检查选项
+CREATE OR REPLACE VIEW v1 AS SELECT id, name from table where id <= 15;
+
+-- 插入成功
+INSERT INTO v1 VALUES(5, 'a');
+
+-- 插入成功，因为创建视图时没有指定检查选项，但当前视图无法查询到这个数据
+INSERT INTO v1 VALUES(16, 'a');
+
+-- 创建视图v2，依赖v1视图，加上LOCAL检查选项
+CREATE OR REPLACE VIEW v2 AS SELECT id, name from v1 where id >= 10 WITH LOCAL CHECK OPTION;
+
+-- 插入成功
+INSERT INTO v2 VALUES(13, 'a');
+
+-- 插入成功，满足当前视图的WHERE条件，由于依赖的视图v1没加检查选项，所以不检查
+INSERT INTO v2 VALUES(17, 'a');
+
+-- 创建视图v3，依赖v2视图，不加检查选项
+CREATE OR REPLACE VIEW v3 AS SELECT id, name from v2 where id < 20;
+
+-- 插入成功，按照规则，我们发现这次插入只在v2视图处进行了WHERE条件检查
+INSERT INTO v3 VALUES(14, 'a');
+```
+
+#### 视图的更新
+
+* 要使视图可更新，视图中的行与基础表中的行之间必须是一对一的关系。如果视图包含以下任何一项，
+则视图不可更新：
+    * 聚合函数或窗口函数（SUM()、MIN()、MAX()、COUNT()等）
+    * DISTINCT
+    * GROUP BY
+    * HAVING
+    * UNION或UNION ALL
+
+#### 视图的作用
+
+* **简单**：视图不仅可以简化用户对数据的理解，也可以简化操作。那些被经常使用的查询可以被定义为视图，
+从而使用户不必为以后的操作每次指定全部的条件
+* **安全**：数据库可以授权，但不能授权到数据库特定行和特定的列上。
+通过视图用户只能查询和修改他们所能见到的数据
+* **数据独立**：视图可以帮助用户屏蔽真实表结构变化带来的影响
+
+
+
+
+### 存储过程
+### 储存函数
+### 触发器
+
 
 ---
 
