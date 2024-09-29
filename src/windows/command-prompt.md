@@ -208,6 +208,23 @@ REM 输出 d.txt
 
 * TODO
 
-## 参考网站
 
-* ss64 <https://ss64.com/nt/>   
+```cmd
+echo 123^
+456^
+789^
+# 输出
+123456789
+```
+
+* 睡眠：`timeout 秒数	`
+
+* 修改当前编码为UTF-8：`chcp 65001`
+
+## 参考
+
+* [Windows批处理(cmd/bat)常用命令教程](https://www.cnblogs.com/xpwi/p/9626959.html)
+* [cmd命令](https://ss64.com/nt/)
+* [判断字符串是否包含某字符串](https://blog.csdn.net/tjcwt2011/article/details/120508290)
+* [批处理之字符串操作](https://blog.csdn.net/peng_cao/article/details/74170979)
+* [for命令用法](https://blog.csdn.net/weixin_43165135/article/details/127702841)
