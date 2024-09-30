@@ -24,7 +24,49 @@
 <a id="filesystem-hierarchy"></a>
 ## 文件层次说明
 
-**TODO**
+> 根据语言不同，部分目录名称在文件资源管理器内显示的是系统默认的语言
+
+<pre>
+    <code>
+<strong>C:\</strong> <span style="color:#998;font-style: italic"># C盘，系统文件一般存放在这里</span>
+│
+├─<strong>Program Files</strong> <span style="color:#998;font-style: italic"># 系统默认软件安装位置（64位）</span>
+│
+├─<strong>Program Files (x86)</strong> <span style="color:#998;font-style: italic"># 旧版软件安装位置（32位）</span>
+│
+├─<strong>Windows</strong> <span style="color:#998;font-style: italic"># 操作系统相关文件存放位置</span>
+│  │
+│  ├─<strong>System32</strong> <span style="color:#998;font-style: italic"># 操作系统核心文件</span>
+│  │  │
+│  │  ├─<strong>config</strong> <span style="color:#998;font-style: italic"># 注册表文件</span>
+│  │  │
+│  │  └─<strong>drivers</strong> <span style="color:#998;font-style: italic"># 设备驱动文件</span>
+│  │
+│  └─<strong>Fonts</strong> <span style="color:#998;font-style: italic"># 系统字体文件</span>
+│
+└─<strong>Users</strong> <span style="color:#998;font-style: italic"># 用户相关目录存放位置，这个目录下用户名目录就是这个用户的家目录</span>
+   │
+   ├─<strong>Default</strong> <span style="color:#998;font-style: italic"># 模板用户目录，新创建用户时，会根据这个目录复制一份作为用户的家目录</span>
+   │
+   ├─<strong>Public</strong> <span style="color:#998;font-style: italic"># 用户共享目录，存放所有用户共享的文件</span>
+   │
+   └─<strong style="color:red">UserName1</strong> <span style="color:#998;font-style: italic"># 用户家目录，UserName1对应实际的用户名，可能会有多个用户</span>
+       │
+       ├─<strong>Desktop</strong> <span style="color:#998;font-style: italic"># 对应桌面下的所有文件</span>
+       │
+       ├─<strong>Downloads</strong> <span style="color:#998;font-style: italic"># 从网上下载的文件</span>
+       │
+       ├─<strong>Documents</strong> <span style="color:#998;font-style: italic"># 用户文档，部分软件也会将数据存放在这</span>
+       │
+       └─<strong>AppData</strong> <span style="color:#998;font-style: italic"># 软件的配置文件或数据目录</span>
+           │
+           ├─<strong>Local</strong> <span style="color:#998;font-style: italic"># 软件缓存数据</span>
+           │
+           ├─<strong>LocalLow</strong> <span style="color:#998;font-style: italic"># 需要较低权限软件缓存数据，不常用</span>
+           │
+           └─<strong>Roaming</strong> <span style="color:#998;font-style: italic"># 软件配置</span>
+    </code>
+</pre>
 
 ---
 
@@ -144,7 +186,29 @@ scoop cache rm 软件名
 <a id="Registry"></a>
 ## 注册表
 
-TODO
+* 注册表主要用于：系统配置、应用程序设置、用户偏好
+### 结构
+
+* 主要分为以下几个根键（Root Keys）
+    * **HKEY_CLASSES_ROOT(HKCR)**：存储文件类型和应用程序的关联信息，帮助系统识别不同类型的文件
+    * **HKEY_CURRENT_USER(HKCU)**：存储当前用户的配置信息，包括用户的设置、应用程序的首选项等
+    * **HKEY_LOCAL_MACHINE(HKLM)**：存储计算机级别的设置，影响所有用户的配置。包含硬件信息、安装的软件等
+    * **HKEY_USERS(HKU)**：存储系统中所有用户的配置文件。每个用户的设置都在一个子项下
+    * **HKEY_CURRENT_CONFIG(HKCC)**：存储当前硬件配置的信息
+
+### 内容
+
+* 键（Keys）：类似于文件夹的结构，用于组织信息
+* 值（Values）：存储实际的数据，主要有几种类型：
+    * 字符串值（REG_SZ）：普通字符串
+    * 多字符串值（REG_MULTI_SZ）：多个字符串的数组
+    * 二进制值（REG_BINARY）：存储二进制数据
+    * DWORD值（REG_DWORD）：32位整数
+
+### 使用
+
+* 打开注册表编辑器：<kbd>Win</kbd>+<kbd>r</kbd> regedit
+
 ---
 
 <a id="windows-subsystem-for-linux"></a>
@@ -262,7 +326,7 @@ $UserPath=[System.Environment]::GetEnvironmentVariable("PATH", [System.Environme
 
 <a id="references"></a>
 ## 参考
-
+* [Windows注册表内容详解](https://www.cnblogs.com/lcxblogs/p/13444855.html)
 * [Windows长安装GCC方案](https://www.cnblogs.com/feipeng8848/p/15227688.html)
 * [MinGW-w64 C/C++编译器各版本说明](https://blog.csdn.net/weixin_42880082/article/details/120097989)
 * [MinGW离线安装包安装教程](https://blog.csdn.net/m0_52733659/article/details/121527947)
