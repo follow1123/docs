@@ -6,7 +6,7 @@
 ## 常用命令
 > cmd内置命令默认后面接`/?` 查看命令的帮助
 
-### 文件管理
+### 文件操作
 
 | 命令 | 描述 |
 | --- | --- |
@@ -20,10 +20,10 @@
 | [copy](#copy) | 复制文件 |
 | [attrib](#attrib) | 显示或修改文件属性 |
 | [mklink](#mklink) | 创建符号链接 |
-| [find](#find) | 过滤文件内容 |
+| [find](#find) | 搜索文件内容 |
 | [findstr](#findstr) | 搜索文件内容 |
 | [tree](#tree) | 以树型结构显示目录 |
-| [type](#type) | 显示文件内容 |
+| type | 显示文件内容 |
 | [more](#more) | 逐屏显示输出 |
 
 ### 服务/进程管理
@@ -40,12 +40,12 @@
 | 命令 | 描述 |
 | --- | --- |
 | [whoami](#whoami) | 显示当前登录用户 |
-| [hostname](#hostname) | 显示主机名 |
-| [path](#path) | 显示path环境变量 |
+| hostname | 显示主机名 |
+| path | 显示path环境变量 |
 | [where](#where) | 显示指定程序所在路径 |
 | [date](#date) | 显示或设置日期 |
 | [time](#time) | 显示或设置时间 |
-| [ver](#ver) | 显示系统版本 |
+| ver | 显示系统版本 |
 | [systeminfo](#systeminfo) | 显示系统详细信息 |
 | [net](#net) | 多功能命令，包括用户管理，服务管理，网络管理等 |
 | [shutdown](#shutdown) | 关机 |
@@ -66,7 +66,7 @@
 | [netsh](#netsh) | 网络操作脚本工具 |
 | [telnet](#telnet) | 计算机之间进行通信 |
 | [arp](#arp) | 显示和修改地址解析协议 (ARP) 缓存中的条目 |
-| [getmac](#getmac) | 显示MAC地址 |
+| getmac | 显示MAC地址 |
 
 ### 设备管理
 
@@ -75,7 +75,7 @@
 | [diskpart](#diskpart) | diskpart 命令解释器可帮助你管理计算机的驱动器（磁盘、分区、卷或虚拟硬盘） |
 | [chkdsk](#chkdsk) | 检查磁盘 |
 | [convert](#convert) | FAT转NTFS文件系统 |
-| [vol](#vol) | 显示磁盘卷标和序列号 |
+| vol | 显示磁盘卷标和序列号 |
 
 ### 批处理脚本
 
@@ -83,17 +83,17 @@
 | --- | --- |
 | [call](#call) | 调用另一个批处理程序 |
 | [color](#color) | 修改终端颜色 |
-| [cls](#cls) | 清除屏幕 |
+| cls | 清除屏幕 |
 | [doskey](#doskey) | 创建别名 |
+| [echo](#echo) | 回显消息 |
 | [for](#for) | for循环 |
 | [if](#if) | if条件 |
 | [goto](#goto) | 跳转 |
-| [rem](#rem) | 注释 |
-| [pause](#pause) | 暂停 |
+| rem | 注释 |
+| pause | 暂停 |
 | [prompt](#prompt) | 修改终端的命令提示符 |
 | [set](#set) | 设置当前环境变量 |
-| [setlocal/endlocal](#setlocal) | 使用这对命令包裹的代码块所设置的环境变量都只能被当前批处理文件使用  |
-| [echo](#echo) | 回显消息 |
+| [setlocal/endlocal](#setlocalendlocal) | 使用这对命令包裹的代码块所设置的环境变量都只能被当前批处理文件使用  |
 | [start](#start) | 启动单独的窗口允许指定的程序或命令 |
 | [timeout](#timeout) | 睡眠 |
 | [title](#title) | 修改终端窗口标题 |
@@ -136,6 +136,9 @@ dir *.txt
 #### cd
 
 ```batch
+rem 显示当前目录
+cd
+
 rem 切换到指定目录
 cd C:\a\b\c
 
@@ -251,88 +254,602 @@ rem 统计abc在C:\a\a.txt出现的次数
 find /c "abc" C:\a\a.txt
 ```
 
+#### findstr
+
+* **find**命令增强版，支持正则表达式
+* 参考[官网](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/findstr)
+
+#### tree
+
+* 树形结构显示目录下的文件
+
+```batch
+rem 树形结构显示C:\a目录下的所有文件
+tree /f C:\a
+```
+
+#### more
+
+* 交互式命令，打开指定文件后，交互式浏览文件，部分快捷键：
+    * <kbd>Space</kbd>：翻页，一整屏
+    * <kbd>Enter</kbd>：翻页，一行
+    * <kbd>=</kbd>：显示行号，屏幕最下面一行的行号
+    * <kbd>q</kbd>：退出交互式命令
+
+```batch
+rem 从10行开始预览C:\a\a.txt文件
+more +10 C:\a\a.txt
+```
+
+---
+
+#### net
+
+* 多功能命令，包含服务管理，账户管理等
+
+##### 服务管理相关
+
+```batch
+rem 启动服务
+net start 服务名
+
+rem 关闭服务
+net stop 服务名
+
+rem 暂停服务
+net pause 服务名
+
+rem 继续暂停的服务
+net continue 服务名
+```
+
+##### 其他
+
+```batch
+rem 显示或修改账户配置
+net accounts
+
+rem 查看当前计算机信息
+net config workstation
+
+rem 管理本地组
+net localgroup
+
+rem 管理共享资源
+net share
+```
+
+#### sc
+
+* 服务管理命令
+* 详细操作参考官方文档：
+    * <code>[sc config](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/sc-config)</code>
+    * <code>[sc create](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/sc-create)</code>
+    * <code>[sc delete](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/sc-delete)</code>
+    * <code>[sc query](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/sc-query)</code>
+
+```batch
+rem 创建服务，服务必须是一个exe可执行程序，不能是cmd或ps1脚本
+sc create 服务名称 binpath= "服务路径"
+
+rem 删除服务
+sc delete 服务名称
+
+rem 启动服务，也可以使用net start 服务名称启动服务
+sc start 服务命令
+
+rem 查询指定服务
+sc query type= all state= all | find /i "服务名"
+```
+
+#### tasklist
+
+* 进程列表
+* 详细操作参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/tasklist)
+
+```batch
+rem 查看进程详细信息
+tasklist /v
+
+rem 查看正在运行的进程
+tasklist /v /fi "status eq running"
+```
+
+#### taskkill
+
+```batch
+rem 停止进程
+taskkill /pid 进程id
+```
+
+---
+
+#### whoami
+
+```batch
+rem 查看当前登录用户
+whoami
+
+rem 查看当前登录用户的详细信息
+whoami /all
+```
+
+#### where
+
+```batch
+rem 显示程序所在位置
+where 程序名称
+```
+
 #### date
 
-* `/T` 显示当前日期不提示输入新的日期 (默认`date`不带参数会提示输入新的日期)
+```batch
+rem 更改系统日期
+date 月-日-年
 
+rem 显示当前系统日期
+date /t
+```
 
-#### timeout
-
-#### start
-
-* TODO
-
-## 批处理脚本
-
-> .bat/.cmd文件
-
-### 变量
+#### time
 
 ```batch
-REM 定义变量
-set a=1
-REM 使用变量
-echo %a%
+rem 更改系统日期
+time 时:分:秒
+
+rem 显示当前系统时间
+time /t
 ```
 
-### 条件
+#### systeminfo
 
-#### 数字
+* 查看系统详细信息，可以查看远程计算机配置信息，参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/systeminfo)
 
-```bash
-REM == 相等
-if 1 == 1 (echo 1)
-REM neq 不相等
-if 1 neq 2 (echo 1)
-REM lss 小于
-if 1 lss 2 (echo 1)
-REM leq 小于等于
-if 1 lss 1 (echo 1)
-REM gtr 大于
-if 2 gtr 1 (echo 1)
-REM geq 大于等于
-if 1 geq 1 (echo 1)
-```
+#### shutdown
 
-#### 字符串
-
-> 匹配方式和数字的一样
+* 关闭或重启一台本地或远程计算机，详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/shutdown)
 
 ```batch
-REM 忽略大小写匹配
-if /i "a" == "A" (echo 1)
+rem 立即关机
+shutdown /s /t 0
+
+rem 立即重启
+shutdown /r /t 0
+
+rem 1分钟后关机
+shutdown /s /t 60
+
+rem 重启并进入高级启动选项，就是选择硬盘启动顺序的界面
+shutdown /r /o /t 0
 ```
 
-#### 文件
+#### schtasks
+
+> 需要管理员权限运行
+
+* 对应`计算机管理>系统工具>任务计划程序`界面
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/schtasks)
 
 ```batch
-REM 判断文件是否存在
-if exist filename (echo 1)
-REM 判断文件不存在
-if not exist filename (echo 1)
+rem 每分钟执行一次指定的程序，可以是脚本
+schtasks /create /sc minute /mo 1 /tn "任务名称" /tr "程序位置"
+
+rem 立即运行这个任务
+schtasks /run /tn "任务名称"
+
+rem 立即结束这个任务
+schtasks /end /tn "任务名称"
+
+rem 修改指定任务的执行程序
+schtasks /change /tn "任务名称" /tr "程序位置"
+
+rem 删除这个任务
+schtasks /delete /tn "任务名称"
+
+rem 查询所有任务
+schtasks /query
 ```
-#### 逻辑运算符
 
-* TODO
+#### reg
 
-### 结构控制
+> 需要管理员权限运行<br></br>
+> <strong>操作注册表可能会导致系统出现问题，谨慎操作</strong>
+
+* 注册表管理
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/reg)
+
+```batch
+rem 添加一个新项
+reg add HKCR\Directory\shell\项名
+
+rem 添加一个新项，并指定其默认值
+reg add HKCR\Directory\shell\项名 /d "值"
+
+rem 在项下面创建一个新的值
+reg add HKCR\Directory\shell\项名 /v "值名称" /d "值"
+
+rem 删除指定的项及其下的所有子项
+reg delete HKCR\Directory\shell\项名
+```
+
+#### setx
+
+> <strong>先在高级系统设置内查看环境变量是否存在后添加，谨慎修改PATH环境变量，谨慎操作</strong>
+
+* 环境变量操作
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/setx)
+
+```batch
+rem 添加一个用户环境变量
+setx 名称 值
+
+rem 添加一个系统环境变量，需要管理员权限
+setx /m 名称 值
+```
+
+---
+
+#### ping
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/ping)
+
+```batch
+rem ping指定网址
+ping 网址
+
+rem ping指定网址，ping10次就结束
+ping 网址 -n 10
+```
+
+#### ipconfig
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/ipconfig)
+
+```batch
+rem 显示TCP/IP信息
+ipconfig
+
+rem 显示完整TCP/IP信息
+ipconfig /all
+
+rem 刷新dns缓存
+ipconfig /flushdns
+```
+
+#### tracert
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/tracert)
+
+```batch
+rem 跟踪网址经过的路由器
+tracert 网址
+
+rem 跟踪网址经过的路由器，只跟踪5个就停止，默认30个
+tracert /h 5 网址
+```
+
+#### netstat
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/netstat)
+
+```batch
+rem 查看所有TCP连接数和进程id
+netstat -ano
+```
+
+#### nslookup
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/nslookup)
+
+```batch
+rem 在默认DNS服务器上查询网址对应的ip
+nslookup 网址
+
+rem 在指定DNS服务器上查询网址对应的ip
+nslookup 网址 DNS服务器ip
+```
+
+#### route
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/route_ws2008)
+
+#### netsh
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/networking/technologies/netsh/netsh)
+
+#### telnet
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/telnet)
+
+```batch
+rem 连接到指定网址的某个端口
+telnet 网址 端口
+```
+
+#### arp
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/arp)
+
+```batch
+rem 显示所有地址解析协议 (ARP) 缓存
+arp /a
+```
+
+---
+
+#### diskpart
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/diskpart)
+
+#### chkdsk
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/chkdsk)
+
+#### convert
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/convert)
+
+---
+
+#### call
+
+```batch
+call 批处理程序 参数
+```
+
+#### color
+
+```batch
+rem 终端字符颜色改为绿色
+color 02
+```
+
+#### doskey
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/doskey)
+
+```batch
+rem 指定dir /w的别名为ls
+doskey ls=dir /w
+```
+
+#### echo
+
+```batch
+rem 回显字符串
+echo aaa
+
+rem 显示环境变量
+echo %USERPROFILE%
+
+rem 输出空行
+echo.
+
+rem 关闭命令行回显命令
+echo off
+
+rem 批处理脚本内关闭回显，在文件第一行加入以下命令
+@echo off
+```
+
+#### for
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/for)
+* 变量前面一个`%`和两个`%`的区别：一个在终端下使用for命令，两个是在批处理脚本内使用for命令
+
+##### 基础用法
+
+```batch
+rem 普通用法：依次输出a,b,c
+for %i in (a,b,c) do echo %i
+
+rem /d用法：输出用户目录下的所有文件
+for /d %i in (%USERPROFILE%\*) do echo %i
+
+rem /r用法：输出用户目录下的所有cmd脚本
+for /r %USERPROFILE% %i in (*.cmd) do echo %i
+
+rem /l用法：依次输出1~10
+for /l %i in (1,1,10) do echo %i
+```
+
+##### 高级用法
+
+* 类似Linux下的`awk`
+* 准备`a.txt`文件，内容如下：
+
+```txt
+a,11,aaa
+b,13,bbb
+c,53,4245
+```
+
+* 以下命令在`a.txt`文件同级目录下执行
+
+```batch
+rem 输出a.txt文件内的所有行
+for /f %i in (./a.txt) do echo %i
+
+rem 只显示内容以逗号分割的2列
+for /f "tokens=2 delims=," %i in (./a.txt) do echo %i
+
+rem 只显示内容以逗号分割的2,3列，变量按字母顺序取，tokens=*则显示全部列
+for /f "tokens=2,3 delims=," %i in (./a.txt) do echo %i %j
+```
 
 #### if
 
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/if)
+
 ```batch
-if 1==1 (
-    echo 1 
-) else (
-    echo 2
-)
+rem 如果存在a.txt这个文件则输出1否则输出2
+if exist a.txt ( echo 1 ) else ( echo 2 )
+
+rem 如果字符串1和字符串2不相同则输出1否则输出2
+if not "字符串1"=="字符串2" ( echo 1 ) else ( echo 2 )
+
+rem 忽略大小写匹配字符串
+if /i "a"=="A" ( echo 1 ) else ( echo 2 )
+
+rem 比较数字大小
+if 2 gtr 1 ( echo 1 ) else ( echo 2 )
+
+rem 判断环境变量是否存在
+if defined 环境变量名 ( echo 1 ) else ( echo 2 )
 ```
 
 #### goto
 
-##### 实现函数定义
+* 以下脚本会先输出1再遍历a，b，c最后退出
 
-> 函数必须定义在脚本的最后，由于是用goto实现，函数就是一部分脚本，定义在前面会先执行一遍  
-> :EOF 表示跳转到文件末尾
+```batch
+@echo off
+
+goto :echo_number
+
+:foreach_word
+
+for %%i in (a,b,c) do echo %%i
+
+goto :eof
+
+:echo_number
+
+echo 1
+
+goto :foreach_word
+```
+
+#### prompt
+
+* 修改终端命令提示符，就是光标左边的部分
+
+```batch
+rem 修改为显示日期样式
+prompt $d$s$s$t$_$g
+
+rem 修改为这样：-->
+prompt --$g
+
+rem 改回默认样式
+prompt $p$g
+```
+
+#### set
+
+* 临时环境变量相关操作，详细操作使用`set /?`查看
+
+```batch
+rem 替换变量内的符号
+set a=1,2,3
+set b=%a:,=-%
+rem 1,2,3
+echo %a%
+rem 1-2-3
+echo %b%
+
+rem 截取变量，丢弃最后一位
+set a=C:\a\b\
+set b=%a:~0,-1%
+rem C:\a\b\
+echo %a%
+rem C:\a\b
+echo %b%
+
+rem 计算表达式
+set /a n=(2+3)*10
+rem 50
+echo %n%
+
+rem 获取用户输入
+set /p name=
+
+rem 显示所有以j开头的环境变量
+set j
+```
+
+#### setlocal/endlocal
+
+* 创建一个`b.cmd`脚本，添加以下内容
+
+```batch
+@echo off
+
+set name=zs
+set age=11
+```
+
+* 打开终端调用`b.cmd`脚本后，此时使用`echo %name%`或`echo %age%`会显示已经定义的值
+* 在`b.cmd`内添加`setlocal/endlocal`命令
+
+```batch
+@echo off
+
+setlocal
+
+set name=zs
+set age=11
+
+endlocal
+```
+
+* 此时再执行这个脚本后就无法输出里面定义的变量了（需要先清空之前的变量）
+
+#### start
+
+* 详细参考[官方文档](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/start)
+
+```batch
+rem 启动一个新程序或脚本
+start "title信息" /d 启动目录 脚本或程序
+
+rem 启动一个程序或脚本，并等待这个程序或脚本执行完成
+start "title信息" /wait 脚本或程序
+```
+
+#### timeout
+
+```batch
+rem 等待5秒
+timeout /t 5
+
+rem 无限等待
+timeout /t -1
+```
+
+#### title
+
+```batch
+rem 指定终端的新标题
+title new title
+```
+
+#### exit
+
+```batch
+rem 退出终端
+exit
+
+rem 在批处理脚本内使用以下命令，表示脚本正常退出
+exit /b 0
+
+rem 在批处理脚本内使用以下命令，表示脚本异常退出，错误码为2
+exit /b 2
+```
+
+## 批处理脚本
+
+> 后缀为.bat或.cmd的文件
+
+### 变量
+
+* 参考[set](#set)
+
+### 流程控制
+
+* 参考[if](#if)
+
+#### goto实现switch
 
 ```batch
 REM 实现根据不同参数输出不同字符功能
@@ -350,44 +867,46 @@ echo b
 goto :EOF
 ```
 
+
+### 逻辑运算符
+
+* TODO
+#### &&
+#### ||
+#### ;
+#### 条件组合
+
+
+### 函数
+
+* TODO
+
 ### 循环
 
-* TODO
+#### for循环
 
-#### for
+* 参考[for](#for)
 
-##### 实现获取路径中的文件名
-```batch
-set path="C:\a\b\a\d.txt"
-
-REM ~n 表示文件名
-for %%i in (%path%) do echo %%~ni
-REM 输出 d
-
-REM ~x 表示文件扩展名
-for %%i in (%path%) do echo %%~xi
-REM 输出 .txt
-
-REM ~nx 表示文件名和文件扩展名
-for %%i in (%path%) do echo %%~nxi
-REM 输出 d.txt
-
-```
-
-* TODO
-
-#### while (使用goto实现)
-
-* TODO
-
+#### goto实现循环
 
 ```batch
-echo 123^
-456^
-789^
-# 输出
-123456789
+@echo off
+
+set i=1
+
+:start_loop
+
+if %i% equ 10 goto :eof 
+
+echo %i%
+set /a i=%i%+1
+
+goto :start_loop
 ```
+
+### 其他
+
+* 转义字符是`^`
 
 ## 参考
 
