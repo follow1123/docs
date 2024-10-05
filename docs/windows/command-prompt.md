@@ -6,7 +6,7 @@
 ## 常用命令
 > cmd内置命令默认后面接`/?` 查看命令的帮助
 
-### 文件操作
+### 文件管理
 
 | 命令 | 描述 |
 | --- | --- |
@@ -595,6 +595,8 @@ arp /a
 
 ```batch
 call 批处理程序 参数
+
+call 标签 参数
 ```
 
 #### color
@@ -845,6 +847,90 @@ exit /b 2
 
 * 参考[set](#set)
 
+#### 实现Array
+
+```batch
+@echo off
+
+chcp 65001 >nul
+setlocal
+
+rem 定义数组
+set arr[0]=zs
+set arr[1]=ls
+set arr[2]=ww
+
+rem 遍历数组
+set idx=0
+
+:startLoop
+
+if defined arr[%idx%] (
+	call echo 下标%idx%的数据为：%%arr[%idx%]%%
+	set /a idx=%idx% + 1
+	goto :startLoop
+)
+
+endlocal
+```
+
+#### 实现Map
+
+```batch
+@echo off
+
+chcp 65001 >nul
+setlocal
+
+rem 定义Map
+set map[id1].name=zs
+set map[id1].age=11
+set map[id2].name=ls
+set map[id2].age=12
+set map[id3].name=ww
+set map[id3].age=13
+
+rem 打印key为id1的数据
+call :get id1
+
+call :get id2
+rem 修改key为id2的数据
+call :put id2 ls1 20
+call :get id2
+
+goto :eof
+
+rem 函数定义处
+
+rem 修改
+:put
+
+if defined map[%1].name (
+	set map[%1].name=%2
+	set map[%1].age=%3
+) else (
+	echo key为%1的数据不存在
+)
+
+goto :eof
+
+rem 获取
+:get
+
+if defined map[%1].name (
+	call echo name=%%map[%1].name%%
+	call echo age=%%map[%1].age%%
+) else (
+	echo key为%1的数据不存在
+)
+
+goto :eof
+
+endlocal
+```
+
+---
+
 ### 流程控制
 
 * 参考[if](#if)
@@ -867,19 +953,156 @@ echo b
 goto :EOF
 ```
 
+---
 
 ### 逻辑运算符
 
-* TODO
 #### &&
+
+* 左边的命令执行成功后，右边的命令才会执行
+
+```batch
+rem a.txt存在，输出find的匹配项并行输出1
+find "a" a.txt && echo 1
+
+rem c.txt不存在，不会输出1
+find "a" c.txt && echo 1
+```
+
 #### ||
-#### ;
+
+* 左边的命令执行失败后，右边的命令才会执行
+
+```batch
+rem a.txt存在，不会输出1
+find "a" a.txt || echo 1
+
+rem c.txt不存在，会输出1
+find "a" c.txt || echo 1
+```
+
+#### &
+
+* 无论左边的命令是否执行成功，右边的命令都会执行
+
+```batch
+rem c.txt不存在，会输出1
+find "a" c.txt & echo 1
+```
+
 #### 条件组合
 
+```batch
+rem 当a.txt内存在a字符或b字符时才会输出1
+(find "a" a.txt || find "b" a.txt) && echo 1
+```
+
+---
 
 ### 函数
 
-* TODO
+* cmd内没有函数的概念，但可以使用[goto](#goto)配合[call](#call)实现简易的函数，或者直接编写另一个批处理脚本作为函数
+
+#### 参数说明
+
+* `%1~%n` 调用时输入的参数，`%1`是第一个参数，`%2`是第二个参数等
+* `%*` 所有参数，一般配合[for](#for)命令使用
+* 部分扩展参数（详细参考`call /?`）：
+    * `%~1` 如果参数被双引号包裹，则去除双引号
+    * `%~f1` 将参数前面拼接当前执行脚本所在路径
+    * `%~n1` 如果参数是文件，获取文件名称
+    * `%~x1` 如果参数是文件，获取文件后缀
+    * `%~a1` 如果参数是文件，获取文件属性
+    * `%~t1` 如果参数是文件，获取文件修改时间
+    * `%~z1` 如果参数是文件，获取文件修改大小
+* [call](#call)命令不止可以调用其他脚本，还可以调用当前脚本内的标签
+    * 在使用`call`命令调用标签并传入参数时，标签下面的代码内获取的参数就是`call`命令传递的参数，这个参数不会覆盖当前文件的参数
+
+##### 示例
+
+* 创建`params.cmd`脚本，内容如下，确保a.txt文件存在
+* 在其他脚本内使用`call params.cmd "a b" a.txt a.txt a.txt`调用该脚本
+
+```batch
+@echo off
+
+rem 设置终端编码为utf8
+chcp 65001 >nul
+
+echo -----删除双引号-----
+echo %1
+echo %~1
+
+echo -----拼接当前文件路径-----
+echo %2
+echo %~f2
+
+echo -----获取文件名和文件后缀-----
+echo %3
+echo %~n3
+echo %~x3
+
+echo -----获取文件的属性日期和大小-----
+echo %4
+echo %~a4
+echo %~t4
+echo %~z4
+
+echo -----遍历所有参数-----
+for %%i in (%*) do echo %%i
+```
+
+#### goto实现函数
+
+* 实现两个数相加
+
+```batch
+@echo off
+setlocal
+
+call :add 1 2
+call :add 5 5
+
+goto :eof
+
+:add
+set /a result=%1 + %2
+echo %result%
+goto :eof
+
+endlocal
+```
+
+* 判断当前目录下文件是否存在
+
+```batch
+@echo off
+setlocal
+
+chcp 65001 >nul
+
+for %%i in (%*) do call :checkFile %%i
+
+goto :eof
+
+:checkFile
+
+if exist %1 (
+	echo %1存在
+)else (
+	echo %1不存在
+)
+
+goto :eof
+
+endlocal
+```
+
+#### 批处理实现函数
+
+* 把上面脚本内goto下面的逻辑单独放在另一个批处理脚本内就行了
+
+---
 
 ### 循环
 
@@ -904,9 +1127,62 @@ set /a i=%i%+1
 goto :start_loop
 ```
 
+---
+
+### 管道和重定向
+
+#### 管道
+
+* 将前面命令的结果作为后面命令的输入
+
+```batch
+rem 将tasklist命令的结果作为find命令的输入，实现查询chrome是否在运行
+tasklist | find "chrome"
+```
+
+#### 重定向
+
+* 相关符号：
+    * `>` 覆盖
+    * `>>` 追加
+    * `<` 输入
+
+```batch
+rem 将dir的输出写入到dirinfo.txt文件内
+dir > dirinfo.txt
+
+rem 将time /t的输出追加到time.txt文件内
+time /t >> time.txt
+
+rem 将time.txt文件内的第一行写入进变量var内
+set /p var=< time.txt
+```
+
+##### 标准输入/标准输出/标准错误
+
+* 标准输入对应一个程序的输入，标准输出对应程序正常的输出，标准错误对应程序的异常输出
+    * 标准输入（standard input）的描述符是 0
+    * 标准输出（standard output）是 1
+    * 标准错误（standard error）是 2
+
+```batch
+rem 将find "a" a.txt这个命令的标准输出写入进info.txt文件内，将这个命令的标准错误追加进error.txt文件内
+find "a" a.txt > info.txt 2>> error.txt
+
+
+rem 将find "a" a.txt这个命令的标准输出追加进all.txt文件内，将这个命令的标准错误输出到标准输出
+find "a" a.txt >> all.txt 2>&1
+
+rem 将休眠命令的标准输出写入进空设备处，意思就是不处理标准输出
+timeout /t 1 > nul
+```
+
+---
+
 ### 其他
 
 * 转义字符是`^`
+* 在批处理脚本内设置编码使脚本内的中文正常显示：`chcp 65001 >nul`
 
 ## 参考
 
@@ -915,3 +1191,4 @@ goto :start_loop
 * [判断字符串是否包含某字符串](https://blog.csdn.net/tjcwt2011/article/details/120508290)
 * [批处理之字符串操作](https://blog.csdn.net/peng_cao/article/details/74170979)
 * [for命令用法](https://blog.csdn.net/weixin_43165135/article/details/127702841)
+* [批处理中屏蔽错误信息 nul 2>nul 的用法 ](https://www.cnblogs.com/wzihan/p/15792344.html)
