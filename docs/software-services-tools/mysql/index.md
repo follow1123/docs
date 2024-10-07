@@ -2274,10 +2274,80 @@ INSERT INTO v3 VALUES(14, 'a');
 通过视图用户只能查询和修改他们所能见到的数据
 * **数据独立**：视图可以帮助用户屏蔽真实表结构变化带来的影响
 
-
-
+---
 
 ### 存储过程
+
+* 存储过程是事先经过编译并存储在数据库中的一段SQL语句的集合，调用存储过程可以简化应用开发人员的很多工作，
+减少数据在数据库和应用服务器之间的传输，对于提高数据处理的效率是有好处的
+* 存储过程就是数据库SQL语言层面的代码封装与重用。
+* 在命令行中创建存储过程是，由于存储过程内部编写的语句包含`;`导致无法创建
+    * 使用`delimiter 结束符号`修改结束符号后再创建
+
+```sql
+-- 创建
+CREATE PROCEDURE name ([args])
+BEGIN
+    
+    
+END;
+
+-- 调用
+CALL name([args])
+
+-- 查询数据库内所有的存储过程
+SELECT * FROM information_schema.routines WHERE ROUTINE_SCHEMA = '数据库名';
+
+-- 查询指定存储过程
+SHOW CREATE PROCEDURE 存储过程名;
+
+-- 删除
+DROP PROCEDURE IF EXISTS 存储过程名;
+```
+
+#### 变量
+
+##### 系统变量
+
+* 系统变量是MySQL服务器提供，不是用户定义的，属于服务器层面。分为全局变量 (GLOBAL) 、会话变量 (SESSION) 
+    * 会话变量，只在当前会话中有效（每一次新建的连接都是一个单独的会话）
+    * 全局变量，在所有会话中有效，MySQL服务重启后就会失效，在`/etc/my.cnf`内永久修改
+
+```sql
+-- 搜索全局/会话系统变量
+SHOW variables;
+SHOW GLOBAL variables LIKE 'auto%';
+
+-- 查看全局/会话系统变量
+SELECT @@global.autocommit;
+SELECT @@session.autocommit;
+
+-- 设置全局/会话系统变量
+SET SESSION autocommit = 1;
+SET GLOBAL autocommit = 1;
+```
+
+##### 用户自定义变量
+
+* 用户定义变量是用户根据需要自己定义的变量，用户变量不用提前声明，在用的时候直接用`@变量名`使用就可以。
+其作用域为当前连接。
+* 变量无需声明，使用未声明的变量时不会报错，只会获取到`NULL`
+
+```sql
+-- 定义
+SET @varname1 = 'value1';
+SET @varname2 = 2;
+SET @varname3 := 'value3';
+SET @varname4 := 'value4', @varname5 := 'value5';
+SELECT @varname6 := 'value6', @varname7 := 'value7';
+SELECT COUNT(*) INTO @varcount FROM app_user;
+
+-- 使用
+SELECT @varname1, @varname2, @varname3, @varname4, @varname5, @varname6, @varname7, @varcount;
+```
+
+##### 局部变量
+
 ### 储存函数
 ### 触发器
 
