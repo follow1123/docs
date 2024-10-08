@@ -237,6 +237,8 @@ System.out.println(c3.size()); // 1
 
 * 放入集合内的元素需要重写`equals()`方法，因为集合内的`contains()`方法和`remove()`等方法会使用到
 
+---
+
 ## 迭代器（Iterator）
 
 * 用来遍历集合内的元素
@@ -289,6 +291,54 @@ for (Object o : c1) {
     System.out.println(o);
 }
 ```
+
+---
+
+## java.util.List
+
+* 用于存储有序可以重复的数据
+
+### 常用方法
+
+* 具体方法和java.util.Collection内的方法类似
+* [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/list/ListTest.java)
+
+### 实现类
+
+* `ArrayList` - 主要实现类，线程不安全、效率高，底层使用Object[]数组实现
+    * 在添加数据、查找数据时，效率较高；在插入、删除数据时，效率较低
+* `LinkedList` - 底层使用双向链表的方式进行存储
+    * 在插入、删除数据时，效率较高；在添加数据、查找数据时，效率较低
+* `Vector` - 旧实现类，jdk1.0就存在，List、ArrayList是在jdk1.2添加的，线程安全、效率低，底层使用Object[]数组实现
+
+#### LinkedList
+
+* 特有方法
+
+```java
+LinkedList list = new LinkedList();
+// 从头部添加
+list.addFirst(1);
+list.addFirst(2);
+// 从尾部添加
+list.addLast(9);
+list.addLast(8);
+System.out.println(list);
+
+// 获取头部的元素
+System.out.println(list.getFirst());
+// 获取尾部的元素
+System.out.println(list.getLast());
+
+// 删除头部的元素
+list.removeFirst();
+
+// 删除尾部的元素
+list.removeLast();
+System.out.println(list);
+```
+
+---
 
 ## ArrayList
 
