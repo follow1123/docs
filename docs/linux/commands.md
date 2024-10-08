@@ -1,105 +1,182 @@
+---
+sidebar_position: 1
+---
+
 # 常用命令
 
 > 使用`man`命令或参数加`--help`查看命令的帮助
 
-## 系统状态管理
-
-| 命令 | 描述 |
-| --- | --- |
-| **[shutdown](#shutdown)** | 关机/重启 |
-| **halt** | 关机 |
-| **reboot** | 重启 |
-| **logout** | 注销用户 |
-
-## 用户管理
-
-| 命令 | 描述 |
-| --- | --- |
-| **[useradd](#useradd)** | 添加用户 |
-| **[userdel](#userdel)** | 删除用户 |
-| **[usermod](#usermod)** | 修改用户信息 |
-| **passwd** | 修改密码 |
-| **id** | 查看用户信息 |
-| **[su](#su)** | 切换用户 |
-| **whoami** | 查看当前是那个用户登录 |
-| **who** | 查看当前是那个用户登录，并显示登录时间 |
-| **groupadd** | 新增组 |
-| **groupdel** | 新增组 |
-| **groups** | 显示当前用户再那些组下 |
 
 ## 文件目录
 
 | 命令 | 描述 |
 | --- | --- |
-| **pwd** | 查看当前处于那个目录下 |
-| **tree** | 使用树结构显示目录结构 |
-| **[ls](#ls)** | 列出当前目录下的文件 |
-| **[cd](#cd)** | 切换目录 |
-| **[mkdir](#mkdir)** | 创建目录 |
-| **rmdir** | 删除空目录 |
-| **touch** | 创建一个空文件 |
-| **[cp](#cp)** | 拷贝 |
-| **[rm](#rm)** | 删除文件或目录 |
-| **[mv](#mv)** | 移动文件或目录 |
-| **[cat](#cat)** | 显示文件内容 |
-| **more** | 显示文件内容（上下移动查看，一页一页显示） |
-| **less** | 显示文件内容（上下移动查看，一行一行显示） |
-| **[head](#head)** | 显示文件起始部分内容 |
-| **[tail](#tail)** | 显示文件结束部分内容 |
-| **[ln](#ln)** | 文件链接 |
+| [ls](#ls) | 列出当前目录下的文件 |
+| pwd | 查看当前处于那个目录下 |
+| tree | 使用树结构显示目录结构 |
+| [stat](#stat) | 显示文件或目录的详细信息，包括权限、所有者和修改时间 |
+| [cd](#cd) | 切换目录 |
+| touch | 创建一个空文件 |
+| [mkdir](#mkdir) | 创建目录 |
+| [cp](#cp) | 拷贝 |
+| [rm](#rm) | 删除文件或目录 |
+| [mv](#mv) | 移动文件或目录 |
+| [ln](#ln) | 文件链接 |
+| rmdir | 删除空目录 |
 
-## 查找筛选编辑
+## 文本处理
 
 | 命令 | 描述 |
 | --- | --- |
-| **[find](#find)** | 查找文件 |
-| **[locate](#locate)** | 查找文件 |
-| **which** | 显示输入的命令所在目录 |
-| **where** | 显示输入的命令所在目录，目录是链接显示原始目录（这个命令好像只在的debian下才有） |
-| **whereis** | 显示输入的命令所在目录、帮助文件目录等 |
-| **[grep](#grep)** | 过滤 |
-| **[awk](#awk)** | 过滤，格式化 |
-| **[sed](#sed)** | 编辑 |
-
-## 日期时间
-
-| 命令 | 描述 |
-| --- | --- |
-| **[date](#date)** | 显示时间 |
-| **[cal](#cal)** | 显示日历 |
+| [cat](#cat) | 显示文件内容 |
+| more | 显示文件内容（上下移动查看，一页一页显示） |
+| less | 显示文件内容（上下移动查看，一行一行显示） |
+| [head](#head) | 显示文件起始部分内容 |
+| [tail](#tail) | 显示文件结束部分内容 |
+| [find](#find) | 查找文件 |
+| [locate](#locate) | 查找文件 |
+| [grep](#grep) | 过滤 |
+| [awk](#awk) | 过滤，格式化 |
+| [sed](#sed) | 编辑 |
+| [sort](#sort) | 对文本行进行排序 |
+| [uniq](#uniq) | 去除重复的行 |
+| [wc](#wc) | 统计文件的行数、字数和字符数 |
+| [cut](#cut) | 从文本行中提取字段 |
+| [paste](#paste) | 将多个文件的行并排合并 |
 
 ## 压缩解压
 
 | 命令 | 描述 |
 | --- | --- |
-| **[gzip](#gzip)** | 使用Lempel-Ziv编码（LZ77）进行压缩 |
-| **[gunzip](#gunzip)** | 解压缩gzip压缩的文件 |
-| **zcat** | 查看gzip压缩的文件 |
-| **[bzip2](#bzip2)** | 用Burrows-Wheeler变换和Huffman编码进行压缩 |
-| **[bunzip2](#bunzip2)** | 解压缩bzip2压缩的文件 |
-| **bzcat** | 查看bzip2压缩的文件 |
-| **[xz](#xz)** | 使用LZMA（Lempel-Ziv-Markov chain Algorithm）进行压缩 |
-| **[unxz](#unxz)** | 解压缩xz压缩的文件 |
-| **xzcat** | 查看xz压缩的文件 |
-| **[tar](#tar)** | 打包，配合以上压缩算法使用 |
-| **[zip](#zip)** | 跨平台压缩（在各个平台都有对于的实现） |
-| **[unzip](#unzip)** | 解压缩zip压缩的文件 |
+| [gzip](#gzip) | 使用Lempel-Ziv编码（LZ77）进行压缩 |
+| [gunzip](#gunzip) | 解压缩gzip压缩的文件 |
+| zcat | 查看gzip压缩的文件 |
+| [bzip2](#bzip2) | 用Burrows-Wheeler变换和Huffman编码进行压缩 |
+| [bunzip2](#bunzip2) | 解压缩bzip2压缩的文件 |
+| bzcat | 查看bzip2压缩的文件 |
+| [xz](#xz) | 使用LZMA（Lempel-Ziv-Markov chain Algorithm）进行压缩 |
+| [unxz](#unxz) | 解压缩xz压缩的文件 |
+| xzcat | 查看xz压缩的文件 |
+| [tar](#tar) | 打包，配合以上压缩算法使用 |
+| [zip](#zip) | 跨平台压缩（在各个平台都有对于的实现） |
+| [unzip](#unzip) | 解压缩zip压缩的文件 |
+
+## 进程/服务
+
+| 命令 | 描述 |
+| --- | --- |
+| [ps](#ps) | 查看当前运行的进程 |
+| [top](#top) | 实时显示进程信息和系统资源使用情况 |
+| [kill](#kill) | 终止指定的进程 |
+| [pkill](#pkill) | 根据名称终止进程 |
+| [killall](#killall) | 终止所有匹配指定名称的进程 |
+| [bg](#bg) | 将后台任务放入后台运行 |
+| [fg](#fg) | 将后台任务恢复到前台 |
+| [systemctl](#systemctl) | systemd服务管理 |
+| [service](#service) | SysVinit服务管理 |
+
+## 网络
+
+| 命令 | 描述 |
+| --- | --- |
+| [ping](#ping) | 测试与目标主机的网络连通性 |
+| [ifconfig](#ifconfig) | 查看和配置网络接口 |
+| [ip](#ip) | 更现代的网络配置工具，提供了更丰富的功能 |
+| [netstat](#netstat) | 显示网络连接、路由表和网络接口统计 |
+| [ss](#ss) | 查看当前的网络连接状态 |
+| [wget](#wget) | 从网络下载文件 |
+| [route](#route) | 路由 |
+| [firewall-cmd](#firewall-cmd) | 用于管理 firewalld 防火墙服务 |
+| [arp](#arp) | 查看和管理 ARP 缓存 |
+
+## 用户/组/权限
+
+| 命令 | 描述 |
+| --- | --- |
+| id | 查看用户信息 |
+| whoami | 查看当前是那个用户登录 |
+| who | 查看当前是那个用户登录，并显示登录时间 |
+| [useradd](#useradd) | 添加用户 |
+| [userdel](#userdel) | 删除用户 |
+| [usermod](#usermod) | 修改用户信息 |
+| passwd | 修改密码 |
+| [chage](#chage) | 更改用户密码的过期信息 |
+| [su](#su) | 切换用户 |
+| groups | 显示当前用户再那些组下 |
+| groupadd | 新增组 |
+| groupmod | 修改组 |
+| groupdel | 删除组 |
+| [chmod](#chmod) | 更改文件或目录的权限 |
+| [chown](#chown) | 更改文件或目录的所有者 |
+| [chgrp](#chgrp) | 更改文件或目录的所属组 |
+| [sudo](#sudo) | 以超级用户身份执行命令 |
+
+## 系统
+
+| 命令 | 描述 |
+| --- | --- |
+| [shutdown](#shutdown) | 关机/重启 |
+| halt | 关机 |
+| reboot | 重启 |
+| logout | 注销用户 |
+| hostname | 查看或设置主机名 |
+| [uptime](#uptime) | 查看系统运行时间和负载 |
+| [uname](#uname) | 显示系统信息 |
+| [lsb_release](#lsb_release) | 查看 Linux 发行版信息 |
+| [poweroff](#poweroff) | 关闭系统 |
+
+## 定时任务
+
+| 命令 | 描述 |
+| --- | --- |
+| [crontab](#crontab) | 设置定期执行的任务 |
+| [at](#at) | 安排一次性任务 |
+
+## 磁盘/设备
+
+| 命令 | 描述 |
+| --- | --- |
+| [df](#df) | 查看文件系统的磁盘空间使用情况 |
+| [du](#du) | 查看指定目录或文件的磁盘使用情况 |
+| [lsblk](#lsblk) | 列出块设备，包括硬盘、分区和挂载点 |
+| [blkid](#blkid) | 查看块设备的 UUID 和文件系统类型 |
+| [lspci](#lspci) | 列出所有 PCI 设备 |
+| [fdisk](#fdisk) | 管理磁盘分区 |
+| [mkfs](#mkfs) | 创建文件系统 |
+| [mount](#mount) | 挂载文件系统 |
+| [umount](#umount) | 卸载文件系统 |
+| [fsck](#fsck) | 检查和修复文件系统错误 |
+| [sync](#sync) |  把内存的数据同步到磁盘 |
+
+## 日志
+
+| 命令 | 描述 |
+| --- | --- |
+| [dmesg](#dmesg) | 查看内核环缓冲区的消息 |
+| [last](#last) | 显示用户的登录历史 |
+| [lastb](#lastb) | 显示失败的登录尝试历史 |
+| [lastlog](#lastlog) | 显示系统中所有用户的最后登录信 |
+| [w](#w) | 显示当前登录用户及其活动状态 |
+| [who](#who) | 查看当前登录的用户 |
+| [users](#users) | 显示当前登录系统的用户列表 |
+| [journalctl](#journalctl) | systemd日志管理 |
+
+## 其他
+
+| 命令 | 描述 |
+| --- | --- |
+| [date](#date) | 显示时间 |
+| [cal](#cal) | 显示日历 |
+| which | 显示输入的命令所在目录 |
+| where | 显示输入的命令所在目录，目录是链接显示原始目录（这个命令好像只在的debian下才有） |
+| whereis | 显示输入的命令所在目录、帮助文件目录等 |
+| history | 历史命令 |
+| [tee](#tee) | 从标准输入读取数据，并将其输出到标准输出和一个或多个文件中 |
+| [xargs](#xargs) | 将标准输入的数据转换为命令行参数，并执行指定命令 |
 
 ---
 
-* `sync`  把内存的数据同步到磁盘. TODO
-* `>`、`>>` 将某个命令的结果重定向到那个位置，一个 `>`表示覆盖，两个 `>>` 表示追加
-  * 例如`ls -l >> info.txt`
-    * `ls -l`意思是显示当前目录下的文件信息，而结果是输出到控制台的，而上面的指令表示把结果输入的info.txt文件内
-* `echo 内容`输出内容到控制台
-
-
-* `history` 查看历史使用过的命令
-  * `history 数字` 查看最近多少次使用过的命令
-  * `! 数字`  这里数字表示历史命令的id，这条命令表示执行对应id的历史命令
----
-
-### 命令说明
+## 命令说明
 
 #### shutdown
 
@@ -122,6 +199,7 @@ shutdown -r now
 useradd 用户名
 
 # 添加用户并指定该用户的家目录地址
+# 可以在/etc/skel目录下获取用户家目录模板文件
 useradd -d 目录路径 用户名
 
 # 添加用户并添加该用户到那个组内
@@ -146,6 +224,9 @@ usermod -g 组名 用户名
 
 # 修改用户home目录
 usermod -d 目录 用户名
+
+# 指定用户的shell
+usermod -s /bin/bash <username>
 ```
 
 #### su
@@ -157,6 +238,24 @@ usermod -d 目录 用户名
 # 切换到a用户
 su a
 ```
+
+#### chmod
+
+```bash
+# 修改目录权限
+chmod 700 <dir>
+
+# 修改用户家目录
+chmod -d <userhome> <username>
+```
+
+#### chown
+
+```bash
+# 修改文件或目录的所属用户和组
+chown -R <username>:<groupname>  <file>
+```
+
 ---
 
 #### ls
@@ -491,7 +590,7 @@ tar -rvf a.tar 3.txt
 
 > 和追加操作类似，不同的是更新会覆盖掉之前的文件
 
-#### `zip`
+#### zip
 
 ```bash
 # 将a.txt压缩生成a.zip
@@ -501,7 +600,7 @@ zip a.zip a.txt
 zip -r a.zip a
 ```
 
-#### `unzip`
+#### unzip
 
 ```bash
 # 将a.zip文件解压到~/Downloads目录下
@@ -509,4 +608,21 @@ unzip a.zip -d ~/Downloads
 
 # 显示a.zip内的内容
 unzip -l a.zip
+```
+
+#### sudo
+
+> 这个命令需要额外安装`apt install sudo`
+
+* 让普通用户可以使用管理员权限执行指定的命令
+
+```bash
+# 创建用户文件
+sudo touch /etc/sudoers.d/<username>
+
+# 添加用户权限
+echo "<username> ALL=(ALL) ALL" | sudo tee -a /etc/sudoers.d/<username>
+
+# 安装软件
+sudo apt install <softname>
 ```

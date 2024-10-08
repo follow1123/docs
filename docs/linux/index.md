@@ -383,8 +383,81 @@ pstree -u
   * `netstat -p` 显示那个进程在调用
   * 常用使用直接输入`netstat -anp` 
 
+
 ## 包管理器
-* centos下使用`rpm`和`yum`
+
+### apt
+
+#### 配置源
+
+* Debian11
+
+```bash
+## tencentyun
+deb http://mirrors.tencentyun.com/debian bullseye main contrib non-free
+deb http://mirrors.tencentyun.com/debian bullseye-updates main contrib non-free
+deb http://mirrors.tencentyun.com/debian bullseye-backports main contrib non-free
+deb http://mirrors.tencentyun.com/debian bullseye-proposed-updates main contrib non-free
+
+## 163
+deb http://mirrors.163.com/debian/ bullseye main non-free contrib
+deb https://mirrors.163.com/debian-security/ bullseye-security main
+deb http://mirrors.163.com/debian/ bullseye-updates main non-free contrib
+deb http://mirrors.163.com/debian/ bullseye-backports main non-free contrib
+
+## huawei
+deb https://mirrors.huaweicloud.com/debian/ bullseye main non-free contrib
+deb https://mirrors.huaweicloud.com/debian-security/ bullseye-security main
+deb https://mirrors.huaweicloud.com/debian/ bullseye-updates main non-free contrib
+deb https://mirrors.huaweicloud.com/debian/ bullseye-backports main non-free contrib
+
+## tsinghua.edu
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-backports main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free
+
+## ustc.edu
+deb https://mirrors.ustc.edu.cn/debian/ bullseye main contrib non-free
+deb https://mirrors.ustc.edu.cn/debian/ bullseye-updates main contrib non-free
+deb https://mirrors.ustc.edu.cn/debian/ bullseye-backports main contrib non-free
+deb https://mirrors.ustc.edu.cn/debian-security/ bullseye-security main contrib non-free
+```
+
+* Debian12
+
+```txt
+deb https://mirrors.aliyun.com/debian/ bookworm main non-free non-free-firmware contrib
+deb https://mirrors.aliyun.com/debian/ bookworm-updates main non-free non-free-firmware contrib
+deb https://mirrors.aliyun.com/debian/ bookworm-backports main non-free non-free-firmware contrib
+deb https://mirrors.aliyun.com/debian-security/ bookworm-security main
+
+deb https://mirrors.163.com/debian/ bookworm main non-free non-free-firmware contrib
+deb https://mirrors.163.com/debian-security/ bookworm-security main
+deb https://mirrors.163.com/debian/ bookworm-updates main non-free non-free-firmware contrib
+deb https://mirrors.163.com/debian/ bookworm-backports main non-free non-free-firmware contrib
+
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
+```
+* ppa源
+    * `apt install software-properties-common` - 软件安装
+    * `add-apt-repository "url"` - 添加ppa源
+    * `add-apt-repository -r "url"` - 删除ppa源
+
+#### 常用命令
+
+* `apt serach <name>` - 搜索软件
+* `apt install <name>` - 安装软件
+* `apt update` - 从配置的源内更新包信息
+* `apt upgrade` - 更新所有软件
+* `apt list --upgradable` - 查看所有可以更新的软件
+* `apt list --installed` - 查看所有已经安装的软件
+* `apt remove <name>` - 删除软件
+* `apt list <name> --all-versions` - 查看软件所有版本
+* `apt show <name>` - 查看软件详细信息
 
 ### rpm包管理
 
