@@ -340,6 +340,38 @@ System.out.println(list);
 
 ---
 
+## java.util.Set
+
+* 用于存储无序不可重复的数据
+
+### 常用方法
+
+* 具体方法参考java.util.Collection内的抽象方法，没有新增的方法
+
+### 实现类
+
+* `HashSet` - 主要实现类，主要实现类；底层使用的是HashMap，使用数组+单向链表+红黑树结进行存储（jdk8），jdk8之前没有红黑树
+* `LinkedHashSet` - 是HashSet的子类；在现有的数组+单向鲢表+红黑树结构的基础上，又添加了一组双向链表，用于记录添加元素的先后顺序。
+可以按照添加元素的顺序实现遍历。便于频繁的查询操作。
+* `TreeSet` - 底层使用红黑树储。可以按照添加的元素的指定的属性的大小顺序进行遍历。
+
+### 无序性和不可重复性
+
+* **无序性** - 无序性不是随机，与添加的元素的位置有关，是根据添加的元素的哈希值，计算的其在数组中的存储位置。此位置不是依次排列的，表现为无序性
+* **不可重复性** - 比较的标准，需要判断`hashCode()`得到的哈希值以及`equals()`的结果。哈希值相同且`equals()`返回`true`，则认为元素是相同的
+* 存入HashSet/LinkedHashSet内的自定义元素必须要重写两个方法：`equals()`和`hashCode()`，并要保证`equals()`和`hashCode()`的一致性
+* [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/set/SetTest.java)
+
+### TreeSet
+
+* 底层数据结构使用**红黑树**
+* 可以按照添加的元素的指定的属性的大小顺序进行遍历
+* 要求添加到TreeSet中的元素必须是同一个类型的对象，否则会报**ClassCastException**。添加的元素需要考虑排序
+* 添加到TreeSet中的元素的类不需要重写`hashCode()`和`equals()`方法
+* 判断数据是否相同的标准：排序方法`compareTo()`或`compare()`的返回值为`0`则两个元素相同
+* [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/set/TreeSetTest.java)
+---
+
 ## ArrayList
 
 * 初始化
