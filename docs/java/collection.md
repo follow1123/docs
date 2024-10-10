@@ -350,8 +350,8 @@ System.out.println(list);
 
 ### 实现类
 
-* `HashSet` - 主要实现类，主要实现类；底层使用的是HashMap，使用数组+单向链表+红黑树结进行存储（jdk8），jdk8之前没有红黑树
-* `LinkedHashSet` - 是HashSet的子类；在现有的数组+单向鲢表+红黑树结构的基础上，又添加了一组双向链表，用于记录添加元素的先后顺序。
+* `HashSet` - 主要实现类，主要实现类；底层使用的是HashMap，使用数组+单向链表+红黑树进行存储（jdk8），jdk8之前没有红黑树
+* `LinkedHashSet` - 是HashSet的子类；在现有的数组+单向链表+红黑树结构的基础上，又添加了一组双向链表，用于记录添加元素的先后顺序。
 可以按照添加元素的顺序实现遍历。便于频繁的查询操作。
 * `TreeSet` - 底层使用红黑树储。可以按照添加的元素的指定的属性的大小顺序进行遍历。
 
@@ -370,7 +370,160 @@ System.out.println(list);
 * 添加到TreeSet中的元素的类不需要重写`hashCode()`和`equals()`方法
 * 判断数据是否相同的标准：排序方法`compareTo()`或`compare()`的返回值为`0`则两个元素相同
 * [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/set/TreeSetTest.java)
+
 ---
+
+## java.util.Map
+
+* 存储键值对（key-value）
+
+### 实现类
+
+* `HashMap` - 主要实现类，线程不安全，效率高，可以添加null的key和value值，
+底层使用**数组**+**单向链表**+**红黑树**进行存储（jdk8），jdk8之前没有红黑树
+* `LinkedHashMap` - 是HashMap的子类；在现有的数组+单向链表+红黑树结构的基础上，又添加了一组双向链表，用于记录添加元素的先后顺序
+* `TreeMap` - 底层使用红黑树存储，可以按照key-value键值对里面的key进行排序
+* `Hashtable` - 旧实现类，线程不安全，效率低，不可以添加null的key或value值
+底层使用**数组**+**单向链表**进行存储
+* `Properties` - 里面的key和value方法都是String类型，常用于处理配置文件
+
+### key-value说明
+
+* key在Map中是无序不可重复的可以理解为Set，key所在的类需要重写`equals()`和`hashCode()`方法
+* value在map中是无序可重复的可以理解为Collection，value所在的类需要重写`equals()`方法
+* Map中的key-value不是分开存放的，而是存放在`Entry`对象内，所有key-value键值对组成`EntrySet`
+
+### 常用方法
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/map/MapTest.java)
+* 添加
+
+```java
+HashMap map = new HashMap();
+map.put("aa", 1);
+map.put("bb", 2);
+
+System.out.println(map);
+
+HashMap m = new HashMap();
+m.put("cc", 3);
+m.put("dd", 4);
+
+map.putAll(m);
+System.out.println(map);
+```
+
+* 删除
+
+```java
+HashMap map = new HashMap();
+map.put("aa", 1);
+map.put("bb", 2);
+System.out.println(map);
+
+Object removedValue = map.remove("aa");
+System.out.println(removedValue);
+System.out.println(map);
+```
+
+* 修改
+
+```java
+HashMap map = new HashMap();
+map.put("aa", 1);
+map.put("bb", 2);
+map.put("cc", 3);
+System.out.println(map);
+
+// put方法在map内已经存在相同的key时就是修改这个key的值
+map.put("bb", 10);
+System.out.println(map);
+
+HashMap m = new HashMap();
+m.put("cc", 20);
+m.put("dd", 4);
+
+// putAll时如果存在相同的key则修改，不存在就添加
+map.putAll(m);
+System.out.println(map);
+```
+
+* 获取
+
+```java
+HashMap map = new HashMap();
+map.put("aa", 1);
+map.put("bb", 2);
+map.put("cc", 3);
+
+System.out.println(map.get("aa"));
+System.out.println(map.get("cc"));
+```
+
+* 遍历
+
+```java
+HashMap map = new HashMap();
+map.put("aa", 1);
+map.put("bb", 2);
+map.put("cc", 3);
+
+// 使用增强for循环遍历map中所有的key
+for (Object key : map.keySet()) {
+    System.out.println(key);
+}
+
+System.out.println("-------------");
+// 使用迭代器遍历map中的所有value
+Collection values = map.values();
+Iterator valIterator = values.iterator();
+while (valIterator.hasNext()){
+    System.out.println(valIterator.next());
+}
+
+System.out.println("-------------");
+// 使用迭代器遍历map中的Entry并获取里面对应的key-value
+Iterator iterator = map.entrySet().iterator();
+while (iterator.hasNext()){
+    Map.Entry next = (Map.Entry) iterator.next();
+    System.out.println("next.getKey() = " + next.getKey());
+    System.out.println("next.getValue() = " + next.getValue());
+}
+
+System.out.println("-------------");
+
+// 根据keySet遍历所有的key-value
+Set keySet = map.keySet();
+for (Object key : keySet) {
+    System.out.println("key = " + key);
+    System.out.println("map.get(key) = " + map.get(key));
+}
+```
+
+* 其他
+
+```java
+HashMap map = new HashMap();
+map.put("aa", 1);
+map.put("bb", 2);
+map.put("cc", 3);
+
+System.out.println(map);
+
+// map的大小，就是entrySet的长度
+System.out.println(map.size());
+
+// 判断map中key为aa的数据
+System.out.println(map.containsKey("aa"));
+
+// 判断map中是否存在value为4的数据
+System.out.println(map.containsValue(4));
+
+// 清空map
+map.clear();
+
+System.out.println(map);
+```
 
 ## ArrayList
 
