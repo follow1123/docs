@@ -92,23 +92,25 @@ unlock tables;
 `-- 使用指定的数据库
 use db_name;
 
--- 给account表添加readlock
+-- 以下操作按左右框内的序号执行
+
+-- 1. 给account表添加readlock
 lock tables account read;
 
--- 执行查询操作，可以正常查询
+-- 2. 执行查询操作，可以正常查询
 select * from account where id = 1;
 
--- 执行修改操作，报错ERROR 1099 (HY000): Table 'account' was locked with a READ lock and can't be updated
+-- 3. 执行修改操作，报错ERROR 1099 (HY000): Table 'account' was locked with a READ lock and can't be updated
 update account set money = 1000 where id = 1;`
         }</CodeBlock>
     <CodeBlock className="v-codeblock-right" language="sql">{
 `-- 使用指定的数据库
 use db_name;
 
--- 执行查询操作，可以正常查询
+-- 4. 执行查询操作，可以正常查询
 select * from account where id = 1;
 
--- 执行修改操作，阻塞，直到account的表锁被释放后执行
+-- 5. 执行修改操作，阻塞，直到account的表锁被释放后执行
 update account set money = 2000 where id = 1;`
         }</CodeBlock>
 </div>
@@ -125,23 +127,23 @@ update account set money = 2000 where id = 1;`
 `-- 使用指定的数据库
 use db_name;
 
--- 给account表添加writelock
+-- 1. 给account表添加writelock
 lock tables account write;
 
--- 执行查询操作，可以正常查询
+-- 2. 执行查询操作，可以正常查询
 select * from account where id = 1;
 
--- 执行修改操作，可以正常修改
+-- 3. 执行修改操作，可以正常修改
 update account set money = 1000 where id = 1;`
         }</CodeBlock>
     <CodeBlock className="v-codeblock-right" language="sql">{
 `-- 使用指定的数据库
 use db_name;
 
--- 执行查询操作，阻塞，直到account的表锁被释放后执行
+-- 4. 执行查询操作，阻塞，直到account的表锁被释放后执行
 select * from account where id = 1;
 
--- 执行修改操作，阻塞，直到account的表锁被释放后执行
+-- 4.1. 执行修改操作，阻塞，直到account的表锁被释放后执行
 update account set money = 2000 where id = 1;`
         }</CodeBlock>
 </div>
