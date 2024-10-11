@@ -178,7 +178,7 @@ sidebar_position: 1
 
 ## 命令说明
 
-#### ls
+### ls
 
 * `-a` - 显示所有文件，包括`.`和`..`
 * `-A` - 显示所有文件，不包括`.`和`..`
@@ -205,17 +205,17 @@ ls -l --sort=size
 ls -l --time=atime
 ```
 
-#### tree
+### tree
 
 * `-d` - 只显示目录
 * `-f` - 显示完整的相对路径
 * `--gitfile=file` - 使用`.gitignore`文件对文件进行过滤
 
-#### stat
+### stat
 
 * `-f` - 跟随链接显示原始文件信息
 
-#### cd
+### cd
 
 ```bash
 # 切换到指定目录
@@ -231,7 +231,7 @@ cd ~
 cd -
 ```
 
-#### mkdir
+### mkdir
 
 * `-p` - 创建目录时，如果父目录不存在则会先创建父目录
 * `-v` - 创建目录时，显示详细信息
@@ -244,7 +244,7 @@ mkdir <dirname>
 mkdir -p a/b/c/d/f/g
 ```
 
-#### cp
+### cp
 
 * `-r` - 如果复制的目录下面还有子文件或目录，则递归复制所有文件或目录
 * `-f` - 如果复制的文件在目标地址已存在，则强制覆盖
@@ -260,7 +260,7 @@ cp a/* ./
 cp -r 原始目录 目标目录
 ```
 
-#### rm
+### rm
 
 * `-r` - 如果删除的目录下面还有子文件或目录，则递归删除所有文件或目录
 * `-f` - 强制删除，不显示错误提示
@@ -273,7 +273,7 @@ rm -r
 rm -f
 ```
 
-#### rmdir
+### rmdir
 
 * `-p` - 如果指定的目录有多级，则会删除所有
 * `-v` - 显示详细信息
@@ -283,7 +283,7 @@ rm -f
 rmdir -p a/b/c
 ```
 
-#### mv
+### mv
 
 * `-f` - 不显示错误提示
 * `-v` - 显示移动过程中的信息
@@ -293,11 +293,11 @@ rmdir -p a/b/c
 mv ./a.txt ./b.txt
 ```
 
-#### ln
+### ln
 
 > 类似文件指针，和Windows下的快捷方式不同，和Windows下的`mklink`命令相同
 
-##### 符号链接（软链接）/硬链接说明
+#### 符号链接（软链接）/硬链接说明
 
 * **符号链接（软链接）** - 可以链接目录，可以跨文件系统，原始文件删除时链接会失效，不会保留文件块
 * **硬链接** - 只能链接文件，不能链接目录，不能跨文件系统，原始文件删除后链接仍然生效，因为硬链接会保留原始文件的文件块
@@ -310,7 +310,7 @@ ln -s 文件或目录 链接
 
 ---
 
-#### cat
+### cat
 
 * `-E` - 显示文件内的换行符号
 * `-n` - 显示行号
@@ -323,7 +323,7 @@ cat <filename>
 cat -n <filename>
 ```
 
-#### head
+### head
 
 * `-c` - 显示前多少个字符
 * `-n` - 显示前多少行内容
@@ -336,7 +336,7 @@ head -n 20 <filename>
 head -c 5 <filename>
 ```
 
-#### tail
+### tail
 
 * `-c` - 显示后多少个字符
 * `-n` - 显示后多少行内容
@@ -350,7 +350,7 @@ tail -n 20 <filename>
 tail -f <filename>
 ```
 
-#### find
+### find
 
 ```bash
 # 显示指定目录下的所以文件和目录
@@ -363,7 +363,7 @@ find ~ -name '*linux*'
 find ~ -size +10m
 ```
 
-#### locate
+### locate
 
 > 使用前必须使用`updatedb`对当前文件系统创建一个文件索引，查找速度快
 
@@ -371,7 +371,7 @@ find ~ -size +10m
 locate <content>
 ```
 
-#### grep
+### grep
 
 * `-i` - 搜索时忽略大小写
 * `-v` - 显示不包含匹配项的所有行
@@ -398,21 +398,64 @@ grep -vE 'abc$' b.txt
 grep -rl --exclude='*.log' 'abc' ./*
 ```
 
-#### awk
+### awk
 
-##### 语法
+* `-F` - 指定字段分隔符
+* `-v` - 传递Shell变量
+* `-f` - 使用awk脚本文件
+
+#### awk测试文件
+
+```bash
+tee users.txt <<eof
+zs 20 1435123141234
+ls 31 942109348430
+ww 25 447934543523
+zl 18 43543435345
+eof
+```
+
+* 使用
+
+```bash
+# 只显示第一列和第三列
+awk '{print $1, $3}' users.txt
+
+# 第一列显示当前家目录
+awk -v hm="$HOME" '{print hm, $1}' users.txt
+
+# 将awk脚本写入文件内使用
+echo "{print \$1, \$2}" > awk-script.awk
+awk -f awk-script.awk users.txt
+
+# 使用1作为字段分隔符
+awk -F'1' '{print $1}' users.txt
+```
+
+#### 语法
 
 * `awk 'pattern { action } file'`
 * `pattern` - 用于匹配行
 * `action` - 对匹配到的行进行的具体操作
 
-##### 字段和记录
+```bash
+# 只显示年龄大于20的用户
+awk '$2 > 20{print $0}' users.txt
+
+# 只显示第2条数据
+awk 'NR == 2{print $0}' users.txt
+
+# 搜索以z开头的数据处理
+awk '/^z/{print $0}' users.txt
+```
+
+#### 字段和记录
 
 * awk将每行文本所为记录，将每个单词（默认以空格分割）作为一个字段
 * `$1`代表记录中的第一个字段，`$2`代表第二个，以此类推
 * `$0`代表所有字段
 
-##### 内置变量
+#### 内置变量
 
 * `NR` - 当前行号
 * `NF` - 当前行的字段数量
@@ -426,11 +469,107 @@ grep -rl --exclude='*.log' 'abc' ./*
 * `ARGV` - 是一个数组，包含所有传递的参数
 * `ARGC` - 传递给awk脚本的参数数量
 
-##### 内置函数
+```bash
+# 显示行号和当前字段个数
+awk '{print NR, $1, $2}' users.txt
+awk '{print NR, NF, $1, $2}' users.txt
 
-##### BEGIN/END块
+# 这种方式也可以修改字段分隔符
+awk 'FS=1{print $1, $2}' users.txt
 
-#### sed
+# 每个字段以，分割
+awk 'OFS=","{print $1, $2}' users.txt
+
+# 多个文件时可以显示对应的文件名
+awk '{print FILENAME, $0}' filename1 filename2 ...
+
+# 多个文件时区分各个文件的行号
+# 在多个文件的情况下NR变量会将所有文件合并起来统一显示行号
+# 而FNR只会显示这个记录在当前文件内的行号
+awk '{print FNR, $0}' filename1 filename2 ...
+
+# 显示环境变量
+awk '{print ENVIRON["HOME"]}' users.txt
+
+# 显示参数的个数，和具体的参数
+awk '{print ARGC, ARGV[0], ARGV[1], ARGV[2]}' users.txt
+```
+
+#### 内置函数
+
+##### 字符串
+
+* `length(s)` - 返回字符串`s`的长度
+* `substr(s, start, length)` - 返回字符串`s`从`start`开始的`length`个字符
+* `index(s, t)` - 返回字符串`t`在字符串`s`中首次出现的位置（从 1 开始），未找到返回 0
+* `toupper(s)` - 转换为大写
+* `tolower(s)` - 转换为小写
+* `gsub(regex, replacement, s)` - 在字符串`s`中，用`replacement`替换所有匹配`regex`的部分，返回替换的次数
+
+```bash
+awk '{print length($3)}' users.txt
+
+awk '{print substr($3, 0, 3)}' users.txt
+
+awk '{print toupper($1)}' users.txt
+```
+
+##### 数值
+
+* `int(n)` - 返回数值`n`的整数部分
+* `rand()` - 返回0到1之间的随机数
+* `srand()` - 设置随机数生成器的种子，需要配合`rand()`使用
+* `sqrt(n)` - 返回数值`n`的平方根
+* `exp(n)` - 返回`e`的`n`次方
+* `log(n)` - 返回数值 n 的自然对数
+
+```bash
+# 获取0~10之间的随机数
+awk '{print int(rand() * 10)}' users.txt
+```
+
+##### 时间函数
+
+* `systime()` - 返回当前的UNIX时间戳（自1970-01-01 00:00:00 UTC起的秒数）
+* `strftime(format, timestamp)` - 将时间戳`timestamp`格式化为指定的字符串格式，`format`使用C语言的`strftime`函数的格式
+
+```bash
+awk '{print systime()}' users.txt
+
+# 格式化时间
+awk '{print strftime("%Y-%m-%d %H:%M:%S", systime())}' users.txt
+```
+
+##### 流程控制
+
+* 和其他变量语言的流程控制语句类似，包含`if-elseif`，`for`，`while`，`do-while`
+    * 其中可以使用`break`跳出当前循环，使用`continue`跳出当次循环
+
+```bash
+# 根据年龄判断新旧用户
+awk '{ if($2 < 20)print $1, "new user"; else print $1, "old user" }' users.txt
+```
+
+#### BEGIN/END块
+
+##### BEGIN
+
+* BEGIN块中的代码在任何输入行被处理之前执行。通常用于初始化变量、设置输出格式或打印标题等
+
+```bash
+# 在处理前打印标题
+awk 'BEGIN { print "Name Age Phone" } { print $1, $2, $3 }' users.txt
+```
+##### END
+
+* END块中的代码在所有输入行处理完成后执行。通常用于输出总结、清理资源或打印最终结果
+
+```bash
+# 求和某age字段的数据
+awk '{ total += $2 } END { print "Total:", total }' users.txt
+```
+
+### sed
 
 
 ```bash
@@ -438,21 +577,21 @@ TODO
 ```
 ---
 
-#### shutdown
+### shutdown
 
 ```bash
 # 立即关机
 shutdown -h now
 
 # 1分钟后会关机
-shudown -h 1
+shutdown -h 1
 
 # 立即重启
 shutdown -r now
 ```
 ---
 
-#### useradd
+### useradd
 
 ```bash
 # 添加用户
@@ -466,7 +605,7 @@ useradd -d 目录路径 用户名
 useradd -g 组名 用户名
 ```
 
-#### userdel
+### userdel
 
 ```bash
 # 删除用户
@@ -476,7 +615,7 @@ userdel 用户名
 userdel -r 用户名
 ```
 
-#### usermod
+### usermod
 
 ```bash
 # 修改用户组
@@ -489,7 +628,7 @@ usermod -d 目录 用户名
 usermod -s /bin/bash <username>
 ```
 
-#### su
+### su
 
 > 登录时尽量少用root帐号登录，因为它是系统管理员，最大的权限，避免操作失误。可以利用普通用户登录，登录后再用`su 用户名`命令来切换成系统管理员身份，或者使用`sudo`以管理员权限执行相关命令
 
@@ -499,7 +638,7 @@ usermod -s /bin/bash <username>
 su a
 ```
 
-#### chmod
+### chmod
 
 ```bash
 # 修改目录权限
@@ -509,7 +648,7 @@ chmod 700 <dir>
 chmod -d <userhome> <username>
 ```
 
-#### chown
+### chown
 
 ```bash
 # 修改文件或目录的所属用户和组
@@ -518,7 +657,7 @@ chown -R <username>:<groupname>  <file>
 
 ---
 
-#### date
+### date
 
 ```bash
 # 显示当前时间
@@ -528,7 +667,7 @@ date
 date "+%Y-%m-%d %H:%M:%S"
 ```
 
-#### cal
+### cal
 
 ```bash
 # 显示当月日历
@@ -539,7 +678,7 @@ cal 2024
 ```
 ---
 
-#### gzip
+### gzip
 
 ```bash
 # 压缩a.txt文件，会在当前目录下生成后的a.txt.gz覆盖掉a.txt文件
@@ -552,7 +691,7 @@ gzip -k a.txt
 gzip -v a.txt
 ```
 
-#### gunzip
+### gunzip
 
 ```bash
 # 解压a.txt.gz文件，会在当前目录下生成后的a.txt覆盖掉a.txt.gz文件
@@ -565,23 +704,23 @@ gunzip -k a.txt.gz
 gunzip -v a.txt.gz
 ```
 
-#### bzip2
+### bzip2
 
 > 基础使用方法和[gzip](#gzip)一样，压缩文件以`bz2`结尾，相比`gzip`有更高的压缩率，但压缩速度相对较慢
 
-#### bunzip2
+### bunzip2
 
 > 基础使用方法和[gunzip](#gunzip)一样
 
-#### xz
+### xz
 
 > 基础使用方法和[gzip](#gzip)一样，压缩文件以`xz`结尾，相比`gzip`和`bzip2`有更高的压缩率，但压缩速度相对较慢
 
-#### unxz
+### unxz
 
 > 基础使用方法和[gunzip](#gunzip)一样
 
-#### tar
+### tar
 
 * 操作参数
     * `-c` 创建
@@ -699,7 +838,7 @@ tar -rvf a.tar 3.txt
 
 > 和追加操作类似，不同的是更新会覆盖掉之前的文件
 
-#### zip
+### zip
 
 ```bash
 # 将a.txt压缩生成a.zip
@@ -709,7 +848,7 @@ zip a.zip a.txt
 zip -r a.zip a
 ```
 
-#### unzip
+### unzip
 
 ```bash
 # 将a.zip文件解压到~/Downloads目录下
@@ -719,7 +858,7 @@ unzip a.zip -d ~/Downloads
 unzip -l a.zip
 ```
 
-#### sudo
+### sudo
 
 > 这个命令需要额外安装`apt install sudo`
 
