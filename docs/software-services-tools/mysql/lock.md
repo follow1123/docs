@@ -1,3 +1,5 @@
+import CodeBlock from '@theme/CodeBlock';
+
 # 锁/InnoDB引擎
 
 * 锁是计算机协调多个进程或线程并发访问某一资源的机制
@@ -20,24 +22,23 @@
 * 左边是使用`mysql -uusername -p`登录的session
 * 右边是命令行终端
 
-<div style={{display: 'flex'}}>
-    <pre style={{flex: 1, margin: '0 2px 0 0'}}>
-        <code>
--- 使用指定的数据库
-use db_name;<br></br>
--- 以下操作按左右框内的序号执行<br></br>
+<div class="v-codeblock-root">
+    <CodeBlock className="v-codeblock-left" language="sql">{
+`-- 使用指定的数据库
+use db_name;
+
+-- 以下操作按左右框内的序号执行
+
 -- 1. 开启全局锁
-flush tables with read lock;<br></br>
+flush tables with read lock;
+
 -- 3. 释放锁
-unlock tables;
-        </code>
-    </pre>
-    <pre style={{flex: 1,margin: '0 0 0 2px'}}>
-        <code>
--- 2. 使用mysqldump备份数据库，如果是备份远程的MySQL仓库，则加上-h参数指定ip
-mysqldump -uusername -ppassword databasename > filename.sql
-        </code>
-    </pre>
+unlock tables;`
+        }</CodeBlock>
+    <CodeBlock className="v-codeblock-right" language="bash">{
+`# 2. 使用mysqldump备份数据库，如果是备份远程的MySQL仓库，则加上-h参数指定ip
+mysqldump -uusername -ppassword databasename > filename.sql`
+        }</CodeBlock>
 </div>
 
 * 在不加锁的情况下完成备份可以使用`mysqldump`命令时添加`--single-transaction`参数
@@ -73,29 +74,30 @@ unlock tables;
 
 * 打开两个命令行窗口，使用`mysql -uusername -p`分别登录两个session
 
-<div style={{display: 'flex'}}>
-    <pre style={{flex: 1, margin: '0 2px 0 0'}}>
-        <code>
--- 使用指定的数据库
-use db_name;<br></br>
+<div class="v-codeblock-root">
+    <CodeBlock className="v-codeblock-left" language="sql">{
+`-- 使用指定的数据库
+use db_name;
+
 -- 给account表添加readlock
-lock tables account read;<br></br>
+lock tables account read;
+
 -- 执行查询操作，可以正常查询
-select * from account where id = 1;<br></br>
+select * from account where id = 1;
+
 -- 执行修改操作，报错ERROR 1099 (HY000): Table 'account' was locked with a READ lock and can't be updated
-update account set money = 1000 where id = 1;
-        </code>
-    </pre>
-    <pre style={{flex: 1,margin: '0 0 0 2px'}}>
-        <code>
--- 使用指定的数据库
-use db_name;<br></br>
+update account set money = 1000 where id = 1;`
+        }</CodeBlock>
+    <CodeBlock className="v-codeblock-right" language="sql">{
+`-- 使用指定的数据库
+use db_name;
+
 -- 执行查询操作，可以正常查询
-select * from account where id = 1;<br></br>
+select * from account where id = 1;
+
 -- 执行修改操作，阻塞，直到account的表锁被释放后执行
-update account set money = 2000 where id = 1;
-        </code>
-    </pre>
+update account set money = 2000 where id = 1;`
+        }</CodeBlock>
 </div>
 
 * 测试发现给account表添加**表共享读锁**的session和其他session都只能对account表进行查询操作，无法进行修改操作
@@ -104,29 +106,30 @@ update account set money = 2000 where id = 1;
 
 * 打开两个命令行窗口，使用`mysql -uusername -p`分别登录两个session
 
-<div style={{display: 'flex'}}>
-    <pre style={{flex: 1, margin: '0 2px 0 0'}}>
-        <code>
--- 使用指定的数据库
-use db_name;<br></br>
--- 给account表添加readlock
-lock tables account write;<br></br>
+<div class="v-codeblock-root">
+    <CodeBlock className="v-codeblock-left" language="sql">{
+`-- 使用指定的数据库
+use db_name;
+
+-- 给account表添加writelock
+lock tables account write;
+
 -- 执行查询操作，可以正常查询
-select * from account where id = 1;<br></br>
+select * from account where id = 1;
+
 -- 执行修改操作，可以正常修改
-update account set money = 1000 where id = 1;
-        </code>
-    </pre>
-    <pre style={{flex: 1,margin: '0 0 0 2px'}}>
-        <code>
--- 使用指定的数据库
-use db_name;<br></br>
+update account set money = 1000 where id = 1;`
+        }</CodeBlock>
+    <CodeBlock className="v-codeblock-right" language="sql">{
+`-- 使用指定的数据库
+use db_name;
+
 -- 执行查询操作，阻塞，直到account的表锁被释放后执行
-select * from account where id = 1;<br></br>
+select * from account where id = 1;
+
 -- 执行修改操作，阻塞，直到account的表锁被释放后执行
-update account set money = 2000 where id = 1;
-        </code>
-    </pre>
+update account set money = 2000 where id = 1;`
+        }</CodeBlock>
 </div>
 
 * 测试发现给account表添加**表独占写锁**的session可以对account表进行读写操作，其他session不能对account表进行读写操作

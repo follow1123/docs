@@ -1,3 +1,5 @@
+import CodeBlock from '@theme/CodeBlock';
+
 # MySQL
 
 * [官网](https://www.mysql.com/)
@@ -964,37 +966,43 @@ INSERT INTO account VALUES (NULL, '张三', 2000), (NULL, '李四', 2000);
 * 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
 * 以下左边为**session1**，右边为**session2**
 
-<div style={{display: 'flex'}}>
-    <pre style={{flex: 1, margin: '0 2px 0 0'}}>
-        <code>
--- 使用指定的数据库
-USE db_name;<br></br>
+<div class="v-codeblock-root">
+    <CodeBlock className="v-codeblock-left" language="sql">{
+`-- 使用指定的数据库
+USE db_name;
+
 -- 设置事务隔离级别为READ UNCOMMITTED
-SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;<br></br>
--- 以下操作按左右框内的序号执行<br></br>
--- 1.开启事务
-START TRANSACTION;<br></br>
--- 3.查询账户表，此时张三的余额是2000
-SELECT * FROM account;<br></br>
--- 5.此时再查询账户表，张三的余额为1000，这就出现了脏读
-SELECT * FROM account;<br></br>
+SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+
+-- 以下操作按左右框内的序号执行
+
+-- 1. 开启事务
+START TRANSACTION;
+
+-- 3. 查询账户表，此时张三的余额是2000
+SELECT * FROM account;
+
+-- 5. 此时再查询账户表，张三的余额为1000，这就出现了脏读
+SELECT * FROM account;
+
 -- 提交事务
-COMMIT;
-        </code>
-    </pre>
-    <pre style={{flex: 1,margin: '0 0 0 2px'}}>
-        <code>
--- 使用指定的数据库
-USE db_name;<br></br>
--- 以下操作按左右框内的序号执行<br></br>
--- 2.开启事务
-START TRANSACTION;<br></br>
--- 4.张三余额扣除1000元
-UPDATE account SET money = money - 1000 WHERE name = '张三';<br></br>
+COMMIT;`
+        }</CodeBlock>
+    <CodeBlock className="v-codeblock-right" language="sql">{
+`-- 使用指定的数据库
+USE db_name;
+
+-- 以下操作按左右框内的序号执行
+
+-- 2. 开启事务
+START TRANSACTION;
+
+-- 4. 张三余额扣除1000元
+UPDATE account SET money = money - 1000 WHERE name = '张三';
+
 -- 提交事务
-COMMIT;
-        </code>
-    </pre>
+COMMIT;`
+        }</CodeBlock>
 </div>
 
 * 以上问题可以将事务隔离级别设置为`READ COMMITTED`及以上级别解决
@@ -1007,37 +1015,43 @@ COMMIT;
 * 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
 * 以下左边为**session1**，右边为**session2**
 
-<div style={{display: 'flex'}}>
-    <pre style={{flex: 1, margin: '0 2px 0 0'}}>
-        <code>
--- 使用指定的数据库
-USE db_name;<br></br>
+<div class="v-codeblock-root">
+    <CodeBlock className="v-codeblock-left" language="sql">{
+`-- 使用指定的数据库
+USE db_name;
+
 -- 设置事务隔离级别为READ COMMITTED
-SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;<br></br>
--- 以下操作按左右框内的序号执行<br></br>
--- 1.开启事务
-START TRANSACTION;<br></br>
--- 3.查询账户表，此时张三的余额是2000
-SELECT * FROM account;<br></br>
--- 6.此时再查询账户表，张三的余额为1000，这就出现了不可重复读
-SELECT * FROM account;<br></br>
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
+
+-- 以下操作按左右框内的序号执行
+
+-- 1. 开启事务
+START TRANSACTION;
+
+-- 3. 查询账户表，此时张三的余额是2000
+SELECT * FROM account;
+
+-- 6. 此时再查询账户表，张三的余额为1000，这就出现了不可重复读
+SELECT * FROM account;
+
 -- 提交事务
-COMMIT;
-        </code>
-    </pre>
-    <pre style={{flex: 1,margin: '0 0 0 2px'}}>
-        <code>
--- 使用指定的数据库
-USE db_name;<br></br>
--- 以下操作按左右框内的序号执行<br></br>
--- 2.开启事务
-START TRANSACTION;<br></br>
--- 4.张三余额扣除1000元
-UPDATE account SET money = money - 1000 WHERE name = '张三';<br></br>
--- 5.提交事务
-COMMIT;
-        </code>
-    </pre>
+COMMIT;`
+        }</CodeBlock>
+    <CodeBlock className="v-codeblock-right" language="sql">{
+`-- 使用指定的数据库
+USE db_name;
+
+-- 以下操作按左右框内的序号执行
+
+-- 2. 开启事务
+START TRANSACTION;
+
+-- 4. 张三余额扣除1000元
+UPDATE account SET money = money - 1000 WHERE name = '张三';
+
+-- 5. 提交事务
+COMMIT;`
+        }</CodeBlock>
 </div>
 
 * 以上问题可以将事务隔离级别设置为`REPEATABLE READ`及以上级别解决
@@ -1049,40 +1063,46 @@ COMMIT;
 * 将事务隔离级别设置为`REPEATABLE READ`
 * 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
 * 以下左边为**session1**，右边为**session2**
+<div class="v-codeblock-root">
+    <CodeBlock className="v-codeblock-left" language="sql">{
+`-- 使用指定的数据库
+use db_name;
 
-<div style={{display: 'flex'}}>
-    <pre style={{flex: 1, margin: '0 2px 0 0'}}>
-        <code>
--- 使用指定的数据库
-use db_name;<br></br>
 -- 设置事务隔离级别为REPEATABLE READ
-SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;<br></br>
--- 以下操作按左右框内的序号执行<br></br>
--- 1.开启事务
-START TRANSACTION;<br></br>
--- 3.查询账户表，此时表内没有id为3的账户
-SELECT * FROM account WHERE id = 3;<br></br>
--- 6.此时新增一个id为3的账户就会出现id重复的错误
-INSERT INTO account (id, name, money) VALUES (3, '王五1', 2000);<br></br>
--- 7.但是根据id为3的条件还是无法查询到数据，这就是幻读
-SELECT * FROM account WHERE id = 3;<br></br>
+SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+-- 以下操作按左右框内的序号执行
+
+-- 1. 开启事务
+START TRANSACTION;
+
+-- 3. 查询账户表，此时表内没有id为3的账户
+SELECT * FROM account WHERE id = 3;
+
+-- 6. 此时新增一个id为3的账户就会出现id重复的错误
+INSERT INTO account (id, name, money) VALUES (3, '王五1', 2000);
+
+-- 7. 但是根据id为3的条件还是无法查询到数据，这就是幻读
+SELECT * FROM account WHERE id = 3;
+
 -- 提交事务
-COMMIT;
-        </code>
-    </pre>
-    <pre style={{flex: 1,margin: '0 0 0 2px'}}>
-        <code>
--- 使用指定的数据库
-USE db_name;<br></br>
--- 以下操作按左右框内的序号执行<br></br>
--- 2.开启事务
-START TRANSACTION;<br></br>
--- 4.新增一条id为3的账户
-INSERT INTO account (id, name, money) VALUES (3, '王五', 1000);<br></br>
--- 5.提交事务
-COMMIT;
-        </code>
-    </pre>
+COMMIT;`
+        }</CodeBlock>
+    <CodeBlock className="v-codeblock-right" language="sql">{
+`-- 使用指定的数据库
+USE db_name;
+
+-- 以下操作按左右框内的序号执行
+
+-- 2. 开启事务
+START TRANSACTION;
+
+-- 4. 新增一条id为3的账户
+INSERT INTO account (id, name, money) VALUES (3, '王五', 1000);
+
+-- 5. 提交事务
+COMMIT;`
+        }</CodeBlock>
 </div>
 
 * 以上问题可以将事务隔离级别设置为`SERIALIZABLE`及以上级别解决

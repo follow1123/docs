@@ -1,3 +1,5 @@
+import CodeBlock from '@theme/CodeBlock';
+
 # 索引
 
 * 索引（index）是帮助MySQL**高校获取数据**的**数据结构（有序）**。在数据之外，
@@ -882,69 +884,78 @@ INSERT INTO account VALUES (NULL, 'zhangsan', 2000), (NULL, 'lisi', 2000);
 
 * 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
 * 以下左边为**session1**，右边为**session2**
+<div class="v-codeblock-root">
+    <CodeBlock className="v-codeblock-left" language="sql">{
+`-- 使用指定的数据库
+USE db_name;
 
-<div style={{display: 'flex'}}>
-    <pre style={{flex: 1, margin: '0 2px 0 0'}}>
-        <code>
--- 使用指定的数据库
-use db_name;<br></br>
--- 以下操作按左右框内的序号执行<br></br>
--- 1.开启事务
-START TRANSACTION;<br></br>
--- 3.更新id为1的数据
-UPDATE account SET money = 1000 WHERE id = 1;<br></br>
+-- 以下操作按左右框内的序号执行
+
+-- 1. 开启事务
+START TRANSACTION;
+
+-- 3. 更新id为1的数据
+UPDATE account SET money = 1000 WHERE id = 1;
+
 -- 提交事务
-COMMIT;
-        </code>
-    </pre>
-    <pre style={{flex: 1,margin: '0 0 0 2px'}}>
-        <code>
--- 使用指定的数据库
-USE db_name;<br></br>
--- 以下操作按左右框内的序号执行<br></br>
--- 2.开启事务
-START TRANSACTION;<br></br>
--- 4.更新id为2的数据，此时正常更新
-UPDATE account SET money = 2000 WHERE id = 2;<br></br>
+COMMIT;`
+        }</CodeBlock>
+    <CodeBlock className="v-codeblock-right" language="sql">{
+`-- 使用指定的数据库
+USE db_name;
+
+-- 以下操作按左右框内的序号执行
+
+-- 2. 开启事务
+START TRANSACTION;
+
+-- 4. 更新id为2的数据，此时正常更新
+UPDATE account SET money = 2000 WHERE id = 2;
+
 -- 提交事务
-COMMIT;
-        </code>
-    </pre>
+COMMIT;`
+        }</CodeBlock>
 </div>
 
 #### 使用其他字段更新数据（未加索引的字段）
 
 * 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
 * 以下左边为**session1**，右边为**session2**
+<div class="v-codeblock-root">
+    <CodeBlock className="v-codeblock-left" language="sql">{
+`-- 使用指定的数据库
+USE db_name;
 
-<div style={{display: 'flex'}}>
-    <pre style={{flex: 1, margin: '0 2px 0 0'}}>
-        <code>
--- 使用指定的数据库
-use db_name;<br></br>
--- 以下操作按左右框内的序号执行<br></br>
--- 1.开启事务
-START TRANSACTION;<br></br>
--- 3.更新name为zhangsan的数据
-UPDATE account SET money = 1000 WHERE name = 'zhangsan';<br></br>
+-- 以下操作按左右框内的序号执行
+
+-- 1. 开启事务
+START TRANSACTION;
+
+-- 3. 更新name为zhangsan的数据
+UPDATE account SET money = 1000 WHERE name = 'zhangsan';
+
 -- 提交事务
-COMMIT;
-        </code>
-    </pre>
-    <pre style={{flex: 1,margin: '0 0 0 2px'}}>
-        <code>
--- 使用指定的数据库
-USE db_name;<br></br>
--- 以下操作按左右框内的序号执行<br></br>
--- 2.开启事务
-START TRANSACTION;<br></br>
--- 4.更新id为2的数据，此时会卡住，由于上一个事务更新时使用了未加索引的字段进行作为条件
--- 导致这张表被锁了，无法更新，需要上一个事务提交后才能继续执行
-UPDATE account SET money = 2000 WHERE id = 2;<br></br>
+COMMIT;`
+        }</CodeBlock>
+    <CodeBlock className="v-codeblock-right" language="sql">{
+`-- 使用指定的数据库
+USE db_name;
+
+-- 以下操作按左右框内的序号执行
+
+-- 2. 开启事务
+START TRANSACTION;
+
+/* 
+4. 更新id为2的数据，此时会卡住
+由于上一个事务更新时使用了未加索引的字段进行作为条件 导致这张表被锁了，无法更新
+需要上一个事务提交后才能继续执行
+*/
+UPDATE account SET money = 2000 WHERE id = 2;
+
 -- 提交事务
-COMMIT;
-        </code>
-    </pre>
+COMMIT;`
+        }</CodeBlock>
 </div>
 
 * 从上面的例子可以看出，InnoDB的行锁是针对索引加的锁，不是针对记录加的锁，

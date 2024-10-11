@@ -31,3 +31,19 @@
   --ifm-heading-color: #bcd1ff;
   --ifm-navbar-search-input-background-color: #2f334d;
 }
+
+.v-codeblock-root {
+  display: flex;
+}
+
+.v-codeblock-left {
+  flex: 1;
+  overflow-x: auto;
+  margin: 0 4px 0 0;
+}
+
+.v-codeblock-right {
+  flex: 1;
+  overflow-x: auto;
+  margin: 0 0 0 4px;
+}
