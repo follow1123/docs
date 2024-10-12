@@ -10,6 +10,16 @@ import CodeBlock from '@theme/CodeBlock';
     * **表级锁** - 每次操作锁住整张表
     * **行级锁** - 每次操作锁住对应的行数据
 
+## 锁查询SQL说明
+
+* 查看**元数据**加锁情况：`select object_type, object_schema, object_name, lock_type, lock_duration from performance_schema.metadata_locks;`
+* 查看**意向锁**和**行锁**加锁情况：`select object_schema, object_name, index_name, lock_type, lock_mode, lock_data from performance_schema.data_locks;`
+    * 部分的字段说明：
+        * `GAP` - 间隙锁
+        * `REC_NOT_GAP` - 普通行锁
+        * 没信息就是临界锁
+
+
 ## 测试数据account表
 
 ```sql
@@ -163,8 +173,6 @@ update account set money = 2000 where id = 1;`
 | `insert、update、delete、select ... for update` | SHARED_WRITE   | 与SHARED_READ、SHARED_WRITE兼容，与EXCLUSIVE互斥    |
 | `alter table ...` | EXCLUSIVE | 与其他的MDL都互斥 |
 
-* 查看元数据加锁情况：`select object_type, object_schema, object_name, lock_type, lock_duration from performance_schema.metadata_locks;`
-
 #### 测试
 
 * 使用[测试数据account表](#测试数据account表)
@@ -207,7 +215,6 @@ select * from account;`
 * 意向锁分为以下两种：
     * **意向共享锁（IS）** - 由语句`select ... lock in share mode`添加，与表锁共享锁（read）兼容，与表锁排他锁（write）互斥
     * **意向排他锁（IX）** - 由`insert、update、delete、select ... for update`添加，与表锁的共享锁和排他锁都互斥，意向锁之间不会互斥
-* 查看**意向锁**和**行锁**加锁情况：`select object_schema, object_name, index_name, lock_type, lock_mode, lock_data from performance_schema.data_locks;`
 * 使用[测试数据account表](#测试数据account表)
 
 <div class="v-codeblock-root">
@@ -289,7 +296,6 @@ unlock tables;`
 * 默认情况下，InnoDB在REPEATABLE READ事务隔离级别运行，InnoDB使用next-key锁进行搜索和索引扫描，以防止读
 * 针对唯一索引进行检索时，对已存在的记录进行等值匹配时，将会自动优化为行锁
 * InnoDB的行锁是针对于索引加的锁，不通过索引条件检索数据，那么InnoDB将对表中的所有记录加锁，此时就会**升级为表锁**
-* 查看**意向锁**和**行锁**加锁情况：`select object_schema, object_name, index_name, lock_type, lock_mode, lock_data from performance_schema.data_locks;`
 
 #### 测试行锁兼容情况
 
@@ -382,7 +388,7 @@ use db_name;
 -- 1. 开启事务，测试意向共享锁
 begin;
 
--- 2. 查询account表，由于修改时没有使用到索引，所以行锁升级为了表锁
+-- 2. 修改account表，由于修改时没有使用到索引，所以行锁升级为了表锁
 update account set name = 'zs' where name = 'zhangsan';
 
 -- 提交事务
@@ -402,3 +408,186 @@ update account set name = 'ls' where id = 2;
 commit;`
         }</CodeBlock>
 </div>
+
+### 间隙锁/临界锁
+
+* 间隙锁唯一目的是防止其他事务插入间
+* 间隙锁可以共存，一个事务采用的间隙锁不会阻止另一个事务在同一间隙上采用间隙锁
+* 索引上的等值查询（唯一索引），给不存在的记录加锁时，优化为间隙锁
+* 索引上的等值查询（普通索引），向右遍历时最后一个值不满足查询需求时， next-key lock退化为间隙锁
+* 索引上的范围查询（唯一索引）会访问到不满足条件的第一个值为止
+
+#### 测试数据`t_user`表
+
+```sql
+create table t_user (
+    id INT PRIMARY KEY  NOT NULL AUTO_INCREMENT,
+    name VARCHAR(50),
+    age TINYINT DEFAULT '0'
+)COMMENT='用户表';
+
+
+INSERT INTO t_user (id, name, age) values
+(1, 'zs', 11),(2, 'ls', 12),(5, 'ww', 20),
+(8, 'zl', 33), (10, 'zz', 18), (12, 'wl', 23)
+```
+
+#### 使用主键索引（唯一索引）更新不存在的数据情况
+
+<div class="v-codeblock-root">
+        <CodeBlock className="v-codeblock-left" language="sql">{
+`-- 使用指定的数据库
+use db_name;
+
+-- 以下操作按左右框内的序号执行
+
+-- 1. 开启事务，测试意向共享锁
+begin;
+
+-- 2. 更新id为3的数据，此时行锁就会优化为间隙锁
+update t_user set name = 'ww' where id = 3;
+
+-- 提交事务
+commit;`
+        }</CodeBlock>
+    <CodeBlock className="v-codeblock-right" language="sql">{
+`-- 使用指定的数据库
+use db_name;
+
+-- 3. 开启事务
+begin;
+
+-- 4. 由于上面的事务更新不存在的数据导致行锁优化成了间隙锁
+-- 将id从2到5之间的间隙锁住了所以会阻塞导致无法插入
+insert into t_user values (4, 'ww1', 12);
+
+-- 提交事务
+commit;`
+        }</CodeBlock>
+</div>
+
+#### 使用普通索引进行等值查询数据的情况
+
+* 将匹配的这一行加锁，并将这行普通索引的左右间隙加锁
+    * 注意：这个左右间隙是针对普通索引的字段
+
+<div class="v-codeblock-root">
+        <CodeBlock className="v-codeblock-left" language="sql">{
+`-- 使用指定的数据库
+use db_name;
+
+-- 以下操作按左右框内的序号执行
+
+-- 1. 给age字段创建普通索引
+create index idx_user_age on t_user(age);
+
+-- 2. 开启事务，测试意向共享锁
+begin;
+
+-- 3. 此时年龄33这条数据会被加上行锁，年龄33左边的年龄数据的间隙会被锁住，也就是年龄23到33之间的数据
+-- 年龄33右边的年龄数据间隙也会被锁住，也就是年龄33到正无穷之间的数据
+select * from t_user where age = 33 lock in share mode;
+
+-- 提交事务
+commit;`
+        }</CodeBlock>
+    <CodeBlock className="v-codeblock-right" language="sql">{
+`-- 使用指定的数据库
+use db_name;
+
+-- 4. 开启事务
+begin;
+
+-- 5. 由于age为33的左边间隙被锁住了，就是年龄23到33之间的年龄数据，所以会阻塞导致无法插入
+insert into t_user values (6, 'aa', 24);
+
+-- 5.1. 由于age为33的右边间隙被锁住了，就是年龄33到正无穷之间的年龄数据，所以会阻塞导致无法插入
+insert into t_user values (7, 'aa', 34);
+
+-- 提交事务
+commit;`
+        }</CodeBlock>
+</div>
+
+#### 使用主键索引（唯一索引）范围查询数据的情况
+
+<div class="v-codeblock-root">
+        <CodeBlock className="v-codeblock-left" language="sql">{
+`-- 使用指定的数据库
+use db_name;
+
+-- 以下操作按左右框内的序号执行
+
+-- 1. 开启事务，测试意向共享锁
+begin;
+
+-- 2. 范围查询时手动添加共享锁
+-- 此时会锁住id为8的数据和所有id大于8并且存在的数据的间隙
+-- 还会锁住最大数据到正无穷数据之间的间隙
+select * from t_user where id >= 8 lock in share mode;
+
+-- 提交事务
+commit;`
+        }</CodeBlock>
+    <CodeBlock className="v-codeblock-right" language="sql">{
+`-- 使用指定的数据库
+use db_name;
+
+-- 3. 开启事务
+begin;
+
+-- 4. 由于id为10的数据被添加了临界锁，所以会阻塞导致无法更新
+update t_user set age = 20 where id = 10;
+
+-- 4.1. 由于id为12的数据被添加了临界锁，所以会阻塞导致无法新增10到12之间的数据
+insert into t_user values (11, 'aa', 18);
+
+-- 4.2. 由于对supremum pseudo-record数据添加了临界锁，就是id最大的数据到正无穷的数据，所以之后的数据都会阻塞导致无法添加
+insert into t_user values (20, 'wer', 33);
+
+-- 4.3. 由于对id为8之前的数据没影响，所以正常更新
+update t_user set age = 22 where id = 2;
+
+-- 提交事务
+commit;`
+        }</CodeBlock>
+</div>
+
+## InnoDB引擎
+
+### 逻辑存储结构
+
+![逻辑存储结构](/img/software-services-tools/Snipaste_2024-09-20_22-01-28.png)
+
+#### 表空间（TableSpace）
+
+* 表空间（ibd文件），一个MySQL实例可以对应多个表空间，用于存储记录、索引等数据
+
+#### 段（Segment）
+
+* 段，分为数据段（Leaf node segment）、索引段（Non-leaf node segment）、回滚段（Rollback segment）
+* InnoDB是索引组织表，数据段就是B+树的叶子节点，索引段即为B+树的非叶子节点。段用来管理多个Extent（区）
+
+#### 区（Extent）
+
+* 区，表空间的单元结构，每个区的大小为1M。默认情况下InnoDB存储引擎页大小为16K，即一个区中一共有64个连续的页
+
+#### 页（Page）
+
+* 页是InnoDB存储引擎磁盘管理的最小单元，每个页的大小默认为16KB，为了保证页的连续性，InnoDB存储引擎每次从磁盘申请4-5个区
+
+##### 行（Row）
+
+* 行，InnoDB存储引擎数据是按行进行存放的
+    * `Trx_id` - 每次对某条记录进行改动时，都会把对应的事务id赋值给`trx_id`隐藏列
+    * `Roll_pointer` - 每次对某条引记录进行改动时，都把旧的版本写入到undo日志中，然后个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息
+
+### 架构
+
+![架构](/img/software-services-tools/innodb-architecture-8-0.png)
+
+### 事务原理
+
+### MVCC
+
+
