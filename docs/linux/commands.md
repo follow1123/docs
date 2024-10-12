@@ -571,9 +571,56 @@ awk '{ total += $2 } END { print "Total:", total }' users.txt
 
 ### sed
 
+#### 选项
+
+* `-n` - 禁止输出模式空间内容，通常与`p`命令结合使用来打印特定行
+* `-e` - 允许同时输入多个脚本命令
+* `-f` - 从文件中读取sed脚本
+* `-i` - 直接在输入文件中进行替换（编辑原文件）
+
+#### 命令
+
+* `i` - 插入
+* `a` - 追加
+* `d` - 删除
+* `s` - 替换
+* `p` - 打印
 
 ```bash
-TODO
+# 测试文件
+tee users.txt <<eof
+zs 20 1435123141234
+ls 31 942109348430
+ww 25 447934543523
+zl 18 43543435345
+eof
+
+# 在第二行插入一条新数据
+sed '2i\zs1 21 342543523' users.txt
+
+# 在第一行的后面添加test文本
+sed '1a\test' users.txt
+
+# 删除第3行数据
+sed '3d' users.txt
+
+# 修改第2行数据的名字
+sed 's/ls/lisi/g' users.txt
+
+# 只打印第3行数据，需要配合-n使用
+sed -n '3p' users.txt
+
+# 修改第一行数据的名字，配合-i选项直接修改原文件
+sed -i 's/zs/zhangsan/g' users.txt
+
+# 删除第2到4行
+sed '2,4d' users.txt
+
+# 删除第一行并修改ww的名字，一个命令要执行多个操作可以使用-e选项
+sed -e '1d' -e 's/ww/wangwu/g' users.txt
+
+# 删除以z开头的行
+sed '/^z/d' users.txt
 ```
 ---
 
