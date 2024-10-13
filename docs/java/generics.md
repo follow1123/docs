@@ -254,3 +254,204 @@ public class A5<T, E> extends A<T> {
 ```
 
 ### 泛型方法
+
+* 泛型方法在声明需要添加泛型参数`<T>`
+* 泛型方法可以是静态方法
+* 方法只使用了泛型类指定的泛型参数，这个方法不是泛型方法
+
+#### 格式
+
+```java
+public <E> E method(E e){
+}
+```
+
+#### 使用
+
+```java
+/**
+ * 普通泛型方法
+ */
+public <E> List<E> add(E[] arr){
+    List<E> list = new ArrayList<>();
+    for (int i = 0; i < arr.length; i++) {
+        list.add(arr[i]);
+    }
+    return list;
+}
+
+/**
+ * 静态多个参数的泛型方法
+ */
+public static <K, V> Map<K, V> put(K k1, V v1, K k2, V v2){
+    Map<K, V> map = new HashMap<>();
+    map.put(k1, v1);
+    map.put(k2, v2);
+
+    return map;
+}
+
+@Test
+public void test() {
+    // 指定泛型参数为Integer
+    List<Integer> list = add(new Integer[]{1, 3, 4, 43,});
+    System.out.println(list);
+
+    // 指定泛型参数为String和Integer
+    Map<String, Integer> map = put("a", 1, "b", 2);
+    System.out.println(map);
+}
+```
+
+## 通配符
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/generics/wildcards/WildcardsTest.java)
+
+### 泛型和继承的关系
+
+* 两个类相同的情况下，尽管这两个类的泛型参数是子父类关系，两个类也不能互相赋值
+
+```java
+// 容器相同，泛型参数是子父类的关系
+ArrayList<Object> list1 = null;
+ArrayList<String> list2 = new ArrayList<>();
+/*
+ 无法将泛型参数为Object的数组赋值给泛型参数为String的数组，尽管String是Object的子类
+ 如果可以的话会出现以下情况
+ list1 = list2;
+ list2.add("a");
+ list1.add(100);
+ 
+ 此时获取获取下标为1的数据时是一个整数，而list2是String类型的数组
+ list2.get(1);
+ */
+// list1 = list2;
+
+// 容器是子父类关系，泛型参数相同
+HashSet<String> set1 = null;
+LinkedHashSet<String> set2 = new LinkedHashSet<>();
+
+// 可以赋值
+set1 = set2;
+
+set1.add("a");
+set2.add("b");
+System.out.println(set1);
+```
+
+### 通配符`?`
+
+* `List<?>`可以作为`List<String>`的父类使用，但是只能读取数据，无法写入数据
+* 由于无法确定类型，所有读取数据的类型都是`Object`
+* 由于所有引用类型的值都可以是null，所以可以写入null值
+
+```java
+List<?> list = null;
+List<String> list1 = new ArrayList<>();
+
+list1.add("a");
+list = list1;
+
+// 可以读取数据
+Object o = list.get(0);
+
+// 无法写入数据
+// list.add("b");
+
+// 但是可以写入null值，因为所有引用类型的值都可以是null
+list.add(null);
+```
+
+### 有限制条件的通配符
+
+* 定义一对父子类`Son`和`Father`，其中`Son`继承`Father`
+
+```java
+// 父类
+public class Father { }
+
+// 子类
+public class Son extends Father{ }
+```
+
+#### `? extends Class`
+
+* 测试extends条件的通配符赋值情况
+
+```java
+List<? extends Father> list = null;
+
+List<Object> list1 = null;
+List<Father> list2 = null;
+List<Son> list3 = null;
+
+// 无法赋值Father类型的父类
+// list = list1;
+
+// 可以赋值Father类型及其子类
+list = list2;
+list = list3;
+```
+
+* 测试extends条件的通配符操作情况
+
+```java
+List<? extends Father> list = null;
+List<Father> list1 = new ArrayList<>();
+
+list1.add(new Father());
+list = list1;
+
+// 可以获取数据，数据的类型确定为Father
+Father father = list.get(0);
+
+/*
+ 无法添加除null以外的所有数据
+ 从List<? extends Father>泛型参数无法看出运行时集合内元素的具体类型，
+ 因为Father的子类可以无限被其子类继承
+ */
+list.add(null);
+// list.add(new Father());
+// list.add(new Son());
+```
+
+#### `? super Class`
+
+* 测试super条件的通配符赋值情况
+
+```java
+List<? super Father> list = null;
+
+List<Object> list1 = null;
+List<Father> list2 = null;
+List<Son> list3 = null;
+
+// 可以赋值为Father和它的父类
+list = list1;
+list = list2;
+
+// 无法赋值Father的子类
+// list = list3;
+```
+
+* 测试super条件的通配符操作情况
+
+```java
+List<? super Father> list = null;
+List<Father> list1 = new ArrayList<>();
+
+list1.add(new Father());
+list = list1;
+
+// 可以获取数据，但无法获取具体类型，所以返回类型是Object
+Object o = list.get(0);
+
+/*
+ 无法添加Father的父类，可以添加Father及其子类
+ 从List<? super Father>泛型参数可以看出运行时集合内元素至少是一个Father类型
+ 所以可以添加Father及其子类
+ */
+// list.add(new Object());
+list.add(new Father());
+list.add(new Son());
+```
