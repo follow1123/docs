@@ -1,3 +1,6 @@
+---
+sidebar_position: 1
+---
 import CodeBlock from '@theme/CodeBlock';
 
 # 索引

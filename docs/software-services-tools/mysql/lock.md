@@ -1,6 +1,9 @@
+---
+sidebar_position: 2
+---
 import CodeBlock from '@theme/CodeBlock';
 
-# 锁/InnoDB引擎
+# 锁
 
 * 锁是计算机协调多个进程或线程并发访问某一资源的机制
 * 在数据库中，除传统的计算资源（CPU、RAM、I/O）的争用以外，数据也是一种供许多用户共享的资源
@@ -552,42 +555,3 @@ update t_user set age = 22 where id = 2;
 commit;`
         }</CodeBlock>
 </div>
-
-## InnoDB引擎
-
-### 逻辑存储结构
-
-![逻辑存储结构](/img/software-services-tools/Snipaste_2024-09-20_22-01-28.png)
-
-#### 表空间（TableSpace）
-
-* 表空间（ibd文件），一个MySQL实例可以对应多个表空间，用于存储记录、索引等数据
-
-#### 段（Segment）
-
-* 段，分为数据段（Leaf node segment）、索引段（Non-leaf node segment）、回滚段（Rollback segment）
-* InnoDB是索引组织表，数据段就是B+树的叶子节点，索引段即为B+树的非叶子节点。段用来管理多个Extent（区）
-
-#### 区（Extent）
-
-* 区，表空间的单元结构，每个区的大小为1M。默认情况下InnoDB存储引擎页大小为16K，即一个区中一共有64个连续的页
-
-#### 页（Page）
-
-* 页是InnoDB存储引擎磁盘管理的最小单元，每个页的大小默认为16KB，为了保证页的连续性，InnoDB存储引擎每次从磁盘申请4-5个区
-
-##### 行（Row）
-
-* 行，InnoDB存储引擎数据是按行进行存放的
-    * `Trx_id` - 每次对某条记录进行改动时，都会把对应的事务id赋值给`trx_id`隐藏列
-    * `Roll_pointer` - 每次对某条引记录进行改动时，都把旧的版本写入到undo日志中，然后个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息
-
-### 架构
-
-![架构](/img/software-services-tools/innodb-architecture-8-0.png)
-
-### 事务原理
-
-### MVCC
-
-
