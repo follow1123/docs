@@ -31,46 +31,120 @@ import CodeBlock from '@theme/CodeBlock';
 
 > 以Windows下安装压缩包版MySQL为例
 
-1. 解压zip文件
+### 安装MySQL`5.7.30`
+
+> 假如安装路径是D:\software
+
+1. 解压zip文件到`D:\software\mysql`目录下，将目录重命名为版本号`5.7.30`
 2. 配置MySQL环境变量
-3. 在MySQL文件夹里面新建一个my.ini文件
+    * <kbd>Win</kbd>+<kbd>q</kbd>输入环境变量，进入**编辑系统环境变量**
+    * 点击**环境变量**按钮
+    * 在你的用户环境变量上新建`MYSQL_HOME`环境变量，值为`D:\software\mysql\5.7.30`
+    * 编辑`Path`环境变量，新建一个`%MYSQL_HOME%\bin`的值
+    * 依次点击确定
+3. 在MySQL目录`D:\software\mysql\5.7.30`内新建一个`my.ini`文件，内容如下：
 
 ```ini
-[mysqlId]
-basedir=mysql安装目录\
-datadir=mysql安装目录\data\
+[mysql]
+# 设置mysql客户端默认字符集
+default-character-set=utf8
+[mysqld]
+#设置3306端口
 port=3306
-skip-grant-tables
+# 设置mysql的安装目录
+basedir=D:/software/mysql/5.7.30
+# 设置mysql数据库的数据的存放目录
+datadir=D:/software/mysql/5.7.30/data
+# 允许最大连接数
+max_connections=200
+# 服务端使用的字符集默认为8比特编码的latin1字符集
+character-set-server=utf8
+# 创建新表时将使用的默认存储引擎
+default-storage-engine=INNODB
 ```
 
-4. 在MySQL目录下新建data文件夹
-5. 以管理员权限进入`cmd`并执行以下命令
-```cmd
-REM 初始化mysql
-mysqld --initialize --console
+4. 以管理员权限进入`cmd`并执行以下命令
 
-REM 安装mysql
-mysqld -install
+```batch
+rem 初始化mysql
+rem 如果电脑上要安装多个版本的mysql，可以使用mysqld install "服务名" --defaults-file="D:\software\mysql\5.7.30\my.ini"
+mysqld install 
 
-REM 启动mysql服务
+rem 初始化mysql相关文件，这行命令执行完成后检查MySQL目录下有没有新建data目录
+mysqld --initialize-insecure --user=mysql
+
+rem 启动mysql服务
 net start mysql
 
-REM 进入MySQL命令行
+rem 进入mysql命令行，进入后提示要输入密码，直接回车
 mysql -uroot -p
 
-REM 修改密码
-SET PASSWORD = PASSWORD('密码');`
-ALTER USER 'root'@'localhost' PASSWORD EXPIRE NEVER;`
+rem 修改密码
+update mysql.user set authentication_string=password('密码') where user='root' and host='localhost';
 
-REM 刷新权限
-flush privileges;`
+rem 刷新权限
+flush privileges;
+
+rem 退出MySQL
+exit
+
+rem 重启服务，安装完成
+net stop mysql
+net start mysql
 ```
 
-6. 修改`my.ini`文件，删除里面的`skip-grant-tables`即可
+5. 安装成功
 
-7. 重启mysql
+### 安装MySQL`8.0.33`
 
-```cmd
+> 假如安装路径是D:\software
+
+1. 解压zip文件到`D:\software\mysql`目录下，将目录重命名为版本号`8.0.33`
+2. 配置MySQL环境变量
+    * <kbd>Win</kbd>+<kbd>q</kbd>输入环境变量，进入**编辑系统环境变量**
+    * 点击**环境变量**按钮
+    * 在你的用户环境变量上新建`MYSQL_HOME`环境变量，值为`D:\software\mysql\8.0.33`
+    * 编辑`Path`环境变量，新建一个`%MYSQL_HOME%\bin`的值
+    * 依次点击确定
+3. 在MySQL目录`D:\software\mysql\8.0.33`内新建一个`my.ini`文件，内容如下：
+
+```ini
+[mysqld]
+#设置3306端口
+port = 3306
+# 设置mysql的安装目录
+basedir=D:/software/mysql/8.0.33
+# 设置mysql数据库的数据的存放目录
+datadir=D:/software/mysql/8.0.33/data
+```
+
+4. 以管理员权限进入`cmd`并执行以下命令
+
+```batch
+rem 初始化mysql
+rem 如果电脑上要安装多个版本的mysql，可以使用mysqld install "服务名" --defaults-file="D:\software\mysql\8.0.33\my.ini"
+mysqld install 
+
+rem 初始化mysql相关文件，这行命令执行完成后检查MySQL目录下有没有新建data目录
+mysqld --initialize-insecure --user=mysql
+
+rem 启动mysql服务
+net start mysql
+
+rem 进入mysql命令行，进入后提示要输入密码，直接回车
+mysql -uroot -p
+
+rem 修改密码
+use mysql;
+alter user root@'localhost' identified by '密码';
+
+rem 刷新权限
+flush privileges;
+
+rem 退出MySQL
+exit
+
+rem 重启服务，安装完成
 net stop mysql
 net start mysql
 ```
@@ -1900,3 +1974,4 @@ source 目标sql路径
 ## 参考
 
 * [黑马MySQL](https://www.bilibili.com/video/BV1Kr4y1i7ru/?spm_id_from=333.999.0.0&vd_source=c8dac761c9fcb8220ee9059d06ac692e)
+* [Windows上同时安装两个不同版本MYSQL](https://blog.csdn.net/Mr_Chp/article/details/132047795)
