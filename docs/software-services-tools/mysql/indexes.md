@@ -27,15 +27,21 @@ import CodeBlock from '@theme/CodeBlock';
 * 二叉搜索树
 
 ```mermaid
-classDiagram
-    class University {
-        - teas: List&lt;Teacher&gt;
-    }
-    class Teacher {
-        - name: String
-        + teach() void
-    }
-    University o-- Teacher
+flowchart TD
+a((36)) --> b1((22))
+a --> b2((48))
+b1 --> c1((19))
+b1 --> c2((33))
+c1 --> d1((17))
+c1 --> d2((20))
+c2 --> d3((23))
+c2 --> d4((34))
+b2 --> c3((45))
+b2 --> c4((53))
+c3 --> d5((40))
+c3 --> d6((46))
+c4 --> d7((50))
+c4 --> d8((70))
 ```
 
 * 如果按顺序插入，就会出现以下情况
