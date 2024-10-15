@@ -887,7 +887,7 @@ INSERT INTO account VALUES (NULL, 'zhangsan', 2000), (NULL, 'lisi', 2000);
 
 * 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
 * 以下左边为**session1**，右边为**session2**
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 USE db_name;
@@ -924,7 +924,7 @@ COMMIT;`
 
 * 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
 * 以下左边为**session1**，右边为**session2**
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 USE db_name;

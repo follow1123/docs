@@ -47,7 +47,7 @@ insert into account values (null, 'zhangsan', 2000), (null, 'lisi', 2000);
 * 左边是使用`mysql -uusername -p`登录的session
 * 右边是命令行终端
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;
@@ -100,7 +100,7 @@ unlock tables;
 * 打开两个命令行窗口，使用`mysql -uusername -p`分别登录两个session
 * 使用[测试数据account表](#测试数据account表)
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;
@@ -135,7 +135,7 @@ update account set money = 2000 where id = 1;`
 * 打开两个命令行窗口，使用`mysql -uusername -p`分别登录两个session
 * 使用[测试数据account表](#测试数据account表)
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;
@@ -180,7 +180,7 @@ update account set money = 2000 where id = 1;`
 
 * 使用[测试数据account表](#测试数据account表)
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;
@@ -220,7 +220,7 @@ select * from account;`
     * **意向排他锁（IX）** - 由`insert、update、delete、select ... for update`添加，与表锁的共享锁和排他锁都互斥，意向锁之间不会互斥
 * 使用[测试数据account表](#测试数据account表)
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;
@@ -305,7 +305,7 @@ unlock tables;`
 * 两个事务对同一行数据添加共享锁情况
 * 使用[测试数据account表](#测试数据account表)
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;
@@ -341,7 +341,7 @@ commit;`
 * 一个事务添加共享锁，一个事务添加排他锁情况
 * 使用[测试数据account表](#测试数据account表)
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;
@@ -381,7 +381,7 @@ commit;`
 * 使用[测试数据account表](#测试数据account表)
 * 这个情况需要对检索数据的字段添加索引解决
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
         <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;
@@ -437,7 +437,7 @@ INSERT INTO t_user (id, name, age) values
 
 #### 使用主键索引（唯一索引）更新不存在的数据情况
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
         <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;
@@ -474,7 +474,7 @@ commit;`
 * 将匹配的这一行加锁，并将这行普通索引的左右间隙加锁
     * 注意：这个左右间隙是针对普通索引的字段
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
         <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;
@@ -514,7 +514,7 @@ commit;`
 
 #### 使用主键索引（唯一索引）范围查询数据的情况
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
         <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;

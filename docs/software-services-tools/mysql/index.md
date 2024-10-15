@@ -1040,7 +1040,7 @@ INSERT INTO account VALUES (NULL, '张三', 2000), (NULL, '李四', 2000);
 * 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
 * 以下左边为**session1**，右边为**session2**
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 USE db_name;
@@ -1089,7 +1089,7 @@ COMMIT;`
 * 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
 * 以下左边为**session1**，右边为**session2**
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 USE db_name;
@@ -1137,7 +1137,7 @@ COMMIT;`
 * 将事务隔离级别设置为`REPEATABLE READ`
 * 打开两个命令行窗口，使用`mysql -u 用户名 -p`登录两个session
 * 以下左边为**session1**，右边为**session2**
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;
@@ -1903,17 +1903,6 @@ SELECT * from app_user_logs;
 ---
 
 ## 其他
-
-### 备份
-
-* 命令行操作
-
-```bash 
-# 导出 表名可不填 不填会到处该数据库的全部表
-mysqldump -h主机 -u用户名 -p密码 数据库名 [表名1[表名2[表名3...]]] > 目标路径+文件名
-# 导入 先登录
-source 目标sql路径
-```
 
 ### 数据库设计规范
 

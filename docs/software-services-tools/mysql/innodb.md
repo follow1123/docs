@@ -2,6 +2,7 @@
 sidebar_position: 3
 ---
 import CodeBlock from '@theme/CodeBlock';
+import PopupMermaid from '@site/src/components/PopupMermaid';
 
 # InnoDB引擎
 
@@ -245,7 +246,7 @@ create table ... tablespace <ts_name>;
     * **Serializable** - 快照读会退化为当前读
 * **MVCC** - 全称**Multi-Version Concurrency Control，多版本并发控制**。指维护一个数据的多个版本，使得读写操作没有冲突，快照读为MySQL实现MVCC提供了一个非阻塞读功能。 MVCC的具体实现，还需要依赖于数据库记录中的三个隐式字段、undo log日志、readView
 
-<div class="v-codeblock-root">
+<div className="v-codeblock-root">
     <CodeBlock className="v-codeblock-left" language="sql">{
 `-- 使用指定的数据库
 use db_name;
@@ -329,28 +330,70 @@ ibd2sdi test_npk.ibd
 
 #### undo log版本链
 
-| 事务2    | 事务3    | 事务4    | 事务5    |
-|---------------- | --------------- | --------------- | --------------- |
-| 开始事务    | 开始事务    | 开始事务    | 开启事务    |
-| 修改id为30的数据，age改为3 | | 查询id为30的数据 | |
-| 提交事务 | | | |
-| | 修改id为30的数据，name改为A3 | | |
-| | | | 查询id为30的数据 |
-| | 提交事务 | | |
-| | | 修改id为30的数据，age改为10 | |
-| | | 查询id为30的数据 | |
-| | | | 查询id为30的数据 |
-| | | 提交事务 | |
+```mermaid
+gantt
+    dateFormat ss
+    axisFormat %S
+    section 事务2
+        begin :a1, 0, 500ms
+        修改id为30的数据，age改为3 :a2, after a1, 1500ms
+        提交事务 :a3, after a2, 1s
+    section 事务3
+        begin :b1, 0, 500ms
+        修改id为30的数据，name改为A3 :b2, after a3, 1500ms
+        提交事务 :b3, after d2, 1s
+    section 事务4
+        begin :c1, 0, 500ms
+        查询id为30的数据 :c2, after c1, 1s
+        修改id为30的数据，age改为10 :c3, after b3, 1500ms
+        查询id为30的数据 :c4, after c3, 1s
+        提交事务 :c5, after d3, 1s
+    section 事务5
+        begin :d1, 0, 500ms
+        查询id为30的数据 :d2, after b2, 1s
+        查询id为30的数据 :d3, after c4, 1s
+```
+
+<PopupMermaid></PopupMermaid>
 
 * 上面表格安装顺序执行会生成以下undo log
 
-![undo log图](/img/software-services-tools/Snipaste_2024-10-14_23-52-37.png)
+```mermaid
+block-beta
+columns 7
+  record
+  block:group1:6
+    columns 5
+    id age name DB_TRX_ID DB_ROLL_PTR
+    id1["30"] age1["10"] name1["A3"] trxid1["4"] rollptr1["0x00003"]
+  end
+  undoLog["undo log"]
+  block:group2:6
+    columns 6
+    addr2["0x00003"] id2["30"] age2["3"] name2["A3"] trxid2["3"] rollptr2["0x00002"]
+    addr3["0x00002"] id3["30"] age3["3"] name3["A30"] trxid3["2"] rollptr3["0x00001"]
+    addr4["0x00001"] id4["30"] age4["30"] name4["A30"] trxid4["1"] rollptr4["null"]
+  end
+
+  rollptr1 --> addr2
+  rollptr2 --> addr3
+  rollptr3 --> addr4
+  classDef header fill:#7bd144,stroke-width:0px
+  classDef hide fill:#7f8b98,stroke-width:0px
+  classDef cell fill:#e0e0e0,stroke-width:0px
+  classDef transparent fill:#00000000,stroke-width:0px
+
+  class id,age,name header
+  class DB_TRX_ID,DB_ROLL_PTR hide
+  class id1,age1,name1,trxid1,rollptr1,id2,age2,name2,trxid2,rollptr2,id3,age3,name3,trxid3,rollptr3,id4,age4,name4,trxid4,rollptr4 cell
+  class record,undoLog,addr2,addr3,addr4 transparent
+```
 
 * 不同事务或相同事务对同一条记录进行修改，会导致该记录的undolog生成一条记录版本链表，链表的头部是最新的旧记录，链表尾部是最早的旧记录
 
 ### readview
 
-* ReadView（读视图）是快照读SQL执行时MVCC提取数据的依据，记录并维护系统当前活跃的事务（未提交的）id
+* ReadView（读视图）是**快照读**SQL执行时MVCC提取数据的依据，记录并维护系统当前活跃的事务（未提交的）id
 * ReadView中包含了四个核心字段：
 
 | 字段   | 含义    |
@@ -360,3 +403,27 @@ ibd2sdi test_npk.ibd
 | `max_trx_id` | 预分配事务ID，当前最大事务ID+1（因为事务ID是自增的）|
 | `creator_trx_id` | ReadView创建者的事务ID |
 
+#### 版本链数据访问规则
+
+* `trx_id（当前事务id）== creator_trx_id` - 可以访问该版本（成立，说明数据是当前这个事务更改的）
+* `trx_id < min_trx_id` - 可以访问该版本（成立，说明数据已经提交了）
+* `trx_id > max_trx_id` - 不可以访问该版本（成立，说明该事务是在ReadView生成后才开启的）
+* `min_trx_id <= trx_id <= max_trx_id && trx_id not in m_ids` - 可以访问该版本（成立，说明数据已经提交）
+* 不同的隔离级别，生成ReadView的时机不同：
+    * **READ COMMITTED** - 在事务中每一次执行快照读时生成ReadView
+    * **REPEATABLE READ** - 仅在事务中第一次执行快照读时生成ReadView，后续复用该ReadView
+
+
+```mermaid
+flowchart TD
+a((获取当前行的trx_id)) --> b{trx_id == creator_trx_id}
+b --是--> z((可以访问))
+b --否--> c{trx_id < min_trx_id}
+c --是--> z
+c --否--> d{trx_id > max_trx_id}
+d --是--> y(获取当前行的DB_ROLL_PTR指向的数据)
+d --否--> e{min_trx_id <= trx_id <= max_trx_id && trx_id not in m_ids}
+e --是--> z
+e --否--> y
+y --> a
+```
