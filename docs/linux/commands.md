@@ -41,7 +41,6 @@ sidebar_position: 1
 | [sort](#sort) | 对文本行进行排序 |
 | [uniq](#uniq) | 去除重复的行 |
 | [wc](#wc) | 统计文件的行数、字数和字符数 |
-| [cut](#cut) | 从文本行中提取字段 |
 | [paste](#paste) | 将多个文件的行并排合并 |
 
 ## 压缩解压
@@ -622,107 +621,71 @@ sed -e '1d' -e 's/ww/wangwu/g' users.txt
 # 删除以z开头的行
 sed '/^z/d' users.txt
 ```
----
 
-### shutdown
+### sort
 
-```bash
-# 立即关机
-shutdown -h now
-
-# 1分钟后会关机
-shutdown -h 1
-
-# 立即重启
-shutdown -r now
-```
----
-
-### useradd
+* `-n` - 按数字排序
+* `-r` - 逆序排序
+* `-u` - 只输出唯一的行
 
 ```bash
-# 添加用户
-useradd 用户名
+# 按数字排序，只是对比每行第一列的字符，不会完全对比数字
+sort -n <filename>
 
-# 添加用户并指定该用户的家目录地址
-# 可以在/etc/skel目录下获取用户家目录模板文件
-useradd -d 目录路径 用户名
+# 按数字排序，降序排序
+sort -nr <filename>
 
-# 添加用户并添加该用户到那个组内
-useradd -g 组名 用户名
+# 输出所有唯一的行
+sort -u <filename>
 ```
 
-### userdel
+### uniq
+
+> 常与`sort`命令结合使用，因为`uniq`只会删除相邻的重复行，单独使用`uniq`时要保证文件是有序的
+
+* `-c` - 计数每个唯一行的出现次数，并在前面显示该计数
+* `-d` - 只显示重复的行
+* `-u` - 只输出唯一的行
+* `-i` - 忽略大小写进行比较
 
 ```bash
-# 删除用户
-userdel 用户名
+# 统计文件内重复行的数量，文件必须有序
+uniq -c <filename>
 
-# 删除用户，并删除该用户的家目录
-userdel -r 用户名
+# 忽略大小写匹配行，并只显示重复的行
+uniq -id <filename>
 ```
 
-### usermod
+### wc
+
+* `-l` - 统计行
+* `-w` - 统计word
+* `-c` - 统计字节（byte）
+* `-m` - 统计字符（char）
+* `-L` - 显示最长的行的长度
+
+### paste
+
+* `-d` - 指定分隔符，默认为制表符（`\t`）
 
 ```bash
-# 修改用户组
-usermod -g 组名 用户名
+# 准备两个文件
+tee a.txt <<eof
+a
+b
+c
+eof
 
-# 修改用户home目录
-usermod -d 目录 用户名
+tee b.txt <<eof
+1
+2
+3
+eof
 
-# 指定用户的shell
-usermod -s /bin/bash <username>
+# 合并两个文件
+paste -d ',' a.txt b.txt
 ```
 
-### su
-
-> 登录时尽量少用root帐号登录，因为它是系统管理员，最大的权限，避免操作失误。可以利用普通用户登录，登录后再用`su 用户名`命令来切换成系统管理员身份，或者使用`sudo`以管理员权限执行相关命令
-
-```bash
-# 不带参数默认切换到root用户
-# 切换到a用户
-su a
-```
-
-### chmod
-
-```bash
-# 修改目录权限
-chmod 700 <dir>
-
-# 修改用户家目录
-chmod -d <userhome> <username>
-```
-
-### chown
-
-```bash
-# 修改文件或目录的所属用户和组
-chown -R <username>:<groupname>  <file>
-```
-
----
-
-### date
-
-```bash
-# 显示当前时间
-date
-
-# 格式化显示时间
-date "+%Y-%m-%d %H:%M:%S"
-```
-
-### cal
-
-```bash
-# 显示当月日历
-cal
-
-# 显示2024年的日历
-cal 2024
-```
 ---
 
 ### gzip
@@ -904,6 +867,192 @@ unzip a.zip -d ~/Downloads
 # 显示a.zip内的内容
 unzip -l a.zip
 ```
+---
+
+### ps
+
+* `ps -ef` - 标准风格显示
+* `ps axu` - BSD风格显示
+* `ps axjf` - 树形结构显示
+
+#### 字段说明
+
+##### `ps -ef`
+
+* `UID` - 用户id
+* `PID` - 进程id
+* `PPID` - 父进程id
+* `C` - CPU使用率
+* `STIME` - 进程启动的时间，`时:分`
+* `TTY` - 终端名称
+* `TIME` - 该进程占用CPU累计的总时间
+* `CMD` - 启动进程的命令和参数
+
+##### `ps axu`
+
+* `USER` - 用户id
+* `PID` - 进程id
+* `%CPU` - CPU使用率
+* `%MEM` - 进程占用物理内存的百分比
+* `VSZ` - 进程占用的虚拟内存大小(单位:KB)
+* `RSS` - 进程占用的物理内存大小(单位:KB )
+* `TTY` - 终端名称,缩写．
+* `STAT` - 进程状态
+    * `D` - 不可中断睡眠（通常为 IO）
+    * `I` - 空闲内核线程
+    * `R` - 正在运行或可运行（在运行队列中）
+    * `S` - 可中断睡眠（等待事件完成）
+    * `T` - 由作业控制信号停止
+    * `t` - 在跟踪期间由调试器停止
+    * `W` - 分页（自 2.6.xx 内核起无效）
+    * `X` - 已死（永远不应出现）
+    * `Z` - 已停止（"僵尸"）进程，已终止但未被其父进程收割
+    * BSD风格额外信息：
+        * `<` - 高优先级（对其他用户不好）
+        * `N` - 低优先级（对其他用户好）
+        * `L` - 将页面锁定在内存中（用于实时和自定义 IO）
+        * `s` - 是会话领导者
+        * `l` - 是多线程的（使用 CLONE_THREAD，就像 NPTL pthreads 一样）
+        * `+` - 位于前台进程组中
+* `STARTED` - 进程启动的时间，`时:分`
+* `TIME` - 该进程占用CPU累计的总时间
+* `COMMAND` - 启动进程的命令和参数
+
+##### `ps axjf`
+
+* `PPID` - 父进程id
+* `PID` - 进程id
+* `PGID` - 进程组id，标识进程所属的进程组
+* `SID` - 会话id，标识进程所属的会话
+* `TTY` - 终端名称,缩写．
+* `TPGID` - 终端进程组id，标识当前终端的前台进程组
+* `STAT` - 进程状态
+* `UID` - 用户id
+* `TIME` - 该进程占用CPU累计的总时间
+* `COMMAND` - 启动进程的命令和参数
+
+#### 常用命令
+
+```bash
+# 查询指定进程id的进程信息
+ps <pid>
+
+# 查询指定命令的进程信息
+ps -C <cmd>
+
+# 查询指定用户的进程信息
+ps -u <username>
+
+# 查询指定组的进程信息
+ps -g <groupname>
+
+# 查看指定进程下的所有子进程
+ps --ppid <parentpid>
+```
+
+---
+
+### shutdown
+
+```bash
+# 立即关机
+shutdown -h now
+
+# 1分钟后会关机
+shutdown -h 1
+
+# 立即重启
+shutdown -r now
+```
+---
+
+### useradd
+
+```bash
+# 添加用户
+useradd 用户名
+
+# 添加用户并指定该用户的家目录地址
+# 可以在/etc/skel目录下获取用户家目录模板文件
+useradd -d 目录路径 用户名
+
+# 添加用户并添加该用户到那个组内
+useradd -g 组名 用户名
+```
+
+### userdel
+
+```bash
+# 删除用户
+userdel 用户名
+
+# 删除用户，并删除该用户的家目录
+userdel -r 用户名
+```
+
+### usermod
+
+```bash
+# 修改用户组
+usermod -g 组名 用户名
+
+# 修改用户home目录
+usermod -d 目录 用户名
+
+# 指定用户的shell
+usermod -s /bin/bash <username>
+```
+
+### su
+
+> 登录时尽量少用root帐号登录，因为它是系统管理员，最大的权限，避免操作失误。可以利用普通用户登录，登录后再用`su 用户名`命令来切换成系统管理员身份，或者使用`sudo`以管理员权限执行相关命令
+
+```bash
+# 不带参数默认切换到root用户
+# 切换到a用户
+su a
+```
+
+### chmod
+
+```bash
+# 修改目录权限
+chmod 700 <dir>
+
+# 修改用户家目录
+chmod -d <userhome> <username>
+```
+
+### chown
+
+```bash
+# 修改文件或目录的所属用户和组
+chown -R <username>:<groupname>  <file>
+```
+
+---
+
+### date
+
+```bash
+# 显示当前时间
+date
+
+# 格式化显示时间
+date "+%Y-%m-%d %H:%M:%S"
+```
+
+### cal
+
+```bash
+# 显示当月日历
+cal
+
+# 显示2024年的日历
+cal 2024
+```
+---
+
 
 ### sudo
 
