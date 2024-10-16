@@ -238,3 +238,140 @@ private void recursionPrintFile(File file){
     }
 }
 ```
+
+---
+
+## Java IO
+
+* I/O流（Input/Output），用于处理设备之间的数据传输。如读/写文件，网络通讯等
+    * **input** - 读取外部数据（磁盘、光盘等存储设备的数据）到程序（内存）中
+    * **output** - 将程序（内存）数据输出到磁盘、光盘等存储设备中
+
+### 流的分类
+
+* `java.io`包下提供了各种**流**类和接囗，用以获取不同种类的数据，并通过标准的方法输入或输出数据
+* 按数据流向不同：
+    * **输入流** - 把数据从**其他设备**上读取到**内存**中的流，以`InputStream`、`Reader`结尾
+    * **输出流** - 把数据从**内存**中写出到**其他设备**上的流，以`OutputStream`、`Writer`结尾
+* 操作数据的单位不同：
+    * **字节流（8bit）** - 以字节为单位，读写数据的流，以`InputStream`、`OutputStream`结尾
+    * **字符流（16bit）** - 以字符为单位，读写数据的流，以`Reader`、`Writer`结尾
+* IO流的角色不同：
+    * **节点流** - 直接从数据源或目的地读写数据
+    * **处理流** - 不直接连接到数据源或目的地，而是**连接**在已存在的流（节点流或处理流）之上，通过对数据的处理为程序提供更为强大的读写功能
+
+### 流的API
+
+* Java的IO流共涉及40多个类，都是从如下4个抽象基类派生的
+
+| 抽象类    | 输出流    | 输出流    |
+|---------------- | --------------- | --------------- |
+| 字节流    | InputStream    | OutputStream    |
+| 字符流    | Reader    | Writer    |
+
+* 由这四个类派生出来的子类名称都是以貝父类名作为子类名后缀
+
+| 分类    | 字节输入流    | 字节输出流    | 字符输入流    | 字符输出流    |
+|---------------- | --------------- | --------------- | --------------- | --------------- |
+| 抽象基类    | **InputStream**    | **OutputStream**    | **Reader**    | **Writer**   |
+| 访问文件   | **FileInputStream**   | **FileOutputStream**   | **FileReader**   | **FileWriter**   |
+| 访问数组   | ByteArrayInputStream   | ByteArrayOutputStream   | CharArrayReader   | CharArrayWriter   |
+| 访问管道   | PipedInputStream   | PipedOutputStream   | PipedReader   | PipedWriter   |
+| 访问字符串 | | | StringReader | StringWriter |
+| 缓冲流 | **BufferedInputStream** | **BufferedOutputStream** | **BufferedReader** | **BufferedWriter** |
+| 对象流 | **ObjectInputStream** | **ObjectOutputStream** | | |
+| 过滤流 | FilterInputStream | FilterOutputStream | FilterReader | FilterWiter |
+| 打印流 | | PrintStream | | PrintWriter |
+| 推回输入流 | PushbackInputStream | | PushbackReader | |
+| 特殊流 | DataInputStream | DataOutputStream | | |
+
+### FileReader/FileWriter
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/file_stream/FileReaderWriterTest.java)
+
+* 使用`FileReader`将数据从文件内一个字符一个字符的读取
+
+```java
+// 创建文件的file对象
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/test1.txt");
+FileReader fileReader = null;
+try {
+    // 创建流
+    fileReader = new FileReader(file);
+    // 读取数据
+    int data;
+    while ((data = fileReader.read()) != -1){
+        System.out.print((char) data);
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+} finally {
+    // 关闭流
+    if (fileReader != null) {
+        try {
+            fileReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+* 使用`try-with-resource`简化关闭流操作
+    * 放入`try()`内的流会自动关闭
+
+```java
+// 创建文件的file对象
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/test1.txt");
+// 创建流
+try(FileReader fileReader = new FileReader(file)){
+    // 读取数据
+    int data;
+    while ((data = fileReader.read()) != -1){
+        System.out.print((char) data);
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+}
+```
+
+* 使用`FileReader`通过添加临时char数组保存数据，减少对磁盘的访问，提高读取速度
+
+```java
+// 创建文件的file对象
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/test1.txt");
+// 创建流
+try(FileReader fileReader = new FileReader(file)){
+    char[] chars = new char[4];
+    // 读取数据，一次读取多个数据
+    int len = 0;
+    while ((len = fileReader.read(chars)) != -1){
+        System.out.print(new String(chars, 0, len));
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+}
+```
+
+* 使用`FileWriter`写出数据
+
+```java
+// 创建文件的file对象
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/test2.txt");
+/*
+ 创建文件输出流
+ 文件不存在默认创建，文件存在默认覆盖
+ 创建输出流时第二个参数，表示文件存在就追加内容
+ */
+try (FileWriter fileWriter = new FileWriter(file)) {
+    // 写出数据
+    fileWriter.write("abc");
+    System.out.println("完成");
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
