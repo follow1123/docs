@@ -375,3 +375,167 @@ try (FileWriter fileWriter = new FileWriter(file)) {
     throw new RuntimeException(e);
 }
 ```
+
+### FileInputStream/FileOutputStream
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/file_stream/FileInputOutputStreamTest.java)
+
+* 使用`FileReader`和`FileWriter`复制图片，图片会损坏
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/jjlight.jpg");
+File destFile = new File(projectPath, "src/main/resources/jjlight_copy.jpg");
+
+try (FileReader fileReader = new FileReader(file);
+     FileWriter fileWriter = new FileWriter(destFile)) {
+    char[] chars = new char[4];
+    int len;
+    while ((len = fileReader.read(chars)) != -1){
+        fileWriter.write(chars, 0, len);
+    }
+
+    System.out.println("done");
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 使用`FileInputStream`和`FileOutputStream`复制图片
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/jjlight.jpg");
+File destFile = new File(projectPath, "src/main/resources/jjlight_copy.jpg");
+
+
+try (FileInputStream fis = new FileInputStream(file);
+     FileOutputStream fos = new FileOutputStream(destFile)) {
+    byte[] bytes = new byte[1024];
+    int len;
+    while ((len = fis.read(bytes)) != -1){
+        fos.write(bytes, 0, len);
+    }
+
+    System.out.println("done");
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 使用`FileInputStream`读取文本文件到控制台上显示
+    * 文本文件内有中文可能乱码
+    * 因为中文编码内一个中文是由多个字节组成的
+    * 在读取数据时，可能刚好读取中文的一半就输出了，所以导致乱码
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/test1.txt");
+
+try (FileInputStream fis = new FileInputStream(file)) {
+    byte[] bytes = new byte[4];
+    int len;
+    while ((len = fis.read(bytes)) != -1){
+        String s = new String(bytes, 0, len);
+        System.out.print(s);
+    }
+
+    System.out.println();
+    System.out.println("done");
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+### BufferedReader/BufferedWriter
+
+> 对[FileReader/FileWriter](#filereaderfilewriter)的包装，
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/buffered/BufferedReaderWriterTest.java)
+
+* 读取utf8文件输出到控制台
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/file_utf8.txt");
+try(BufferedReader br = new BufferedReader(new FileReader(file))) {
+    char[] chars = new char[1024];
+    int len;
+    while ((len = br.read(chars)) != -1){
+        System.out.println(new String(chars, 0, len));
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 读取utf8文件输出到控制台，使用`readLine()`方法
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/file_utf8.txt");
+try(BufferedReader br = new BufferedReader(new FileReader(file))) {
+    String line;
+    // 每次读取一行，不包括行尾的换行符
+    while ((line = br.readLine()) != null){
+        System.out.println(line);
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+
+* 复制文件，使用`flush()`方法
+     * 使用`flush()`将内存的数据实时写出到磁盘
+     * 调用`close()`方法关闭流时也会将数据写入到磁盘
+     * 如果未调用`flush()`，结束时也未调用`close()`方法关闭流，可能出现数据丢失问题
+
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/file_utf8.txt");
+File dest = new File(projectPath, "src/main/resources/file_utf8_copy.txt");
+
+try(BufferedReader br = new BufferedReader(new FileReader(file));
+    BufferedWriter bw = new BufferedWriter(new FileWriter(dest))) {
+    String line;
+    while ((line = br.readLine()) != null){
+        bw.write(line);
+        bw.newLine();
+        /*
+         使用flush()将内存的数据实时写出到磁盘
+         调用close()方法关闭流时也会将数据写入到磁盘
+         如果未调用flush()，结束时也未调用close()方法关闭流，可能出现数据丢失问题
+         */
+        bw.flush();
+    }
+    System.out.println("done");
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+### BufferedInputStream/BufferedOutputStream
+
+> 对[FileInputStream/FileOutputStream](#fileinputstreamfileoutputstream)的包装，
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/buffered/BufferedInputOutputStreamTest.java)
+
+* 使用缓冲流复制大文件
+
+```java
+private void copyVideoWithBuffered(String file, String dest) {
+    try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest))) {
+
+        byte[] bytes = new byte[1024];
+        int len;
+        while ((len = bis.read(bytes)) != -1) {
+            bos.write(bytes, 0, len);
+        }
+
+        System.out.println("done");
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+}
+```
