@@ -297,6 +297,47 @@ git config --global i18n.logoutputencoding utf-8  # 输出 log 编码
 * 本地仓库配置：`git config http.postBuffer 1024000000`
 * 全局配置：`git config –global http.postBuffer 1024000000`
 
+### 本地永久保存Token
+
+* 配置凭证保存方式：`git config --global credential.helper store`
+* 下次拉取或推送时提示需要输入用户名和密码
+    * 用户名输入账户名称
+    * 密码就输入Token
+    * 凭证保存在`~/.git-credentials`
+
+### GitHub Actions自动发布
+
+1. 当前仓库下创建`.github/workflows/release.yml`文件
+
+```yaml
+name: Build Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*" # 当推送版本号为v0.1.0类似的格式时进行构建
+
+jobs:
+  build:
+    runs-on: windows-latest # 在windows上进行构建，可选ubuntu-latest的Linux环境
+    steps: # 以下操作是构建软件包时的步骤
+      - name: Checkout code
+        uses: actions/checkout@v2  # 检出代码
+      - name: Build
+        run: <scripts> # 这里可以写需要执行的脚本
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: <package-name> # 软件包名
+```
+
+2. 打开仓库，进入`Settings`页面
+3. 找到`Actions`点击下面的`General`进入
+4. 找到`Workflow permissions`部分
+5. 选择`Read and write permissions`，勾选`Allow GitHub Actions to create and approve pull requests`
+
 ---
 
 ## 参考
