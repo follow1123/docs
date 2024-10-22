@@ -279,15 +279,18 @@ private void recursionPrintFile(File file){
 | 访问管道   | PipedInputStream   | PipedOutputStream   | PipedReader   | PipedWriter   |
 | 访问字符串 | | | StringReader | StringWriter |
 | 缓冲流 | **BufferedInputStream** | **BufferedOutputStream** | **BufferedReader** | **BufferedWriter** |
+| 转换流 | | | **InputStreamReader** | **OutputStreamWriter** |
 | 对象流 | **ObjectInputStream** | **ObjectOutputStream** | | |
 | 过滤流 | FilterInputStream | FilterOutputStream | FilterReader | FilterWiter |
 | 打印流 | | PrintStream | | PrintWriter |
 | 推回输入流 | PushbackInputStream | | PushbackReader | |
 | 特殊流 | DataInputStream | DataOutputStream | | |
 
-### FileReader/FileWriter
+## 字符流
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/file_stream/FileReaderWriterTest.java)
+
+### FileReader
 
 * 使用`FileReader`将数据从文件内一个字符一个字符的读取
 
@@ -356,6 +359,8 @@ try(FileReader fileReader = new FileReader(file)){
 }
 ```
 
+### FileWriter
+
 * 使用`FileWriter`写出数据
 
 ```java
@@ -376,9 +381,11 @@ try (FileWriter fileWriter = new FileWriter(file)) {
 }
 ```
 
-### FileInputStream/FileOutputStream
+## 字节流
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/file_stream/FileInputOutputStreamTest.java)
+
+### FileInputStream/FileOutputStream
 
 * 使用`FileReader`和`FileWriter`复制图片，图片会损坏
 
@@ -447,9 +454,13 @@ try (FileInputStream fis = new FileInputStream(file)) {
 }
 ```
 
-### BufferedReader/BufferedWriter
+## 缓冲流
 
-> 对[FileReader/FileWriter](#filereaderfilewriter)的包装，
+### 字符缓冲流
+
+#### BufferedReader/BufferedWriter
+
+> 对[FileReader](#filereader)和[FileWriter](#filewriter)的包装，
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/buffered/BufferedReaderWriterTest.java)
 
 * 读取utf8文件输出到控制台
@@ -515,7 +526,9 @@ try(BufferedReader br = new BufferedReader(new FileReader(file));
 }
 ```
 
-### BufferedInputStream/BufferedOutputStream
+### 字节缓冲流
+
+#### BufferedInputStream/BufferedOutputStream
 
 > 对[FileInputStream/FileOutputStream](#fileinputstreamfileoutputstream)的包装，
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/buffered/BufferedInputOutputStreamTest.java)
@@ -537,5 +550,316 @@ private void copyVideoWithBuffered(String file, String dest) {
     } catch (IOException e) {
         throw new RuntimeException(e);
     }
+}
+```
+
+## 转换流
+
+* 编码和解码
+    * **编码** - 将可以识别的内容转换为不能识别的内容
+    * **解码** - 将不能识别的内容转换为可以识别的内容
+* **字符集** - 编码和解码时对应的字典
+* 解码时的字符集和编码时的字符集必须相同
+* 大部分常用的字符集（UTF-8、GBK等）都兼容ASCII
+
+| 字符集   | 描述    |
+|--------------- | --------------- |
+| ASCII   | 包含128个字符，基本的拉丁字母、数字和常用符号   |
+| ISO-8859-1 | 包含西欧语言的字符，每个字符占1个字节，兼容ASCII |
+| GBK | 存储中间简体繁体，中文占2个字节，兼容ASCII，如果是ASCII还是占用一个字节 |
+| UTF-8 | 存储世界上所有字符，Unicode的实现，使用1~4个不等长的字节表示一个字符，中文占3个字节，兼容ASCII，占1个字节 |
+
+### InputStreamReader/OutputStreamWriter
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/transform/EncodeDecodeTest.java)
+
+* 读取UTF-8格式保存的文本并在控制台打印
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/file_utf8.txt");
+try(InputStreamReader isr = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)){
+    char[] chars = new char[1024];
+    int len;
+    while ((len = isr.read(chars)) != -1){
+        System.out.println(new String(chars, 0, len));
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 读取GBK格式保存的文本并在控制台打印
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/file_gbk.txt");
+try(InputStreamReader isr = new InputStreamReader(new FileInputStream(file), Charset.forName("gbk"))){
+    char[] chars = new char[1024];
+    int len;
+    while ((len = isr.read(chars)) != -1){
+        System.out.println(new String(chars, 0, len));
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 将UTF-8格式文本转换为GBK格式并保存
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/file_utf8.txt");
+File file1 = new File(projectPath, "src/main/resources/file_gbk.txt");
+try(InputStreamReader isr = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
+    OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(file1), Charset.forName("gbk"))) {
+    char[] chars = new char[1024];
+    int len;
+    while ((len = isr.read(chars)) != -1){
+        osw.write(chars, 0, len);
+    }
+    System.out.println("done");
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+## 对象流
+
+* **数据流** - `DataInputStream/DataOutputStream` 8种基本数据类型和String类型的输入输出流操作
+* **对象流** - `ObjectInputStream/ObjectOutputStream` 除了支持数据流所支持的类型，还支持对象
+
+### 对象序列化机制
+
+* 对象序列化机制允许把内存中的Java对象转换成平台无关的二进制流，从而允许把这种二进制流持久地保存在磁盘上，或通过网络将这种二进制流传输到另一个网络节点
+* 当其它程序获取了这种二进制流，就可以恢复成原来的Java对象
+* 序列化和反序列化过程：
+    * **序列化** - 使用`ObjectOutputStream`将内存中的Java保存在文件或通过网络传输
+    * **反序列化** - 使用`ObjectInputStream`将文件中的数据还原为内存中的Java对象
+* 实现自定义类进行序列化相关说明：
+    * 需要实现`Serializale`接口
+    * 需要声明一个全局常量：`static final long serialVersionUID = 213432432L;`用来唯一标识这个类
+        * 没加这个全局常量的情况下，系统后自动生成一个`serialVersionUID`，如果修改这个类后在进行反序列化，就会出现`InvalidClassException`异常
+    * 如果对象内有自定义的属性，这个属性也需要实现`Serializale`接口
+    * 类中的属性如果声明为`transient`或`static`，则不会实现序列化
+
+### ObjectInputStream/ObjectOutputStream
+
+#### 基本数据类型和String的操作
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/object_stream/DataObjectStreamTest.java)
+
+* 序列化
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/data.txt");
+try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+    oos.writeInt(1);
+    oos.writeFloat(1.1F);
+    oos.writeChar('a');
+    oos.writeBoolean(true);
+    oos.writeUTF("测试");
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 反序列化
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/data.txt");
+try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+    // 读取的循序必须和写入的顺序一致
+    System.out.println(ois.readInt());
+    System.out.println(ois.readFloat());
+    System.out.println(ois.readChar());
+    System.out.println(ois.readBoolean());
+    System.out.println(ois.readUTF());
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+#### 对象的序列化和反序列化
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/object_stream/object_serialization/ObjectStreamTest.java)
+
+* 对没有实现Serializable接口的对象进行序列化
+    * 报错NotSerializableException
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/object1.txt");
+// 序列化对象
+try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+    ObjNonSerializable obj = new ObjNonSerializable("a", 1);
+    oos.writeObject(obj);
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 测试实现Serializable接口的对象，但是没添加serialVersionUID属性
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/object2.txt");
+// 序列化对象
+// try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+//     ObjNoVersionUID obj = new ObjNoVersionUID("a", 1);
+//     oos.writeObject(obj);
+// } catch (IOException e) {
+//     throw new RuntimeException(e);
+// }
+
+// 反序列化对象
+try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+    /*
+     反序列化正常
+     但如果在类中新加一个属性后就会报错InvalidClassException
+     因为实现Serializable接口后默认自动生成一个serialVersionUID
+     而修改类后这个serialVersionUID就和之前的不一样了，而文件内还是使用的之前的id，所以报错
+     */
+    ObjNoVersionUID obj = (ObjNoVersionUID) ois.readObject();
+    System.out.println(obj);
+} catch (IOException | ClassNotFoundException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 测试实现Serializable接口的对象，并添加serialVersionUID属性
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/object3.txt");
+// 序列化对象
+// try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+//     ObjSerializable obj = new ObjSerializable("a", 1);
+//     oos.writeObject(obj);
+// } catch (IOException e) {
+//     throw new RuntimeException(e);
+// }
+
+// 反序列化对象
+try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+    /*
+     反序列化正常，无论怎么修改类都正常
+     */
+    ObjSerializable obj = (ObjSerializable) ois.readObject();
+    System.out.println(obj);
+} catch (IOException | ClassNotFoundException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 测试实现Serializable接口的对象，但有个属性没有实现Serializable接口
+    * 报错NotSerializableException
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/object4.txt");
+// 序列化对象
+try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+    ObjHasNonSerializableField obj = new ObjHasNonSerializableField("a", 1, new ObjNonSerializable("b", 2));
+    oos.writeObject(obj);
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 测试序列化实现Serializable接口的对象，有transient关键字标记的属性和静态属性
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/object5.txt");
+// 序列化对象
+try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+    ObjHasSpecialField obj = new ObjHasSpecialField("a", 1, 1.1F);
+    oos.writeObject(obj);
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 测试反序列化实现Serializable接口的对象，有transient关键字标记的属性和静态属性
+    * 由于静态属性赋值后直到程序结束不会消失，所以反序列化需要单独测试
+
+```java
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/object5.txt");
+// 反序列化对象
+try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+    /*
+     反序列化正常
+     使用transient标记的属性和静态属性都未保存
+     */
+    ObjHasSpecialField obj = (ObjHasSpecialField) ois.readObject();
+    System.out.println(obj);
+} catch (IOException | ClassNotFoundException e) {
+    throw new RuntimeException(e);
+}
+```
+
+## 其他流
+
+### 标准输入、输出流
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/other/StandStreamTest.java)
+
+* `System.in` - 标准输入流，默认从键盘输入
+* `System.out` - 标准输出流，默认输出到控制台
+* 使用`setIn()/setOut()`修改输入输入流的位置，因为in和out两个属性是final标识的，在Java层面无法修改，所以底层调用`c/c++`代码实现
+
+```java
+String projectPath = System.getProperty("user.dir");
+File fileA = new File(projectPath, "src/main/resources/a.txt");
+File fileB = new File(projectPath, "src/main/resources/b.txt");
+System.out.println("输入a开头的字符保存到a.txt文件内\n输入b开头的字符保存到b.txt文件内\n输入q退出");
+try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+     PrintStream psA = new PrintStream(fileA);
+     PrintStream psB = new PrintStream(fileB)) {
+    PrintStream defaultPs = System.out;
+
+    String line;
+
+    while (!(line = br.readLine()).equals("q")){
+        if (line.startsWith("a")){
+            System.setOut(psA);
+        }else if (line.startsWith("b")){
+            System.setOut(psB);
+        }else {
+            System.setOut(defaultPs);
+        }
+        System.out.println(line);
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+### 字节数组流
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/other/ByteArrayStreamTest.java)
+
+* 对字节数组进行操作
+
+```java
+try {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream(5);
+    baos.write(1);
+    baos.write(new byte[]{2, 3, 4, 5});
+
+    // 转换为byte数组
+    byte[] byteArray = baos.toByteArray();
+    ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+
+    System.out.println(bais.read());
+    System.out.println(bais.read());
+    System.out.println(bais.read());
+    System.out.println(bais.read());
+} catch (IOException e) {
+    e.printStackTrace();
 }
 ```
