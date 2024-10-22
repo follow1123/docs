@@ -68,9 +68,6 @@ sidebar_position: 1
 | [top](#top) | 实时显示进程信息和系统资源使用情况 |
 | [kill](#kill) | 终止指定的进程 |
 | [pkill](#pkill) | 根据名称终止进程 |
-| [killall](#killall) | 终止所有匹配指定名称的进程 |
-| [bg](#bg) | 将后台任务放入后台运行 |
-| [fg](#fg) | 将后台任务恢复到前台 |
 | [systemctl](#systemctl) | systemd服务管理 |
 | [service](#service) | SysVinit服务管理 |
 
@@ -83,10 +80,10 @@ sidebar_position: 1
 | [ip](#ip) | 更现代的网络配置工具，提供了更丰富的功能 |
 | [netstat](#netstat) | 显示网络连接、路由表和网络接口统计 |
 | [ss](#ss) | 查看当前的网络连接状态 |
-| [wget](#wget) | 从网络下载文件 |
 | [route](#route) | 路由 |
-| [firewall-cmd](#firewall-cmd) | 用于管理 firewalld 防火墙服务 |
 | [arp](#arp) | 查看和管理 ARP 缓存 |
+| [firewall-cmd](#firewall-cmd) | 用于管理 firewalld 防火墙服务 |
+| [wget](#wget) | 从网络下载文件 |
 
 ## 用户/组/权限
 
@@ -102,13 +99,13 @@ sidebar_position: 1
 | [chage](#chage) | 更改用户密码的过期信息 |
 | [su](#su) | 切换用户 |
 | groups | 显示当前用户再那些组下 |
-| groupadd | 新增组 |
-| groupmod | 修改组 |
-| groupdel | 删除组 |
+| [groupadd](#groupadd) | 新增组 |
+| [groupmod](#groupmod) | 修改组 |
+| [groupdel](#groupdel) | 删除组 |
 | [chmod](#chmod) | 更改文件或目录的权限 |
 | [chown](#chown) | 更改文件或目录的所有者 |
 | [chgrp](#chgrp) | 更改文件或目录的所属组 |
-| [sudo](#sudo) | 以超级用户身份执行命令 |
+| [sudo](#sudo) | 以指定用户执行命令 |
 
 ## 系统
 
@@ -1054,7 +1051,6 @@ kill -l
 
 #### 信号
 
-
 | 信号名称 |  信号编号 |  描述 |
 | --- | --- | --- |
 | `SIGHUP`    | 1 | 挂起信号，通常用于通知进程重新加载配置 |
@@ -1085,19 +1081,195 @@ kill -l
 | `SIGSYS`    | 26    | 无效系统调用信号 |
 | `SIGUNUSED` | 27    | 未使用的信号 |
 
----
 
-### shutdown
+### pkill
+
+* 指定进程名称发送终止信号
 
 ```bash
-# 立即关机
-shutdown -h now
+# 发送终止信号到指定名称的进程
+pkill <pname>
 
-# 1分钟后会关机
-shutdown -h 1
+# 指定父进程id发送终止信号到其下得所有子进程
+pkill -P <ppid>
+```
 
-# 立即重启
-shutdown -r now
+### systemctl
+
+* 参考[systemctl](./systemd#服务相关)
+
+### service
+
+```bash
+# 启动服务
+service <servicename> start
+
+# 重启服务
+service <servicename> restart
+
+# 查看服务状态
+service <servicename> status
+
+# 重新加载服务配置文件
+service <servicename> reload
+
+# 停止服务
+service <servicename> stop
+```
+
+---
+
+### ping
+
+* `-c` - 指定发送请求次数
+* `-i` - 指定发送请求时间间隔
+* `-s` - 指定发送得数据包大小
+* `-4/-6` - 指定IPV4或IPV6
+
+```bash
+# 测试ip或主机是否可以访问
+ping <ip>
+
+# 测试ip或主机是否可以访问，指定请求次数
+ping -c 4 <ip>
+```
+
+### ifconfig
+
+```bash
+# 查看所有网络接口信息
+ifconfig
+
+# 查看指定接口信息
+ifconfig <interfacename>
+
+# 启用接口
+ifconfig <interfacename> up
+
+# 禁用接口
+ifconfig <interfacename> down
+```
+
+### ip
+
+#### 网络接口
+
+```bash
+# 查看所有网络接口
+ip link
+
+# 启用
+ip link set <interfacename> up
+
+# 禁用
+ip link set <interfacename> down
+```
+
+#### IP地址
+
+* `ip addr` - 查看所有ip地址信息
+
+#### 路由
+
+* `ip route` - 查看路由信息
+
+#### 策略路由
+
+* `ip rule` - 查看路由规则信息
+
+
+### netstat
+
+* `-a` - 显示所有连接信息
+* `-l` - 只显正在监听的服务
+* `-n` - 以数字形式显示地址和端口号，不解析域名
+
+#### 字段说明
+
+* **Proto** - 协议类型（TCP/UDP）
+* **Recv-Q** - 接收队列中未处理的数据字节数
+* **Send-Q** - 发送队列中等待发送的数据字节数
+* **Local Address** - 本地地址和端口
+* **Foreign Address** - 远程地址和端口
+* **State** - 连接状态（如ESTABLISHED、LISTEN、CLOSE_WAIT等）
+
+
+```bash
+# 查看详细信息
+netstat -ano
+```
+
+### ss
+
+* `-a` - 显示所有连接信息
+* `-l` - 只显正在监听的服务
+* `-n` - 以数字形式显示地址和端口号，不解析域名
+* `-4/-6` - 分别显示IPv4或IPv6的套接字信息
+
+### route
+
+```bash
+# 以数字形式显示地址和端口号的路由信息
+route -n
+```
+
+### arp
+
+* `-a` - 显示所有缓存信息
+* `-n` - 以数字形式显示地址和端口号，不解析域名
+
+#### 字段说明
+
+* **Address** - 表示设备的IP地址（IPv4地址），这是ARP缓存中记录的网络地址
+* **HWtype** - 表示硬件类型，通常为ether，表示以太网。此字段指示所使用的网络协议类型
+* **HWaddress** - 表示设备的MAC地址，这是通过ARP协议解析得来的物理地址。它以六个两位十六进制数字的形式显示，例如00:1A:2B:3C:4D:5E
+* **Flags** - 表示ARP条目的状态标志。常见标志包括：
+    * **C** - 示此条目是缓存条目（即已存储的ARP条目）
+    * **M** - 示此条目是手动设置的条目
+* **Mask** - 表示网络掩码，通常在使用ARP的上下文中不常用，但如果存在，可能会指示该条目所属的子网掩码
+
+### firewall-cmd
+
+> 可能需要手动安装sudo apt install firewalld
+
+* `--state` - 显示firewalld的当前状态
+* `--list-all` - 列出当前区域的所有设置
+* `--add-port=<port>/[protocol]` - 开放指定端口
+* `--remove-port=<port>/[protocol]` - 关闭指定端口
+* `--permanent` - 使更改永久生效，防止在防火墙重启时丢失
+* `--reload` - 重新加载防火墙配置，使永久更改生效
+* `--query-port=<port>/[protocol]` - 查询指定端口是否开放
+
+```bash
+# 开放22端口流程
+
+# 查询22端口是否开放
+firewall-cmd --query-port=22/tcp
+
+# 如果不存在则添加
+firewall-cmd --permanent --add-port=22/tcp
+
+# 重新加载配置
+firewall-cmd --reload
+
+# 再次查询
+firewall-cmd --query-port=22/tcp
+```
+
+### wget
+
+* `-O` - 指定下载文件的名称
+* `-P` - 指定下载文件保存的目录
+* `-q` - 不显示输出信息
+* `--limit-rate=<rate>` - 下载限速，单位k、m等
+* `-b` - 后台下载，日志文件在当前目录`wget-log`文件
+
+```bash
+# 下载文件
+wget <url> -O <filename>
+
+# 将下载速度限制在100k/s
+wget --limit-rate=100k <url>
 ```
 ---
 
@@ -1136,6 +1308,26 @@ usermod -d 目录 用户名
 
 # 指定用户的shell
 usermod -s /bin/bash <username>
+
+# 添加用户到多个组
+usermod -aG <username> <groupname1>,<groupname2>
+```
+
+### chage
+
+* `-l` - 列出指定用户的密码过期信息
+* `-m <days>` - 设置用户密码的最小使用天数（密码在这段时间内无法更改）
+* `-M <days>` - 设置用户密码的最大有效天数（超过此天数需要更改密码）
+* `-I <days>` - 设置密码过期后，用户在此天数内未使用账户将被锁定
+* `-E <date>` - 设置用户账户的到期日期（格式为YYYY-MM-DD）
+* `-W <days>` - 设置在密码到期前的警告天数（用户在此期间会收到通知）
+
+```bash
+# 查看指定用户密码过期信息
+chage -l <username>
+
+# 指定用户的密码30天后过期
+chage -M 30 <username>
 ```
 
 ### su
@@ -1147,6 +1339,37 @@ usermod -s /bin/bash <username>
 # 切换到a用户
 su a
 ```
+
+### groupadd
+
+```bash
+# 创建一个新组
+groupadd <groupname>
+
+# 创建一个新组，并指定组id
+groupadd -g <groupid> <groupname>
+
+# 强制创建一个新组
+groupadd -f <groupname>
+```
+
+### groupmod
+
+```bash
+# 修改组名称
+groupmod -n <newgroupname> <groupname>
+
+# 修改组id
+groupmod -g <groupid> <groupname>
+```
+
+### groupdel
+
+```bash
+# 删除指定的组
+groupdel <groupname>
+```
+
 
 ### chmod
 
@@ -1161,8 +1384,80 @@ chmod -d <userhome> <username>
 ### chown
 
 ```bash
-# 修改文件或目录的所属用户和组
-chown -R <username>:<groupname>  <file>
+# 修改指定文件的所属用户
+chown <username> <filename>
+
+# 递归修改指定目录及其下面的所有文件和目录的所属用户和组
+chown -R <username>:<groupname> <dir>
+```
+
+### chgrp
+
+* `-R` - 递归修改
+* `-v` - 显示修改的详细信息
+
+```bash
+# 修改文件所属组
+chgrp <groupname> <filename>
+
+# 递归修改指定目录及其下面的所有文件和目录的组，并显示详细信息
+chgrp -R -v <groupname> <dir>
+```
+
+### sudo
+
+> 这个命令可能需要额外安装`sudo apt install sudo`
+
+* `-l` - 查看当前用户可以使用的权限
+* `-k` - 时当前会话的密码过期
+* `-u <username>` - 以指定用户的身份指定命令
+
+```bash
+# 查看当前用户可以使用的权限
+sudo -l
+
+# 以指定用户指定ping命令
+sudo -u <username> /bin/ping
+
+# 使用管理员权限执行指定命令
+sudo /bin/ls /root
+```
+
+#### `/etc/sudoers`文件
+
+* 配置用户权限
+* 用户权限配置：`username ALL(ALL:ALL) ALL`，用户可以在**任意主机**用**任意用户:组**的身份执行**任意命令**
+    * 第一个ALL表示主机
+    * 第二个ALL表示用户
+    * 第三个ALL表示组
+    * 最后一个ALL表示命令，多个以`,`分割
+* 组权限配置：`%groupname ALL(ALL:ALL) ALL`
+* 一般在`/etc/sudoers.d`目录下创建对应用户名称的文件并配置权限
+
+```bash
+# 创建用户文件
+sudo touch /etc/sudoers.d/<username>
+
+# 添加用户权限
+echo "<username> ALL=(ALL) ALL" | sudo tee -a /etc/sudoers.d/<username>
+
+# 安装软件
+sudo apt install <softname>
+```
+
+---
+
+### shutdown
+
+```bash
+# 立即关机
+shutdown -h now
+
+# 1分钟后会关机
+shutdown -h 1
+
+# 立即重启
+shutdown -r now
 ```
 
 ---
@@ -1185,23 +1480,4 @@ cal
 
 # 显示2024年的日历
 cal 2024
-```
----
-
-
-### sudo
-
-> 这个命令需要额外安装`apt install sudo`
-
-* 让普通用户可以使用管理员权限执行指定的命令
-
-```bash
-# 创建用户文件
-sudo touch /etc/sudoers.d/<username>
-
-# 添加用户权限
-echo "<username> ALL=(ALL) ALL" | sudo tee -a /etc/sudoers.d/<username>
-
-# 安装软件
-sudo apt install <softname>
 ```
