@@ -91,7 +91,9 @@ sidebar_position: 1
 | --- | --- |
 | id | 查看用户信息 |
 | whoami | 查看当前是那个用户登录 |
-| who | 查看当前是那个用户登录，并显示登录时间 |
+| [who](#who) | 查看当前登录的用户 |
+| [w](#w) | 显示当前登录用户及其活动状态 |
+| users | 显示当前登录系统的所有用户 |
 | [useradd](#useradd) | 添加用户 |
 | [userdel](#userdel) | 删除用户 |
 | [usermod](#usermod) | 修改用户信息 |
@@ -111,22 +113,23 @@ sidebar_position: 1
 
 | 命令 | 描述 |
 | --- | --- |
-| [shutdown](#shutdown) | 关机/重启 |
-| halt | 关机 |
+| halt | 强制关机 |
+| poweroff | 关机 |
 | reboot | 重启 |
+| [shutdown](#shutdown) | 关机/重启 |
 | logout | 注销用户 |
-| hostname | 查看或设置主机名 |
+| [hostname](#hostname) | 查看或设置主机名 |
 | [uptime](#uptime) | 查看系统运行时间和负载 |
 | [uname](#uname) | 显示系统信息 |
 | [lsb_release](#lsb_release) | 查看 Linux 发行版信息 |
-| [poweroff](#poweroff) | 关闭系统 |
 
 ## 定时任务
 
 | 命令 | 描述 |
 | --- | --- |
 | [crontab](#crontab) | 设置定期执行的任务 |
-| [at](#at) | 安排一次性任务 |
+| [at](#at) | 一次性执行任务 |
+| [systemd-timer](#systemd-timer) | systemd配置定时任务 |
 
 ## 磁盘/设备
 
@@ -152,9 +155,6 @@ sidebar_position: 1
 | [last](#last) | 显示用户的登录历史 |
 | [lastb](#lastb) | 显示失败的登录尝试历史 |
 | [lastlog](#lastlog) | 显示系统中所有用户的最后登录信 |
-| [w](#w) | 显示当前登录用户及其活动状态 |
-| [who](#who) | 查看当前登录的用户 |
-| [users](#users) | 显示当前登录系统的用户列表 |
 | [journalctl](#journalctl) | systemd日志管理 |
 
 ## 其他
@@ -1271,7 +1271,29 @@ wget <url> -O <filename>
 # 将下载速度限制在100k/s
 wget --limit-rate=100k <url>
 ```
+
 ---
+
+### who
+
+* `-a` - 显示所有信息，包括用户的登录时间、活动状态等
+* `-b` - 显示系统上次重启的时间
+* `-m` - 仅显示当前终端的用户
+* `-q` - 只显示用户的名字和数量
+* `-H` - 在输出中显示列标题
+
+### w
+
+#### 字段说明
+
+* **USER** - 用户名
+* **TTY** - 终端
+* **FROM** - 用户登录的主机
+* **LOGIN** - ：登录时间
+* **IDLE** - 用户在当前会话中空闲的时间
+* **JCPU** - 用户在该终端上运行的所有进程的 CPU 时间
+* **PCPU** - 当前进程的 CPU 时间
+* **WHAT** - 当前正在执行的命令
 
 ### useradd
 
@@ -1370,7 +1392,6 @@ groupmod -g <groupid> <groupname>
 groupdel <groupname>
 ```
 
-
 ### chmod
 
 ```bash
@@ -1425,6 +1446,7 @@ sudo /bin/ls /root
 
 #### `/etc/sudoers`文件
 
+* 使用`visudo`命令直接打开并编辑这个文件
 * 配置用户权限
 * 用户权限配置：`username ALL(ALL:ALL) ALL`，用户可以在**任意主机**用**任意用户:组**的身份执行**任意命令**
     * 第一个ALL表示主机
@@ -1449,16 +1471,320 @@ sudo apt install <softname>
 
 ### shutdown
 
+> 可以代替`halt` `reboot` `poweroff`命令
+
+* `-H` - 类似`halt`命令，强制关机
+* `-P` - 类似`poweroff`命令，安全的关机（默认行为）
+* `-r` - 重启
+* `--show` - 显示关机任务
+* `-c` - 取消关机任务
+
 ```bash
 # 立即关机
-shutdown -h now
+shutdown now
 
 # 1分钟后会关机
-shutdown -h 1
+shutdown 1
 
 # 立即重启
 shutdown -r now
 ```
+
+### hostname
+
+* `-i` - 查看当前主机的IP地址，一般是loopback
+* `-I` - 查看当前主机的IP地址
+
+### uptime
+
+* 参考`top`命令的[第一行信息](#顶部信息第一行)
+
+
+### uname
+
+* `-a` - 显示所有可用的信息，包括操作系统名称、主机名、内核版本、发布日期、处理器架构等
+* `-s` - 显示操作系统名称（默认）
+* `-n` - 显示网络节点的主机名
+* `-r` - 显示内核版本
+* `-v` - 显示内核版本的发布日期
+* `-m` - 显示机器硬件名称（架构）
+* `-p` - 显示处理器架构（如果可用）
+* `-i` - 显示硬件平台（如果可用）
+* `-o` - 显示操作系统名称（通常是 GNU/Linux）
+
+
+### lsb_release
+
+* `-a` - 显示所有可用的信息，包括发行版名称、版本号、代号和描述
+* `-d` - 仅显示发行版的描述
+* `-r` - 仅显示发行版的版本号
+* `-c` - 仅显示发行版的代号
+
+---
+
+### crontab
+
+* `-e` - 编辑当前用户的crontab文件
+* `-l` - 列出当前用户的crontab内容
+* `-r` - 删除当前用户的crontab文件
+
+#### cron表达式
+
+* cron表达式由5个特殊符号组成
+
+##### 位置说明
+
+| 位置    | 含义    | 范围    |
+|---------------- | --------------- | --------------- |
+| 第一位    | 一小时当中的第几分钟    | 0~59    |
+| 第二位    | 一天当中的第几小时    | 0~23    |
+| 第三位 | 一个月当中的第几天 | 1~31 |
+| 第四位 | 一年当中的第几月 | 1~12 |
+| 第五位 | 一周当中的星期几 | 0~7（0和7都代表星期日）|
+
+##### 占位符说明
+
+| 符号   | 含义    |
+|--------------- | --------------- |
+| `*`   | 任何时间。比如第一个`*`就代表一小时中的每分钟都执行一次   |
+| `,` | 不连续的时间。比如`0 8,12,16 * * * command`，就代表在每天的8点，12点，16点都执行一次 |
+| `-` | 连续的时间范围。比如`0 5 * * 1-6 command`，代表周一到周六的5点0分执行 |
+| `*/n` | 每隔多久执行一次。比如`*/10 * * * * command`，代表每隔10分钟就执行一次 |
+
+#### 常见定时任务
+
+| 时间   | 含义    |
+|--------------- | --------------- |
+| `45 22 * * * command`   | 在22点45分执行   |
+| `0 17 * * 1 command` | 每周一的17点0分执行 |
+| `0 5 1,15 * * command` | 每月1号到15号的5点0分执行 |
+| `40 4 * * 1-5 command` | 每周一到周五的4点40分执行 |
+| `*/10 4 * * * command` | 每天4点，每隔10分钟执行一次 |
+| `0 0 1,15 * 1 command` | 每月1号到15号，每周1的0点0分执行 |
+
+* 创建定时任务流程
+
+```bash
+# 编辑crontab文件，此时会进入指定的编辑器
+# 输入0 0 1,15 * 1 command后保存退出
+crontab -e
+
+# 查看定时任务是否添加成功
+crontab -l
+```
+
+### at
+
+> 这个命令可能需要额外安装`sudo apt install at`，并保证`atd`后台服务已启动<br></br>
+> 由于at是每60秒扫描一次任务，所以执行时机可能有出入
+
+* `-f FILE` - 从指定的文件读取命令
+* `-l` - 列出当前用户的所有计划任务
+* `-r` - 删除指定的任务
+
+#### 时间格式
+
+* `now + 5 minutes` - 在当前时间后 5 分钟
+* `1:00 PM` - 指定具体时间
+* `today` - 今天
+* `tomorrow` - 明天
+* `Dec 25 10:00` - 指定日期和时间
+
+
+```bash
+# 1分钟后执行指定的脚本
+at now+1minutes -f <scriptfile>
+
+# 明天执行指定的脚本
+at tomorrow -f <scriptfile>
+```
+
+### systemd-timer
+
+* TODO
+
+---
+
+### df
+
+* `-h` - 以人类可读的格式显示（例如，以 KB、MB、GB 为单位）
+* `-a` - 包括所有文件系统，包括大小为 0 的文件系统
+* `-T` - 显示文件系统类型
+* `-i` - 显示 inode 使用情况，而不是磁盘空间
+* `--total` - 显示所有文件系统的总计
+
+```bash
+# 以可读的方式显示所有文件系统信息
+df -h
+
+# 显示home目录的文件系统信息
+df -h /home
+```
+
+### du
+
+* `-h` - 以人类可读的格式显示（例如，以 KB、MB、GB 为单位）
+* `-s` - 仅显示总计，不递归显示每个子目录
+* `-c` - 显示总计
+* `--max-depth=N` - 限制显示的子目录层级，N 为深度
+
+```bash
+# 显示home目录下所有文件的磁盘占用情况
+du -h /home
+
+# 显示home目录下深度3层的所有文件信息，并统计
+du -hc --max-depth=3 /home
+```
+
+### lsblk
+
+* `-a` - 显示所有设备，包括未挂载的设备
+* `-f` - 显示文件系统类型和UUID等信息
+* `-l` - 以列表形式显示输出
+* `-p` - 显示完整的设备路径
+
+### blkid
+
+* `-o` - 指定输出格式，常见的选项有value、udev和full
+* `-s` - 指定要显示的属性，例如UUID、LABEL等
+* `-c` - 指定一个缓存文件，以避免频繁访问设备
+* `-p` - 在查找设备之前查看设备的状态
+
+### lspci
+
+* `-v` - 显示详细信息
+* `-vv` - 显示更详细的信息
+* `-s` - 只显示特定设备的信息，例如 lspci -s 00:1f.2
+* `-n` - 以数字格式显示设备 ID，而不是名称
+* `-k` - 显示设备驱动程序信息
+* `-t` - 以树形结构显示设备关系
+
+### fdisk
+
+* TODO
+
+### mkfs
+
+* `-t FSTYPE` - 指定文件系统类型，例如 ext4、xfs、vfat 等
+* `-n` - 不执行格式化，只显示所需的操作
+
+```bash
+# 将指定磁盘格式化为ext4文件系统
+mkfs -t ext4 /dev/<devname>
+```
+
+### mount
+
+* `-t FSTYPE` - 指定文件系统类型（如 ext4、xfs、ntfs 等）
+* `-o OPTIONS` - 指定挂载选项，例如 ro（只读）、rw（读写）、noexec（禁止执行文件）
+* `-v` - 显示详细输出
+
+```bash
+# 将某个设备挂载到指定路径下
+mount /dev/<devname> <dir>
+
+# 将某个设备挂载到指定路径下，并指定ext4文件系统
+mount -t ext4 /dev/<devname> <dir>
+```
+
+### umount
+
+* `-a` - 卸载`/etc/mtab`中列出的所有文件系统
+* `-r` - 在卸载失败时，尝试以只读方式卸载
+* `-l` - 懒惰卸载，即在文件系统不再被使用后再真正卸载
+* `-f` - 强制卸载，即使设备处于忙碌状态
+
+```bash
+# 卸载指定目录
+umount <dir>
+```
+
+### fsck
+
+* `-a` - 自动修复文件系统中的错误（可能会忽略一些问题）
+* `-y` - 对所有问题自动回答“是”，进行修复
+* `-n` - 不进行修复，只显示问题
+* `-t` - 指定检查的文件系统类型（如 ext4、xfs 等）
+* `-f` - 强制检查，即使文件系统看起来是干净的
+
+```bash
+# 检查指定磁盘设备
+fsck /dev/<devname>
+```
+
+### sync
+
+* 通常在关机或卸载文件系统前执行，用于保存数据都被写入
+
+---
+
+### dmesg
+
+* `-f` - 显示特定类型的日志
+    * `kern` - kernel messages
+    * `user` - random user-level messages
+    * `mail` - mail system
+    * `daemon` - system daemons
+    * `auth` - security/authorization messages
+    * `syslog` - messages generated internally by syslogd
+    * `lpr` - line printer subsystem
+    * `news` - network news subsystem
+* `-l` - 显示指定级别的日志
+    * `emerg` - system is unusable
+    * `alert` - action must be taken immediately
+    * `crit` - critical conditions
+    * `err` - error conditions
+    * `warn` - warning conditions
+    * `notice` - normal but significant condition
+    * `info` - informational
+    * `debug` - debug-level messages
+* `-u` - 只显用户空间的日志
+* `-T` - 将时间戳转换为可读格式
+* `-J` - 输出json格式信息
+* `--help` - 显示详细帮助
+
+```bash
+# 只显示错误日志，并将日志转换为可读
+dmesg -T -l err
+
+# 只显示邮件相关信息
+dmesg -f mail
+```
+
+### last
+
+* `-a` - 显示最后登录的主机名
+* `-n N` - 显示最近 N 条记录
+* `-x` - 显示系统重启和运行级别变化的信息
+* `-R` - 不显示主机名
+* `-F` - 显示完整的时间信息，包括日期和时间
+
+```bash
+# 显示最后10条登录信息
+last -F -n 10
+```
+
+### lastb
+
+* 选项参数和[last](#last)类似，只显示失败的登录记录，需要管理员权限执行
+
+
+### lastlog
+
+* `-u USER` - 显示特定用户的最后登录信息
+* `-t DAYS` - 显示在指定天数内登录的用户信息
+
+```bash
+# 查看系统内所有用户的登录记录
+lastlog
+
+# 查看10天内登录系统的用户
+lastlog -t 10
+```
+
+### journalctl
+
+* 参考[systemctl](./systemd#日志相关)
 
 ---
 
@@ -1470,9 +1796,14 @@ date
 
 # 格式化显示时间
 date "+%Y-%m-%d %H:%M:%S"
+
+# 显示UTC时间
+date -u
 ```
 
 ### cal
+
+> 可能需要手动安装sudo apt install bsdmainutils
 
 ```bash
 # 显示当月日历
@@ -1480,4 +1811,32 @@ cal
 
 # 显示2024年的日历
 cal 2024
+```
+
+### tee
+
+* `-a` - 追加文件
+
+```bash
+# 将文本打印到终端并且写入到a.txt文件内
+echo 'this is line' | tee a.txt
+
+# 将所有进程信息保存到b.txt文件内并过滤指定服务打印到终端
+ps -ef | tee b.txt | grep <servicename>
+
+# 将文件追加到root目录下的c.txt文件内
+echo 111 | tee -a /root/c.txt
+```
+
+### xargs
+
+* `-n N` - 每次调用命令时传递N个参数
+* `-d DELIMITER` - 指定输入项的使用指定分隔符（默认是空格或换行）
+
+```bash
+# 显示当前目录下所有txt文件的内容
+ls *.txt | xargs cat
+
+# 依次输出1到4
+echo "1,2,3,4" | xargs -d "," -n 1 echo
 ```
