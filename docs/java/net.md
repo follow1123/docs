@@ -114,30 +114,6 @@ sequenceDiagram
     </tbody>
 </table>
 
-## InetAddress
-
-```java
-try {
-    // 指定域名或IP获取地址信息
-    InetAddress addr1 = InetAddress.getByName("192.168.173.109");
-    System.out.println(addr1);
-    InetAddress addr2 = InetAddress.getByName("www.baidu.com");
-    System.out.println(addr2);
-    InetAddress addr3 = InetAddress.getByName("127.0.0.1");
-    System.out.println(addr3);
-
-    // 获取本机地址信息
-    InetAddress addr4 = InetAddress.getLocalHost();
-    System.out.println(addr4);
-
-    // 常用方法
-    System.out.println(addr4.getHostName()); // 获取域名
-    System.out.println(addr4.getHostAddress()); // 获取域名对应的IP地址
-} catch (UnknownHostException e) {
-    throw new RuntimeException(e);
-}
-```
-
 ## TCP和UDP协议
 
 * `java.net`包中提供了两种见的网络协议的支持
@@ -170,6 +146,7 @@ try {
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant c as 客户端
     participant s as 服务器
     c ->> s: seq=x,SYN=1
@@ -187,10 +164,231 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant c as 客户端
     participant s as 服务器
     c ->> s: Fin=1,Ack=z,seq=x
     s ->> c: ACK=x+1,seq=z
     s ->> c: Fin=1,ack=x,seq=y
     c ->> s: ACK=y,seq=x
+```
+
+## Java API
+
+### InetAddress
+
+```java
+try {
+    // 指定域名或IP获取地址信息
+    InetAddress addr1 = InetAddress.getByName("192.168.173.109");
+    System.out.println(addr1);
+    InetAddress addr2 = InetAddress.getByName("www.baidu.com");
+    System.out.println(addr2);
+    InetAddress addr3 = InetAddress.getByName("127.0.0.1");
+    System.out.println(addr3);
+
+    // 获取本机地址信息
+    InetAddress addr4 = InetAddress.getLocalHost();
+    System.out.println(addr4);
+
+    // 常用方法
+    System.out.println(addr4.getHostName()); // 获取域名
+    System.out.println(addr4.getHostAddress()); // 获取域名对应的IP地址
+} catch (UnknownHostException e) {
+    throw new RuntimeException(e);
+}
+```
+
+### Socket
+
+* 网络上具有唯一标识的**IP地址**和**端口号**组合在一起构成唯一能识别的标识符套接字（Socket）
+* 一般主动发起通信的应用程序属**客户端**，等待通信请求的为**服务端**
+* Socket分类：
+    * **流套接字（stream socket）**- 使用TCP提供可依赖的字节流服务
+        * `ServerSocket` - 实现TCP服务器套接字，服务器套接字等待请求通过网络传入
+        * `Socket` - 此类实现客户端套接字，套接字是两台机器间通信的端点
+    * **数据报套接字（datagram socket）**- 使用UDP提供尽力而为的数据报服务
+        * `DatagramSocket` - 表示用来发送和接收UDP数据报包的套接字
+
+### TCP
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/net/TCPTest.java)
+
+* 通信模型
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant c as 客户端
+    participant s as 服务器
+    Note right of s: ServerSocket(int port)监听端口"
+    Note left of c: Socket(InetAddress address, int port)指定服务器IP和端口
+    c ->> s: 请求服务器
+    s ->> c: 处理accept()，建立连接
+    loop 互相发送数据
+        c ->> s: 使用getOutputStream()发送数据
+        Note right of s: 使用getInputStream()接收数据
+        s ->> c: 使用getOutputStream()发送数据
+        Note left of c: 使用getInputStream()接收数据
+end
+```
+
+* 客户端
+
+```java
+// 创建Socket
+try (Socket socket = new Socket(InetAddress.getLocalHost(), 8989)) {
+    System.out.println("连接到服务器：" + socket.getInetAddress().getHostAddress());
+    // 接收客户端Socket
+    OutputStream os = null;
+    InputStream is = null;
+    try{
+        os = socket.getOutputStream();
+        // 发送数据
+        os.write("Hello".getBytes());
+        // 如果写完数据后不再发送数据必须关闭输出流，否则服务端不知道数据有多少，会阻塞
+        socket.shutdownOutput();
+
+        is = socket.getInputStream();
+        // 接收回复
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] bytes = new byte[5];
+        int len;
+        while ((len = is.read(bytes)) != -1){
+            baos.write(bytes, 0, len);
+        }
+        System.out.println("接收服务端回复数据：" + baos);
+    }catch (IOException e){
+        throw new RuntimeException(e);
+    }finally {
+        if (is != null) is.close();
+        if (os != null) os.close();
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 服务端
+
+```java
+// 创建ServerSocket
+try (ServerSocket ss = new ServerSocket(8989)) {
+    // 接收客户端Socket
+    Socket socket = null;
+    InputStream is = null;
+    OutputStream os = null;
+    try{
+        socket = ss.accept();
+        System.out.println("连接到客户端：" + socket.getInetAddress().getHostAddress());
+        // 接收数据
+        is = socket.getInputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] bytes = new byte[5];
+        int len;
+        while ((len = is.read(bytes)) != -1){
+            baos.write(bytes, 0, len);
+        }
+        System.out.println("接收客户端数据：" + baos);
+        System.out.println("回复客户端数据：" + socket.getInetAddress().getHostAddress());
+
+        // 回复数据
+        os = socket.getOutputStream();
+        os.write("收到".getBytes());
+    }catch (IOException e){
+        throw new RuntimeException(e);
+    }finally {
+        if (os != null) os.close();
+        if (is != null) is.close();
+        if (socket != null) socket.close();
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+### UDP
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/net/UDPTest.java)
+
+* 发送端
+
+```java
+int port = 8990;
+try (DatagramSocket ds = new DatagramSocket()) {
+    // 准备数据
+    byte[] bytes = "Hello".getBytes();
+    // 包内填写发送的地址
+    DatagramPacket dp = new DatagramPacket(bytes, 0, bytes.length, InetAddress.getLocalHost(), port);
+    // 发送
+    ds.send(dp);
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 接收端
+
+```java
+// 开启UDP服务
+int port = 8990;
+try (DatagramSocket ds = new DatagramSocket(port)) {
+    // 准备包
+    byte[] bytes = new byte[1024];
+    DatagramPacket dp = new DatagramPacket(bytes, 0, bytes.length);
+    // 接收数据
+    ds.receive(dp);
+    // 获取数据
+    String str = new String(dp.getData(), 0, dp.getLength());
+    System.out.println(str);
+}catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+### URL
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/net/URLTest.java)
+
+* **URL(Uniform Resource Locator)** - 统一资源定位符
+* URL对象
+
+```java
+String str = "https://127.0.0.1:8080/examples/a.txt?type=1";
+try {
+    URL url = new URL(str);
+    System.out.println(url.getProtocol()); // 协议名
+    System.out.println(url.getHost()); // 主机号
+    System.out.println(url.getPort()); // 端口号
+    System.out.println(url.getPath()); // 文件路径
+    System.out.println(url.getFile()); // 文件名
+    System.out.println(url.getQuery()); // 查询参数
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 使用URL从互联网下载资源
+
+```java
+try {
+    String projectPath = System.getProperty("user.dir");
+    File file = new File(projectPath, "src/main/resources/test.png");
+    URL url = new URL("");
+    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+    try (InputStream is = connection.getInputStream();
+         FileOutputStream fos = new FileOutputStream(file)) {
+        byte[] bytes = new byte[1024];
+        int len;
+        while ((len = is.read(bytes)) != -1){
+            fos.write(bytes, 0, len);
+        }
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+    connection.disconnect();
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
 ```
