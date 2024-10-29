@@ -392,3 +392,24 @@ try {
     throw new RuntimeException(e);
 }
 ```
+
+## 常见问题
+
+### socket相关状态方法说明
+
+* `isBound()/isConnected()` - 判断是否绑定端口，是否连接过
+
+```java
+// 只有在以下情况才能判断出区别
+Socket s = new Socket();
+assertFalse(s.isConnected());
+assertFalse(s.isBound());
+s.connect(new InetSocketAddress(InetAddress.getLocalHost(), port));
+assertTrue(s.isConnected());
+assertTrue(s.isBound());
+```
+
+* `isClosed()/isInputShutdown()/isOutputShutdown()` - 判断是否关闭Socket，是否关闭输入输出流
+    * `isInputShutdown()/isOutputShutdown()`这两个方法只有在调用`shutdownInput()/shutdownOutput()`方法后才有效，和Socket调不调用`close()`方法无关
+    * `isClosed()`方法只有在调用Socket的`close()`方法后才有效
+* 这几个方法都没什么用
