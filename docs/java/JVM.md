@@ -4,7 +4,7 @@ sidebar_position: 25
 
 # JVM
 
-## JVM简化图
+* JVM简化图
 
 ![JVM简化图](/img/java/Snipaste_2024-09-07_14-53-06.png)
 
@@ -16,10 +16,9 @@ sidebar_position: 25
 | 本地方法栈 | 当程序中调用了native的本地方法时，本地方法执行期间的内存区域 |
 | 程序计数器 | 程序计数器是CPU中的寄存器，它包含每一个线程下一条要执行的指令地址 |
 
-
-
-
 ## 类加载过程
+
+![类加载子系统图](/img/java/Snipaste_2024-10-30_21-44-22.png)
 
 * 加载
   * 将class文件字节码内容加载到内存中，并将这些静态数据转换成方法区中的运行时数据结构，在堆中生成一个代表这个类的java.lang.Class对象，作为方法区类数据访问入口。（这个过程需要类加载器参与）
@@ -32,7 +31,6 @@ sidebar_position: 25
   * 当初始化一个类的时候，如果发现其父类还没有进行初始化，则需要先初始化其父类
   * 虚拟机会保证一个类的&lt;clinit>()方法在多线程环境中正确加锁和同步
   * 当访问一个java类的静态域时，只有真正声明这个域的类才会被初始化 
-
 * 类的主动引用（一定会发生类的初始化）
   * new一个类的对象
   * 调用类的金泰成员（除final常量）和静态方法
@@ -52,8 +50,20 @@ sidebar_position: 25
 * 类缓存
   * 标准的javaSE类加载器可以按要求查找类，但一旦某一个类被加载到在加载器中，它将维持加载（缓存）一段时间，不过，JVM垃圾收集器可以回收这些Class对象
 
-## 类加载器的层次结构（树状结构）
+### 类加载器的层次结构
 
+```mermaid
+flowchart BT
+a[用户自定义类加载器\nUser ClassLoader] --> b[应用程序类加载器\nApplication ClassLoader]
+c[用户自定义类加载器\nUser ClassLoader] --> b
+b --> d[扩展类加载器\nExtension ClassLoader]
+d --> e[启动类加载器\nBootstrap ClassLoader]
+```
+
+* 类加载器之间不是继承关系，是组合关系
+* 双亲委派机制
+    * 类加载器之间的关系形成链表，加载类时会抛向最顶层的类加载器加载，如果顶层没有，则依次向下加载
+    * 防止用户自定义同包同名的类替换java核心api
 * 引导类加载器（bootstrap class loader）
   * 它用来加载java的核心库（JAVA_HOME/jre/lib/rt.jar,或sun.boot.class.path路径下的内容），是用原生代码实现的，并不是继承java.lang.ClassLoader
   * 加载扩展类和应用程序类加载器，并指定他们的父类加载器
@@ -66,7 +76,7 @@ sidebar_position: 25
 * 自定义类加载器
   * 一开发人员可以通过继承java.lang.ClassLoader类的方式，实现自己的类加载器,以满足一-些特殊的需求。
 
-## java.class.ClassLoader类介绍
+### java.class.ClassLoader类介绍
 
 * 作用：
   * java.lang.ClassLoader类的基本职责就是根据-个指定的类的名称，找到或者生成其对应的字节代码,然后从这些字节代码中定义出一个Java类,即java.lang.Class类的一个实例。
@@ -80,7 +90,7 @@ sidebar_position: 25
   * resolveClass(Class&lt;?> c)链接指定的 Java类。
   * 对于以上给出的方法,表示类名称的name参数的值是类的二进制名称。需要注意的是内部类的表示,如com.example.Sample$1和com.example.Sample$Inner等表示方式。
 
-## 类加载器的代理模式
+### 类加载器的代理模式
 
 * 代理模式
   * 一交给其他加载器来加载指定的类
@@ -96,89 +106,89 @@ sidebar_position: 25
 ## 自定义类加载器
 
 * 自定义类加载器的流程:
-
   * 首先检查请求的类型是否E经被这个类装载器装载到命名空间中了，如果E经装载,直接返回;
   * 委派类加载请求给父类加载器,如果父类加载器能够完成,则返回父加载器加载的Class实例;
   * 调用本数载器的findClass ()方法,试图获取对应的字节码,如果获取的到,则调用defineClass 导入类型到方法区;如果获取不到对应的字节码或者其他原因失败,返回异常给loadClass转抛异常,终止加载过程
   * 注意:
     * 被两个类加载器加载的同-个类, JVM不认为是相同的类。
+* 可以实现应用隔离，不同模块之间使用不同的类加载器加载一个类的不同版本
 
-  ```java
-  //自定义加载类
-  public class FileClassLoader extends ClassLoader {
-      private String root;
-      public FileClassLoader(String root) {
-          this.root = root;
-      }
-      //重写findClass方法
-      @Override
-      protected Class&lt;?> findClass(String name) throws ClassNotFoundException {
-          //查找该类是否已经被加载
-          Class&lt;?> aClass = findLoadedClass(name);
+```java
+//自定义加载类
+public class FileClassLoader extends ClassLoader {
+  private String root;
+  public FileClassLoader(String root) {
+      this.root = root;
+  }
+  //重写findClass方法
+  @Override
+  protected Class&lt;?> findClass(String name) throws ClassNotFoundException {
+      //查找该类是否已经被加载
+      Class&lt;?> aClass = findLoadedClass(name);
+      if (aClass == null){
+          try {
+              //没被加载先给父类加载进加载
+              aClass = getParent().loadClass(name);
+          }catch (Exception e){
+              aClass = null;
+          }
+          //判断父类加载器是否加载成功
           if (aClass == null){
-              try {
-                  //没被加载先给父类加载进加载
-                  aClass = getParent().loadClass(name);
-              }catch (Exception e){
-                  aClass = null;
-              }
-              //判断父类加载器是否加载成功
+              //否者自己加载
+              byte[] classData = getClassFromDir(name);
+              aClass = defineClass(name, classData, 0, classData.length);
               if (aClass == null){
-                  //否者自己加载
-                  byte[] classData = getClassFromDir(name);
-                  aClass = defineClass(name, classData, 0, classData.length);
-                  if (aClass == null){
-                      throw new ClassNotFoundException();
-                  }
+                  throw new ClassNotFoundException();
               }
           }
-          return aClass;
       }
-      //根据root目录获取class文件的byte数据
-      private byte[] getClassFromDir(String className){
-          String path = root + "/" + className.replace(".", "/")+".class";
-          FileInputStream fis = null;
-          ByteArrayOutputStream baos = null;
-          try{
-              baos = new ByteArrayOutputStream();
-              fis = new FileInputStream(path);
-              byte[] buffer = new byte[1024];
-              int len = 0;
-              while ((len = fis.read(buffer)) > 0){
-                  baos.write(buffer, 0, len);
+      return aClass;
+  }
+  //根据root目录获取class文件的byte数据
+  private byte[] getClassFromDir(String className){
+      String path = root + "/" + className.replace(".", "/")+".class";
+      FileInputStream fis = null;
+      ByteArrayOutputStream baos = null;
+      try{
+          baos = new ByteArrayOutputStream();
+          fis = new FileInputStream(path);
+          byte[] buffer = new byte[1024];
+          int len = 0;
+          while ((len = fis.read(buffer)) > 0){
+              baos.write(buffer, 0, len);
+          }
+          baos.flush();
+          return baos.toByteArray();
+      }catch (Exception e){
+          e.printStackTrace();
+          return null;
+      }finally {
+          if (fis != null){
+              try {
+                  fis.close();
+              } catch (IOException e) {
+                  e.printStackTrace();
               }
-              baos.flush();
-              return baos.toByteArray();
-          }catch (Exception e){
-              e.printStackTrace();
-              return null;
-          }finally {
-              if (fis != null){
-                  try {
-                      fis.close();
-                  } catch (IOException e) {
-                      e.printStackTrace();
-                  }
-              }
-              if (baos != null){
-                  try {
-                      baos.close();
-                  } catch (IOException e) {
-                      e.printStackTrace();
-                  }
+          }
+          if (baos != null){
+              try {
+                  baos.close();
+              } catch (IOException e) {
+                  e.printStackTrace();
               }
           }
       }
   }
-  ```
+}
+```
 
 * 可以自定义当前线程的类加载器
 
-  ```java
-  Thread.currentThread().setContextClassLoader(自定义的类加载器);
-  ```
+```java
+Thread.currentThread().setContextClassLoader(自定义的类加载器);
+```
 
-## TOMCAT服务器的类加载机制
+### TOMCAT服务器的类加载机制
 
 * TOMCAT不能使用系统默认的类加载器。
   * 如果TOMCAT跑你的WEB项目使用系统的类加载器那是相当危险的,你可以直接是无忌惮是操作系统的各个目录了。
