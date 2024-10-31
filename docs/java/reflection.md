@@ -209,3 +209,278 @@ Properties prop = new Properties();
 prop.load(is);
 System.out.println(prop.get("name"));
 ```
+
+## 使用
+
+### 构造器
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/reflection/ConstructorTest.java)
+
+* newInstance方法创建对象
+
+```java
+Class<User> userClass = User.class;
+/*
+    使用这种方式调用的是类的空参构造器，如果类没有空参构造器会报错
+    空参构造器的权限必须是public的
+ */
+User user = userClass.newInstance();
+System.out.println(user);
+```
+
+* 获取构造器方式
+
+```java
+Class<User> userClass = User.class;
+Constructor<User> c1 = userClass.getDeclaredConstructor(String.class, int.class);
+c1.setAccessible(true);
+User user1 = c1.newInstance("zs", 18);
+System.out.println(user1);
+```
+
+### 属性
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/reflection/FieldTest.java)
+
+* 获取属性
+
+```java
+Class<User> userClass = User.class;
+// 获取当前类以及父类所有的public修饰的属性
+Field[] fields = userClass.getFields();
+for (Field field : fields) {
+    System.out.println(field);
+}
+
+System.out.println("---------------");
+// 只获取当前类所有修饰符的属性，不包含父类的属性
+Field[] declaredFields = userClass.getDeclaredFields();
+for (Field declaredField : declaredFields) {
+    System.out.println(declaredField);
+}
+```
+
+* 获取属性内的信息
+
+```java
+Class<User> userClass = User.class;
+Field[] declaredFields = userClass.getDeclaredFields();
+for (Field f : declaredFields) {
+    // 修饰符
+    int modifiers = f.getModifiers();
+    // 类型
+    Class<?> type = f.getType();
+    // 名称
+    String name = f.getName();
+
+    System.out.printf("field modifier: %s, field type: %s, field name: %s\n",
+            Modifier.toString(modifiers), type.getName(), name);
+}
+```
+
+* 修改或使用public属性
+
+```java
+Class<User> userClass = User.class;
+User user = userClass.getConstructor().newInstance();
+
+Field nameField = userClass.getField("name");
+
+nameField.set(user, "zs");
+System.out.println(nameField.get(user));
+```
+
+* 修改或使用非public属性
+
+```java
+Class<User> userClass = User.class;
+User user = userClass.getConstructor().newInstance();
+
+Field ageField = userClass.getDeclaredField("age");
+
+ageField.setAccessible(true);
+
+ageField.set(user, 18);
+System.out.println(ageField.get(user));
+```
+
+* 修改或使用static属性
+
+```java
+Class<User> userClass = User.class;
+
+Field uidField = userClass.getDeclaredField("uid");
+uidField.setAccessible(true);
+
+// 静态属性第一个参数可以填null
+// uidField.set(null, 111);
+// System.out.println(uidField.get(null));
+
+uidField.set(userClass, 111);
+System.out.println(uidField.get(userClass));
+```
+
+### 方法
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/reflection/MethodTest.java)
+
+* 获取方法
+
+```java
+Class<User> userClass = User.class;
+
+// 获取当前类以及父类所有的public修饰的方法
+Method[] methods = userClass.getMethods();
+for (Method method : methods) {
+    System.out.println(method);
+}
+
+System.out.println("---------------");
+// 只获取当前类所有修饰符的方法，不包含父类的方法
+Method[] declaredMethods = userClass.getDeclaredMethods();
+for (Method declaredMethod : declaredMethods) {
+    System.out.println(declaredMethod);
+}
+```
+
+* 获取方法内的信息
+
+```java
+Class<User> userClass = User.class;
+Method[] methods = userClass.getDeclaredMethods();
+for (Method m : methods) {
+    System.out.printf("name\t\t\t%s\n", m.getName());
+    /*
+        获取方法上声明的注解，可以有多个
+        注解必须使用@Retention(RetentionPolicy.RUNTIME)声明，保证运行时存在
+     */
+    Annotation[] annotations = m.getAnnotations();
+    System.out.printf("annotations\t\t%d\n", annotations.length);
+    for (Annotation annotation : annotations) {
+        System.out.println(annotation);
+    }
+
+    // 修饰符
+    System.out.printf("modifiers\t\t%s\n", Modifier.toString(m.getModifiers()));
+    // 返回值类型
+    System.out.printf("return type\t\t%s\n", m.getReturnType().getName());
+
+    // 形参列表
+    Class<?>[] parameterTypes = m.getParameterTypes();
+    System.out.printf("params type\t\t%s\n", parameterTypes.length);
+    for (Class<?> parameterType : parameterTypes) {
+        System.out.println(parameterType.getName());
+    }
+
+    // 抛出的异常
+    Class<?>[] exceptionTypes = m.getExceptionTypes();
+    System.out.printf("exceptions type\t%s\n", exceptionTypes.length);
+    for (Class<?> exceptionType : exceptionTypes) {
+        System.out.println(exceptionType);
+    }
+
+    System.out.println("------------------------------------------------------------");
+}
+```
+
+* 调用方法
+
+```java
+Class<User> userClass = User.class;
+User user = userClass.getConstructor().newInstance();
+
+// 调用带参数的方法
+Method sleepMethod = userClass.getDeclaredMethod("sleep", int.class);
+sleepMethod.setAccessible(true);
+
+sleepMethod.invoke(user, 8);
+
+// 调用有返回值的方法
+Method workingMethod = userClass.getDeclaredMethod("working");
+workingMethod.setAccessible(true);
+
+System.out.println(workingMethod.invoke(user));
+```
+
+* 调用static方法
+
+```java
+Class<User> userClass = User.class;
+
+// 调用静态方法
+Method seeMethod = userClass.getDeclaredMethod("see");
+seeMethod.setAccessible(true);
+seeMethod.invoke(null);
+```
+
+### 注解
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/reflection/AnnotationTest.java)
+
+* 获取类上的注解
+
+```java
+Class<User> userClass = User.class;
+Deprecated d = userClass.getDeclaredAnnotation(Deprecated.class);
+System.out.println(d);
+
+System.out.println(d.forRemoval());
+System.out.println(d.since());
+```
+
+* 获取方法上的注解
+
+```java
+Class<User> userClass = User.class;
+Method eatMethod = userClass.getDeclaredMethod("eat");
+Deprecated d = eatMethod.getDeclaredAnnotation(Deprecated.class);
+System.out.println(d);
+```
+
+* 获取构造器上的注解
+
+```java
+Class<User> userClass = User.class;
+Constructor<User> c = userClass.getDeclaredConstructor();
+Deprecated d = c.getDeclaredAnnotation(Deprecated.class);
+System.out.println(d);
+```
+
+### 其他
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/reflection/OtherTest.java)
+
+* `getSuperclass()` - 获取运行时类的父类
+* `getInterfaces()` - 获取运行时类实现的接口，返回数组
+* `getPackage()` - 获取运行时类所在的包
+* `getGenericSuperclass()` - 获取运行时类带泛型的父类
+* 获取运行时类带泛型的父类的泛型参数
+
+```java
+Class<User> userClass = User.class;
+// 获取运行时类带泛型的父类的泛型参数
+ParameterizedType pt = (ParameterizedType)userClass.getGenericSuperclass();
+Type[] typeArgs = pt.getActualTypeArguments();
+for (Type typeArg : typeArgs) {
+    System.out.println(typeArg);
+}
+```
+
+* 获取运行时类带泛型的接口的泛型参数
+
+```java
+Class<User> userClass = User.class;
+// 获取运行时类带泛型的接口的泛型参数
+Type[] ts = userClass.getGenericInterfaces();
+for (Type t : ts) {
+    System.out.println(t.getTypeName());
+    // 由于有些接口不带泛型，所以需要判断
+    if (t instanceof ParameterizedType){
+        ParameterizedType pt = (ParameterizedType) t;
+        Type[] typeArgs = pt.getActualTypeArguments();
+        for (Type typeArg : typeArgs) {
+            System.out.println(typeArg);
+        }
+    }
+}
+```
