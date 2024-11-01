@@ -261,9 +261,172 @@ users.stream().filter(u -> u.getRoles() != null)
 
 ##### 排序
 
+```java
+Integer[] integers = {3, 34, 234, 423, 23};
+// 默认升序排序
+Arrays.stream(integers).sorted().forEach(System.out::println);
+Arrays.stream(integers).sorted(Integer::compareTo).forEach(System.out::println);
+// 数组内的元素还是原来的顺序，stream操作不会修改原容器内的元素
+System.out.println(Arrays.toString(integers));
+
+List<User> users = User.listUser();
+// 定制排序
+users.stream().sorted((u1, u2) -> u1.getName().compareTo(u2.getName())).forEach(System.out::println);
+```
+
+#### 终止操作
+
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/stream/TerminateTest.java)
+
+##### 匹配和查找
+
+```java
+List<User> users = User.listUser();
+// 匹配所有用户的年龄是否都大于20岁
+System.out.println(users.stream().allMatch(u -> u.getAge() > 20));
+// 匹配是否有一个用户的年龄大于20岁
+System.out.println(users.stream().anyMatch(u -> u.getAge() > 20));
+// 匹配是否没有大于50岁的用户
+System.out.println(users.stream().noneMatch(u -> u.getAge() > 50));
+
+// 获取流内的第一个元素
+System.out.println(users.stream().findFirst().get());
+// 随机获取流内的一个元素
+System.out.println(users.stream().findAny().get());
+
+// 获取年龄大于40岁的用户的个数
+System.out.println(users.stream().filter(u -> u.getAge() > 30).count());
+
+// 获取年龄最大或最小的用户
+System.out.println(users.stream().max((u1, u2) -> Integer.compare(u1.getAge(), u2.getAge())).get());
+System.out.println(users.stream().min((u1, u2) -> Integer.compare(u1.getAge(), u2.getAge())).get());
+// users.stream().max(Comparator.comparing(User::getAge))
+
+// 遍历集合
+users.stream().forEach(System.out::println);
+```
+
+##### 归并
+
+```java
+List<Integer> ints = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+/*
+ 累计集合内的元素
+ 第一个参数是初始值
+ */
+System.out.println(ints.stream().reduce(0, (i1, i2) -> i1 + i2));
+System.out.println(ints.stream().reduce(10, (i1, i2) -> i1 + i2));
+// 使用方法引用代替
+System.out.println(ints.stream().reduce(10, Integer::sum));
+
+List<User> users = User.listUser();
+
+// 计算年龄总和
+Optional<Integer> reduce = users.stream().map(User::getAge).reduce(Integer::sum);
+System.out.println(reduce);
+```
+
+##### 收集
+
+```java
+List<User> users = User.listUser();
+// 获取用户的年龄都大于20岁的，并存入另一个集合内
+List<User> youngerUsers = users.stream().filter(u -> u.getAge() < 20).collect(Collectors.toList());
+System.out.println(youngerUsers);
+
+// 根据id转换为Map
+Map<Integer, User> userMap = users.stream().collect(Collectors.toMap(User::getId, u -> u));
+Set<Map.Entry<Integer, User>> entries = userMap.entrySet();
+for (Map.Entry<Integer, User> entry : entries) {
+    System.out.printf("%s=%s\n", entry.getKey(), entry.getValue());
+}
+
+// 求平均年龄
+Double avgAge = users.stream().collect(Collectors.averagingInt(User::getAge));
+System.out.println(avgAge);
+
+// 根据性别分组
+Map<Boolean, List<User>> usersGroupByGender = users.stream().collect(Collectors.groupingBy(User::getGender));
+Set<Map.Entry<Boolean, List<User>>> entries1 = usersGroupByGender.entrySet();
+for (Map.Entry<Boolean, List<User>> entry : entries1) {
+    System.out.printf("%s=%s\n", entry.getKey(), entry.getValue());
+}
+```
+### Optional类
+
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/stream/OptionalTest.java)
+
+* 创建
+
+```java
+String s1 = "aaa";
+String s2 = null;
+Optional<String> optional1 = Optional.of(s1);
+// 传入null值会报错，空指针异常
+// Optional<String> optional2 = Optional.of(s2);
+
+Optional<Object> emptyOptional = Optional.empty();
+
+// 可以为空
+Optional<String> optional3 = Optional.ofNullable(s1);
+Optional<String> optional4 = Optional.ofNullable(s2);
+```
+
+* 使用
+
+```java
+Optional<String> optional = Optional.of("100");
+optional
+        // 映射
+        .map(Integer::parseInt)
+        // 过滤
+        .filter(i -> i > 50)
+        // 获取，如果存在才执行指定的逻辑
+        .ifPresent(System.out::println);
+
+// 判断值是否存在
+boolean present = optional.isPresent();
+// 直接获取值
+String s = optional.get();
+// 获取值，不存在则返回提供的默认值
+String s1 = optional.orElse("aa");
+// 获取值，不存在则指定指定逻辑返回对应值
+String s2 = optional.orElseGet(() -> 10 + "");
+// 获取值，不存在直接抛出异常
+String s3 = optional.orElseThrow(RuntimeException::new);
+```
+
+### 其他
+
+#### 新时间日期API
+
+* [参考](./apis.md#jdk8的日期时间相关类) 
+
+#### 接口默认方法
+
+* [参考](./index.md#接口新特性) 
+
+#### 新方法
+
+* `java.lang.Iterate`
+    * `forEach()` - 用于使用Lambda表达式方式遍历集合
+* `java.util.Collection`
+    * `removeIf()` - 如果存在就移除
+    * `stream()` - 返回流对象
+* `java.util.Map`
+    * `getOrDefault(key, defaultValue)` - 根据key获取value，如果不存在则返回提供的默认值
+    * `forEach()` - 遍历
+    * `replaceAll()` - 根据参数的key和value，判断，并返回新的value
+    * `putIfAbsent(key, value)` - 如果不存在就加入
+    * `remove(key, value)` - 根据key和value删除元素
+    * `replace(key, value)` - 根据key替换value
+    * `replace(key, value, newValue)` - 根据key和value查询指定的元素并替换里面的value
+
 ## Java 9
 
-### 模块机制
+### 模块
+
+> 模块系统（Java Platform Module System，JPMS）
 
 * 在项目目录下新建module-info.java文件
 
@@ -274,13 +437,9 @@ module com.demo{
 ```
 
 * `requires` 依赖模块
-    
     * `requires transitive 模块名` 将依赖模块依赖的模块传递到当前模块，不用重复依赖
-
 * `exports` 导出模块
-    
     * `exports 包名 to 模块名` 到处模块到指定的模块
-
 * 开放反射权限，标记`open`关键字
 
 ```java
@@ -313,69 +472,68 @@ module module.a{
 
 ```
 
-### 接口内可以定义private方法
-
-> 定义接口的的公共方法
-
-### 集合类的工厂方法
-
-> 快速创建集合，这种方法创建的集合都是只读的
-
-```java
-// Map
-Map.of("key1", "value1", "key2", "value2")
-
-// List
-List.of("value1", "value2");
-
-// Set
-Set.of("value1", "value2");
-```
-### Stream增强
-
-```java
-// 创建Stream空指针判断方法
-Stream.ofNullable(null);
-
-// iterate创建Stream时添加limit条件，添加截断操作
-Stream.iterate(0, i -> i < 10, i -> i = i + 1)
-  .takeWhile(i -> i < 6) // i < 6 时截断
-  .forEach(System.out::println);
-
-// 丢弃
-
-Stream.iterate(0, i -> i < 10, i -> i = i + 1)
-  .dropWhile(i -> i < 6) // i < 6 时丢弃
-  .forEach(System.out::println);
-```
-
 ### 其他
 
-* try-with-resource语法优化
+#### 新方法
+
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java9/other-features/src/main/java/cn/y/java/ApisTest.java)
+
+* `java.util.Optional`
+    * `stream()` - 返回单个值的流
+    * `ifPresentOrElse()` - 存在执行一个操作，不存在执行另一个操作
+    * `or()` - 指定默认的Optional
+* `java.util.List`
+    * `of()` - 创建不可变List，不能新增修改或删除
+* `java.util.Set`
+    * `of()` - 创建不可变Set
+* `java.util.Map`
+    * `of()` - 根据key-value创建不可变Map
+    * `ofEntries()` - 根据Entry创建不可变Map
+* `java.util.Stream`
+    * `ofNullable()` - 创建可空Stream，对参数进行null判断
+    * `iterate()` - 添加限制参数
+    * `takeWhile()` - 从第一个元素还是判断，满足条件的元素会保留，当遇到一个不满足条件的元素时，后面的元素都丢弃
+    * `dropWhile()` - 从第一个元素还是判断，满足条件的元素会丢弃，当遇到一个不满足条件的元素时，后面的元素都保留
+
+#### 接口内可以定义private方法
 
 ```java
-// try-with-resource语法不需要在括号内申明完整的语句
-FileInputStream fileInputStream = new FileInputStream(new File("/path/to/aaa"));
-try(fileInputStream){
-    fileInputStream.read();
+public interface PrivateMethodInInterface {
+
+    /**
+     * 私有方法定义默认方法的内部通用逻辑
+     */
+    private void b(){
+        System.out.println("b");
+    }
+
+    default void a(){
+        System.out.println("a");
+        b();
+    }
 }
 ```
 
-* Optional添加部分方法
+#### try-with-resource语法优化
 
 ```java
-// 如果数据为空则提供另一个Optional
-Optional.ofNullable(null)
-  .or(() -> Optional.of(1));
-
-// ifPresent添加为空分支
-Optional.ofNullable(null)
-  .ifPresentOrElse(v -> {
-    System.out.println("value is: " + v);
-  }, () -> {
-    System.out.println("value is null");
-  });
+File resDir = new File(System.getProperty("user.dir"), "src/main/resources");
+FileInputStream fis = new FileInputStream(new File(resDir, "1.txt"));
+FileOutputStream fos = new FileOutputStream(new File(resDir, "2.txt"));
+try(fis;fos){
+    byte[] data = new byte[1024];
+    int len;
+    while((len = fis.read(data)) != -1){
+        fos.write(data, 0, len);
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
 ```
+
+#### 命令行工具
+
+* `jshell` - java命令行工具
 
 ## Java 10 
 
