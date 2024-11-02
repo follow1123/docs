@@ -428,48 +428,89 @@ String s3 = optional.orElseThrow(RuntimeException::new);
 
 > 模块系统（Java Platform Module System，JPMS）
 
-* 在项目目录下新建module-info.java文件
+* 在项目目录下新建`module-info.java`文件
+* 项目默认导入`java.base`模块
+* 如果项目没有`module-info.java`文件则不使用模块机制
 
 ```java
-module com.demo{
-  requires java.se;
+module <module.name>{
+    exports <package.name>;
+    requires <module.name>;
+    opens <package.name>;
 }
 ```
 
-* `requires` 依赖模块
-    * `requires transitive 模块名` 将依赖模块依赖的模块传递到当前模块，不用重复依赖
-* `exports` 导出模块
-    * `exports 包名 to 模块名` 到处模块到指定的模块
-* 开放反射权限，标记`open`关键字
+#### 关键字
+
+* `requires <module.name>` - 依赖模块
+    * `requires transitive <module.name>` - 将引入模块所依赖的模块传递到当前模块，不用重复引入
+* `exports <package.name>` - 导出模块
+    * `exports <package.name> to <module.name>` - 导出模块到指定的模块
+* `opens <package.name>` -  开放反射权限
+    * `open module <module.name> {}` - 将open关键字直接标记到`module`定义前，表示开放整个模块的反射权限
+
+#### 使用
+
+> [参考](https://github.com/follow1123/java-version-features/blob/main/java9)`module-a` `module-b` `module-c` `module-d`
+
+* 暴露包和引入模块
 
 ```java
-// 开放整个模块的反射权限
-open module com.demo{
-  requires java.se;
+// 模块a
+module module.a {
+    // 暴露包
+    exports cn.a;
+    // 暴露包给指定的模块
+    exports cn.b to module.c;
 }
 
-// 开放部分包的反射权限
-open module com.demo{
-    opens 包名;
-}
-
-```
-
-* 定义接口给其他模块实现
-
-```java
-// 模块a内有一个Test接口
-module module.a{
-    uses com.Test
-}
-
-// 模块b内实现了Test接口
-
-module module.a{
+// 模块b，可以使用模块a下cn.a包下的类，无法使用cn.b包下的类
+module module.b {
+    // 引入模块a
     requires module.a;
-    provides com.Test whit com.TestImpl;
 }
 
+/*
+    模块c，transitive关键字表示将模块b引入的依赖传递到当前模块
+    所以模块c，可以使用模块a导出的所有包
+*/
+module module.c {
+    // 引入模块b
+    requires transitive module.b;
+}
+```
+
+* 声明接口和提供实现类
+
+```java
+// 模块a
+module module.a {
+    exports cn.a;
+    // 声明接口，给其他模块实现
+    uses cn.a.AService
+}
+
+// 模块b，提供实现类
+module module.b {
+    requires module.a;
+    // 实现其他模块声明的接口
+    provides cn.a.AService with cn.b.AServiceImpl;
+}
+```
+
+* 开放反射权限
+
+```java
+// 模块a
+module module.a{
+    // 开放cn.a包下所有类的反射权限
+    opens cn.a;
+}
+
+// 模块b，开放整个模块的反射权限
+open module module.b {
+    requires module.a;
+}
 ```
 
 ### 其他
@@ -531,119 +572,118 @@ try(fis;fos){
 }
 ```
 
+#### 响应式流
+
+* `java.util.concurrent.Flow`
+
 #### 命令行工具
 
 * `jshell` - java命令行工具
 
-## Java 10 
+## Java 10-11
+
+### HTTP Client
+
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java10-11/src/main/java/cn/y/java/HttpClientTest.java)
+
+* 发送GET请求
+
+```java
+HttpRequest req = HttpRequest.newBuilder()
+        .uri(URI.create("http://localhost:8989/test"))
+        .GET()
+        .build();
+HttpClient client = HttpClient.newHttpClient();
+HttpResponse<String> respData = client.send(req, HttpResponse.BodyHandlers.ofString());
+System.out.println(respData.body());
+```
+
+* 发送GET请求，异步接收
+
+```java
+HttpRequest req = HttpRequest.newBuilder()
+        .uri(URI.create("http://localhost:8989/test"))
+        .GET()
+        .build();
+HttpClient.newHttpClient().sendAsync(req, HttpResponse.BodyHandlers.ofString())
+        .thenApply(HttpResponse::body)
+        .thenAccept(System.out::println)
+        .exceptionally(e ->{
+            System.out.println(e.getMessage());
+            return null;
+        });
+
+// 添加睡眠以防主线程过早退出
+try {
+    Thread.sleep(1000);
+} catch (InterruptedException e) {
+    e.printStackTrace();
+}
+```
+
+* 发送POST请求
+
+```java
+HttpRequest req = HttpRequest.newBuilder()
+        .uri(URI.create("http://localhost:8989/test"))
+        .POST(HttpRequest.BodyPublishers.ofString("this is post body"))
+        .build();
+HttpClient client = HttpClient.newHttpClient();
+HttpResponse<String> respData = client.send(req, HttpResponse.BodyHandlers.ofString());
+System.out.println(respData.body());
+```
+
+### 其他
+
+#### 新方法
+
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java10-11/src/main/java/cn/y/java/ApisTest.java)
+
+* `java.util.Optional`
+    * `isEmpty()` - 判断Optional内的值是否为空
+* `java.lang.String`
+    * `isBlank()` - 判断字符串是否为空串，会判断空格
+    * `repeat(num)` - 返回当前字符串重复拼接多少次后的字符串
+    * `lines()` - 返回由当前字符串每行组成的流
+    * `strip()` - 去除字符串前后空格
+    * `stripLeading()` - 去除字符串前面的空格
+    * `stripTrailing()` - 去除字符串后面的空格
+
+#### var关键字（Java 10）
 
 * 添加`var`关键字用于类型推断，只适用与局部变量
 
-## Java 11
-
-* var 关键字可以用于lambda参数内
-
 ```java
-// var 关键字可以用于lambda参数内
-Consumer<String> consumer = (var s) -> {
-    System.out.println(s);
-};
-consumer.accept("123");
-```
+public class VarTest {
 
-* String增强
+    // 无法定义成员变量
+    // var a = 10;
 
-```java
-// 非空判断
-String s = "";
-String s1 = " ";
+    // 无法定义静态变量
+    // static var b = "abc";
 
-System.out.println(s.isEmpty()); // true
-System.out.println(s.isBlank()); // true
+    @Test
+    public void test() {
+        // 类型推断
+        var list = new ArrayList<>();
 
-System.out.println(s1.isEmpty()); // false
-System.out.println(s1.isBlank()); // true
-
-// 字符串重复
-
-String s2 = "a";
-System.out.println(s2.repeat(3)); // aaa
-
-
-// 获取字符串内的每行组成一个Stream
-String s3 = "a\nb\nc";
-s3.lines().forEach(System.out::println);
-
-// 去除字符串首位空格
-
-String s4 = " a b c d ";
-System.out.println(s4.strip().length()); // 7
-System.out.println(s4.stripLeading().length()); // 8
-System.out.println(s4.stripTrailing().length()); // 8
-```
-
-* HttpClient 全新Http客户端
-
-## Java 12-16
-
-* switch表达式
-
-```java
-int i = 0;
-String a = switch (i){
-  case 1, 2 -> "case 1";
-  case 3, 4 -> "case 2";
-  default -> {
-    System.out.println("123");
-    yield "case default";
-  }
-};
-```
-
-* 文本快
-
-```java
-String s = """
-12321
-123123ad
-qweqwe
-""";
-System.out.println(s);
-```
-
-* instanceof增强
-
-```java
-Object s = "123";
-
-if (s instanceof String str){
-System.out.println(str);
+        // 无法推断lambda表达式对应的函数式接口
+        // var runnable = () -> System.out.println("runnable");
+    }
 }
 ```
 
-* 空指针报错优化，异常信息更准确
-
-* Record类，替换Lombok(jave16)
-
-## Java 17
+## Java 12-17
 
 ### 密封类型
 
-* 使用final关键字表示A类无法被其他类继承
-
-```java
-public final class A {
-
-}
-```
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java12-17/src/main/java/cn/y/java/sealed_class)
 
 * 使用sealed关键字修饰并使用permits指定某些类，表示只允许指定的某些类继承
-
 * 想要继承使用sealed修饰的类当前类必须使用`final` `sealed` `no-sealed`修饰
     * `final` 无法被其他类继承
     * `sealed` 当前类也变成密封类
     * `no-sealed` 当前类恢复为默认类，可以被其他任何类继承
-    
 
 ```java
 public sealed class A permits B {
@@ -655,29 +695,94 @@ public [final/sealed/no-sealed] class B extends A {
 }
 ```
 
-## Java 18
+### Record类
 
-* 默认使用UTF-8编码
-
-* `jwebserver`命令简单web服务器
-
-* `@snippet` 文档内的代码预览，使用`javadoc`命令生成文档
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java12-17/src/main/java/cn/y/java/record/RecordTest.java)
 
 ```java
-public class Text {
-    /**
-     * {@snippet
-     * int c = a + b;
-     * }
-     */
-    public int add(int a, int b) {
-        int c = a + b;
-        return c;
+User user = new User("zs", 28);
+// 获取属性方法
+System.out.println(user.name());
+System.out.println(user.age());
+
+// 自动重写equals和hashCode方法
+HashSet<User> users = new HashSet<>();
+users.add(user);
+users.add(new User("zs", 28));
+System.out.println(users);
+```
+
+### switch表达式
+
+```java
+int i = 0;
+String a = switch (i){
+    case 1, 2 -> "case 1";
+    case 3, 4 -> "case 2";
+    default -> {
+        System.out.println("123");
+        // yield表示在代码块中的返回值，相当于方法里面的return
+        yield "case default";
     }
+};
+System.out.println(a);
+```
+
+### 文本快
+
+```java
+String s = """
+        12321
+        123123ad
+        qweqwe
+        """;
+System.out.println(s);
+
+// 文本块内使用'\'取消换行
+String s2 = """
+        1 2 \
+        3
+        a b \
+        c""";
+System.out.println(s2);
+```
+
+### 其他
+
+#### 新方法
+
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java12-17/src/main/java/cn/y/java/ApisTest.java)
+
+* `java.lang.String`
+    * `indent(num)` - 添加缩进，正数添加，负数减少
+    * `transform()` - 使用函数式接口转换字符串
+
+#### instanceof增强
+
+```java
+Object o = "aaa";
+if (o instanceof String str){
+    System.out.println(str);
 }
 ```
 
-## Java 19
+#### 空指针报错优化，异常信息更准确
+
+```java
+String a = null;
+
+/*
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "String.length()" because "a" is null
+    at cn.y.java.NullPointerExceptionTest.main(NullPointerExceptionTest.java:7)
+ */
+System.out.println(a.length());
+```
+
+#### `jpackage`打包工具
+
+#### 弃用 Applet API 以进行删除
+
+## Java 18-21
 
 ### 虚拟线程
 
@@ -712,7 +817,7 @@ public void ThreadTest() {
 
 * 虚拟线程不支持`stop()`, `suspend()`, `resume()`方法
 
-### 创建虚拟线程的方式
+#### 创建虚拟线程的方式
 
 * 方式1
 
@@ -746,22 +851,10 @@ try {
 
 * 使用`Thread`对象内的`isVirtual()`方法判断是否为虚拟线程
 
-## Java 21
-
-* 虚拟线程成为正式版
-
-* 字符串模板（预览）
-
-```java
-String zs = "zs";
-String str = STR."my name is \{zs}";
-System.out.println(str);
-```
 
 ### scoped values 隐藏的方法参数（预览）
 
-    * 一般用于代替ThreadLocal
-
+* 一般用于代替ThreadLocal
 
 ```java
 public class ScopedValuesTest {
@@ -808,28 +901,7 @@ public class ScopedValuesMultithreadTest {
 }
 ```
 
-### Record Pattern（预览）
-
-```java
-public class RecordPatternTest {
-    public static void main(String[] args) {
-        Object o = new Person("zs", 18);
-        printObj(o);
-    }
-
-    public static void printObj(Object o){
-        if (o instanceof Person(String name, int age)){
-            System.out.println("name = " + name);
-            System.out.println("age = " + age);
-        }
-    }
-
-}
-
-record Person(String name, int age){}
-```
-
-### switch表达式
+### switch表达式增强
 
 * 临时变量
 
@@ -879,7 +951,52 @@ public class SwitchTest2 {
 }
 ```
 
-### 简化版main方法（预览）
+### 其他
+
+#### 结构化并发，`StructuredTaskScope`类的使用
+
+#### Record Pattern（预览）
+
+```java
+public class RecordPatternTest {
+    public static void main(String[] args) {
+        Object o = new Person("zs", 18);
+        printObj(o);
+    }
+
+    public static void printObj(Object o){
+        if (o instanceof Person(String name, int age)){
+            System.out.println("name = " + name);
+            System.out.println("age = " + age);
+        }
+    }
+
+}
+
+record Person(String name, int age){}
+```
+
+#### 默认使用UTF-8编码
+
+#### `jwebserver`命令简单web服务器
+
+#### `@snippet` 文档内的代码预览，使用`javadoc`命令生成文档
+
+```java
+public class Text {
+    /**
+     * {@snippet
+     * int c = a + b;
+     * }
+     */
+    public int add(int a, int b) {
+        int c = a + b;
+        return c;
+    }
+}
+```
+
+#### 简化版main方法（预览）
 
 ```java
 void main(){
@@ -887,4 +1004,11 @@ void main(){
 }
 ```
 
-### 结构化并发，`StructuredTaskScope`类的使用
+#### 字符串模板（预览）
+
+```java
+String zs = "zs";
+String str = STR."my name is \{zs}";
+System.out.println(str);
+```
+
