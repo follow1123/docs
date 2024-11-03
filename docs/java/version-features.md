@@ -8,9 +8,9 @@ sidebar_position: 20
 
 ### Lambda表达式
 
-* 基础使用
-
 > [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/lambda/LambdaTest.java)
+
+* 基础使用
 
 ```java
 // 原生方式
@@ -354,7 +354,7 @@ for (Map.Entry<Boolean, List<User>> entry : entries1) {
 ```
 ### Optional类
 
-> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/stream/OptionalTest.java)
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/optional/OptionalTest.java)
 
 * 创建
 
@@ -533,8 +533,8 @@ open module module.b {
 * `java.util.Stream`
     * `ofNullable()` - 创建可空Stream，对参数进行null判断
     * `iterate()` - 添加限制参数
-    * `takeWhile()` - 从第一个元素还是判断，满足条件的元素会保留，当遇到一个不满足条件的元素时，后面的元素都丢弃
-    * `dropWhile()` - 从第一个元素还是判断，满足条件的元素会丢弃，当遇到一个不满足条件的元素时，后面的元素都保留
+    * `takeWhile()` - 从第一个元素开始判断，满足条件的元素会保留，当遇到一个不满足条件的元素时，后面的元素都丢弃
+    * `dropWhile()` - 从第一个元素开始判断，满足条件的元素会丢弃，当遇到一个不满足条件的元素时，后面的元素都保留
 
 #### 接口内可以定义private方法
 
@@ -786,195 +786,103 @@ System.out.println(a.length());
 
 ### 虚拟线程
 
-* 使用线程池方式
-
-```java
-public void ThreadTest() {
-    ExecutorService executor = Executors.newCachedThreadPool();
-    try(executor){
-        IntStream.range(1, 10000).forEach(i -> executor.submit(() -> {
-            try {
-                Thread.sleep(1000);
-                System.out.println("execute: " + i );
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
-        }));
-    }catch (Exception e){
-        e.printStackTrace();
-    }
-}
-```
-
-* 使用虚拟线程方式，只需要将`newCachedThreadPool`修改为`newVirtualThreadPerTaskExecutor`，速度就会明显提升
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java18-21/src/main/java/cn/y/java/VirtualThreadTest.java)
 
 * 需要同步代码块时尽量使用`ReentrantLock`替代`synchronized`
-
-* 虚拟线程时守护线程，无法修改为未守护线程
-
+* 虚拟线程是守护线程，无法修改为未守护线程
 * 虚拟线程默认优先级是5，无法修改
-
 * 虚拟线程不支持`stop()`, `suspend()`, `resume()`方法
+* 使用`Thread`对象内的`isVirtual()`方法判断是否为虚拟线程
 
 #### 创建虚拟线程的方式
 
-* 方式1
+* `Thread`类的静态方法
 
 ```java
-Runnable task = () -> {
-    System.out.println("run task");
-};
-Thread.startVirtualThread(task);
-try {
-    Thread.sleep(100);
-} catch (InterruptedException e) {
-    throw new RuntimeException(e);
-}
+Thread.ofVirtual().name("virtual thread 1")
+        .start(() -> System.out.printf("%s started\n", Thread.currentThread().getName()));
+
+Thread.startVirtualThread(() -> System.out.println("started"));
+
+Thread virtualThread3 = Thread.ofVirtual().name("virtual thread 3")
+        .unstarted(() -> System.out.printf("%s started\n", Thread.currentThread().getName()));
+virtualThread3.start();
+
+System.out.println(virtualThread3.isDaemon());
+System.out.println(virtualThread3.isVirtual());
 ```
-* 方式2
+
+* 线程池
 
 ```java
-Runnable task = () -> {
-    System.out.println("run task");
-};
-// Thread virtualThread = Thread.ofVirtual().name("virtualThreadName").start(task);
-Thread virtualThread = Thread.ofVirtual().name("virtualThreadName").unstarted(task);
-virtualThread.start();
-try {
-    Thread.sleep(100);
-} catch (InterruptedException e) {
-    throw new RuntimeException(e);
-}
-```
-* 方式3 就是使用创建线程池
-
-* 使用`Thread`对象内的`isVirtual()`方法判断是否为虚拟线程
-
-
-### scoped values 隐藏的方法参数（预览）
-
-* 一般用于代替ThreadLocal
-
-```java
-public class ScopedValuesTest {
-
-    public static void main(String[] args) {
-         new ScopedValuesTest().set();
-    }
-    
-    private ScopedValue<String> value = ScopedValue.newInstance();
-
-    public void set(){
-        ScopedValue.where(value, "111").run(() -> get());
-    }
-
-    public void get(){
-        System.out.println(value.get());
-    }
-}
-```
-* 多线程方式
-
-```java
-public class ScopedValuesMultithreadTest {
-
-    public static void main(String[] args) {
-        ExecutorService pool = Executors.newCachedThreadPool();
-        ScopedValuesMultithreadTest test = new ScopedValuesMultithreadTest();
-        for (int i = 0; i < 10; i++) {
-            pool.submit(() -> test.set());
-        }
-        pool.shutdown();
-
-    }
-
-    private ScopedValue<String> value = ScopedValue.newInstance();
-
-    public void set(){
-        ScopedValue.where(value, Thread.currentThread().getName()).run(() -> get());
-    }
-
-    public void get(){
-        System.out.println(value.get());
+try (ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor()) {
+    for (int i = 0; i < 5; i++) {
+        pool.submit(()-> System.out.println("started"));
     }
 }
 ```
 
 ### switch表达式增强
 
-* 临时变量
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java18-21/src/main/java/cn/y/java/SwitchTest.java)
+
+* 模式匹配
 
 ```java
-public class SwitchTest1 {
+Object o = 100;
 
-    public static void main(String[] args) {
-        int i = 100;
-        System.out.println(getValue(i));
-    }
-
-    public static String getValue(Object o){
-       return switch (o){
-           case null -> "null object";
-           case Integer i -> "integer: " + i;
-           case String str -> "string: " + str;
-           default -> o.toString();
-       };
-    }
-}
+String result = switch (o){
+    case String s -> "2134";
+    case Integer i -> String.valueOf(i);
+    case null -> "null";
+    default -> "err";
+};
+System.out.println(result);
 ```
 
 * `when`关键字
 
 ```java
-public class SwitchTest2 {
+Object o = 100;
 
-    public static void main(String[] args) {
-        int score = 10;
-        test(score);
-    }
+String result = switch (o){
+    case Integer i when i >= 100 -> "A";
+    case String s -> s;
+    case null -> "C";
+    default -> "D";
+};
+System.out.println(result);
+```
 
-    public static void test(Object o){
-       switch (o){
-           case Integer i when i <= 60 -> {
-               System.out.println("not great");
-           }
-           case Integer i when i <= 100 -> {
-               System.out.println("great");
-           }
-           default -> {
-               System.out.println("error");
-           }
-       };
+### Record 值解构
 
-    }
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java18-21/src/main/java/cn/y/java/record/RecordTest.java)
+
+* 配合`instanceof`使用
+
+```java
+Color color = new RGBColor(255, 255, 100);
+if (color instanceof RGBColor(int red, int green, int blue)){
+    System.out.printf("[%d, %d, %d]\n", red, green, blue);
+}
+```
+
+* 配合`switch`使用
+
+```java
+Color color = new HexColor(0xFFFFFE);
+switch (color){
+    case RGBColor(int red, int green, int blue) ->
+            System.out.printf("[%d, %d, %d]\n", red, green, blue);
+    case HexColor(int hex) ->
+            System.out.printf("%x\n", hex);
+    default -> System.out.println("error");
 }
 ```
 
 ### 其他
 
 #### 结构化并发，`StructuredTaskScope`类的使用
-
-#### Record Pattern（预览）
-
-```java
-public class RecordPatternTest {
-    public static void main(String[] args) {
-        Object o = new Person("zs", 18);
-        printObj(o);
-    }
-
-    public static void printObj(Object o){
-        if (o instanceof Person(String name, int age)){
-            System.out.println("name = " + name);
-            System.out.println("age = " + age);
-        }
-    }
-
-}
-
-record Person(String name, int age){}
-```
 
 #### 默认使用UTF-8编码
 
@@ -993,6 +901,28 @@ public class Text {
         int c = a + b;
         return c;
     }
+}
+```
+#### scoped value（预览）
+
+* 一般用于代替ThreadLocal
+
+```java
+private static final ScopedValue<String> scopeValue = ScopedValue.newInstance();
+
+public static void main(String[] args) {
+    try (ExecutorService pool = Executors.newFixedThreadPool(3)) {
+        for (int i = 0; i < 5; i++) {
+            pool.submit(() -> {
+                ScopedValue.runWhere(scopeValue, "hello", ScopeValueTest::handleMessage);
+            });
+        }
+    }
+}
+
+public static void handleMessage(){
+    String value = scopeValue.get();
+    System.out.printf("handle message from %s: %s\n", Thread.currentThread().getName(), value);
 }
 ```
 
