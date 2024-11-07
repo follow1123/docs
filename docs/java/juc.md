@@ -779,6 +779,333 @@ System.out.println(doubleAdder.doubleValue());
 
 ## 线程池
 
+### 自定义线程池
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/thread_pool/custom_thread_pool)
+
+### ThreadPoolExecutor
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/thread_pool/ThreadPoolExecutorTest.java)
+
+#### 线程池状态
+
+* **ThreadPoolExecutor**使用`int`的高3位来表示线程池状态，低29位表示线程数量
+* 使用一个`int`来表示这两种状态的原因：是可以用一次CAS操作修改这两个状态
+
+| 状态    | 高3位    | 接收新任务    | 处理阻塞队列任务    | 说明    |
+|---------------- | --------------- | --------------- | --------------- | --------------- |
+| `RUNNING`    | 111    | Y    | N    |    |
+| `SHUTDOWN`   | 000   | N   | Y   | 不会接收新任务，但会处理阻塞队列剩余任务   |
+| `STOP`   | 001   | N   | N   | 会中断正在执行的任务，并抛弃阻塞队列任务   |
+| `TIDYING`   | 010   | -   | -   | 任务全执行完成，活动线程为0，即将进入终结   |
+| `TERMINATED` | 011 | - | - | 终结 |
+
+#### 构造方法
+
+* `corePoolSize` - 核心线程数目（最多保留的线程数）
+* `maximumPoolSize` - 最大线程数目
+* `keepAliveTime` - 生存时间-针对救急线程
+* `unit` - 时间单位-针对救急线程
+* `workQueue` - 阻塞队列
+* `threadFactory` - 线程工厂-可以为线程创建时起个好名字
+* `handler` - 拒绝策略
+
+#### 核心线程
+
+* 使用`corePoolSize`参数定义最大数量
+* 核心线程默认会一直存在
+* 可以使用`allowCoreThreadTimeOut(true)`方法将核心线程设置为可超时，超时时间默认和救急线程的超时时间一样
+
+#### 救急线程
+
+* **最大线程数(maximumPoolSize)减核心线程数(corePoolSize)** 就是救急线程的数量
+* 救急线程不会一直存在，任务执行完成后，等待`keepAliveTime`和`unit`定义的时间后停止
+* 救急线程只有在[阻塞队列](#阻塞队列)满了之后才会开始创建并运行，如果**阻塞队列**是无界队列，那救急线程永远不会运行
+
+#### 阻塞队列
+
+* 用于在核心线程忙不过来的时候保存提交的任务
+
+| 实现 | 说明 |
+| --- | --- |
+| ArrayBlockingQueue | 如果你有固定数量的任务且需要限制队列的容量，可以使用这个**有界队列** |
+| LinkedBlockingQueue | 当任务量不确定或可能变得非常大，如果不需要限制队列大小，可以使用这个**无界队列** |
+| SynchronousQueue | 如果你希望每个提交的任务都被立即处理，可以使用 SynchronousQueue |
+| DelayQueue | 适用于任务的执行有延迟要求的场景，比如定时任务或者某些任务的延迟执行 |
+
+#### 拒绝策略
+
+* 当核心线程正在运行，**有界**阻塞队列也已经满了，并且救急线程也正在运行的时候，再提交新的任务就会执行拒绝策略
+
+| 实现 | 说明 |
+| --- | --- |
+| AbortPolicy | 直接抛出异常 |
+| CallerRunsPolicy | 在调用者的线程执行这个任务 |
+| DiscardPolicy | 丢弃这个任务 |
+| DiscardOldestPolicy | 丢弃最早提交的任务 |
+
+#### 线程工厂
+
+* 一般用来给线程起名，实现`ThreadFactory`接口进行自定义
+
+#### 使用
+
+##### 救急线程的执行时机
+
+* 当核心线程正在运行，并且**有界**任务队列已满时，救急线程才会执行
+
+```mermaid
+flowchart LR
+    subgraph blockQueue [阻塞队列,size=2]
+        t3(任务3)
+        t4(任务4)
+    end
+
+    subgraph pool [线程池,cs=2,ms=3]
+        ct1(核心线程1) --> t1(任务1)
+        ct2(核心线程2) --> t2(任务2)
+        et1(救急线程1) --> t5(任务5)
+    end
+```
+
+```java
+ThreadPoolExecutor pool = new ThreadPoolExecutor(2, 3, 5,
+        TimeUnit.SECONDS, new ArrayBlockingQueue<>(2));
+for (int i = 0; i < 5; i++) {
+    long[] valRef = new long[]{i, 1000};
+    if (i == 0 || i == 1){
+        valRef[1] = 1000000;
+    }
+    pool.submit(() -> {
+        log.info("start {} task", valRef[0]);
+        try{Thread.sleep(valRef[1]);}catch(InterruptedException e){e.printStackTrace();}
+        log.info("end {} task", valRef[0]);
+    });
+}
+
+try{Thread.sleep(5000);}catch(InterruptedException e){e.printStackTrace();}
+log.info("core size: {}, largest size: {}", pool.getCorePoolSize(), pool.getLargestPoolSize());
+log.info("all task: {}, complete task: {}", pool.getTaskCount(), pool.getCompletedTaskCount());
+```
+
+##### newFixedThreadPool
+
+* 创建：`ExecutorService pool = Executors.newFixedThreadPool(5);`
+* 没有救急线程，阻塞队列是无界的，可以放任意数量的任务
+* 用于执行任务量已知，相对耗时的任务
+
+##### newCachedThreadPool
+
+* 创建：`ExecutorService pool = Executors.newCachedThreadPool();`
+* 核心线程数是0，最大线程数是`Integer.MAX_VALUE`，救急线程的空闲生存时间是60s
+    * 全部都是救急线程（ 60S 后可以回收）
+    * 救急线程可以无限创建
+* 队列采用了`SynchronousQueue`实现特点是，它没有容量，没有线程来取是放不进去的（一手交钱、一手交货）
+* 适合任务数比较密集，但每个任务执行时间较短的情况
+* 测试SynchronousQueue
+
+```java
+SynchronousQueue<Integer> queue = new SynchronousQueue<>();
+new Thread(() -> {
+    log.info("putting 1");
+    try {queue.put(1);} catch (InterruptedException e) {throw new RuntimeException(e);}
+    log.info("1 putted");
+
+    log.info("putting 2");
+    try {queue.put(2);} catch (InterruptedException e) {throw new RuntimeException(e);}
+    log.info("2 putted");
+}).start();
+
+// 一秒后取1时才能添加1
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+new Thread(() -> {
+    log.info("take 1");
+    try {queue.take();} catch (InterruptedException e) {throw new RuntimeException(e);}
+}).start();
+
+// 再一秒后取2时才能添加2
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+new Thread(() -> {
+    log.info("take 2");
+    try {queue.take();} catch (InterruptedException e) {throw new RuntimeException(e);}
+}).start();
+```
+
+* 测试使用缓存线程池
+
+```java
+ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+for (int i = 0; i < 10; i++) {
+    int num = i;
+    pool.submit(() -> {
+        log.info("start {}", num);
+        try{Thread.sleep(10000000);}catch(InterruptedException e){e.printStackTrace();}
+    });
+}
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+log.info("core size: {}, largest size: {}", pool.getCorePoolSize(), pool.getLargestPoolSize());
+log.info("all task: {}, complete task: {}", pool.getTaskCount(), pool.getCompletedTaskCount());
+```
+
+##### newSingleThreadExecutor
+
+* 创建：`ExecutorService pool = Executors.newSingleThreadExecutor();`
+* 希望多个任务排队执行。线程数固定为1，任务数多于1时，会放入无界队列排队。任务执行完毕，这唯一的线程也不会被释放
+* 某一个任务执行抛出异常也不会影响后续的任务
+* 无法通过获取具体实现类修改线程池大小，创建的是`FinalizableDelegatedExecutorService`，无法定义，而且没有修改线程池大小的方法
+
+```java
+ExecutorService pool = Executors.newSingleThreadExecutor();
+for (int i = 0; i < 5; i++) {
+    int num = i;
+    pool.submit(() -> {
+        log.info("execute {}", num);
+        // 出现异常后也会执行后续的任务
+        if (num == 2) throw new RuntimeException("err");
+        try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+    });
+}
+```
+
+##### 提交任务相关方法
+
+* 提交单个任务
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(3);
+pool.execute(() -> log.info("execute runnable task"));
+pool.submit(() -> log.info("submit runnable task"));
+Future<Integer> t1 = pool.submit(() -> {
+    log.info("submit callable task");
+    return 1;
+});
+try {System.out.println(t1.get());} catch (InterruptedException | ExecutionException e) {throw new RuntimeException(e);}
+// 指定一个返回值，用于确认线程是否完成
+Future<String> t2 = pool.submit(() -> {
+    int i = 1/0;
+    log.info("submit runnable task with result");
+}, "done");
+try {System.out.println(t2.get());} catch (InterruptedException | ExecutionException e) {throw new RuntimeException(e);}
+```
+
+* 提交全部任务，并获取所有任务的返回值
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(3);
+ArrayList<Callable<String>> tasks = new ArrayList<>();
+for (int i = 0; i < 5; i++) {
+    int num = i;
+    tasks.add(() -> num + "");
+}
+try {
+    List<Future<String>> futures = pool.invokeAll(tasks);
+    for (Future<String> future : futures) {
+        log.info(future.get());
+    }
+} catch (InterruptedException | ExecutionException e) {
+    throw new RuntimeException(e);
+}
+```
+
+* 提交全部任务，并获取最快执行完成的任务的返回值
+    * 其他任务，如果正在执行的就打断，没执行的就放弃
+
+```java
+ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(3);
+ArrayList<Callable<String>> tasks = new ArrayList<>();
+Random random = new Random();
+for (int i = 0; i < 5; i++) {
+    int mills = random.nextInt(0, 10) * 100;
+    int num = i;
+    tasks.add(() -> {
+        try{Thread.sleep(mills);}catch(InterruptedException e){e.printStackTrace();}
+        return num + "";
+    });
+}
+/*
+    只会获取最快执行完成的一个任务的结果
+    其他任务，如果正在执行的就打断，没执行的就放弃
+ */
+try {log.info(pool.invokeAny(tasks));} catch (Exception e) {throw new RuntimeException(e);}
+log.info("core size: {}, largest size: {}", pool.getCorePoolSize(), pool.getLargestPoolSize());
+log.info("all task: {}, complete task: {}", pool.getTaskCount(), pool.getCompletedTaskCount());
+```
+
+##### 关闭线程
+
+* `shutdown()`
+
+```java
+// ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(3);
+ThreadPoolExecutor pool = new ThreadPoolExecutor(3, 3, 3, TimeUnit.SECONDS,
+        new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
+
+for (int i = 0; i < 5; i++) {
+    int num = i;
+    pool.submit(() -> {
+        log.info("execute {}", num);
+        try{Thread.sleep(2000);}catch(InterruptedException e){e.printStackTrace();}
+    });
+}
+log.info("before shutdown");
+// 不会阻塞当前线程，所有已经提交的任务都会执行完成
+pool.shutdown();
+log.info("other");
+
+// 线程关闭后再提交任务就会执行默认或指定的拒绝策略
+pool.submit(() -> log.info("execute after shutdown"));
+```
+
+* `shutdownNow()`
+
+```java
+ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(3);
+// ThreadPoolExecutor pool = new ThreadPoolExecutor(3, 3, 3, TimeUnit.SECONDS,
+//         new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
+
+for (int i = 0; i < 5; i++) {
+    int num = i;
+    pool.submit(() -> {
+        log.info("execute {}", num);
+        try{Thread.sleep(2000);}catch(InterruptedException e){e.printStackTrace();}
+    });
+}
+log.info("before shutdown");
+/*
+ 不会阻塞当前线程
+ 正在运行的任务直接打断
+ 阻塞队列中的任务不会执行，会返回
+ */
+List<Runnable> tasks = pool.shutdownNow();
+log.info("runnable tasks myself");
+tasks.forEach(Runnable::run);
+
+// 线程关闭后再提交任务，就会执行默认或指定的拒绝策略
+pool.submit(() -> log.info("execute after shutdown"));
+```
+
+* `isShutdown()` - 不在RUNNING状态的线程池，此方法就返回true
+* `isTerminated()` - 线程池状态是否是TERMINATED
+* `awaitTermination(long timeout, TimeUnit unit)` - 调用shutdown后，由于调用线程并不会等待所有任务运行结束，因此如果它想在线程池TERMINATED后做些事情，可以利用此方法等待
+
+### 线程池创建多少线程合适
+
+* 过小会导致程序不能充分地利用系统资源、容易导致饥饿
+* 过大会导致更多的线程上下文切换，占用更多内存
+
+#### CPU密集型运算
+
+* 通常采用**CPU核数+1**能够实现最优的CPU利用率， +1是保证当线程由于页缺失故障（操作系统）或其它原因导致暂停时，额外的这个线程就能顶上去，保证CPU时钟周期不被浪费
+
+#### I/O密集型运算
+
+* CPU不总是处于繁忙状态，例如，当你执行业务计算时，这时候会使用CPU资源，但当你执行操作时、远程RPC调用时，包括进行数据库操作时，这时候就闲下来了，你可以利用多线程提高它的利用率
+* 公式：`线程数 = 核数 * 期望CPU利用率 * 总时间(CPU计算时间 + 等待时间) / CPU计算时间`
+* 例如4核计算时间是50％，其它等待时间是50％，期望CPU被100％利用，套用公式：`4 * 100% * 100% / 50％ = 8`
+* 例如4核计算时间是10％，其它等待时间是90％，期望CPU被100％利用，套用公式：`4 * 100% * 100% / 10％ = 40`
+* CPU计算时间越短，线程数应该越多
+
+
 ---
 
 ## 并发数据结构
@@ -788,8 +1115,8 @@ System.out.println(doubleAdder.doubleValue());
 ## 命令行工具
 
 * `jps` - 查看所有java进程信息
-    * `jps -l` - 显示main方法
-    * `jps -v` - 显示详细信息
+* `jps -l` - 显示main方法
+* `jps -v` - 显示详细信息
 * `jstack <pid>` - 查看指定java进程的所有线程信息
 * `jconsole` - 图形化界面，查看jvm信息
 
@@ -917,3 +1244,7 @@ end
   * 在单例模式的双重检测锁实现方式下也需要使用volatile关键字修饰实例对象
     * 因为jvm在创建对象时会分为三步：申请空间、初始化成员变量、赋值到实例，在这几个部分内：
       * 如果第一个线程在锁内初始化这个对象，初始化时发生了指令重排，把第二和第三个步骤换了一下，那么第二个线程就会拿到一个默认值全部为空的对象。
+
+## 参考
+
+* [黑马](https://www.bilibili.com/video/BV16J411h7Rd/?spm_id_from=333.788.videopod.episodes&vd_source=c8dac761c9fcb8220ee9059d06ac692e)
