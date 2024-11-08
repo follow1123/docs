@@ -315,6 +315,153 @@ public static void afterMidOperate(AtomicStampedReference<String> str){
 
 ---
 
+## AQS
+
+* **AbstractQueuedSynchronizer**，是阻塞式锁和相关的同步器工具的框架
+* 用`state`属性来表示资源的状态（分独占模式和共享模式），子类需要定义如何维护这个状态，控制如何获取锁和释放锁
+    * `getState` - 获取state状态
+    * `setState` - 设置state状态
+    * `compareAndSetState` - 使用CAS机制设置state状态
+    * 独占模式是只有一个线程能够访问资源，而共享模式可以允许多个线程访问资源
+* 是供了基于FIFO的等待队列，类似于Monitor的EntryList
+* 条件变量来实现等待、唤醒机制，支持多个条件变量，类似于Monitor的WaitSet
+* 子类主要实现这样一些方法
+    * `tryAcquire` - 尝试使用**独占模式**获取同步资源
+    * `tryRelease` - 尝试释放**独占模式**下的同步资源
+    * `tryAcquireShared` - 尝试使用**共享模式**获取同步资源
+    * `tryReleaseShared` - 尝试释放**共享模式**下的同步资源
+    * `isHeldExclusively` - 判断当前的同步资源是否处理**独占模式**
+
+```mermaid
+flowchart
+    subgraph AQS
+        subgraph blockingQueue
+            direction LR
+            n1(nullNode) <--> n2(thread2)
+            n2 <--> n3(thread3)
+        end
+        subgraph fields
+            direction LR
+            f1(state)
+            f2(head) --> n1
+            f3(tail) --> n3
+        end
+    end
+    subgraph threads
+        direction LR
+        t1(thread1) --> t11(update state) --修改成功--> t111(run task)
+        t2(thread2) --> t22(update state) --修改失败--> t222(enqueue)
+        t3(thread3) --> t33(update state) --修改失败--> t333(enqueue)
+    end
+```
+
+### 自定义锁
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/aqs/MLock.java)
+
+* 实现一个不可重入的锁
+
+```java
+@Slf4j(topic = "MLock")
+public class MLock implements Lock {
+
+    private final MSync sync;
+
+    public MLock() {this.sync = new MSync();}
+    @Override
+    public void lock() {sync.lock();}
+    @Override
+    public void lockInterruptibly() throws InterruptedException {sync.lockInterruptibly();}
+    @Override
+    public boolean tryLock() {return sync.tryLock();}
+    @Override
+    public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {return sync.tryLock(time, unit);}
+    @Override
+    public void unlock() {sync.unlock();}
+    @Override
+    public Condition newCondition() {return sync.newCondition();}
+
+    // 状态0为没加锁，状态1为加锁
+    class MSync extends AbstractQueuedSynchronizer{
+        /*
+            由于状态只有两种，具体逻辑在tryAcquire和tryRelease方法内已经实现了
+            所以传递参数时给一个固定值，这个值没意义，就是占个位置
+         */
+        private final int ignoreArg = 1;
+
+        // 加锁，会阻塞
+        void lock(){
+            /*
+                底层调用自己实现的tryAcquire方法
+                无法加锁则直接进阻塞队列，并使用LockSupport.park阻塞
+             */
+            acquire(ignoreArg);
+        }
+
+        // 可打断的锁，会阻塞
+        void lockInterruptibly() throws InterruptedException {
+            // 底层调用acquire方法
+            acquireInterruptibly(ignoreArg);
+        }
+
+        // 加锁，只试一次，不会阻塞
+        boolean tryLock() {
+            // 直角调用自己实现的方法
+            return tryAcquire(ignoreArg);
+        }
+
+        // 加锁，阻塞指定时间
+        boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
+            // 底层调用acquire方法
+            return tryAcquireNanos(ignoreArg, unit.toNanos(time));
+        }
+
+        // 解锁
+        void unlock() {
+            /*
+                底层调用自己实现的tryRelease方法
+                解锁成功后会唤醒下一个线程
+             */
+            release(ignoreArg);
+        }
+
+        // 条件变量
+        Condition newCondition() {
+            return new ConditionObject();
+        }
+
+        // 主要重写的方法
+        // 尝试加锁，试一次，不阻塞线程
+        @Override
+        protected boolean tryAcquire(int acquires) {
+            if (getState() == 0 && compareAndSetState(0, 1)) {
+                setExclusiveOwnerThread(Thread.currentThread());
+                return true;
+            }
+            return false;
+        }
+
+        // 尝试解锁，试一次，不阻塞线程
+        @Override
+        protected boolean tryRelease(int arg) {
+            if (getExclusiveOwnerThread() != Thread.currentThread())
+                throw new IllegalMonitorStateException();
+            setExclusiveOwnerThread(null);
+            setState(0);
+            return true;
+        }
+
+        // 判断当前是否处于独占模式
+        @Override
+        protected boolean isHeldExclusively() {
+            return Thread.currentThread() == getExclusiveOwnerThread();
+        }
+    }
+}
+```
+
+---
+
 ## JUC锁
 
 ### ReentrantLock
@@ -491,6 +638,156 @@ log.info("notify c1");
 lock.lock();
 c1.signalAll();
 lock.unlock();
+```
+
+### ReentrantReadWriteLock
+
+* 读写锁
+* 当读操作远远高于写操作时，这时候使用卖写锁让**读-读**可以并发，提高性能
+* 读锁不支持条件变量，读锁的`newCondition`未实现，使用会抛出异常
+* 重入时升级不支持：即持有读锁的情况下去获取写锁，会导致获取写锁永久等待
+* 重入时降级支持：即持有写锁的情况下去获取读锁
+
+```java
+int count = 10;
+for (int i = 0; i < count; i++) {
+    boolean flag = i % 2 == 0;
+    new Thread(() -> {
+        if (flag){
+            lock.readLock().lock();
+            try {
+                log.info("num: {}", num);
+            }finally {
+                lock.readLock().unlock();
+            }
+        }else {
+            lock.writeLock().lock();
+            try {
+                num = num - 1;
+                log.info("update num");
+            }finally {
+                lock.writeLock().unlock();
+            }
+        }
+    }).start();
+}
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+log.info("num: {}", num);
+```
+
+* 测试锁升级，无法升级
+
+```java
+new Thread(() -> {
+    lock.readLock().lock();
+    try {
+        log.info("num: {}", num);
+        lock.writeLock().lock();
+    }finally {
+        lock.readLock().unlock();
+    }
+    try {
+        log.info("get write lock");
+    }finally {
+        lock.writeLock().unlock();
+    }
+}).start();
+```
+
+* 测试锁降级，可以降级
+
+```java
+new Thread(() -> {
+    lock.writeLock().lock();
+    try {
+        num = num - 1;
+        log.info("update num");
+        lock.readLock().lock();
+    }finally {
+        lock.writeLock().unlock();
+    }
+    try {
+        log.info("get readlock");
+    }finally {
+        lock.readLock().unlock();
+    }
+}).start();
+```
+
+### StampedLock
+
+* 该类自JDK8加入，是为了进一步优化读性能，它的特点是在使用读锁、写锁时都必须配合**戳**使用
+* 加解读锁
+
+```java
+long stamp = lock.readLock();
+lock.unlockRead(stamp);
+```
+
+* 加解写锁
+
+```java
+long stamp = lock.writeLock();
+lock.unlockWrite(stamp);
+```
+
+* 乐观读，StampedLock支持`tryOptimisticRead()`方法（乐观读）读取完毕后需要做一次戳校验如果校验通过，表示这期间确实没有写操作，数据可以安全使用，如果校验没通过，需要重新获取读锁，保证数据安全。
+
+```java
+long stamp = lock.tryOptimisticRead();
+// 验戳
+if(lock.validate(stamp)){
+    // 成功，读取数据
+}
+// 失败，升级为读锁
+```
+
+* 使用
+
+```java
+private static final StampedLock lock = new StampedLock();
+
+private static int num = 50;
+
+public static void main(String[] args) {
+    int count = 100;
+    for (int i = 0; i < count; i++) {
+        boolean flag = i % 2 == 0;
+        new Thread(() -> {
+            if (flag){
+                try{Thread.sleep(10);}catch(InterruptedException e){e.printStackTrace();}
+                long stamp = lock.writeLock();
+                log.info("write stamp: {}", stamp);
+                try {
+                    // try{Thread.sleep(300);}catch(InterruptedException e){e.printStackTrace();}
+                    num = num - 1;
+                    log.info("update num");
+                }finally {
+                    lock.unlockWrite(stamp);
+                }
+            }else {
+                long stamp = lock.tryOptimisticRead();
+                log.info("optimistic read stamp: {}", stamp);
+                if (lock.validate(stamp)){
+                    // try{Thread.sleep(100);}catch(InterruptedException e){e.printStackTrace();}
+                    log.info("first time num: {}", num);
+                    return;
+                }
+                log.info("update to read lock");
+                stamp = lock.readLock();
+                try{
+                    // try{Thread.sleep(100);}catch(InterruptedException e){e.printStackTrace();}
+                    log.info("num: {}", num);
+                }finally {
+                    lock.unlockRead(stamp);
+                }
+            }
+        }).start();
+    }
+
+    try{Thread.sleep(4000);}catch(InterruptedException e){e.printStackTrace();}
+    log.info("num: {}", num);
+}
 ```
 
 ## 原子类
@@ -774,6 +1071,89 @@ System.out.println(doubleAdder.doubleValue());
 ---
 
 ## 并发工具类
+
+### Semaphore
+
+* 信号量，用来限制能同时访问共享资源的线程上限
+    * 类似理发店，同时只有固定的位置的人数可以理发
+* 使用Semaphore限流，在访问高峰期时，让请求线程阻塞，高峰期过去再释放许可，当然它只适合限制单机线程数量，并且仅是限制线程数，而不是限制资源数（例如连接数，请对比Tomcat LimitLatch的实现）
+```java
+Semaphore semaphore = new Semaphore(5);
+for (int i = 0; i < 50; i++) {
+    int idx = i;
+    new Thread(() -> {
+        try {
+            semaphore.acquire();
+            log.info("acquire resource {}", idx);
+            try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }finally {
+            semaphore.release();
+        }
+    }).start();
+}
+```
+
+### CountDownLatch
+
+* 用来进行线程同步协作，等待所有线程完成倒计时
+* 其中构造参数用来初始化等待计数值，`awalt()`用来等待计数归零，`countDown()`用来让计数减一
+
+```java
+int count = 10;
+CountDownLatch countDownLatch = new CountDownLatch(count);
+Random random = new Random();
+for (int i = 0; i < count; i++) {
+    new Thread(() -> {
+        try{Thread.sleep(random.nextInt(0, 10) * 100);}catch(InterruptedException e){e.printStackTrace();}
+        log.info("execute");
+        countDownLatch.countDown();
+    }).start();
+}
+try {countDownLatch.await();} catch (InterruptedException e) {throw new RuntimeException(e);}
+log.info("other thing");
+```
+
+* 所有提交的任务完成后关闭线程池
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(3);
+int count = 10;
+CountDownLatch countDownLatch = new CountDownLatch(count);
+for (int i = 0; i < count; i++) {
+    pool.submit(() -> {
+        log.info("run task");
+        countDownLatch.countDown();
+        log.info("task done");
+    });
+}
+
+// 等待所有任务执行完成后关闭线程池
+try {countDownLatch.await();} catch (InterruptedException e) {throw new RuntimeException(e);}
+pool.shutdown();
+```
+
+### CyclicBarrier
+
+* 循环栅栏，用来进行线程协作，等待线程满足某个计数。构造时设置**计数个数**，每个线程执行到某个需要**同步**的时刻调用`await()`方法进行等待，当等待的线程数满足了**计数个数**时，继续执行
+* 如果需要严格限制同一批线程一起执行，需要将栅栏的参数和线程池的个数设置成一样，如果线程池的个数大于栅栏的参数时，由于每个任务执行耗时可能不一样，多出来的线程可能挤占上一批的线程运行
+
+```java
+int count = 5;
+CyclicBarrier cyclicBarrier = new CyclicBarrier(count, () -> log.info("发车"));
+ExecutorService pool = Executors.newFixedThreadPool(count);
+
+int person = 20;
+for (int i = 0; i < person; i++) {
+    int personNo = i;
+    pool.submit(() -> {
+        log.info("person {} 上车", personNo);
+        try {cyclicBarrier.await();} catch (InterruptedException | BrokenBarrierException e) {throw new RuntimeException(e);}
+        log.info("person {} 睡觉", personNo);
+    });
+}
+```
 
 ---
 
@@ -1088,6 +1468,31 @@ pool.submit(() -> log.info("execute after shutdown"));
 * `isTerminated()` - 线程池状态是否是TERMINATED
 * `awaitTermination(long timeout, TimeUnit unit)` - 调用shutdown后，由于调用线程并不会等待所有任务运行结束，因此如果它想在线程池TERMINATED后做些事情，可以利用此方法等待
 
+### 线程池异常处理
+
+* 使用`execute()`方法执行的任务，出现异常后，如果不在任务内处理就会导致执行的线程崩溃，会直接打印异常信息
+* 使用`submit()`方法执行的任务，出现异常后，如果没有使用`future.get()`方法获取，则不会打印任何异常信息
+    * 使用`future.get()`方法时，会抛出任务内的异常，可以在此时处理异常
+
+```java
+ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(3);
+log.info("submit task start");
+Future<Integer> t1 = pool.submit(() -> {
+    log.info("run task1");
+    return 1 / 0;
+});
+log.info("submit task end");
+
+try {
+    // 使用Future.get方法时，如果任务执行时出现了异常，在get时会抛出
+    Integer result = t1.get();
+
+    log.info("result: {}", result);
+} catch (InterruptedException | ExecutionException e) {
+    log.error("handle task exception: ", e);
+}
+```
+
 ### 线程池创建多少线程合适
 
 * 过小会导致程序不能充分地利用系统资源、容易导致饥饿
@@ -1105,6 +1510,106 @@ pool.submit(() -> log.info("execute after shutdown"));
 * 例如4核计算时间是10％，其它等待时间是90％，期望CPU被100％利用，套用公式：`4 * 100% * 100% / 10％ = 40`
 * CPU计算时间越短，线程数应该越多
 
+### 任务调度线程池
+
+#### Timer
+
+* 旧版任务调度实现
+* 所有任务使用同一个线程执行，一个任务执行耗时操作会影响到另一个线程
+
+```java
+Timer timer = new Timer();
+TimerTask t1 = new TimerTask() {
+    @Override
+    public void run() {
+        // int i = 1/0;
+        // 由于任务使用同一个线程执行，一个任务执行耗时会影响后面的任务执行时机
+        try{Thread.sleep(2000);}catch(InterruptedException e){e.printStackTrace();}
+        log.info("execute t1");
+    }
+};
+TimerTask t2 = new TimerTask() {
+    @Override
+    public void run() {
+        log.info("execute t2");
+    }
+};
+
+timer.schedule(t1, 1000);
+timer.schedule(t2, 1000);
+```
+
+#### ScheduledThreadPool
+
+* 创建：`ScheduledExecutorService pool = Executors.newScheduledThreadPool(3)`
+* 每秒执行一次任务
+
+```java
+ScheduledExecutorService pool = Executors.newScheduledThreadPool(3);
+// 两秒后每隔1秒执行一次这个任务
+pool.scheduleAtFixedRate(() -> log.info("execute"), 2, 1, TimeUnit.SECONDS);
+```
+
+* 每天晚上23点执行任务
+
+```java
+ScheduledExecutorService pool = Executors.newScheduledThreadPool(3);
+
+// 默认间隔时间，24小时
+long delay = 24 * 60 * 60;
+LocalTime localTime = LocalTime.now();
+LocalTime scheduleTime = LocalTime.of(23, 0, 0);
+Duration between = Duration.between(localTime, scheduleTime);
+/*
+    计算出当前时间距离晚上11点还剩多少秒
+    果是负数，说明已经超过了晚上11点了，直接减去多余的秒数
+ */
+long seconds = between.toSeconds();
+long initDelay = seconds >= 0 ? seconds : delay + seconds;
+LocalDate localDate = LocalDate.now();
+LocalDateTime localDateTime = localDate.atTime(localTime.plusSeconds(initDelay));
+log.info("execute time: {}", localDateTime);
+log.info("next execute time: {}", localDateTime.plusSeconds(delay));
+pool.scheduleWithFixedDelay(() -> log.info("execute"), initDelay, delay, TimeUnit.SECONDS);
+```
+
+### Fork/Join
+
+* Fork/Join是JDK1.7加入的新的线程池实现，它体现的是一种分治思想，适用于能够进行任务拆分的cpu密集型运算
+* 任务拆分就是将一个大任务拆分为算法去上相同的小任务，直至不能拆分可以直接求解。跟递归相关的一些计算，如归并排序、斐波那契数列、都可以用分治思想进行求解
+* Fork/Join在分治的基础上加入了多线程，可以把每个任务的分解和合并交给不同的线程来完成，进一步提升了运算效率
+* Fork/Join默认会创建与cpu核心数大小相同的线程池
+
+```java
+public static void main(String[] args) {
+    ForkJoinPool pool = new ForkJoinPool();
+    log.info("result: {}", pool.invoke(new Add(10)));
+}
+
+@Slf4j(topic = "Add")
+public static class Add extends RecursiveTask<Integer>{
+
+    private final int num;
+    public Add(int num) {this.num = num;}
+
+    @Override
+    protected Integer compute() {
+        if (num == 1){
+            log.info("end");
+            return 1;
+        }
+        log.info("fork: {}", num);
+        // 分解任务
+        Add add = new Add(num - 1);
+        add.fork();
+
+        // 等待分解的任务执行完成
+        Integer result = add.join();
+        log.info("join: {}, result: {}", result, result + num);
+        return result + num;
+    }
+}
+```
 
 ---
 
