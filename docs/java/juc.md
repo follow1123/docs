@@ -1155,6 +1155,348 @@ for (int i = 0; i < person; i++) {
 }
 ```
 
+### CompletableFuture
+
+* 并发编程工具，用于组合异步任务
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/concurrent_utils/CompletableFutureTest.java)
+
+* 创建方式
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(5);
+CompletableFuture.runAsync(() -> log.info("runnable task 1"));
+CompletableFuture.runAsync(() -> log.info("runnable task 2 use custom pool"), pool);
+CompletableFuture.supplyAsync(() -> {
+    log.info("supplier task 3");
+    return 1;
+});
+CompletableFuture.supplyAsync(() -> {
+    log.info("supplier task 4 use custom pool");
+    return 1;
+}, pool);
+try {
+    Thread.sleep(1000);
+} catch (InterruptedException e) {
+    e.printStackTrace();
+}
+```
+
+* 基础使用
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(5);
+// 提交任务
+CompletableFuture.supplyAsync(() -> {
+            log.info("step 1");
+            try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
+            return "100";
+        }, pool)
+        // 处理上一步任务的结果
+        .thenApply(v -> {
+            log.info("step 2");
+            return Integer.parseInt(v);
+        })
+        // 处理上一步任务的结果
+        .thenApply(v -> {
+            log.info("step 3");
+            // return v / 0;
+            return v / 10;
+        })
+        // 处理上面所有步骤的异常
+        .exceptionally(e -> {
+            log.error("error", e);
+            return 1;
+        })
+        // 接收结果并使用
+        .thenAccept(v -> log.info("step 4 get value: {}", v));
+```
+
+* 获取结果
+
+```java
+CompletableFuture<Integer> cf = CompletableFuture.supplyAsync(() -> {
+    log.info("run task");
+    try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+    return 1;
+});
+Integer v = null;
+// 阻塞获取结果，和Future一样
+// try {v = cf.get();} catch (InterruptedException | ExecutionException e) {throw new RuntimeException(e);}
+
+// 指定时间阻塞获取结果，超时就抛出异常，和Future一样
+// try {v = cf.get(500, TimeUnit.MICROSECONDS);} catch (InterruptedException | TimeoutException | ExecutionException e) {throw new RuntimeException(e);}
+
+// 等待获取结果，阻塞
+// v = cf.join();
+
+// 立即获取值，没有就返回默认值
+// v = cf.getNow(0);
+
+// log.info("result: {}", v);
+
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+/*
+    直接打断运行的任务给一个指定的返回值
+    这个方法的返回值为true说明打断成功，使用时会获取指定的值
+    如果返回false，说明任务已经完成，使用时会获取任务返回的值
+ */
+boolean complete = cf.complete(0);
+v = cf.join();
+log.info("is complete early: {}, value: {}", complete, v);
+```
+
+* 处理结果
+
+```java
+String result = CompletableFuture.supplyAsync(() -> {
+            log.info("run task");
+            int i = 1/0;
+            return 1;
+        })
+        // 将结果转换为字符串，无法处理异常
+        // .thenApply(v -> {
+        //     log.info("apply result: {}", v);
+        //     return v + "";
+        // })
+        // 可以处理异常
+        .handle((v, e) -> {
+            if (e != null) return "error str";
+            return v + "";
+        })
+        .join();
+log.info("get result: {}", result);
+```
+
+* 消费结果
+
+```java
+CompletableFuture.supplyAsync(() -> {
+            log.info("run task");
+            return 1;
+        })
+        // 将结果转换为字符串
+        .thenApply(v -> {
+            log.info("apply result: {}", v);
+            return v + "";
+        })
+        // 消费结果
+        // .thenAccept(v -> log.info("accept result: {}", v));
+        // 消费结果并处理异常
+        .whenComplete((v, e) -> {
+            if (e != null){
+                log.error("error", e);
+            }else {
+                log.info("accept result: {}", v);
+            }
+        });
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+```
+
+* 忽略结果
+
+```java
+System.out.println(CompletableFuture.supplyAsync(() -> {
+            int person = 20;
+            for (int i = 0; i < person; i++) {
+                log.info("上车{}人", i + 1);
+            }
+            return person;
+        })
+        // 消费结果
+        .thenRun(() -> log.info("发车")).join());
+```
+
+* 使用两个任务中执行最快的一个
+
+```java
+CompletableFuture.supplyAsync(() -> {
+            log.info("run task 1");
+            try{Thread.sleep(100);}catch(InterruptedException e){e.printStackTrace();}
+            return 1;
+        }).applyToEither(CompletableFuture.supplyAsync(() -> {
+            log.info("run task 2");
+            try{Thread.sleep(11);}catch(InterruptedException e){e.printStackTrace();}
+            return 2;
+        }), v -> v)
+        .thenAccept(v -> log.info("get result: {}", v));
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+```
+
+* 组合两个任务的结果
+
+```java
+CompletableFuture.supplyAsync(() -> {
+            log.info("run task 1");
+            try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
+            return 1;
+        }).thenCombine(CompletableFuture.supplyAsync(() -> {
+            log.info("run task 2");
+            try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
+            return 2;
+        }), (result1, result2) -> result1 + "-" + result2)
+        .thenAccept(v -> log.info("get result: {}", v));
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+```
+
+* 串联两个任务
+
+```java
+CompletableFuture.supplyAsync(() -> {
+            log.info("run task 1");
+            return 1;
+        }).thenCompose(r -> CompletableFuture.supplyAsync(() -> r + 1))
+        .thenAccept(v -> log.info("get result: {}", v));
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+```
+
+* 等待所有任务运行完成
+
+```java
+CompletableFuture.allOf(
+        CompletableFuture.runAsync(() -> log.info("task 1")),
+        CompletableFuture.runAsync(() -> log.info("task 2")),
+        CompletableFuture.runAsync(() -> log.info("task 3")),
+        CompletableFuture.runAsync(() -> log.info("task 4"))
+).thenRun(() -> log.info("done"));
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+```
+
+* 等待任意一个任务运行完成
+
+```java
+CompletableFuture.anyOf(
+        CompletableFuture.runAsync(() -> {
+            try{Thread.sleep(10);}catch(InterruptedException e){e.printStackTrace();}
+            log.info("task 1");
+        }),
+        CompletableFuture.runAsync(() -> {
+            try{Thread.sleep(100);}catch(InterruptedException e){e.printStackTrace();}
+            log.info("task 2");
+        }),
+        CompletableFuture.runAsync(() -> {
+            try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+            log.info("task 3");
+        }),
+        CompletableFuture.runAsync(() -> log.info("task 4"))
+).thenRun(() -> log.info("done"));
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+```
+
+#### 使用指定线程池规则
+
+* 使用以`Async`结尾的方法，如果不指定线程池，后面执行不带`Async`操作的任务都会使用默认的ForkJoinPool
+* 使用以`Async`结尾的方法，指定自己的线程池，后面执行不带`Async`操作的任务都会使用指定的线程池
+* 如果提交的任务执行过快，后面的操作可能直接让主线程运行
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(5);
+// 启动时指定了线程池，当前任务包括后续不带Async的方法都会使用指定的线程池
+CompletableFuture.supplyAsync(() -> {
+            log.info("task 1");
+            return 1;
+        }, pool)
+        // 如果提交的任务执行过快，后面的操作可能直接让主线程运行
+        .thenRun(() -> {
+            log.info("task 2");
+        })
+        /*
+            使用带Async的方法没指定线程池的情况下
+            当前任务及后续使用不带Async的方法都在默认的ForkJoinPool内运行
+         */
+        .thenRunAsync(() -> {
+            log.info("task 3");
+        }).thenRun(() -> {
+            log.info("task 4");
+        });
+```
+
+### LockSupport
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/concurrent_utils/LockSupportTest.java)
+
+* 和Object的`wait()/notify()`、Condition的`await()/signal()`类似，都是用来挂起和唤醒线程，用于线程协作
+* LockSupport不需要在同步代码块中使用
+* LockSupport不需要遵循先等待后唤醒的步骤
+    * LockSupport的唤醒操作是给指定的线程颁发一个**凭证**，在挂起时判断有没有凭证，如果有就不用挂起，所以没有顺序
+    * **凭证**只有一个，无法多次唤醒挂起多次的线程
+* 使用 
+
+```java
+Thread thread = new Thread(() -> {
+    log.info("enter");
+    LockSupport.park();
+    log.info("wake");
+});
+
+thread.start();
+
+new Thread(() -> {
+    log.info("start");
+    try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+    LockSupport.unpark(thread);
+    log.info("done");
+}).start();
+```
+
+* 测试先唤醒后挂起
+
+```java
+Thread thread = new Thread(() -> {
+    try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+    log.info("enter");
+    LockSupport.park();
+    // 发放的凭证只能使用一次
+    // LockSupport.park();
+    log.info("wake");
+});
+
+thread.start();
+
+new Thread(() -> {
+    log.info("start");
+    LockSupport.unpark(thread);
+    // 凭证只有一个，无法多次发放
+    // LockSupport.unpark(thread);
+    log.info("done");
+}).start();
+```
+
+* 实现交替打印数字
+
+```java
+private static int num = 0;
+private static void testPrint() {
+    Thread[] threads = new Thread[2];
+    threads[0] = new Thread(() -> {
+        while (true){
+            if (num % 2 == 0){
+                try{Thread.sleep(500);}catch(InterruptedException e){e.printStackTrace();}
+                log.info("num: {}", num++);
+                LockSupport.unpark(threads[1]);
+            }else {
+                LockSupport.park();
+            }
+        }
+    });
+
+    threads[1] = new Thread(() -> {
+        while (true){
+            if (num % 2 != 0){
+                try{Thread.sleep(500);}catch(InterruptedException e){e.printStackTrace();}
+                log.info("num: {}", num++);
+                LockSupport.unpark(threads[0]);
+            }else {
+                LockSupport.park();
+            }
+        }
+    });
+    threads[0].start();
+    threads[1].start();
+}
+```
+
+
 ---
 
 ## 线程池
@@ -1209,7 +1551,7 @@ for (int i = 0; i < person; i++) {
 | 实现 | 说明 |
 | --- | --- |
 | ArrayBlockingQueue | 如果你有固定数量的任务且需要限制队列的容量，可以使用这个**有界队列** |
-| LinkedBlockingQueue | 当任务量不确定或可能变得非常大，如果不需要限制队列大小，可以使用这个**无界队列** |
+| LinkedBlockingQueue | 当任务量不确定或可能变得非常大，如果不需要限制队列大小，可以当**无界队列**队列使用 |
 | SynchronousQueue | 如果你希望每个提交的任务都被立即处理，可以使用 SynchronousQueue |
 | DelayQueue | 适用于任务的执行有延迟要求的场景，比如定时任务或者某些任务的延迟执行 |
 
@@ -1615,6 +1957,159 @@ public static class Add extends RecursiveTask<Integer>{
 
 ## 并发数据结构
 
+* 线程安全集合类，里面包含三类关键词：`Blocking`、`CopyOnWrite`、`Concurrent`
+    * `Blocking` - 大部分实现基于锁，并提供用来阻塞的方法
+    * `CopyOnWrite` - 修改开销相对较重
+    * `Concurrent`
+        * 内部很多操作使用CAS优化，一般可以提供较高吞吐量
+        * 弱一致性
+            * 遍历时弱一致性，例如，当利用迭代器遍历时，如果容器发生修改，迭代器仍然可以继续进行遍历，这时内容是旧的
+            * 求大小弱一致性，`size()`操作未必是100％准确
+            * 读取弱一致性
+        * 遍历时如果发生了修改，对于非安全容器来讲，使用`fail-fast`机制也就是让遍历立刻失败，抛出ConcurrentModificationException，不再继续遍历
+
+### ConcurrentHashMap
+
+* 统计多个文件内的字母个数
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/data_structure/ConcurrentHashMapTest.java)
+
+* 使用HashMap统计，无法正确统计
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(5);
+HashMap<Character, Integer> map = new HashMap<>();
+CountDownLatch countDownLatch = new CountDownLatch(FILE_COUNT);
+for (int i = 0; i < FILE_COUNT; i++) {
+    int fileSuffix = i;
+    pool.submit(() -> {
+        try (FileInputStream fis = new FileInputStream(new File(FILE_DIR, FILE_PREFIX + fileSuffix))) {
+            int data;
+            while ((data = fis.read()) != -1){
+                // synchronized (map){
+                    char letter = (char) data;
+                    map.compute(letter, (k, v) -> v == null ? 1 : v + 1);
+                // }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }finally {
+            countDownLatch.countDown();
+        }
+    });
+}
+try {countDownLatch.await();} catch (InterruptedException e) {throw new RuntimeException(e);}
+pool.shutdown();
+System.out.println(map);
+```
+
+* 使用`ConcurrentHashMap`统计
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(5);
+ConcurrentHashMap<Character, Integer> map = new ConcurrentHashMap<>();
+// ConcurrentHashMap<Character, LongAdder> map = new ConcurrentHashMap<>();
+CountDownLatch countDownLatch = new CountDownLatch(FILE_COUNT);
+for (int i = 0; i < FILE_COUNT; i++) {
+    int fileSuffix = i;
+    pool.submit(() -> {
+        try (FileInputStream fis = new FileInputStream(new File(FILE_DIR, FILE_PREFIX + fileSuffix))) {
+            int data;
+            while ((data = fis.read()) != -1){
+                char letter = (char) data;
+                map.compute(letter, (k, v) -> v == null ? 1 : v + 1);
+                // 使用LongAdder累加器方式
+                // LongAdder longAdder = map.computeIfAbsent(letter, k -> new LongAdder());
+                // longAdder.increment();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }finally {
+            countDownLatch.countDown();
+        }
+    });
+}
+try {countDownLatch.await();} catch (InterruptedException e) {throw new RuntimeException(e);}
+pool.shutdown();
+System.out.println(map);
+```
+
+### LinkedBlockingQueue
+
+* 阻塞队列，采用锁机制实现阻塞
+* 常用方法
+    * `take()` - 获取并**删除**队列头的元素，如果没有则会阻塞
+    * `put(E e)` - 向队列尾部添加元素，如果队列已满则会阻塞
+    * `poll()` - 获取并**删除**队列头的元素，不会阻塞，可以指定等待时间参数
+    * `offer(E e)` - 向队列尾部添加元素，不会阻塞，可以指定等待时间参数
+    * `peek()` - 获取队列头的元素，不会阻塞，不会删除元素
+* 测试阻塞方法
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(10);
+LinkedBlockingQueue<Integer> queue = new LinkedBlockingQueue<>(1);
+
+pool.submit(() -> {
+    try {
+        log.info("start take");
+        Integer val = queue.take();
+        log.info("take value: {}", val);
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+});
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+pool.submit(() -> {
+    try {
+        log.info("start put");
+        queue.put(1);
+        log.info("put value: {}", 1);
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+});
+```
+
+* 测试非阻塞方法
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(10);
+LinkedBlockingQueue<Integer> queue = new LinkedBlockingQueue<>(1);
+
+pool.submit(() -> {
+    log.info("start take");
+    Integer val = queue.poll();
+    // 也可以指定等待的时间
+    // queue.poll(1, TimeUnit.SECONDS)
+    log.info("take value: {}", val);
+});
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+pool.submit(() -> {
+    log.info("start put");
+    queue.offer(1);
+    // 也可以指定等待的时间
+    // queue.offer(1, 1, TimeUnit.SECONDS);
+    log.info("put value: {}", 1);
+});
+```
+
+### ConcurrentLinkedQueue
+
+* 非阻塞队列，没有容量限制，使用CAS实现线程安全
+* 常用方法
+    * `poll()` - 获取并**删除**队列头的元素
+    * `offer(E e)` - 向队列尾部添加元素
+    * `peek()` - 获取队列头的元素，不会删除元素
+    * `add(E E)` - 底层调用的`offer(E e)`方法
+    * 其他方法和集合类似
+
+### CopyOnWriteArrayList
+
+* 底层实现采用了**写入时拷贝**的思想，增删改操作会将底层数组拷贝一份，更改操作在新数组上执行，这时不影响其它线程的并发读，**读写分离**
+* 获取和迭代器弱一致性，获取的数据可能不是最新的
+* CopyOnWriteArraySet基于CopyOnWriteArrayList实现
+* 常用方法就和List类似
+
 ---
 
 ## 命令行工具
@@ -1753,3 +2248,4 @@ end
 ## 参考
 
 * [黑马](https://www.bilibili.com/video/BV16J411h7Rd/?spm_id_from=333.788.videopod.episodes&vd_source=c8dac761c9fcb8220ee9059d06ac692e)
+* [尚硅谷](https://www.bilibili.com/video/BV1ar4y1x727/) 
