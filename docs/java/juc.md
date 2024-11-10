@@ -1496,7 +1496,6 @@ private static void testPrint() {
 }
 ```
 
-
 ---
 
 ## 线程池
@@ -2110,8 +2109,207 @@ pool.submit(() -> {
 * CopyOnWriteArraySet基于CopyOnWriteArrayList实现
 * 常用方法就和List类似
 
----
+### ThreadLocal
 
+* 保存线程独立数据
+
+#### 使用
+
+* 创建测试类
+
+```java
+@Slf4j(topic = "Rating")
+class Rating{
+
+    private int score;
+
+    private final ThreadLocal<Integer> tl = ThreadLocal.withInitial(() -> 0);
+
+    public synchronized void scoring(int score){
+        log.info("{} 打分：{}", Thread.currentThread().getName(), score);
+        this.score += score;
+    }
+
+    public void scoringLocal(int score){
+        tl.set(tl.get() + score);
+        synchronized (this){
+            this.score += score;
+        }
+    }
+
+    public int myScore(){
+        return tl.get();
+    }
+
+    public void clearScore(){
+        tl.remove();
+    }
+
+    public int total(){
+        return score;
+    }
+}
+```
+
+* 不使用ThreadLocal的情况
+
+```java
+Rating rating = new Rating();
+new Thread(() -> rating.scoring(new Random().nextInt(0, 10)), "评委1").start();
+new Thread(() -> rating.scoring(new Random().nextInt(0, 10)), "评委2").start();
+try{Thread.sleep(100);}catch(InterruptedException e){e.printStackTrace();}
+log.info("total score: {}", rating.total());
+```
+
+* 使用ThreadLocal
+
+```java
+Rating rating = new Rating();
+
+new Thread(() -> {
+    try{
+        rating.scoringLocal(new Random().nextInt(0, 10));
+        log.info("{} 打分：{}", Thread.currentThread().getName(), rating.myScore());
+    }finally {
+        rating.clearScore();
+    }
+}, "评委1").start();
+new Thread(() -> {
+    try{
+        rating.scoringLocal(new Random().nextInt(0, 10));
+        log.info("{} 打分：{}", Thread.currentThread().getName(), rating.myScore());
+    }finally {
+        rating.clearScore();
+    }
+}, "评委2").start();
+
+try{Thread.sleep(100);}catch(InterruptedException e){e.printStackTrace();}
+log.info("total score: {}", rating.total());
+```
+
+* 在线程池内使用ThreadLocal
+
+```java
+Rating rating = new Rating();
+ExecutorService pool = Executors.newFixedThreadPool(4);
+
+for (int i = 0; i < 6; i++) {
+    String name = "评委" + (i + 1);
+    pool.submit(() -> {
+        try{
+            rating.scoringLocal(new Random().nextInt(0, 10));
+            log.info("{} 打分：{}", name, rating.myScore());
+        }finally {
+            // 使用线程池的情况下，由于线程会复用，如果不清理，会出现累加的问题
+            rating.clearScore();
+        }
+    });
+}
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+log.info("total score: {}", rating.total());
+pool.shutdown();
+```
+
+#### 内存泄漏问题
+
+* ThreadLocal在使用后如果无法清理会出现内存泄漏问题
+
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(6);
+for (int i = 0; i < 6; i++) {
+    pool.submit(() -> {
+        log.info("enter task");
+        ThreadLocal<Obj> tl = ThreadLocal.withInitial(() -> new Obj(true));
+        try {
+            try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+            Obj obj = tl.get();
+            log.info("use data: {}", obj);
+            // 使用对象...
+        }finally {
+            // 这里注释就会出现内存溢出
+            // tl.remove();
+        }
+    });
+}
+try{Thread.sleep(2000);}catch(InterruptedException e){e.printStackTrace();}
+for (int i = 0; i < 10; i++) {
+    try{Thread.sleep(10);}catch(InterruptedException e){e.printStackTrace();}
+    System.gc();
+}
+
+log.info("create 2mb byte array");
+byte[] data = new byte[1024 * 1024 * 3];
+log.info("use byte array");
+```
+
+#### Java引用
+
+* 强引用
+
+```java
+Obj a = new Obj("a");
+
+new Thread(() -> {
+    // 只有在没有根指向这个引用的情况下才会被回收
+    Obj b = new Obj("b");
+    log.info("use {}", b);
+}).start();
+
+log.info("use {}", a);
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+System.gc();
+try{Thread.sleep(2000);}catch(InterruptedException e){e.printStackTrace();}
+```
+
+* 软引用
+
+```java
+// 执行前添加jvm参数-Xms10m -Xmx10m
+WeakReference<Obj> obj = new WeakReference<>(new Obj());
+log.info("use {}", obj.get());
+// 创建4m内存数组
+byte[] data = new byte[4 * 1024 * 1024];
+// 此时发现对象已经被回收了
+log.info("use {}", obj.get());
+```
+
+* 弱引用
+
+```java
+WeakReference<Obj> obj = new WeakReference<>(new Obj());
+log.info("use {}", obj.get());
+// 手动执行gc
+System.gc();
+// 一执行gc对象就会被回收
+log.info("use {}", obj.get());
+```
+
+* 虚引用
+
+```java
+ReferenceQueue<Obj> objQueue = new ReferenceQueue<>();
+PhantomReference<Obj> obj = new PhantomReference<>(new Obj(), objQueue);
+log.info("use {}", obj.get());
+new Thread(() -> {
+    log.info("listen reference queue");
+    try {
+        // 阻塞直到虚引用被回收
+        objQueue.remove();
+        log.info("obj was recycled");
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+}).start();
+
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+for (int i = 0; i < 10; i++) {
+    System.gc();
+    try{Thread.sleep(200);}catch(InterruptedException e){e.printStackTrace();}
+}
+```
+
+---
 ## 命令行工具
 
 * `jps` - 查看所有java进程信息
