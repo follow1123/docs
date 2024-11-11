@@ -1,0 +1,16 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '.deploy_gh_pages'
+
+jobs:
+  test:
+    name: Test deploy with paths
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: echo 111111
