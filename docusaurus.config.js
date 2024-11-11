@@ -21,7 +21,7 @@ const config = {
   url: 'https://follow1123.github.io/',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/doc/',
+  baseUrl: '/docs/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -117,7 +117,7 @@ const config = {
               },
               {
                 label: 'GitHub Repository',
-                href: 'https://github.com/follow1123/doc',
+                href: 'https://github.com/follow1123/docs',
               },
             ],
           },
