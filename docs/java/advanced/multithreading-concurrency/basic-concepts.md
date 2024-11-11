@@ -1,0 +1,418 @@
+---
+sidebar_position: 100
+---
+
+# 基础概念
+
+Java并发和多线程机制的核心概念
+
+## synchronized
+
+> 保证被包裹的代码块的原子性
+
+* 底层实现（大致）：
+  * JDK早期直接就是重量级锁（向操作系统申请锁）
+  * 后来改进为锁升级的过程
+    * 偏向锁：当一段加锁了的代码第一次被一个线程访问时，会在这个锁上标记这个线程的id号，下次如果还是这个线程访问就直接通行，没有进行其他操作，提高了效率。
+    * 自旋锁：接着上面的过程，如果有多个线程访问时，当一个线程持有这个锁未释放时，其他线程就会在外面执行自选操作，类似while循环。
+    * 重量级锁：当自旋次数达到10此后就会向操作系统申请重量级锁。
+  * 理解：偏向锁和自旋锁都是用户态的操作效率会提高，重量级锁是用户态内核态频繁切换，降低了效率，但是自旋锁也有缺点，就是如果当自旋的线程多了起来也会降低效率，因为自旋操作时这个线程没有被挂起，当自旋的线程多了之后就会有一大堆线程在执行自旋操作，而操作算是一种无意义的操作，所以当一段加锁的代码执行时间很长而且会有很多个线程访问时不建议使用自旋锁
+* 在synchronized代码块内出异常默认锁会被释放
+* synchronized不能锁字符串常量和基础的数值包装类型
+  * 字符串常量在字符串常量池内始终是一个对象
+  * 数组包装类型由于内部结构跟改一下就会变成不同的对象
+
+### 共享模型
+
+#### 共享问题
+
+* **临界区**
+  一段代码块内会对一个资源进行读写操作，会有多个线程执行这段代码块，这段代码块就叫临界区
+* **竞态条件**
+  多个线程在临界区内执行，由于代码的执行序列不同而导致结果无法预测，称之为发生了竞态条件
+
+### synchronized锁升级原理
+
+![](/img/java/image-20210608161529253.png)
+
+![](/img/java/image-20210608163209781.png)
+
+* 无锁到偏向锁
+  * 对象的markword倒数第三位为1的话则可以使用偏向锁，否则竞争时直接升级为轻量级锁。
+  * 无锁到偏向锁的过程：
+    * 一个线程需要加锁时会将线程的id写入锁对象的markword头上面，
+
+### 线程安全分析
+
+### Monitor
+
+* 使用`synchronized(obj)`锁定一个对象时将这个对象和操作系统提供的monitor对象关联，
+
+```mermaid
+graph TD
+
+subgraph Monitor
+    a(WaitSet)
+    b(EntitySet)
+    c(Owner)
+end
+```
+
+* 一个monitor对象包含这几个属性
+    * **entitySet** - 当一个线程获取对象锁时如果owner已经指向一个线程则进入这个队列等待
+    * **Owner** - 当一个对象获取该对象锁时，如果owner没有指向任何线程，则owner指向这个线程，代表这个对象锁被该线程拥有
+* 当对象锁和monitor关联后，这个对象的markword位置则会存放指向monitor的指针，而markword里面的相关属性会被存放到monitor对象内
+
+## volatile
+
+> 保证被修饰的对象不被指令重排
+
+* 保证线程的可见性
+  * jvm虚拟机分为heap、stack等空间，heap空间是共享的而开启线程就是创建一个stack，这两个线程在不同的stack里面访问heap里面的同一个数据时都需要copy一份数据到自己stack空间里面的数据存储区域内，再在自己的区域内对这个数据进行修改，修改完才写回到heap空间，而另一个线程也需要获取这个数据，而不知道这个数据被没被修改，所以需要保证线程的可见性这里需要使用到cpu的缓存一直循协议。
+* 禁止指令重排
+  * 编译器会将程序编译完的指令进行重写排序以提高效率。
+  * 我自己的理解：在一段代码内上半部分的代码执行耗时上，下半部分的代码执行耗时端，而这两部分代码执行时也没有太多关联，编译器就会将下半部分的代码编译完的指令安排到上半部分代码前面执行。
+  * 在单例模式的双重检测锁实现方式下也需要使用volatile关键字修饰实例对象
+    * 因为jvm在创建对象时会分为三步：申请空间、初始化成员变量、赋值到实例，在这几个部分内：
+      * 如果第一个线程在锁内初始化这个对象，初始化时发生了指令重排，把第二和第三个步骤换了一下，那么第二个线程就会拿到一个默认值全部为空的对象。
+
+## CAS
+
+* 结合CAS和volatile可以实现无锁并发，适用于线程数少、多核CPU的场景下
+* CAS是基于乐观锁的思想：最乐观的估计，不怕别的线程来修改共享变量，就算改了也没关系，我吃亏点再重试呗
+* synchromzed是基于悲观锁的思想：最悲观的估计，得防着其它线程来修改共享变量，我上了锁你们都别想改，我改完了解开锁，你们才有机会
+* CAS体现的是无锁并发、无阻塞并发
+    * 因为没有使用synchronized, 所以线程不会陷入阻塞
+    * 如果竟争激烈，可以想到重试必然频繁发生，反而效率会受影响
+
+```mermaid
+sequenceDiagram
+    participant A as ThreadA
+    participant N as Number
+    participant B as ThreadB
+
+    A ->> N: 获取数值100 
+    A ->> A: 100-1=99
+    B -->> N: 修改为99
+    A ->> N: cas(100, 99)，失败
+    A ->> N: 获取数值99
+    A ->> A: 99-1=98
+    B -->> N: 修改为98
+    A ->> N: cas(99, 98)，失败
+    A ->> N: 获取数值98
+    A ->> A: 98-1=97
+    A ->> N: cas(98, 97)，成功
+```
+
+### 使用加锁的方式实现线程安全
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/cas/WithLockTest.java)
+
+```java
+@Slf4j(topic = "WithLockTest")
+public class WithLockTest {
+
+    private int num = 1000;
+
+    public int getNum() {return num;}
+
+    public void subNum() {
+        // log.info("before: {}", num);
+        synchronized (this) {num = num - 1;}
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i < 10; i++) test();
+    }
+
+    private static void test() {
+        WithLockTest withLockTest = new WithLockTest();
+        Thread[] threads = new Thread[1000];
+
+        for (int i = 0; i < threads.length; i++) {
+            threads[i] = new Thread(withLockTest::subNum);
+        }
+        long start = System.currentTimeMillis();
+        for (Thread thread : threads) thread.start();
+        for (Thread thread : threads) {
+            try {thread.join();} catch (InterruptedException e) {throw new RuntimeException(e);}
+        }
+        log.info("result: {}, time: {}ms", withLockTest.getNum(), System.currentTimeMillis() - start);
+    }
+}
+```
+
+### 使用CAS方式实现线程安全
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/cas/WithoutLockTest.java)
+
+```java
+@Slf4j(topic = "WithoutLockTest")
+public class WithoutLockTest {
+
+    private final AtomicInteger num = new AtomicInteger(1000);
+
+    public int getNum() {return num.get();}
+
+    public void subNum() {
+        while (true){
+            int prev = num.get();
+            int next = prev - 1;
+            if (num.compareAndSet(prev, next)) {
+                break;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i < 10; i++) test();
+    }
+
+    private static void test() {
+        WithoutLockTest withLockTest = new WithoutLockTest();
+        Thread[] threads = new Thread[1000];
+
+        for (int i = 0; i < threads.length; i++) {
+            threads[i] = new Thread(withLockTest::subNum);
+        }
+        long start = System.currentTimeMillis();
+        for (Thread thread : threads) thread.start();
+        for (Thread thread : threads) {
+            try {thread.join();} catch (InterruptedException e) {throw new RuntimeException(e);}
+        }
+        log.info("result: {}, time: {}ms", withLockTest.getNum(), System.currentTimeMillis() - start);
+    }
+}
+```
+
+### ABA问题
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/cas/aba/ABATest.java)
+
+```mermaid
+sequenceDiagram
+    participant A as Thread1
+    participant V as Value="A"
+    participant B as Thread2
+    A ->> V: 获取当前值"A"准备修改
+    B ->> V: 将数据修改为"B"
+    B ->> V: 将数据改回"A"
+    A ->> V: compareAndSet("A", "C")，修改成功
+```
+
+```java
+public static void before(){
+    AtomicReference<String> str = new AtomicReference<>("A");
+
+    String prev = str.get();
+    beforeMidOperate(str);
+    try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+    log.info("set to C - {}", str.compareAndSet(prev, "C"));
+}
+
+public static void beforeMidOperate(AtomicReference<String> str){
+    Thread t1 = new Thread(() -> {
+        log.info("set to B - {}", str.compareAndSet(str.get(), "B"));
+    });
+
+    Thread t2 = new Thread(() -> {
+        log.info("set to A - {}", str.compareAndSet(str.get(), "A"));
+    });
+
+    t1.start();
+    try{Thread.sleep(100);}catch(InterruptedException e){e.printStackTrace();}
+    t2.start();
+}
+```
+
+* 上面的操作在修改数据前不知道数据已经被修改过几次，但是数据最后被还原成了原来的数据，所以修改还是成功了
+* 添加版本号解决ABA问题，使用`AtomicStampedReference`
+
+```mermaid
+sequenceDiagram
+    participant A as Thread1
+    participant V as Value="A",1
+    participant B as Thread2
+    A ->> V: 获取当前值"A"，版本号1，准备修改
+    B ->> V: 将数据修改为"B"，版本号改为2
+    B ->> V: 将数据改回"A"，版本号改为3
+    A ->> V: compareAndSet("A", "C", 1, 2)，修改失败，版本号不一致
+```
+
+```java
+public static void after(){
+    AtomicStampedReference<String> str = new AtomicStampedReference<>("A", 1);
+    afterMidOperate(str);
+
+    String prev = str.getReference();
+    int stamp = str.getStamp();
+    try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+    log.info("set to C - {}", str.compareAndSet(prev, "C", stamp, stamp + 1));
+    log.info("reference: {}, stamp: {}", str.getReference(), str.getStamp());
+}
+
+public static void afterMidOperate(AtomicStampedReference<String> str){
+    Thread t1 = new Thread(() -> {
+        String prev = str.getReference();
+        int stamp = str.getStamp();
+        log.info("set to B - {}", str.compareAndSet(prev, "B", stamp, stamp + 1));
+        log.info("reference: {}, stamp: {}", str.getReference(), str.getStamp());
+    });
+
+    Thread t2 = new Thread(() -> {
+        String prev = str.getReference();
+        int stamp = str.getStamp();
+        log.info("set to A - {}", str.compareAndSet(prev, "A", stamp, stamp + 1));
+        log.info("reference: {}, stamp: {}", str.getReference(), str.getStamp());
+    });
+
+    t1.start();
+    try{Thread.sleep(100);}catch(InterruptedException e){e.printStackTrace();}
+    t2.start();
+}
+```
+
+## AQS
+
+* **AbstractQueuedSynchronizer**，是阻塞式锁和相关的同步器工具的框架
+* 用`state`属性来表示资源的状态（分独占模式和共享模式），子类需要定义如何维护这个状态，控制如何获取锁和释放锁
+    * `getState` - 获取state状态
+    * `setState` - 设置state状态
+    * `compareAndSetState` - 使用CAS机制设置state状态
+    * 独占模式是只有一个线程能够访问资源，而共享模式可以允许多个线程访问资源
+* 是供了基于FIFO的等待队列，类似于Monitor的EntryList
+* 条件变量来实现等待、唤醒机制，支持多个条件变量，类似于Monitor的WaitSet
+* 子类主要实现这样一些方法
+    * `tryAcquire` - 尝试使用**独占模式**获取同步资源
+    * `tryRelease` - 尝试释放**独占模式**下的同步资源
+    * `tryAcquireShared` - 尝试使用**共享模式**获取同步资源
+    * `tryReleaseShared` - 尝试释放**共享模式**下的同步资源
+    * `isHeldExclusively` - 判断当前的同步资源是否处理**独占模式**
+
+```mermaid
+flowchart
+    subgraph AQS
+        subgraph blockingQueue
+            direction LR
+            n1(nullNode) <--> n2(thread2)
+            n2 <--> n3(thread3)
+        end
+        subgraph fields
+            direction LR
+            f1(state)
+            f2(head) --> n1
+            f3(tail) --> n3
+        end
+    end
+    subgraph threads
+        direction LR
+        t1(thread1) --> t11(update state) --修改成功--> t111(run task)
+        t2(thread2) --> t22(update state) --修改失败--> t222(enqueue)
+        t3(thread3) --> t33(update state) --修改失败--> t333(enqueue)
+    end
+```
+
+### 自定义锁
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/aqs/MLock.java)
+
+* 实现一个不可重入的锁
+
+```java
+@Slf4j(topic = "MLock")
+public class MLock implements Lock {
+
+    private final MSync sync;
+
+    public MLock() {this.sync = new MSync();}
+    @Override
+    public void lock() {sync.lock();}
+    @Override
+    public void lockInterruptibly() throws InterruptedException {sync.lockInterruptibly();}
+    @Override
+    public boolean tryLock() {return sync.tryLock();}
+    @Override
+    public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {return sync.tryLock(time, unit);}
+    @Override
+    public void unlock() {sync.unlock();}
+    @Override
+    public Condition newCondition() {return sync.newCondition();}
+
+    // 状态0为没加锁，状态1为加锁
+    class MSync extends AbstractQueuedSynchronizer{
+        /*
+            由于状态只有两种，具体逻辑在tryAcquire和tryRelease方法内已经实现了
+            所以传递参数时给一个固定值，这个值没意义，就是占个位置
+         */
+        private final int ignoreArg = 1;
+
+        // 加锁，会阻塞
+        void lock(){
+            /*
+                底层调用自己实现的tryAcquire方法
+                无法加锁则直接进阻塞队列，并使用LockSupport.park阻塞
+             */
+            acquire(ignoreArg);
+        }
+
+        // 可打断的锁，会阻塞
+        void lockInterruptibly() throws InterruptedException {
+            // 底层调用acquire方法
+            acquireInterruptibly(ignoreArg);
+        }
+
+        // 加锁，只试一次，不会阻塞
+        boolean tryLock() {
+            // 直角调用自己实现的方法
+            return tryAcquire(ignoreArg);
+        }
+
+        // 加锁，阻塞指定时间
+        boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
+            // 底层调用acquire方法
+            return tryAcquireNanos(ignoreArg, unit.toNanos(time));
+        }
+
+        // 解锁
+        void unlock() {
+            /*
+                底层调用自己实现的tryRelease方法
+                解锁成功后会唤醒下一个线程
+             */
+            release(ignoreArg);
+        }
+
+        // 条件变量
+        Condition newCondition() {
+            return new ConditionObject();
+        }
+
+        // 主要重写的方法
+        // 尝试加锁，试一次，不阻塞线程
+        @Override
+        protected boolean tryAcquire(int acquires) {
+            if (getState() == 0 && compareAndSetState(0, 1)) {
+                setExclusiveOwnerThread(Thread.currentThread());
+                return true;
+            }
+            return false;
+        }
+
+        // 尝试解锁，试一次，不阻塞线程
+        @Override
+        protected boolean tryRelease(int arg) {
+            if (getExclusiveOwnerThread() != Thread.currentThread())
+                throw new IllegalMonitorStateException();
+            setExclusiveOwnerThread(null);
+            setState(0);
+            return true;
+        }
+
+        // 判断当前是否处于独占模式
+        @Override
+        protected boolean isHeldExclusively() {
+            return Thread.currentThread() == getExclusiveOwnerThread();
+        }
+    }
+}
+```

@@ -1,0 +1,146 @@
+---
+sidebar_position: 99
+---
+
+# 并发设计模式
+
+并发设计模式（Concurrency Design Patterns）是指在多线程或并发编程中，帮助开发者解决常见的并发问题、提高程序可伸缩性、可维护性和性能的设计模式。这些模式通常专注于线程之间的协作、同步、资源共享、任务调度等方面
+
+## 生产者消费者
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_communication/producer_comsumer/ProducerConsumerTest.java)
+
+* 定义资源、生产者、消费者类
+
+<details>
+    <summary>店员（资源）</summary>
+```java {7,10,16,19}
+public class Clerk {
+
+    private int product;
+
+    public synchronized void addProduct(){
+        if (product == 20){
+            try {wait();} catch (InterruptedException e) {throw new RuntimeException(e);}
+        }else {
+            System.out.println(Thread.currentThread().getName() + "开始生成商品---" + ++product);
+            notifyAll();
+        }
+    }
+
+    public synchronized void minusProduct(){
+        if (product == 0){
+            try {wait();} catch (InterruptedException e) {throw new RuntimeException(e);}
+        }else {
+            System.out.println(Thread.currentThread().getName() + "开始消费商品---" + product--);
+            notifyAll();
+        }
+
+    }
+}
+```
+</details>
+
+<details>
+    <summary>生产者</summary>
+```java
+public class Producer extends Thread{
+
+    private Clerk clerk;
+
+    public Producer(Clerk clerk, String name){
+        this.clerk = clerk;
+        this.setName(name);
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {Thread.sleep(80);} catch (InterruptedException e) {throw new RuntimeException(e);}
+            clerk.addProduct();
+        }
+    }
+
+}
+```
+</details>
+
+<details>
+    <summary>消费者</summary>
+```java
+public class Consumer extends Thread{
+
+    private Clerk clerk;
+
+    public Consumer(Clerk clerk, String name){
+        this.clerk = clerk;
+        this.setName(name);
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {Thread.sleep(200);} catch (InterruptedException e) {throw new RuntimeException(e);}
+            clerk.minusProduct();
+        }
+    }
+}
+```
+</details>
+
+```java
+Clerk clerk = new Clerk();
+Producer producer = new Producer(clerk, "生产者");
+Consumer consumer1 = new Consumer(clerk, "消费者1");
+Consumer consumer2 = new Consumer(clerk, "消费者2");
+
+// 一个生产者，两个消费者
+producer.start();
+consumer1.start();
+consumer2.start();
+```
+
+## 两阶段终止模式
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/design_pattern/TwoPhaseTerminationTest.java)
+
+```mermaid
+graph TD
+a("while(true)") --> b(有没有被打断？)
+b --有-->c(料理后事)
+c --> d((结束循环))
+b --没有-->e(睡眠)
+e --无异常--> g(执行监控记录)
+e --有异常--> f(设置打断标记)
+f --> a
+g --> a
+```
+
+```java
+Thread thread = new Thread(() -> {
+    while (true) {
+        Thread cur = Thread.currentThread();
+        if (cur.isInterrupted()) {
+            // 清理工作
+            log.info("clean up");
+            break;
+        }
+        try {
+            // 睡眠后执行任务
+            Thread.sleep(500);
+            log.info("execute");
+        } catch (InterruptedException e) {
+            log.info("re interrupt");
+            // 重新设置打断标记
+            cur.interrupt();
+            e.printStackTrace();
+        }
+    }
+});
+thread.start();
+
+try{Thread.sleep(2200);}catch(InterruptedException e){e.printStackTrace();}
+log.info("interrupt");
+// 执行打断，停止另一个线程
+thread.interrupt();
+```

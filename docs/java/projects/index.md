@@ -1,5 +1,11 @@
 ---
-sidebar_position: 21
+sidebar_position: 6
 ---
 
-# Demo项目
+# 项目
+
+```mdx-code-block
+import DocCardList from '@theme/DocCardList';
+
+<DocCardList />
+```
