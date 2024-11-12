@@ -74,6 +74,8 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      // 侧边栏底部点击隐藏
+      docs: { sidebar: { hideable: true } },
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
@@ -142,7 +144,8 @@ const config = {
             { types: ['constant'], style: { color: '#4FC1FF', }, },
           ],
       },
-      additionalLanguages: ["lua", "batch", "bash", "powershell", "java", "mermaid", "sql", "nginx", "properties", "ini"]
+      additionalLanguages: ["lua", "batch", "bash", "powershell", "java", "mermaid", "sql", "nginx", "properties", "ini"],
+      magicComments: [ { className: 'code-block-error-line', line: 'error line', } ]
     },
   }),
 };
