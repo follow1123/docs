@@ -83,7 +83,7 @@ System.out.println(bi.get());
 
 ### AtomicStampedReference
 
-* 可以用于解决[ABA问题](#aba问题)
+* 可以用于解决[ABA问题](./basic-concepts.md#aba问题)
 * 常用方法
     * `getReference()` - 获取当前值
     * `getStamp()` - 获取当前戳

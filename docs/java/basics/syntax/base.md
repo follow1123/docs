@@ -1,0 +1,163 @@
+---
+sidebar_position: 2
+---
+
+# 进制
+
+在数学和计算机科学中，进制（Base）指的是一个数值系统中使用的符号的数量，或者是数位的权重
+
+* **十进制** - `0-9` 组成，满十进一
+* **二进制** - `0-1` 组成，满二进一，以 `0b` 或 `0B` 开头
+* **八进制** - `0-7` 组成，满八进一，以 `0` 开头
+* **十六进制** - `0-9,a-f` 组成，满十六进一，以 `0x` 或 `0X` 开头
+
+```java
+int n1 = 2134; // 十进制
+int n2 = 0b1011; // 二进制
+int n3 = 033; // 八进制
+int n4 = 0xfa33; // 十六进制
+```
+
+<details>
+    <summary>进制之间的换算</summary>
+| 十进制    | 二进制    | 八进制    | 十六进制    |
+|---------------- | --------------- | --------------- | --------------- |
+| 0    | 0    | 0    | 0    |
+| 1    | 1   | 1   | 1   |
+| 2   | 10   | 2   | 2   |
+| 3   | 11   | 3   | 3   |
+| 4   | 100   | 4   | 4   |
+| 5   | 101   | 5   | 5   |
+| 6   | 110   | 6   | 6   |
+| 7   | 111   | 7   | 7   |
+| 8   | 1000   | 10   | 8   |
+| 9   | 1001   | 11   | 9   |
+| 10   | 1010   | 12   | A   |
+| 11   | 1011   | 13   | B   |
+| 12   | 1100   | 14   | C   |
+| 13   | 1101   | 15   | D   |
+| 14   | 1110   | 16   | E   |
+| 15   | 1111   | 17   | F   |
+| 16   | 10000   | 20   | 10   |
+</details>
+
+## 二进制转换
+
+* 计算机数据的存储使用二进制**补码**形式存储，并且**最高位是符号位**
+    * 正数最高位是 `0`
+    * 负数最高位是 `1`
+* 正数的补码与反码、原码一样，称为**三码合一**
+* 负数的补码与反码、原码不一样
+    * **原码** - 把十进制转为二进制，然后最高位设置为1
+    * **反码** - 在原码的基础上，最高位不变，其余为取反
+    * **补码** - 反码+1
+
+## 二进制转十进制
+
+* 正整数：`00001011`的十进制是 `11` 
+
+<table>
+    <tbody>
+        <tr> <td>二进制</td> <td>0(符号位)</td> <td>0</td> <td>0</td> <td>0</td> <td>1</td> <td>0</td> <td>1</td> <td>1</td> </tr>
+        <tr> <td>2的次方</td> <td></td> <td>2^6</td> <td>2^5</td> <td>2^4</td> <td>2^3</td> <td>2^2</td> <td>2^1</td> <td>2^0</td> </tr>
+        <tr> <td>十进制</td> <td></td> <td>64</td> <td>32</td> <td>16</td> <td>8</td> <td>4</td> <td>2</td> <td>1</td> </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="1">`+`</td>
+            <td colspan="7" style={{textAlign:'center'}}>`8` + `2` + `1` = `11`</td>
+        </tr>
+    </tfoot>
+</table>
+
+* 负整数：补码 `11110101` 的十进制是`-11`
+
+<table>
+    <tbody>
+        <tr> <td>补码</td> <td>1(符号位)</td> <td>1</td> <td>1</td> <td>1</td> <td>0</td> <td>1</td> <td>0</td> <td>1</td> </tr>
+        <tr> <td>反码</td> <td>1</td> <td>1</td> <td>1</td> <td>1</td> <td>0</td> <td>1</td> <td>0</td> <td>0</td> </tr>
+        <tr> <td>原码</td> <td>1</td> <td>0</td> <td>0</td> <td>0</td> <td>1</td> <td>0</td> <td>1</td> <td>1</td> </tr>
+        <tr> <td>2的次方</td> <td></td> <td>2^6</td> <td>2^5</td> <td>2^4</td> <td>2^3</td> <td>2^2</td> <td>2^1</td> <td>2^0</td> </tr>
+        <tr> <td>十进制</td> <td></td> <td>64</td> <td>32</td> <td>16</td> <td>8</td> <td>4</td> <td>2</td> <td>1</td> </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="1">`-`</td>
+            <td colspan="7" style={{textAlign:'center'}}>`8` + `2` + `1` = `11`</td>
+        </tr>
+    </tfoot>
+</table>
+
+## 十进制转二进制
+
+* 除2取余的逆
+* `13`的二进制是 `1101`
+
+<table>
+    <thead>
+        <tr>
+            <th>商</th>
+            <th>余数</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr> <td>13/2</td> <td>1</td> </tr>
+        <tr> <td>6/2</td> <td>0</td> </tr>
+        <tr> <td>3/2</td> <td>1</td> </tr>
+        <tr> <td>1/2</td> <td>1</td> </tr>
+        <tr> <td>0</td> <td></td> </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td>结果</td>
+            <td>`1101`</td>
+        </tr>
+    </tfoot>
+</table>
+
+## 二进制与八进制、十六进制之间的转换
+
+<details>
+    <summary>八进制转十进制，十进制 `233` 对应的八进制是 `351` </summary>
+    <table>
+        <tbody>
+            <tr> <td>十进制</td> <td style={{textAlign:'center'}} colspan="8">233</td> </tr>
+            <tr> <td>二进制</td> <td>1</td> <td>1</td> <td>1</td> <td>0</td> <td>1</td> <td>0</td> <td>0</td> <td>1</td> </tr>
+            <tr>
+                <td>每3位转十进制对应八进制</td>
+                <td colspan="2" style={{textAlign:'center'}}>`3`</td>
+                <td colspan="3" style={{textAlign:'center'}}>`5`</td>
+                <td colspan="3" style={{textAlign:'center'}}>`1`</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>结果</td>
+                <td colspan="8" style={{textAlign:'center'}}>`351`</td>
+            </tr>
+        </tfoot>
+    </table>
+</details>
+
+<details>
+    <summary>八进制转十六进制，十进制 `233` 对应的十六进制是 `E9` </summary>
+    <table>
+        <tbody>
+            <tr> <td>十进制</td> <td style={{textAlign:'center'}} colspan="8">233</td> </tr>
+            <tr> <td>二进制</td> <td>1</td> <td>1</td> <td>1</td> <td>0</td> <td>1</td> <td>0</td> <td>0</td> <td>1</td> </tr>
+            <tr>
+                <td>每4位转十进制对应十六进制</td>
+                <td colspan="4" style={{textAlign:'center'}}>`E`</td>
+                <td colspan="4" style={{textAlign:'center'}}>`9`</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>结果</td>
+                <td colspan="8" style={{textAlign:'center'}}>`E9`</td>
+            </tr>
+        </tfoot>
+    </table>
+</details>

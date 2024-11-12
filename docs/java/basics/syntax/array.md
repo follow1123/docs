@@ -1,0 +1,407 @@
+---
+sidebar_position: 5
+---
+
+# 数组
+
+用于存储固定大小的同类型元素的集合
+
+* 数组（Array），是多个相同类型数据按一定循序排列的集合，并使用一个名字命名，通过编号的方式对这些数据进行统一管理
+* 概念
+    * 数组名
+    * 下标（索引），从0开始
+    * 元素
+    * 数组的长度
+* 特点
+   * 数组中的元素在内存中是依次紧密排列的，有序的
+   * 数组属于引用数据类型，数组中的元素可以是基本数据类型或引用数据类型
+   * 数组一旦初始化完成，长度确定，不可变
+   * 创建数组对象会在内存中开辟一整块**连续的空间**。占用空间的大小，取决于数组的长度和数组中元素的类型
+
+## 一维数组
+
+```java
+// 声明
+int[] integers;
+String[] names;
+
+// 初始化
+integers = new int[]{1, 2, 3, 4}; // 静态初始化
+int[] integers1 = {5, 6, 7, 8}; // 类型推断
+names = new String[4]; // 动态初始化
+
+// 添加
+names[0] = "zs";
+names[1] = "ls";
+// error line
+names[4] = "ww"; // 下标从0开始最大为3，所以报错ArrayIndexOutOfBoundsException
+
+// 获取
+System.out.println(integers[0]); // 1
+System.out.println(integers[1]); // 2
+// error line
+System.out.println(integers[4]); // 下标从0开始最大为3，所以报错ArrayIndexOutOfBoundsException
+
+// 数组长度
+System.out.println(integers.length); // 4
+System.out.println(names.length); // 4
+
+// 遍历数组
+for (int i = 0; i < names.length; i++) {
+    System.out.println(names[i]);
+}
+
+// foreach遍历
+for (int integer : integers) {
+    System.out.println(integer);
+}
+```
+
+### 数组元素的默认初始化值
+
+:::note
+* 基本数据类型默认值，参考[变量](./variables.md)
+* 引用数据类型默认都是 `null`
+:::
+
+```java
+// 数组默认初始化值
+int[] is = new int[3];
+double[] ds = new double[4];
+String[] strs = new String[5];
+System.out.println(is[0]); // 0
+System.out.println(ds[0]); // 0.0
+System.out.println(strs[1]); // null
+```
+
+### 一维数组的内存解析
+
+```java
+int[] arr1 = new int[4];
+arr1[0] = 10;
+arr1[1] = 20;
+
+String[] arr2 = new String[2];
+arr2[1] = "zs";
+arr2 = new String[3];
+```
+![内存图](/img/java/Snipaste_2024-09-07_15-33-16.png)
+
+## 二维数组
+
+二维数组就是一维数组中的元素又是一维数组
+
+```java
+// 初始化，模拟班级里面分组
+String[][] classroom = new String[][]{
+    {"zs", "ls"},
+    {"aa", "bb", "cc"},
+    {"mm", "nn", "xx", "yy", "zz"}
+};
+
+// 获取
+// 1组里面的第二个成员
+System.out.println(classroom[0][1]); // ls
+// 3组里面的第三个成员
+System.out.println(classroom[2][2]); // xx
+System.out.println("---");
+// 长度
+// 班级里面有多少个组
+System.out.println(classroom.length); // 3
+// 每个组里面有多少个成员
+System.out.println(classroom[0].length); // 2
+System.out.println(classroom[1].length); // 3
+System.out.println(classroom[2].length); // 5
+
+System.out.println("---");
+// 遍历
+// 模拟报数
+for (int i = 0; i < classroom.length; i++) {
+    System.out.println("第" + ( i + 1 ) + "组报数");
+    for (int j = 0; j < classroom[i].length; j++) {
+        System.out.println(classroom[i][j] + ": " + (j + 1));
+    }
+}
+```
+
+## 数组相关操作
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/syntax/arrays/ArrayOperator.java)
+
+### 最大值
+
+```java
+int[] array = getRandomIntegerArray(10, 59, 10);
+
+int max = array[0];
+for (int i = 0; i < array.length; i++) {
+    if (max < array[i]) {
+        max = array[i];
+    }
+}
+printArray(array);
+System.out.println(max);
+```
+
+### 最小值
+
+```java
+int[] array = getRandomIntegerArray(10, 59, 10);
+
+int min = array[0];
+for (int i = 0; i < array.length; i++) {
+    if (min > array[i]) {
+        min = array[i];
+    }
+}
+printArray(array);
+System.out.println(min);
+```
+
+### 求和
+
+```java
+int[] array = getRandomIntegerArray(10, 59, 10);
+
+int count = 0;
+for (int i = 0; i < array.length; i++) {
+    count += array[i];
+}
+printArray(array);
+System.out.println(count);
+```
+
+### 平均数
+
+```java
+int[] array = getRandomIntegerArray(10, 59, 10);
+
+int count = 0;
+for (int i = 0; i < array.length; i++) {
+    count += array[i];
+}
+printArray(array);
+System.out.println(count / array.length);
+```
+
+### 杨辉三角
+
+```java
+int[][] arrays = new int[10][];
+
+for (int i = 0; i < arrays.length; i++) {
+    // 边框
+    arrays[i] = new int[i + 1];
+    arrays[i][0] = arrays[i][i] = 1;
+    // 内部
+    for (int j = 1; j < arrays[i].length - 1; j++) {
+        arrays[i][j] = arrays[i - 1][j - 1] + arrays[i - 1][j];
+    }
+}
+
+for (int i = 0; i < arrays.length; i++) {
+    for (int j = 0; j < arrays[i].length; j++) {
+        System.out.print(arrays[i][j] + "\t");
+    }
+    System.out.println();
+}
+```
+
+### 回形数
+
+```java
+Scanner scanner = new Scanner(System.in);
+int num;
+while ((num = scanner.nextInt()) != 0) {
+    int[][] arrays = new int[num][num];
+
+    int loopNum = num * num;
+    // 1 右 2 下 3 左 4 上
+    int direction = 1;
+
+    int i = 0, j = 0;
+    for (int data = 1; data <= loopNum; data++) {
+        if (direction == 1) {
+            if (j < num && arrays[i][j] == 0) {
+                arrays[i][j++] = data;
+            } else {
+                direction = 2;
+                i++;
+                j--;
+                data--;
+
+            }
+        } else if (direction == 2) {
+            if (i < num && arrays[i][j] == 0) {
+                arrays[i++][j] = data;
+            } else {
+                direction = 3;
+                i--;
+                j--;
+                data--;
+            }
+        } else if (direction == 3) {
+            if (j >= 0 && arrays[i][j] == 0) {
+                arrays[i][j--] = data;
+            } else {
+                direction = 4;
+                i--;
+                j++;
+                data--;
+            }
+        } else if (direction == 4) {
+            if (i >= 0 && arrays[i][j] == 0) {
+                arrays[i--][j] = data;
+            } else {
+                direction = 1;
+                i++;
+                j++;
+                data--;
+            }
+        }
+
+    }
+    for (int m = 0; m < arrays.length; m++) {
+        for (int n = 0; n < arrays[m].length; n++) {
+            System.out.print(arrays[m][n] + "\t");
+        }
+        System.out.println();
+    }
+
+}
+```
+
+### 数组翻转
+
+```java
+int[] arr = new int[]{39, 59, 25, 51, 38, 11, 26, 47, 31, 37, 25};
+
+
+int lastIdx = arr.length - 1;
+int halfLen = arr.length / 2;
+
+for (int i = 0; i < halfLen; i++) {
+    // 分别将头尾的元素交换
+    int tmp = arr[i];
+    arr[i] = arr[lastIdx - i];
+    arr[lastIdx - i] = tmp;
+    // arr[i] = arr[i] ^ arr[lastIdx - i];
+    // arr[lastIdx - i] = arr[i] ^ arr[lastIdx - i];
+    // arr[i] = arr[i] ^ arr[lastIdx - i];
+}
+printArray(arr);
+```
+
+### 数组扩容
+
+```java
+// 38, 11, 26
+int[] arr = new int[]{39, 59, 25, 51};
+// 创建新数组
+int[] newArr = new int[arr.length * 2];
+// 将原数组内的数据添加进来
+for (int i = 0; i < arr.length; i++) {
+    newArr[i] = arr[i];
+}
+// 添加新元素
+newArr[arr.length] = 38;
+newArr[arr.length + 1] = 11;
+newArr[arr.length + 2] = 26;
+
+printArray(newArr);
+```
+
+## 数组相关算法
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/syntax/arrays/ArrayAlgorithm.java)
+
+### 线性查找
+
+```java
+for (int i = 0; i < arr.length; i++) {
+    if (arr[i] == data){
+        return i;
+    }
+}
+return -1;
+```
+
+### 二分查找
+
+```java
+int head = 0;
+int tail = arr.length - 1;
+while (head <= tail){
+    int mid = (head + tail) / 2;
+    if (data == arr[mid]){
+        return mid;
+    } else if (data > arr[mid]) {
+        head = mid + 1;
+    }else {
+        tail = mid - 1;
+    }
+}
+return -1;
+```
+
+### 冒泡排序
+
+```java
+int tmp;
+for (int i = 0; i < arr.length; i++) {
+    for (int j = i + 1; j < arr.length; j++) {
+        if (arr[i] > arr[j]){
+            tmp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = tmp;
+        }
+    }
+}
+```
+
+### 快速排序
+
+```java
+private void swap(int[] arr, int i, int j){
+    int tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+}
+private void quickSort(int[] arr, int start, int end){
+    if (start < end) {
+        int base = arr[start];
+        int low = start;
+        int high = end + 1;
+        while (true){
+            while (low < end && arr[++low] - base <= 0);
+            while (high > start && arr[--high] - base >= 0);
+            if (low < high) {
+                swap(arr, low, high);
+            }else {
+                break;
+            }
+        }
+        swap(arr, start, high);
+
+        quickSort(arr, start, high - 1);
+        quickSort(arr, high + 1, end);
+    }
+}
+```
+
+## Arrsys工具类
+
+```java
+int[] arr = new int[]{39, 59, 25, 51, 38, 11, 26, 47, 31, 37};
+int[] arr1 = new int[]{39, 59, 25, 51, 38, 11, 26, 47, 31, 37, 25};
+
+System.out.println(Arrays.compare(arr, arr1)); // 比较 0 相同，1 左边数组大，-1左边数组小
+System.out.println(Arrays.equals(arr, arr1)); // 比较， true 相同，false 不同
+
+Arrays.sort(arr); // 排序
+System.out.println(Arrays.binarySearch(arr, 11)); // 查找
+
+int[] newArr = Arrays.copyOf(arr, arr1.length + 3); // 扩容
+
+System.out.println(Arrays.toString(newArr)); // 打印
+```

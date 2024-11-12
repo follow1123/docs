@@ -398,11 +398,11 @@ String s3 = optional.orElseThrow(RuntimeException::new);
 
 ### 新时间日期API
 
-* [参考](./apis.md#jdk8的日期时间相关类) 
+* [参考](../basics/apis.md#jdk8的日期时间相关类) 
 
 ### 接口默认方法
 
-* [参考](./index.md#接口新特性) 
+* [参考](../advanced/object-oriented.md#接口新特性) 
 
 ### 新方法
 
