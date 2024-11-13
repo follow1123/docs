@@ -4,9 +4,11 @@ sidebar_position: 4
 
 # 泛型
 
-* 在Java中，在声明方法时，当在完成方法功能时如果有未知的数据需要参与这些未知的数据需要在调用方法时才能确定，
-那么我们吧这样的数据通过形参表示。在方法体中，用这个形参名来代表那个未知的数据，而调用者在调用时，对应的传入实参就可以
-* 在JDK5.0之前只能把元素类型设计为Object, JDK5.0时Java引入了<strong>参数化类型（Parameterized type）</strong>的概念，允许我们在创建集合时指定集合元素的类型
+泛型 是一种允许在定义类、接口或方法时使用类型参数的机制，可以让代码在类型安全的前提下更加通用和灵活
+
+在Java中，在声明方法时，当在完成方法功能时如果有未知的数据需要参与这些未知的数据需要在调用方法时才能确定，那么我们吧这样的数据通过形参表示。在方法体中，用这个形参名来代表那个未知的数据，而调用者在调用时，对应的传入实参就可以
+
+在JDK5.0之前只能把元素类型设计为Object, JDK5.0时Java引入了<strong>参数化类型（Parameterized type）</strong>的概念，允许我们在创建集合时指定集合元素的类型
 
 ## Java内泛型的使用
 
@@ -65,8 +67,8 @@ while (iterator.hasNext()){
 
 #### 定制排序
 
-* 对象内继承Comparable接口并指定泛型
-
+<details>
+    <summary>继承Comparable接口并指定泛型</summary>
 ```java
 public class User implements Comparable<User> {
     private String name;
@@ -110,8 +112,7 @@ public class User implements Comparable<User> {
     }
 }
 ```
-
-* 使用
+</details>
 
 ```java
 ArrayList<User> users = new ArrayList<>();
@@ -163,9 +164,7 @@ System.out.println(users);
 
 ### 泛型类
 
-* 格式
-
-```java
+```java title="格式"
 // 泛型类
 class A<T> {
 
@@ -179,22 +178,24 @@ interface B<T> {
 }
 ```
 
-#### 说明
-
+:::info
 * 声明完自定义泛型类以后，可以在类的内部（属性、方法、构造器中）使用类的泛型
 * 我们在创建自定义泛型类的对象时，可以指明泛型参数类型。一旦指明，内部凡是使用类的泛型参数的位置，都具体化为指定的类的泛型类型
 * 如果在创建自定义泛型类的对象时，没有指明泛型参数类型，那么泛型将被除，泛型对应的类型均按照Object处理，但不等价于Object
 * 泛型的指定中必须使用引用数据类型。不能使用**基本数据类型**，只能使用**包装类**替换
 * 除创建泛型类对象外，子类继承泛型类时、实现类实现泛型接囗时，也可以确定泛型结构中的泛型参数
 * 如果我们在给泛型类提供子类时，子类也不确定泛型的类型，则可以继续使用泛型参数，还可以在现有的父类的泛型参数的基础上，新增泛型参数
-* 创建泛型类时，如果需要定义多个泛型参数，可以使用`<E1, E2, E3>`方式，使用逗号分割
-* 不能使用`new E[]`创建泛型参数数组，但可以使用`E[] elements = (E[]) new Object[capacity];`这种方式创建
+* 创建泛型类时，如果需要定义多个泛型参数，可以使用 `<E1, E2, E3>` 方式，使用逗号分割
+:::
+:::warning
+* 不能使用 `new E[]` 创建泛型参数数组，但可以使用 `E[] elements = (E[]) new Object[capacity];` 这种方式创建
 * 不能在静态方法中使用类的泛型属性
 * 异常类不能带泛型
+:::
 
 #### 继承泛型类的情况
 
-* 定义泛型类
+定义泛型类
 
 ```java
 public class A<T> {
@@ -202,7 +203,7 @@ public class A<T> {
 }
 ```
 
-* 继承泛型类时不指定父类泛型的类型
+继承泛型类时不指定父类泛型的类型
 
 ```java
 public class A1 extends A{
@@ -214,7 +215,7 @@ public class A1 extends A{
 }
 ```
 
-* 继承泛型类，指定父类的泛型类型
+继承泛型类，指定父类的泛型类型
 
 ```java
 public class A2 extends A<String>{
@@ -226,7 +227,7 @@ public class A2 extends A<String>{
 }
 ```
 
-* 继承泛型类，使用自己的泛型类型指定父类的泛型类型
+继承泛型类，使用自己的泛型类型指定父类的泛型类型
 
 ```java
 public class A3<T> extends A<T>{
@@ -234,7 +235,7 @@ public class A3<T> extends A<T>{
 }
 ```
 
-* 指定父类的泛型类型，但自己也有泛型参数
+指定父类的泛型类型，但自己也有泛型参数
 
 ```java
 public class A4<T> extends A<Integer>{
@@ -244,7 +245,7 @@ public class A4<T> extends A<Integer>{
 }
 ```
 
-* 当前类有多个泛型参数，指定父类的泛型参数
+当前类有多个泛型参数，指定父类的泛型参数
 
 ```java
 public class A5<T, E> extends A<T> {
@@ -255,18 +256,15 @@ public class A5<T, E> extends A<T> {
 
 ### 泛型方法
 
-* 泛型方法在声明需要添加泛型参数`<T>`
-* 泛型方法可以是静态方法
-* 方法只使用了泛型类指定的泛型参数，这个方法不是泛型方法
+泛型方法在声明需要添加泛型参数 `<T>`，泛型方法可以是静态方法
+:::warning
+方法只使用了**泛型类**指定的**泛型参数**，这个方法不是泛型方法
+:::
 
-#### 格式
-
-```java
+```java title="格式"
 public <E> E method(E e){
 }
 ```
-
-#### 使用
 
 ```java
 /**
@@ -309,7 +307,7 @@ public void test() {
 
 ### 泛型和继承的关系
 
-* 两个类相同的情况下，尽管这两个类的泛型参数是子父类关系，两个类也不能互相赋值
+两个类相同的情况下，尽管这两个类的泛型参数是子父类关系，两个类也不能互相赋值
 
 ```java
 // 容器相同，泛型参数是子父类的关系
@@ -364,8 +362,8 @@ list.add(null);
 
 ### 有限制条件的通配符
 
-* 定义一对父子类`Son`和`Father`，其中`Son`继承`Father`
-
+<details>
+    <summary>定义一对父子类 `Son` 和 `Father`，其中 `Son` 继承 `Father`</summary>
 ```java
 // 父类
 public class Father { }
@@ -373,10 +371,12 @@ public class Father { }
 // 子类
 public class Son extends Father{ }
 ```
+</details>
+
 
 #### `? extends Class`
 
-* 测试extends条件的通配符赋值情况
+测试 `extends` 条件的通配符赋值情况
 
 ```java
 List<? extends Father> list = null;
@@ -393,7 +393,7 @@ list = list2;
 list = list3;
 ```
 
-* 测试extends条件的通配符操作情况
+测试 `extends` 条件的通配符操作情况
 
 ```java
 List<? extends Father> list = null;
@@ -417,7 +417,7 @@ list.add(null);
 
 #### `? super Class`
 
-* 测试super条件的通配符赋值情况
+测试 `super` 条件的通配符赋值情况
 
 ```java
 List<? super Father> list = null;
@@ -434,7 +434,7 @@ list = list2;
 // list = list3;
 ```
 
-* 测试super条件的通配符操作情况
+测试 `super` 条件的通配符操作情况
 
 ```java
 List<? super Father> list = null;

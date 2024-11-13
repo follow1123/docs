@@ -6,9 +6,15 @@ sidebar_position: 5
 
 ## 集合框架类图
 
-### java.util.Collection
+:::info
+`List` - 存储有序、可重复的数据
 
+`Set` - 存储无序、不可重复的数据
+:::
 ```mermaid
+---
+title: java.util.Collection
+---
 classDiagram
 direction BT
 class AbstractCollection~E~
@@ -52,12 +58,13 @@ Vector~E~  -->  AbstractList~E~
 Vector~E~  ..>  List~E~ 
 ```
 
-* List：存储有序、可重复的数据
-* Set：存储无序、不可重复的数据
-
-### java.util.Map
-
+:::info
+`Map` - 存储key-value键值对
+:::
 ```mermaid
+---
+title: java.util.Map
+---
 classDiagram
 direction BT
 class AbstractMap~K, V~
@@ -82,7 +89,6 @@ TreeMap~K, V~  -->  AbstractMap~K, V~
 TreeMap~K, V~  ..>  Map~K, V~ 
 ```
 
-* Map：存储key-value键值对
 
 ---
 
@@ -90,9 +96,7 @@ TreeMap~K, V~  ..>  Map~K, V~
 
 ### 常用方法
 
-* 添加
-
-```java
+```java title="添加"
 // 添加元素
 Collection c1 = new ArrayList();
 c1.add("string");
@@ -109,9 +113,7 @@ c1.addAll(c2);
 System.out.println(c1);
 ```
 
-* 判断
-
-```java
+```java title="判断"
 // 添加元素
 Collection c1 = new ArrayList();
 c1.add("string");
@@ -143,9 +145,7 @@ System.out.println(c1.containsAll(c2)); // true
 System.out.println(c1.equals(c2)); // false
 ```
 
-* 删除
-
-```java
+```java title="删除"
 // 添加元素
 Collection c1 = new ArrayList();
 c1.add("string");
@@ -191,9 +191,7 @@ c4.retainAll(c5);
 System.out.println(c4); // [3, 4]
 ```
 
-* 其他
-
-```java
+```java title="其他"
 // 添加元素
 Collection c1 = new ArrayList();
 c1.add("string");
@@ -232,16 +230,15 @@ System.out.println(c2.size()); // 4
 Collection c3 = Arrays.asList(new int[]{1, 2, 3});
 System.out.println(c3.size()); // 1
 ```
-
-### 集合使用说明
-
-* 放入集合内的元素需要重写`equals()`方法，因为集合内的`contains()`方法和`remove()`等方法会使用到
+:::tip
+放入集合内的元素需要重写 `equals()` 方法，因为集合内的 `contains()` 方法和 `remove()` 等方法会使用到
+:::
 
 ---
 
 ## 迭代器（Iterator）
 
-* 用来遍历集合内的元素
+用来遍历集合内的元素
 
 ```java
 Collection c1 = new ArrayList();
@@ -277,8 +274,11 @@ while (iterator.hasNext()) {
 // }
 ```
 
-* foreach增强for循环（jdk5）
-    * 底层使用的就是迭代器
+foreach增强for循环（jdk5）
+
+:::note
+底层使用的就是迭代器
+:::
 
 ```java
 Collection c1 = new ArrayList();
@@ -296,12 +296,11 @@ for (Object o : c1) {
 
 ## java.util.List
 
-* 用于存储有序可以重复的数据
+用于存储有序可以重复的数据
 
 ### 常用方法
 
-* 具体方法和java.util.Collection内的方法类似
-* [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/list/ListTest.java)
+和 `java.util.Collection` 内的方法类似，[详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/list/ListTest.java)
 
 ### 实现类
 
@@ -313,7 +312,7 @@ for (Object o : c1) {
 
 #### LinkedList
 
-* 特有方法
+特有方法
 
 ```java
 LinkedList list = new LinkedList();
@@ -342,64 +341,84 @@ System.out.println(list);
 
 ## java.util.Set
 
-* 用于存储无序不可重复的数据
+用于存储无序不可重复的数据
 
 ### 常用方法
 
-* 具体方法参考java.util.Collection内的抽象方法，没有新增的方法
+具体方法参考 `java.util.Collection` 内的抽象方法，没有新增的方法
 
 ### 实现类
 
-* `HashSet` - 主要实现类，主要实现类；底层使用的是HashMap，使用数组+单向链表+红黑树进行存储（jdk8），jdk8之前没有红黑树
-* `LinkedHashSet` - 是HashSet的子类；在现有的数组+单向链表+红黑树结构的基础上，又添加了一组双向链表，用于记录添加元素的先后顺序。
-可以按照添加元素的顺序实现遍历。便于频繁的查询操作。
-* `TreeSet` - 底层使用红黑树储。可以按照添加的元素的指定的属性的大小顺序进行遍历。
+:::info[主要实现类]
+`HashSet` - 底层使用的是HashMap，使用数组+单向链表+红黑树进行存储（jdk8），jdk8之前没有红黑树
+:::
+:::note
+`LinkedHashSet` - 是HashSet的子类；在现有的数组+单向链表+红黑树结构的基础上，又添加了一组双向链表，用于记录添加元素的先后顺序。可以按照添加元素的顺序实现遍历。便于频繁的查询操作。
+
+`TreeSet` - 底层使用红黑树储。可以按照添加的元素的指定的属性的大小顺序进行遍历。
+:::
 
 ### 无序性和不可重复性
 
-* **无序性** - 无序性不是随机，与添加的元素的位置有关，是根据添加的元素的哈希值，计算的其在数组中的存储位置。此位置不是依次排列的，表现为无序性
-* **不可重复性** - 比较的标准，需要判断`hashCode()`得到的哈希值以及`equals()`的结果。哈希值相同且`equals()`返回`true`，则认为元素是相同的
-* 存入HashSet/LinkedHashSet内的自定义元素必须要重写两个方法：`equals()`和`hashCode()`，并要保证`equals()`和`hashCode()`的一致性
+**无序性** - 无序性不是随机，与添加的元素的位置有关，是根据添加的元素的哈希值，计算的其在数组中的存储位置。此位置不是依次排列的，表现为无序性
+
+**不可重复性** - 比较的标准，需要判断 `hashCode()` 得到的哈希值以及 `equals()` 的结果。哈希值相同且 `equals()` 返回 `true`，则认为元素是相同的
+
 * [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/set/SetTest.java)
+
+:::warning
+存入HashSet/LinkedHashSet内的自定义元素必须要重写两个方法：`equals()` 和 `hashCode()`，并要保证 `equals()` 和 `hashCode()` 的一致性
+:::
 
 ### TreeSet
 
-* 底层数据结构使用**红黑树**
-* 可以按照添加的元素的指定的属性的大小顺序进行遍历
-* 要求添加到TreeSet中的元素必须是同一个类型的对象，否则会报**ClassCastException**。添加的元素需要考虑排序
-* 添加到TreeSet中的元素的类不需要重写`hashCode()`和`equals()`方法
-* 判断数据是否相同的标准：排序方法`compareTo()`或`compare()`的返回值为`0`则两个元素相同
-* [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/set/TreeSetTest.java)
+底层数据结构使用**红黑树**，可以按照添加的元素的指定的属性的大小顺序进行遍历，[详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/set/TreeSetTest.java)
+
+:::warning
+添加到TreeSet中的元素的类不需要重写 `hashCode()` 和 `equals()` 方法
+
+添加的元素需要考虑排序，判断数据是否相同的标准：排序方法 `compareTo()` 或 `compare()` 的返回值为 `0` 则两个元素相同
+:::
+:::danger
+要求添加到 `TreeSet` 中的元素必须是同一个类型的对象，否则会报**ClassCastException**。
+:::
 
 ---
 
 ## java.util.Map
 
-* 存储键值对（key-value）
+存储键值对（key-value）
 
 ### 实现类
 
-* `HashMap` - 主要实现类，线程不安全，效率高，可以添加null的key和value值，
-底层使用**数组**+**单向链表**+**红黑树**进行存储（jdk8），jdk8之前没有红黑树
-* `LinkedHashMap` - 是HashMap的子类；在现有的数组+单向链表+红黑树结构的基础上，又添加了一组双向链表，用于记录添加元素的先后顺序
-* `TreeMap` - 底层使用红黑树存储，可以按照key-value键值对里面的key进行排序
-* `Hashtable` - 旧实现类，线程不安全，效率低，不可以添加null的key或value值
-底层使用**数组**+**单向链表**进行存储
-* `Properties` - 里面的key和value方法都是String类型，常用于处理配置文件
+:::info
+`HashMap` - 主要实现类，线程不安全，效率高，可以添加null的key和value值，底层使用**数组**+**单向链表**+**红黑树**进行存储（jdk8），jdk8之前没有红黑树
+:::
+:::note
+`LinkedHashMap` - 是HashMap的子类；在现有的数组+单向链表+红黑树结构的基础上，又添加了一组双向链表，用于记录添加元素的先后顺序
+
+`TreeMap` - 底层使用红黑树存储，可以按照key-value键值对里面的key进行排序
+
+`Hashtable` - 旧实现类，线程不安全，效率低，不可以添加null的key或value值，底层使用**数组**+**单向链表**进行存储
+
+`Properties` - 里面的key和value方法都是String类型，常用于处理配置文件
+:::
 
 ### key-value说明
 
-* key在Map中是无序不可重复的可以理解为Set，key所在的类需要重写`equals()`和`hashCode()`方法
-* value在map中是无序可重复的可以理解为Collection，value所在的类需要重写`equals()`方法
-* Map中的key-value不是分开存放的，而是存放在`Entry`对象内，所有key-value键值对组成`EntrySet`
+Map中的key-value不是分开存放的，而是存放在 `Entry` 对象内，所有key-value键值对组成 `EntrySet`
+
+:::warning
+key在Map中是无序不可重复的可以理解为Set，key所在的类需要重写 `equals()` 和 `hashCode()` 方法
+
+value在map中是无序可重复的可以理解为Collection，value所在的类需要重写 `equals()` 方法
+:::
 
 ### 常用方法
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/map/MapTest.java)
 
-* 添加
-
-```java
+```java title="添加"
 HashMap map = new HashMap();
 map.put("aa", 1);
 map.put("bb", 2);
@@ -414,9 +433,7 @@ map.putAll(m);
 System.out.println(map);
 ```
 
-* 删除
-
-```java
+```java title="删除"
 HashMap map = new HashMap();
 map.put("aa", 1);
 map.put("bb", 2);
@@ -427,9 +444,7 @@ System.out.println(removedValue);
 System.out.println(map);
 ```
 
-* 修改
-
-```java
+```java title="修改"
 HashMap map = new HashMap();
 map.put("aa", 1);
 map.put("bb", 2);
@@ -449,9 +464,7 @@ map.putAll(m);
 System.out.println(map);
 ```
 
-* 获取
-
-```java
+```java title="获取"
 HashMap map = new HashMap();
 map.put("aa", 1);
 map.put("bb", 2);
@@ -461,9 +474,7 @@ System.out.println(map.get("aa"));
 System.out.println(map.get("cc"));
 ```
 
-* 遍历
-
-```java
+```java title="遍历"
 HashMap map = new HashMap();
 map.put("aa", 1);
 map.put("bb", 2);
@@ -501,9 +512,7 @@ for (Object key : keySet) {
 }
 ```
 
-* 其他
-
-```java
+```java title="其他"
 HashMap map = new HashMap();
 map.put("aa", 1);
 map.put("bb", 2);
@@ -528,23 +537,28 @@ System.out.println(map);
 
 ### TreeMap
 
-* 底层使用红黑树存储，可以按照添加的key-value中的key元素的指定的属性的大小顺序进行遍历
-* TreeMap中添加的key必须是同一个类型的对象
-* 详细操作参考[TreeSet](#treeset)
+底层使用红黑树存储，可以按照添加的key-value中的key元素的指定的属性的大小顺序进行遍历，详细操作参考[TreeSet](#treeset)
+
+:::warning
+TreeMap中添加的key必须是同一个类型的对象
+:::
+
 
 ### Properties
 
-* 常用于处理配置文件
-* 假如是一个Maven项目，在resources目录下新建`config.properties`文件并添加以下配置
+常用于处理配置文件
+
+<details>
+    <summary>读取Maven项目下resources目录下的`config.properties`配置文件</summary>
+
+在resources目录下新建`config.properties`文件并添加以下配置
 
 ```properties
 name=zs
 password=123
 ```
 
-* 测试获取配置
-
-```java
+```java title="读取配置"
 Properties props = new Properties();
 InputStream is = null;
 try {
@@ -566,18 +580,17 @@ try {
     }
 }
 ```
+</details>
 
 ## Collections工具类
 
-* Collections是一个操作Set、List和Map等集合的工具
+Collections是一个操作Set、List和Map等集合的工具
 
 ### 排序
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/collections/SortTest.java)
 
-* 反转集合
-
-```java
+```java title="反转集合"
 List list = RandomUtil.getRandomIntList(10, 50);
 System.out.println(list);
 
@@ -586,9 +599,7 @@ Collections.reverse(list);
 System.out.println(list);
 ```
 
-* 打乱集合内元素位置
-
-```java
+```java title="打乱集合内元素位置"
 List list = RandomUtil.getRandomIntList(10, 50);
 // 先排序
 Collections.sort(list);
@@ -600,9 +611,7 @@ Collections.shuffle(list);
 System.out.println(list);
 ```
 
-* 排序 
-
-```java
+```java title="排序"
 // 自然排序
 List list = RandomUtil.getRandomIntList(10, 50);
 System.out.println(list);
@@ -627,9 +636,7 @@ Collections.sort(list1, new Comparator<Object>() {
 System.out.println(list1);
 ```
 
-* 调换元素位置
-
-```java
+```java title="调换元素位置"
 List list = RandomUtil.getRandomIntList(10, 50);
 System.out.println(list);
 
@@ -643,9 +650,7 @@ System.out.println(list);
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/collections/SearchTest.java)
 
-* 最大值
-
-```java
+```java title="最大值"
 // 根据自然排序找出集合内最大的元素
 List list = RandomUtil.getRandomIntList(10, 50);
 System.out.println(list);
@@ -666,9 +671,7 @@ System.out.println(Collections.max(strList, new Comparator<String>() {
 }));
 ```
 
-* 最小值
-
-```java
+```java title="最小值"
 // 根据自然排序找出集合内最小的元素
 List list = RandomUtil.getRandomIntList(10, 50);
 System.out.println(list);
@@ -689,9 +692,7 @@ System.out.println(Collections.min(strList, new Comparator<String>() {
 }));
 ```
 
-* 二分搜索
-
-```java
+```java title="二分搜索"
 // 根据自然排序搜索元素
 List list = RandomUtil.getRandomIntList(10, 50);
 // 使用二分搜索时集合内的元素必须有序
@@ -718,9 +719,7 @@ System.out.println(list1 + " search: " + value1);
 System.out.println(Collections.binarySearch(list1, value1, comparator));
 ```
 
-* 元素出现的频率
-
-```java
+```java title="元素出现的频率"
 List list = RandomUtil.getRandomIntList(10, 5);
 System.out.println(list);
 // 获取元素出现的次数
@@ -731,9 +730,7 @@ System.out.println(Collections.frequency(list, 1));
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/collections/OthersTest.java)
 
-* 复制
-
-```java
+```java title="复制"
 List list = RandomUtil.getRandomIntList(10, 50);
 System.out.println(list);
 
@@ -743,18 +740,14 @@ Collections.copy(newList, list);
 System.out.println(newList);
 ```
 
-* 全部替换
-
-```java
+```java title="全部替换"
 List list = RandomUtil.getRandomIntList(10, 5);
 System.out.println(list);
 System.out.println(Collections.replaceAll(list, 1, 100));
 System.out.println(list);
 ```
 
-* 转换为只读集合或Map
-
-```java
+```java title="转换为只读集合或Map"
 List list = RandomUtil.getRandomIntList(10, 50);
 System.out.println(list.get(0));
 list.add("1234");
@@ -767,9 +760,7 @@ System.out.println(list.get(0));
 // list1.add(1234); 写入元素会报错
 ```
 
-* 添加多个元素
-
-```java
+```java title="添加多个元素"
 List list = RandomUtil.getRandomIntList(5, 50);
 List list1 = RandomUtil.getRandomStringList(5, 5);
 
@@ -778,9 +769,7 @@ Collections.addAll(list, list1.toArray());
 System.out.println(list);
 ```
 
-* 转换为线程安全的集合或Map
-
-```java
+```java title="转换为线程安全的集合或Map"
 // 线程数组，用于等待所有线程执行完
 ArrayList<Thread> threadList = new ArrayList();
 

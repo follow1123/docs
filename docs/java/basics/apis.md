@@ -4,21 +4,28 @@ sidebar_position: 6
 
 # 常用类
 
+丰富的内置类库，数据结构到输入输出操作、日期时间处理等
+
 ## String
 
-* 使用`final`修饰，不可被继承
-* 实现`Serializable`可序列化接口，表示可以通过网络或本地进行数据传输
-* 实现`Comparable`接口，表示可以和其他对象比较大小
-* jdk8使用`char`类型数组表示数据
-* jdk9开始使用`byte`类型数组表示数据
+* 使用 `final` 修饰，不可被继承
+* 实现 `Serializable` 可序列化接口，表示可以通过网络或本地进行数据传输
+* 实现 `Comparable` 接口，表示可以和其他对象比较大小
+:::note
+jdk8使用 `char` 类型数组表示数据
+
+jdk9开始使用 `byte` 类型数组表示数据
+:::
 
 ### 字符串常量存储的位置
 
 * 字符串常量都存储在字符串常量池（StringTable）中
 * 字符串常量池不允许存放两个相同的字符串常量
-* 在不同的jdk版本中，字符串常量池存放的位置不同
-    * jdk7之前：存放在方法区
-    * jdk7及之后：存放在堆空间，由于方法区内GC不频繁，所以放在堆空间
+:::note[在不同的jdk版本中，字符串常量池存放的位置不同]
+jdk7之前：存放在方法区
+
+jdk7及之后：存放在堆空间，由于方法区内GC不频繁，所以放在堆空间
+:::
 
 ```java
 String s1 = "hello"; // 使用字面量声明
@@ -29,8 +36,9 @@ System.out.println(s1 == s2); // true
 
 ### String的不可变性
 
-* 当对字符串变量重新赋值时，需要重新指定一个字符串常量的位置进行赋值，不能在原有的位置修改
-* 当对字符串进行拼接或替换操作时，需要开辟空间保存修改后的字符串，不能在原有的位置修改
+当对字符串变量重新赋值时，需要重新指定一个字符串常量的位置进行赋值，不能在原有的位置修改
+
+当对字符串进行拼接或替换操作时，需要开辟空间保存修改后的字符串，不能在原有的位置修改
 
 ```java
 @Test
@@ -70,8 +78,9 @@ public void testImmutable3() {
 String s1 = "hello";
 String s2 = new String("hello");
 ```
-* 如果使用字面量声明，只会在创建一个对象
-* 如果使用new声明，则会创建两个对象，一个是存在堆空间，一个在字符串常量池内
+如果使用字面量声明，只会在创建一个对象
+
+如果使用new声明，则会创建两个对象，一个是存在堆空间，一个在字符串常量池内
 
 ```java
 String s1 = "hello";
@@ -89,13 +98,13 @@ System.out.println(s1.equals(s3)); // true
 
 ### String的连接方式
 
-* String通过`+`与其他字符串进行连接
-    * 常量 + 常量：结果还是在字符串常量池中
-    * 常量 + 变量或变量 + 变量：会通过new方式新建一个字符串
-* 调用字符串的`intern()`方法可以获取当前字符串在字符串常量池内的地址
-* 调用字符串的`concat()`方法拼接字符串，会直接创建一个新对象
+* String通过 `+` 与其他字符串进行连接
+    * `常量 + 常量` - 结果还是在字符串常量池中
+    * `常量 + 变量或变量 + 变量` - 会通过new方式新建一个字符串
+* 调用字符串的 `intern()` 方法可以获取当前字符串在字符串常量池内的地址
+* 调用字符串的 `concat()` 方法拼接字符串，会直接创建一个新对象
 
-```language
+```java
 String s1 = "hello";
 String s2 = "world";
 
@@ -121,15 +130,19 @@ System.out.println(s3 == s9); // false
 
 ### String的构造器和常用方法
 
-#### 构造器
+
+#### 编码和解码
 
 * 在utf-8字符集中，一个汉字占用3个字节，一个字母占用1个字节
 * 在gbk字符集中，一个汉字占用2个字节，一个字母占用1个字节
-* 将String转换成byte或char数组的过程叫编码
-* 将byte或char数组转换成String的过程叫解码
-* 解码时的字符集必须可编码时的字符集一致，否则会乱码
+* 将 `String` 转换成 `byte` 或 `char` 数组的过程叫编码
+* 将 `byte` 或 `char` 数组转换成 `String` 的过程叫解码
 
-```java
+:::warning
+解码时的字符集必须可编码时的字符集一致，否则会乱码
+:::
+
+```java title="构造器"
 System.out.println("字符串转charArray，再还原成字符串");
 // 获取字符串内的char数组
 String s1 = "hello";
@@ -162,9 +175,7 @@ System.out.println("使用gbk解码");
 System.out.println(new String(gbkBytes, Charset.forName("gbk")));
 ```
 
-#### 方法
-
-```java
+```java title="方法"
 // 是否为空字符串
 String s1 = new String();
 System.out.println(s1.isEmpty()); // true
@@ -265,14 +276,20 @@ System.out.println(s19.replaceAll("o", "1")); // hell1 w1rld
 
 ### StringBuilder和StringBuffer
 
-* StringBuffer：可变字符序列，线程安全（jdk1）
-* StringBuilder：可变字符序列（jdk5）
-* jdk9及之后这两个类的value属性也从charArray改为了byteArray
-* 这两个类的父类是AbstractStringBuilder，父类里定义具体操作的数据
+* `StringBuffer` - 可变字符序列，线程安全（jdk1）
+* `StringBuilder` - 可变字符序列（jdk5）
+:::info
+* 这两个类的父类是 `AbstractStringBuilder`，父类里定义具体操作的数据
 * 默认初始化大小是16，如果初始化时指定字符串，则初始化大小为指定的字符串长度+16
 * 在添加时如果数据满了，则需要进行扩容操作，扩容为原来数组长度的2倍+2
-* 执行效率：StringBuilder > StringBuffer > String
-* StringBuffer和StringBuilder在`append(null)`时，会添加null字符串
+* 执行效率：`StringBuilder` > `StringBuffer` > `String`
+:::
+:::note
+jdk9及之后这两个类的value属性也从charArray改为了byteArray
+:::
+:::warning
+StringBuffer和StringBuilder在 `append(null)` 时，会添加null字符串
+:::
 
 ```java
 StringBuilder sb = new StringBuilder("aaa");
@@ -315,18 +332,20 @@ System.out.println(sb); // ddd
 
 ## 日期时间
 
-* 计算机时间的主要时间标准有
-    * UTC(Coordinated Universal Time)
-    * GMT(Greenwich Mean Time)
-    * CST(Central Standard Time)
-* UTC和GMT相差不大，可以认为是一样的
-* CST在不同的位置有不同的含义
-    * 中国标准时间（China Standard Time）：即北京时间，UTC+8
-    * 中央标准时间（Central Standard Time）：主要用于美国和加拿大的中部地区，UTC-6
+计算机时间的主要时间标准有
+* UTC(Coordinated Universal Time)
+* GMT(Greenwich Mean Time)
+* CST(Central Standard Time)
+
+UTC和GMT相差不大，可以认为是一样的
+:::info[CST在不同的位置有不同的含义]
+* 中国标准时间（China Standard Time）- 即北京时间，UTC+8
+* 中央标准时间（Central Standard Time）- 主要用于美国和加拿大的中部地区，UTC-6
+:::
 
 ### JDK8之前的日期时间相关类
 
-#### System.currentTimeMillis()
+* System.currentTimeMillis()
 
 ```java
 /*
@@ -356,7 +375,10 @@ System.out.println(date2);
 ```
 
 * java.sql.Date
-    * java.sql.Date是java.util.Date的子类
+
+:::tip
+`java.sql.Date` 就是 `java.util.Date` 的子类
+:::
 
 ```java
 // 创建对象
@@ -379,9 +401,10 @@ Date date = new Date(sqlDate.getTime());
 
 #### SimpleDateFormat
 
-* 用于日期格式化和解析
-    * 格式化：日期 > 字符串
-    * 解析：字符串 > 日期
+用于日期格式化和解析
+
+* **格式化** - 日期 > 字符串
+* **解析** - 字符串 > 日期
 
 ```java
 // 格式化日期
@@ -408,7 +431,7 @@ System.out.println(date4);
 
 #### Calendar
 
-* 日历，对日期进行修改
+日历，对日期进行修改
 
 ```java
 // 创建对象
@@ -443,23 +466,27 @@ calendar.setTime(date2);
 
 ### JDK8的日期时间相关类
 
-* 之前日期设计的问题
-    * 可变性：像日期和时间这样的类应该是不可变的
-    * 偏移性：Date中的年份是从1900开始的，而月份都从0开始
-    * 格式化：格式化只对Date有用，Calendar则不行
-    * 它们也不是线程安全的，不能处理闰秒
-* java8新日期api相关包
-    * `java.time`：包含值对象的基础包
-    * `java.time.chrono`：提供对不同的日历系统的访问
-    * `java.time.format`：格式化和解析日期和时间
-    * `java.time.temporal`：包括底层框架和扩展性
-    * `java.time.zone`：包含时区支持的类
+
+:::info[之前日期设计的问题]
+* **可变性** - 像日期和时间这样的类应该是不可变的
+* **偏移性** - Date中的年份是从1900开始的，而月份都从0开始
+* **格式化** - 格式化只对Date有用，Calendar则不行
+
+它们也不是线程安全的，不能处理闰秒
+:::
+java8新日期api相关包
+
+* `java.time` - 包含值对象的基础包
+* `java.time.chrono` - 提供对不同的日历系统的访问
+* `java.time.format` - 格式化和解析日期和时间
+* `java.time.temporal` - 包括底层框架和扩展性
+* `java.time.zone` - 包含时区支持的类
 
 #### LocalDate/LocalTime/LocalDateTime
 
-* LocalDate：日期
-* LocalTime：时间
-* LocalDateTime：日期和时间
+* `LocalDate` - 日期
+* `LocalTime` - 时间
+* `LocalDateTime` - 日期和时间
 
 ```java
 // 创建对象
@@ -499,9 +526,11 @@ System.out.println(localDateTime5);
 
 #### Instant
 
-* 瞬时，时间戳
-* 指格林维治时间1970年01月01日00时00分00秒起至现在的总秒数
-* 和北京时间相差8小时
+瞬时，时间戳
+
+:::note
+指格林维治时间1970年01月01日00时00分00秒起至现在的总秒数，和北京时间相差8小时
+:::
 
 ```java
 // 实例化
@@ -519,8 +548,8 @@ System.out.println(epochMilli);
 
 #### Duration/Period
 
-* Duration：时间段
-* Period：日期段
+* `Duration` - 时间段
+* `Period` - 日期段
 
 ```java
 // 获取两个时间段相差的秒数
@@ -534,7 +563,7 @@ System.out.println(period.getDays());
 
 #### DateTimeFormatter
 
-* 日期时间格式化
+日期时间格式化
 
 ```java
 // 格式化
@@ -597,16 +626,20 @@ Format format = dateTimeFormatter.toFormat();
 
 ### Comparable接口
 
-* 实现`Comparable`接口，并实现里面的`compareTo(Object o)`方法
-* `compareTo(Object o)`方法返回一个int，比较规则如下：
-    * 如果返回值是正数，当前对象大
-    * 如果返回值是负数，当前对象小
-    * 如果返回值是0，一样大
+实现 `Comparable` 接口，并实现里面的 `compareTo(Object o)` 方法
+
+:::info[比较规则]
+`compareTo(Object o)` 方法返回一个 `int`
+
+* 如果返回值是正数，当前对象大
+* 如果返回值是负数，当前对象小
+* 如果返回值是0，一样大
+:::
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/api/comparable/ComparableTest.java)
 
-* 定义对象并实现`Comparable`接口
-
+<details>
+    <summary>定义对象并实现 `Comparable` 接口</summary>
 ```java
 public class Product implements Comparable {
 
@@ -656,44 +689,36 @@ public class Product implements Comparable {
     }
 }
 ```
+</details>
 
-* 测试
 
-```java
-public class ComparableTest {
+```java title="比较字符串"
+String[] strings = {"f", "g", "d", "e", "p"};
 
-    @Test
-    public void testCompareString() {
-        String[] strings = {"f", "g", "d", "e", "p"};
+Arrays.sort(strings);
+System.out.println(Arrays.toString(strings));
+```
 
-        Arrays.sort(strings);
+```java title="比较对象"
+Product[] products = new Product[3];
 
-        System.out.println(Arrays.toString(strings));
-    }
+products[0] = new Product("vde", 1000);
+products[1] = new Product("ads", 2000);
+products[2] = new Product("zdd", 1000);
 
-    @Test
-    public void testCompareObj() {
-        Product[] products = new Product[3];
+Arrays.sort(products);
 
-        products[0] = new Product("vde", 1000);
-        products[1] = new Product("ads", 2000);
-        products[2] = new Product("zdd", 1000);
-
-        Arrays.sort(products);
-
-        for (Product product : products) {
-            System.out.println(product);
-        }
-    }
+for (Product product : products) {
+    System.out.println(product);
 }
 ```
 
 ### Comparator
 
-* 使用场景
-    * 当元素的类型没有实现`Comparable`接口，而又不方便修改代码时
-    * 如果有一个类，实现了`Comparable`接口，指定了比较大小的规则，但我不想安装它预定义的方法比较大小，
-    又不能随意修改类时
+使用场景
+
+* 当元素的类型没有实现`Comparable`接口，而又不方便修改代码时
+* 如果有一个类，实现了`Comparable`接口，指定了比较大小的规则，但我不想安装它预定义的方法比较大小，又不能随意修改类时
 * 创建一个实现了`Comparator`接口的类，实现`compare(Object o1, Object o2)`方法
 * 将实现了排序方法逻辑的类传入`Arrays.sort(value, comparator)`方法内实现自定义排序
 
@@ -755,9 +780,7 @@ System.out.println(System.getProperty("user.dir")); // 当前项目路径
 
 ### Runtime
 
-* 获取JVM运行时相关数据
-
-```java
+```java title="获取JVM运行时相关数据"
 Runtime runtime = Runtime.getRuntime();
 
 // 获取JVM运行时相关数据
@@ -768,9 +791,7 @@ System.out.println(runtime.freeMemory()); // 可用内存，单位byte
 
 ### Math
 
-* 数学运算操作
-
-```java
+```java title="数学运算操作"
 // 数学运算操作
 // 绝对值
 System.out.println(Math.abs(-1));  // 1
@@ -786,9 +807,7 @@ System.out.println(Math.round(1.4)); // 1
 
 #### BigInteger
 
-* 不可变的任意精度整数
-
-```java
+```java title="不可变的任意精度整数"
 // 不可变的任意精度整数
 BigInteger bi = BigInteger.valueOf(15);
 // 绝对值
@@ -807,9 +826,7 @@ System.out.println(bi.remainder(BigInteger.valueOf(4))); // 3
 
 #### BigDecimal
 
-* 任意精度的浮点数
-
-```java
+```java title="任意精度的浮点数"
 // 任意精度的浮点数
 BigInteger bi = new BigInteger("12433241123");
 BigDecimal bd1 = new BigDecimal("12435.351");
@@ -825,9 +842,7 @@ System.out.println(bd1.divide(bd2, 10, RoundingMode.HALF_UP));
 
 ### Random
 
-* 随机数
-
-```java
+```java title="随机数"
 // 随机数
 
 Random random = new Random();
