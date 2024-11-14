@@ -402,7 +402,7 @@ String s3 = optional.orElseThrow(RuntimeException::new);
 
 ### 接口默认方法
 
-* [参考](../advanced/object-oriented.md#接口新特性) 
+* [参考](../advanced/object-oriented/other-keyword-structure#接口新特性) 
 
 ### 新方法
 

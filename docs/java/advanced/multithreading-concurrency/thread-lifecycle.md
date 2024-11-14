@@ -15,7 +15,11 @@ sidebar_position: 10
     * `Blocked` - 阻塞
     * `Dead` - 死亡
 
-![jdk1.5前的线程生命周期](/img/java/Snipaste_2024-09-19_16-46-46.png)
+```mdx-code-block
+import LifecycleBeforeJDK5 from './assets/lifecycle_before_jdk5.drawio.svg';
+
+<LifecycleBeforeJDK5 width="100%" />
+```
 
 ## JDK1.5及之后
 
@@ -34,8 +38,11 @@ sidebar_position: 10
         * 当前线程进入同步代码块内，并调用了锁对象的`wait()`方法，就会进入这个状态，
         必须调用锁对象的`notify()/notifyAll()`方法唤醒
 
-![jdk1.5及之后的线程生命周期](/img/java/Snipaste_2024-09-20_17-04-30.png)
+```mdx-code-block
+import LifecycleJDK5AndLater from './assets/lifecycle_jdk5_and_later.drawio.svg';
 
+<LifecycleJDK5AndLater width="100%" />
+```
 ### 代码示例
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_lifecycle/ThreadLifecycleTest.java)

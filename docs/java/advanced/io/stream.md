@@ -1,8 +1,10 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 ---
 
-# IO
+# 流（Stream）
+
+数据的传输通道
 
 ## File类使用
 

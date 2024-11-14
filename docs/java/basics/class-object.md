@@ -101,7 +101,7 @@ public class Employee {
     // 方法体
 }
 ```
-* 权限修饰符 - `private` `缺省` `protected` `public`，详细说明参考[可见性范围](../advanced/object-oriented#java实现封装性)
+* 权限修饰符 - `private` `缺省` `protected` `public`，详细说明参考[可见性范围](../advanced/object-oriented/three-characteristics#java实现封装性)
 * 返回值类型 - 调用当前方法，是否需要一个结果
     * **无返回值** - 使用 `void`
     * **有返回值** - 指明返回值的具体类型，可以是基本数据类型或引用数据类型在方法内部使用 `return + 返回类型的变量`
