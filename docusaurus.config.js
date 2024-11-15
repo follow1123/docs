@@ -145,7 +145,15 @@ const config = {
           ],
       },
       additionalLanguages: ["lua", "batch", "bash", "powershell", "java", "mermaid", "sql", "nginx", "properties", "ini"],
-      magicComments: [ { className: 'code-block-error-line', line: 'error line', } ]
+      magicComments: [ 
+        // Remember to extend the default highlight class name as well!
+        {
+          className: 'theme-code-block-highlighted-line',
+          line: 'highlight-next-line',
+          block: {start: 'highlight-start', end: 'highlight-end'},
+        },
+        { className: 'code-block-error-line', line: 'error line', }
+      ]
     },
   }),
 };
