@@ -1,0 +1,57 @@
+.container {
+  position: relative;
+}
+
+.popupDialog {
+  width: 94vw;
+  height: 74vh;
+  margin: 5% auto;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 0 18px rgba(0,0,0,.4);
+}
+
+[data-theme='dark'] .popupDialog::backdrop {
+  background-color: rgba(218, 232, 252, 0.5)
+}
+
+[data-theme='dark'] .popupDialog {
+  background-color: var(--ifm-background-color);
+}
+
+.dlgForm {
+  position: relative;
+  height: 100%;
+}
+
+.btnCloseForm {
+  position: absolute;
+  top: 20px;
+  right: 8px;
+}
+
+.container:hover .btnSvg {
+  opacity: 0.3;
+}
+
+.btnSvg {
+  opacity: 0;
+  transition: 0.1s linear;
+}
+
+[data-theme='dark'] .btnSvg [fill='#123456'] {
+  fill: #d4d4d4;
+}
+
+.btnSvgBroder {
+  background: transparent;
+  border: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.btnSvgBroder:hover .btnSvg {
+  opacity: 0.8;
+}
+

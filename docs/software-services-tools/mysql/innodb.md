@@ -2,7 +2,6 @@
 sidebar_position: 3
 ---
 import CodeBlock from '@theme/CodeBlock';
-import PopupMermaid from '@site/src/components/PopupMermaid';
 
 # InnoDB引擎
 
@@ -353,8 +352,6 @@ gantt
         查询id为30的数据 :d2, after b2, 1s
         查询id为30的数据 :d3, after c4, 1s
 ```
-
-<PopupMermaid></PopupMermaid>
 
 * 上面表格安装顺序执行会生成以下undo log
 

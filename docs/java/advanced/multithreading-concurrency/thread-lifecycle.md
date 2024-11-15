@@ -17,8 +17,11 @@ sidebar_position: 10
 
 ```mdx-code-block
 import LifecycleBeforeJDK5 from './assets/lifecycle_before_jdk5.drawio.svg';
+import PopupSvg from '@site/src/components/PopupSvg';
 
-<LifecycleBeforeJDK5 width="100%" />
+<PopupSvg>
+    <LifecycleBeforeJDK5 width="100%" height="100%" />
+</PopupSvg>
 ```
 
 ## JDK1.5及之后
@@ -41,7 +44,9 @@ import LifecycleBeforeJDK5 from './assets/lifecycle_before_jdk5.drawio.svg';
 ```mdx-code-block
 import LifecycleJDK5AndLater from './assets/lifecycle_jdk5_and_later.drawio.svg';
 
-<LifecycleJDK5AndLater width="100%" />
+<PopupSvg>
+    <LifecycleJDK5AndLater width="100%" height="100%" />
+</PopupSvg>
 ```
 ### 代码示例
 
