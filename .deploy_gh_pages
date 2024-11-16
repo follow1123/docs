@@ -1,1 +1,2 @@
-测试docusaurus官网提交的发布脚本是否有效
+# 这个文件用于配合Github Actions提交后发布Github Pages
+分离Java文档，并完善
