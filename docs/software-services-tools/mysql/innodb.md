@@ -329,8 +329,11 @@ ibd2sdi test_npk.ibd
 
 #### undo log版本链
 
-```mermaid
-gantt
+```mdx-code-block
+import PopupSvg from '@site/src/components/PopupSvg';
+
+<PopupSvg mermaid={
+`gantt
     dateFormat ss
     axisFormat %S
     section 事务2
@@ -350,7 +353,7 @@ gantt
     section 事务5
         begin :d1, 0, 500ms
         查询id为30的数据 :d2, after b2, 1s
-        查询id为30的数据 :d3, after c4, 1s
+        查询id为30的数据 :d3, after c4, 1s`} />
 ```
 
 * 上面表格安装顺序执行会生成以下undo log
