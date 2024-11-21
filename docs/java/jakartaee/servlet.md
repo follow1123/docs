@@ -1,5 +1,9 @@
 # Servlet
 
+使用 Tomcat 容器
+
+[详细代码](https://github.com/follow1123/java-frameworks/blob/main/servlet)
+
 ## Servlet 生命周期
 
 | 生命周期    | 方法    | 执行时机    | 执行次数    |
@@ -196,14 +200,11 @@ while (params.hasMoreElements()){
 }
 ```
 
-### 域对象
-
+:::info[Servlet Context 也是一个域对象]
 * `setAttribute(name, object)` - 添加数据
 * `getAttribute(name)` - 获取数据
 * `getAttributeNames()` - 获取所有数据的key
 * `removeAttribute(name)` - 移除数据
-
-:::info
 Servlet Context 域内的数据添加后所有 Servlet 内都可以使用
 :::
 
@@ -324,8 +325,8 @@ sb ->> client: 响应
 
 ```java
 /*
-    转发路径如果填写webapp下的资源路径，则可以直接转发到资源
-    可以转发到WEB-INF目录下的受保护资源 "WEB-INF/private.html"
+    转发路径如果填写 webapp 下的资源路径，则可以直接转发到资源
+    可以转发到 WEB-INF 目录下的受保护资源 "WEB-INF/private.html"
 */
 req.getRequestDispatcher("转发地址").forward(req, resp);
 ```
@@ -364,7 +365,7 @@ sb ->> client: 响应
 
 ```java
 /*
-    转发路径如果填写webapp下的资源路径，则可以直接转发到资源，不可以访问 WEB-INF 目录下的受保护资源
+    转发路径如果填写 webapp 下的资源路径，则可以直接转发到资源，不可以访问 WEB-INF 目录下的受保护资源
     可以转发到外部资源
 */
 resp.sendRedirect("资源路径");
@@ -429,6 +430,307 @@ if (cookies != null) {
 * `setSecure(flag)` - 指定只有使用 **SSL/TLS** 加密的协议才能访问，例如 **HTTPS**
 * `setHttpOnly(isHttpOnly)` - 指定 Cookie 是否无法在 JavaScript 内获取，防止 XSS 攻击
 
+### Session
+
+HttpSession 是一种保留更多信息在服务端的一种技术，服务器会为每一个客户端开辟一块内存空间，即 Session 对象．客户端在发送请求时，都可以使用自己的 Session 这样服务端就可以通过 Session 来记录某个客户端的状态了
+
+服务端在为客户端创建 Session 时，会同时将 Session 对象的 id ，即 JSESSIONID 以 Cookie 的形式放入响应对象，创建完后，客户端会收到一个特殊的 Cookie，叫做 JSESSIONID
+
+客户端下一次请求时带 JSESSIONID，后端收到后，根据 JSESSIONID 找到对应的 Session 对象
+
+```mermaid
+sequenceDiagram
+participant client as 客户端 
+participant server as 服务器
+
+client ->> server: 请求
+Note right of server: 创建Session(id:234)
+server ->> client: 响应(Set-Cookie: JSESSIONID=234)
+client ->> server: 请求(cookie: JSESSIONID=234)
+Note right of server: 查询是否有id为234的Session，判断是否是同一个人，没有就创建一个新Session
+server ->> client: 响应
+```
+
+```java
+// 只有在执行这个方法之后才会开始会话
+req.getSession();
+```
+
+```mermaid
+flowchart TD
+a("req.getSession()") --> b{{请求的 Cookie 是否携带 JSESSIONID}}
+b -- 是 --> c{{在服务器查找对应的 Session 对象}}
+b -- 否 --> d[创建 Session 对象]
+c -- 找得到 --> e(返回 Session 对象)
+c -- 找不到 --> d
+d --> e
+```
+
+* `isNew()` - 判断 Session 对象是不是新建的
+
+#### Session 也是一个域对象
+
+可以使用 `setAttribute()/getAttribute()` 等方法操作域内的数据
+
+#### Session 时效性
+
+Session 默认 30 分钟后就销毁，如果 30 分钟内有对应 JSESSIONID 请求过来，则重新计时
+
+```xml
+<!-- 默认在 Tomcat 安装目录下 conf/web.xml 内配置，可以在当前项目的 web.xml 文件内覆盖，单位分钟 -->
+<session-config>
+    <session-timeout>30</session-timeout>
+</session-config>
+```
+
+* `setMaxInactiveInterval(interval)` - 设置 Session 对象的过期时间，单位秒
+* `invalidate()` - 让 Session 直接失效
+
+## 三大域对象
+
+* **请求域** - 一次请求响应内
+* **会话域** - 一次会话内，可以跨多个请求
+* **应用域** - 应用内，可以跨多个会话
+
+![Servlet域对象](/img/java/servlet-scope-objects.drawio.png)
+
+```java title="请求域"
+// 添加请求域数据
+req.setAttribute("name", "value");
+
+// 获取请求域数据
+req.getAttribute("name");
+```
+
+```java title="会话域"
+// 添加会话域数据
+req.getSession().setAttribute("name", "value");
+
+// 获取会话域数据
+req.getSession().getAttribute("name");
+```
+
+```java title="应用域"
+// 添加应用域数据
+getServletContext().setAttribute("name", "value");
+
+// 获取应用域数据
+getServletContext().getAttribute("name");
+```
+
+## Filter
+
+Filter（过滤器）是一个用于处理 请求和响应 的组件，它能够在请求到达 Servlet 之前，或者响应返回客户端之前进行一些预处理或后处理
+
+```mermaid
+sequenceDiagram
+participant client as 客户端 
+box 服务器
+participant filter as 过滤器
+participant servlet as Servlet
+end
+
+client ->> filter: 请求
+filter ->> filter: 执行请求之前的操作
+filter ->> servlet: 放行
+servlet ->> filter: 响应
+filter ->> filter: 执行响应之前的操作
+filter ->> client: 响应
+```
+
+```mdx-code-block
+<Tabs>
+  <TabItem value="annotation" label="Annotation" default>
+     <CodeBlock language="java">
+{
+`@WebFilter("/*")
+public class ConfWithAnnotationFilter extends HttpFilter {
+
+// ...`
+}
+    </CodeBlock>
+  </TabItem>
+  <TabItem value="xml" label="XML">
+    <CodeBlock language="xml">
+{
+`<filter>
+    <filter-name>ConfWithXmlFilter</filter-name>
+    <filter-class>cn.y.java.filter.ConfWithXmlFilter</filter-class>
+</filter>
+<filter-mapping>
+    <filter-name>ConfWithXmlFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>`
+}
+    </CodeBlock>
+  </TabItem>
+</Tabs>
+```
+
+```java title="完整操作"
+@WebFilter("/*")
+public class ConfWithAnnotationFilter extends HttpFilter {
+
+    @Override
+    protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+        System.out.println("annotation filter 请求之前的操作");
+
+        // 放行
+        chain.doFilter(req, res);
+
+        System.out.println("annotation filter 响应之前的操作");
+    }
+}
+```
+
+:::note
+方法内如果判断正常一定要执行 `chain.doFilter(req, resp)` 方法放行
+
+`chain.doFilter(req, resp)` 方法之后才是响应之前的操作，这时 Servlet 内的逻辑已经执行完成了
+:::
+
+### 生命周期
+
+| 生命周期    | 方法    | 执行时机    | 执行次数    |
+|---------------- | --------------- | --------------- | --------------- |
+| 构造对象    | 构造器    | 容器启动    | 1    |
+| 初始化    | `init()`   |  构造完成后   | 1   |
+| 处理服务   | `service(req, resp, filterChain)`   | 每次请求   | 多次   |
+| 销毁 | `destroy()` | 容器关闭| 1 |
+
+:::note
+生命周期部分和 Servlet 生命周期类似，但是 Filter 是在容器启动时就创建的
+:::
+
+### 过滤器链
+
+过滤器链（Filter Chain）是指一系列 Filter（过滤器）按照配置顺序依次处理请求和响应的机制。每个过滤器都可以对请求和响应进行处理，然后将请求传递给下一个过滤器（如果有的话），直到最终的 Servlet 被调用
+
+![过滤器链](/img/java/servlet-filter-chain.drawio.png)
+
+:::info[Filter 链执行顺序]
+如果使用 xml 配置的情况下，根据 filter-mapping 标签的定义顺序执行
+
+如果使用注解方式配置，则根据类名顺序执行
+:::
+
+获取过滤器的初始化参数，配置方式参考[Servlet Config](#servlet-config)
+
+```java
+getFilterConfig().getInitParameter("name")
+```
+
+## Listener
+
+监听器（Listener） 是一种用于监听和处理 Servlet 容器中事件的对象。它是 Servlet 规范的一部分，用于监听容器生命周期中的不同事件（如请求、会话、上下文的创建与销毁等）
+
+| 监听器    | 所属域    | 说明    |
+|---------------- | --------------- | --------------- |
+| `ServletContextListener`    | **应用域**    | 监听应用域的创建和销毁    |
+| `ServletContextAttributeListener`    | **应用域**    | 监听应用域内数据的增删改操作    |
+| `HttpSessionListener` | **会话域** | 监听会话域的创建和销毁 |
+| `HttpSessionAttributeListener` | **会话域** | 监听会话域内数据的增删改操作 |
+| `HttpSessionBindingListener` | **会话域** | 监听会话域内绑定指定绑定解绑操作 |
+| `HttpSessionActivationListener` | **会话域** | 监听会话域持久化和激活操作 |
+| `ServletRequestListener`    | **请求域**    | 监听请求域的创建和销毁    |
+| `ServletRequestAttributeListener`    | **请求域**    | 监听请求域内数据的增删改操作    |
+
+```mdx-code-block
+<Tabs>
+  <TabItem value="annotation" label="Annotation" default>
+     <CodeBlock language="java">
+{
+`@WebListener
+public class ContextTestListener implements ServletContextListener {
+
+// ...`
+}
+    </CodeBlock>
+  </TabItem>
+  <TabItem value="xml" label="XML">
+    <CodeBlock language="xml">
+{
+`<listener>
+    <listener-class>cn.y.java.listener.SessionTestListener</listener-class>
+</listener>`
+}
+    </CodeBlock>
+  </TabItem>
+</Tabs>
+```
+
+Session 的两个特殊监听器
+
+**HttpSessionBindingListener**
+
+```java
+// 绑定操作
+session.setAttribute("testBindListener", new SessionBindingTestListener());
+
+// 解绑操作
+session.removeAttribute("testBindListener");
+```
+
+**HttpSessionActivationListener**
+
+:::info[配置 Session 持久化]
+在 webapp 目录下新建 `META-INF/context.xml` 文件
+
+```xml
+<Context>
+    <!-- maxIdleSwap: 指定 session 对象多长时间不使用就持久化，单位分钟 -->
+    <Manager className="org.apache.catalina.session.PersistentManager" maxIdleSwap="1">
+    <Store className="org.apache.catalina.session.FileStore" directory="filedir" />
+    </Manager>
+</Context>
+```
+:::
+
+## 异步 Servlet/Filter
+
+异步计算
+
+```java
+@WebServlet(value = "/async", asyncSupported = true)
+public class AsyncServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 获取结果，如果有结果直接返回
+        Object result = req.getSession().getAttribute("result");
+        if (result != null){
+            resp.getWriter().write("<h1>OK result: " + result + "</h1>");
+            return;
+        }
+        // 开启异步任务
+        AsyncContext asyncContext = req.startAsync();
+        System.out.println("asyncContext default timeout: " + asyncContext.getTimeout());
+        asyncContext.start(() -> {
+            try {
+                Thread.sleep(2000);
+                HttpSession session = ((HttpServletRequest) asyncContext.getRequest()).getSession();
+                session.setAttribute("result", "111");
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                asyncContext.complete();
+            }
+        });
+
+        // 先返回正在处理
+        resp.setContentType("text/html");
+        resp.setCharacterEncoding("UTF-8");
+        resp.getWriter().write("<h1>正在处理</h1>");
+    }
+}
+```
+
+:::info
+如果要正确使用异步 Servlet 那包括这个 Servlet 之内的所有请求链都需要开启异步支持，否则会报错 **startAsync 无法启动async，因为处理链中的下列类不支持**
+
+也就是说所有拦截到这个 Servlet 的 Filter 都需要开启异步
+:::
+
 ## 常见问题
 
 ### 乱码问题
@@ -444,6 +746,37 @@ if (cookies != null) {
 1. 确保 Idea 设置的 `File Encoding` 选项内配置的都是 `UTF-8`
 2. 编辑 Tomcat 启动配置，在 `-Dfile.encoding=UTF-8`
 3. 重启 Tomcat
+
+### 跨域问题
+
+跨域问题 是指当浏览器在执行跨域请求时，因浏览器的同源策略（Same-Origin Policy）而产生的限制。浏览器的同源策略要求，网页中的脚本只能访问与当前页面同源（协议、域名、端口号都相同）的资源。如果网页需要访问不同域（跨域）的资源，浏览器会阻止该请求，造成 跨域问题
+
+```mermaid
+sequenceDiagram
+participant client as 客户端
+participant webserver as Web服务器(a.com:80)
+participant server as 后端服务器(b.com:8080)
+
+client ->> webserver: 访问网页index.html
+webserver ->> client: 返回index.html
+client ->> server: 在index.html进行登录，访问后端的/login接口
+Note left of client: 此时浏览器判断不是同源，根据情况先发送预检请求
+client ->> server: 预检请求
+client ->> server: 请求/login接口
+server ->> client: 响应数据
+```
+
+添加以下响应头即可
+
+```java
+resp.setHeader("Access-Control-Allow-Origin", "*");
+resp.setHeader("Access-Control-Allow-Methods", "POST,GET,PUT,DELETE,OPTIONS,HEAD");
+resp.setHeader("Access-Control-Max-Age", "3600");
+resp.setHeader("Access-Control-Allow-Headers", "*");
+```
+:::note
+什么时候发送预检请求：PUT、DELETE 方法，或请求头有 `Authorization` 的接口等
+:::
 
 ## 参考
 
