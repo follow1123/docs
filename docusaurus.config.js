@@ -58,6 +58,16 @@ const config = {
 
   plugins: [
     [
+      '@docusaurus/plugin-content-docs',
+      /** @type {import('@docusaurus/plugin-content-docs').Options} */
+      ({
+        id: 'java',
+        path: 'java',
+        routeBasePath: '/java',
+        sidebarPath: './sidebarsJava.js',
+      })
+    ],
+    [
       "@easyops-cn/docusaurus-search-local",
       {
         hashed: true,
@@ -79,7 +89,6 @@ const config = {
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: 'Doc Site',
         logo: {
           alt: 'Doc Site Logo',
           src: 'img/logo.svg',
@@ -87,14 +96,21 @@ const config = {
         items: [
           {
             type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
+            sidebarId: 'docs',
             position: 'left',
             label: 'Docs',
           },
           {
+            to: '/java',
+            position: 'left',
+            label: 'Java',
+            activeBaseRegex: `/java/`,
+          },
+          {
             href: 'https://github.com/follow1123',
-            label: 'GitHub',
             position: 'right',
+            className: 'header-github-link',
+            'aria-label': 'GitHub repository',
           },
         ],
       },
@@ -107,6 +123,10 @@ const config = {
               {
                 label: 'Docs',
                 to: '/',
+              },
+              {
+                label: 'Java',
+                to: '/java',
               },
             ],
           },

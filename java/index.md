@@ -1,8 +1,8 @@
 ---
-sidebar_position: 20
+sidebar_position: 0
 ---
 
-# Java
+# 说明
 
 > [官方文档](https://docs.oracle.com/javase/tutorial/reallybigindex.html)<br></br>
 > [详细代码地址](https://github.com/follow1123/java-basics)
@@ -13,12 +13,6 @@ sidebar_position: 20
 * **JRE**(Java Runtime Environment)：是Java程序的运行时环境，包含JVM和运行时所下需要的核心库
 * java长期支持版本8、11、17、21
 * 使用包管理器或压缩包安装
-
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
-
-<DocCardList />
-```
 
 ## 参考
 
