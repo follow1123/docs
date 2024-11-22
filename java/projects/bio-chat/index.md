@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # 聊天室（BIO版）
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/demo_projects/minichat)
+> [详细代码](https://github.com/follow1123/java-projects/tree/main/minichat-bio)
 
 ## 项目文件说明
 
