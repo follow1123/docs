@@ -268,7 +268,7 @@ Tomcat 在接口客户端的请求后，封装 `HttpServletRequest` 对象的同
 
 响应头
 
-* `setHeader(name,` - value) 设置响应头信息
+* `setHeader(name, value)` - 设置响应头信息
 * `setContentType(type)` - 设置响应头的content-type，（媒体类型设置）
 
 响应体
@@ -279,7 +279,7 @@ Tomcat 在接口客户端的请求后，封装 `HttpServletRequest` 对象的同
 
 其他
 
-* `sendError(sc,` - msg) 响应错误信息
+* `sendError(sc, msg)` - 响应错误信息
 * `addCookie(cookie)` - 设置 Cookie
 * `setCharacterEncoding(charset)` - 设置响应字符集
 
@@ -447,7 +447,7 @@ client ->> server: 请求
 Note right of server: 创建Session(id:234)
 server ->> client: 响应(Set-Cookie: JSESSIONID=234)
 client ->> server: 请求(cookie: JSESSIONID=234)
-Note right of server: 查询是否有id为234的Session，判断是否是同一个人，没有就创建一个新Session
+Note right of server: 查询是否有id为234的Session，没有就新建一个Session
 server ->> client: 响应
 ```
 
@@ -457,6 +457,9 @@ req.getSession();
 ```
 
 ```mermaid
+---
+title: Session 创建流程
+---
 flowchart TD
 a("req.getSession()") --> b{{请求的 Cookie 是否携带 JSESSIONID}}
 b -- 是 --> c{{在服务器查找对应的 Session 对象}}
@@ -567,7 +570,7 @@ public class ConfWithAnnotationFilter extends HttpFilter {
 </Tabs>
 ```
 
-```java title="完整操作"
+```java
 @WebFilter("/*")
 public class ConfWithAnnotationFilter extends HttpFilter {
 
@@ -726,9 +729,9 @@ public class AsyncServlet extends HttpServlet {
 ```
 
 :::info
-如果要正确使用异步 Servlet 那包括这个 Servlet 之内的所有请求链都需要开启异步支持，否则会报错 **startAsync 无法启动async，因为处理链中的下列类不支持**
+如果要正确使用异步 Servlet 需要包括这个 Servlet 内的所有**请求链**都是开启异步支持的，否则会报错 **startAsync 无法启动async，因为处理链中的下列类不支持**
 
-也就是说所有拦截到这个 Servlet 的 Filter 都需要开启异步
+也就是说所有拦截到这个 Servlet 的 Filter 都需要开启异步支持
 :::
 
 ## 常见问题
@@ -760,7 +763,7 @@ participant server as 后端服务器(b.com:8080)
 client ->> webserver: 访问网页index.html
 webserver ->> client: 返回index.html
 client ->> server: 在index.html进行登录，访问后端的/login接口
-Note left of client: 此时浏览器判断不是同源，根据情况先发送预检请求
+Note left of client: 此时浏览器判断不是同源，<br />根据情况先发送预检请求
 client ->> server: 预检请求
 client ->> server: 请求/login接口
 server ->> client: 响应数据
@@ -775,7 +778,9 @@ resp.setHeader("Access-Control-Max-Age", "3600");
 resp.setHeader("Access-Control-Allow-Headers", "*");
 ```
 :::note
-什么时候发送预检请求：PUT、DELETE 方法，或请求头有 `Authorization` 的接口等
+什么时候发送预检请求：
+* PUT、DELETE 方法
+* 有 `Authorization` 的接口等请求头
 :::
 
 ## 参考
