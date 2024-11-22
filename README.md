@@ -2,6 +2,8 @@
 
 一个使用[Docusaurus](https://docusaurus.io/)构建的文档网站
 
+地址：[Docs](https://follow1123.github.io/docs)
+
 ## 相关命令
 
 * `yarn run start` - 开发模式启动项目

@@ -107,7 +107,7 @@ const config = {
             activeBaseRegex: `/java/`,
           },
           {
-            href: 'https://github.com/follow1123',
+            href: 'https://github.com/follow1123/docs',
             position: 'right',
             className: 'header-github-link',
             'aria-label': 'GitHub repository',
@@ -133,10 +133,6 @@ const config = {
           {
             title: 'More',
             items: [
-              {
-                label: 'GitHub',
-                href: 'https://github.com/follow1123',
-              },
               {
                 label: 'GitHub Repository',
                 href: 'https://github.com/follow1123/docs',
