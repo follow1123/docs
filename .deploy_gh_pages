@@ -1,2 +1,4 @@
 # 这个文件用于配合Github Actions提交后发布Github Pages
-分离Java文档，并完善
+由于java部分东西太多，将java部分文档在header部分单独建一个标签
+修复部分svg资源占用太大问题
+调整GitHub地址图标
