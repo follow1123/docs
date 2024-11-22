@@ -16,14 +16,7 @@ sidebar_position: 10
 * `Blocked` - 阻塞
 * `Dead` - 死亡
 
-```mdx-code-block
-import PopupSvg from '@site/src/components/PopupSvg';
-import LifecycleBeforeJDK5 from './assets/lifecycle_before_jdk5.drawio.svg';
-
-<PopupSvg>
-    <LifecycleBeforeJDK5 width="100%" height="100%" />
-</PopupSvg>
-```
+![JDK1.5之前线程生命周期](/img/java/thread-lifecycle-before-jdk5.drawio.png)
 
 ## JDK1.5及之后
 
@@ -38,13 +31,7 @@ import LifecycleBeforeJDK5 from './assets/lifecycle_before_jdk5.drawio.svg';
 
 > [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_lifecycle/ThreadLifecycleTest.java)
 
-```mdx-code-block
-import LifecycleJDK5AndLater from './assets/lifecycle_jdk5_and_later.drawio.svg';
-
-<PopupSvg>
-    <LifecycleJDK5AndLater width="100%" height="100%" />
-</PopupSvg>
-```
+![JDK1.5之前线程生命周期](/img/java/thread-lifecycle-jdk5-and-later.drawio.png)
 
 ### 新建/运行/终止
 
