@@ -101,7 +101,7 @@ const config = {
             label: 'Docs',
           },
           {
-            to: '/java',
+            to: '/java/',
             position: 'left',
             label: 'Java',
             activeBaseRegex: `/java/`,
@@ -126,7 +126,7 @@ const config = {
               },
               {
                 label: 'Java',
-                to: '/java',
+                to: '/java/',
               },
             ],
           },
