@@ -9,103 +9,11 @@
 
 | 命令   | 描述    |
 |--------------- | --------------- |
-| [git remote](#git-remote)   | 远程相关   |
-| [git pull](#git-pull)   | 拉取相关   |
-| [git push](#git-push)   | 推送相关   |
-| [git clone](#git-clone)   | 克隆相关   |
-| [git add](#git-add)   | 添加到暂存区   |
-| [git commit](#git-commit)   | 提交代码到本地仓库   |
-| [git rm](#git-rm)   | 删除相关   |
-| [git log](#git-log)   | 日志相关   |
-| [git reflog](#git-reflog)   | 操作日志相关   |
 | [git branch](#git-branch)   | 分支相关   |
 | [git merge](#git-merge)   | 分支合并相关   |
-| [git diff](#git-diff)   | 版本对比相关   |
 | [git checkout](#git-checkout)   | 切换分支或恢复文件   |
 | [git reset](#git-reset)   | 重置相关   |
-| [git config](#git-config)   | 配置相关   |
 | [git submodule](#git-submodule)   | 子模块相关相关   |
-
-### 命令详情
-
-#### git remote
-
-```bash
-# 查看远程信息
-git remote -v
-
-# 删除远程地址
-git remote rm 远程名
-
-# 重命名远程
-git remote rename 远程名 新远程名
-```
-
-#### git pull
-
-```bash
-# 直接从远程拉取文件
-git pull
-
-# 从远程拉取某个分支并新建这个分支
-git checkout -b 本地分支名 远程分支名
-```
-
-#### git push
-
-```bash
-```
-
-#### git clone
-
-```bash
-# 指定分支或tag拉取
-git clone -b 分支名或tag名 url
-```
-
-#### git add
-
-```bash
-# 添加到暂存区
-git add .
-```
-
-#### git commit
-
-```bash
-# 提交到本地仓库
-git commit -m "备注"
-```
-
-#### git rm
-
-```bash
-# git停止跟踪一个文件
-git rm --cached 文件名
-
-# 从本地库中删除文件
-git rm 文件名
-```
-
-#### git log
-
-```bash
-# 显示提交日志
-git log
-
-# 显示提交流程线
-git log --graph 
-
-# 显示简化日志
-git log --oneline
-```
-
-#### git reflog
-
-```bash
-# 显示操作日志
-git reflog
-```
 
 #### git branch
 
@@ -125,13 +33,6 @@ git branch -d 分支名
 ```bash
 # 合并分支，先切换到一个需要被合并的分支
 git merge 分支名
-```
-
-#### git diff
-
-```bash
-# 查看版本差异
-git diff commit_id1 commit_id1 file
 ```
 
 #### git checkout
@@ -155,23 +56,6 @@ git reset 版本号 文件名
 
 # 撤掉操作
 git reset --hard reflog_id
-```
-
-#### git config
-
-```bash
-# 查看系统配置
-git config --system --list
-
-# 查看全局配置
-git config --global --list
-
-# 查看本地配置
-git config --local --list
-
-# 设置全局提交的用户信息
-git config --global user.name ""
-git config --global user.email ""
 ```
 
 #### git reset
@@ -199,6 +83,128 @@ git submodule deinit -f --all
 
 ---
 
+## 初始化
+
+* `git init` - 初始化 git 本地仓库
+* `git clone <url>` - 克隆远程仓库到本地
+* `git clone -b <branch_name>/<tab_name> <url>` - 克隆远程仓库到本地，指定克隆的分支或 tag
+
+## 提交（commit）
+
+* `git status` - 查看**工作区**和**暂存区**状态信息
+* `git status -s` - 查看**工作区**和**暂存区**简短的状态信息
+* `git commit` - 提交**暂存区**内的所有文件。这个命令会打开一个编辑器用于编写提交信息（使用 `git config --global core.editor` 配置）
+* `git commit -m '<message>'` - 提交**暂存区**内的所有文件，直接指定提交信息
+* `git rm -f <file>` - 将**暂存区**和**工作区**的指定文件一起删除。`-f`：强制移除
+* `git rm --cached <file>` - 将已经存放到**暂存区**的文件移除，不删除**工作区**内的这个文件
+* `git mv <path_file> <to_path_file>` - 将**暂存区**内的文件移动或重命名
+* `git diff` - 查看**工作区**内的这个文件和这个文件上一次提交的版本进行对比
+* `git diff --staged/--cached` - 查看**暂存区**内的这个文件和这个文件上一次提交的版本进行对比
+* `git commit --amend` - 修正提交，提交后发现有个文件忘改了，可以修改后使用这个命令直接怼进上一次提交里面，这个命令也会打开编辑器编写提交信息
+* `git commit --amend --no-edit` - 修正提交，不指定提交信息
+* `git restore <file>` - 将**工作区**内的指定文件恢复成上次提交的样子，撤消对文件的修改
+* `git restore --staged <file>` - 将**暂存区**内的指定文件恢复成上次提交的样子
+
+### 修正上次提交
+
+将当前工作区内已经暂存的文件直接加入到上次的提交内
+
+* `git commit -amend` - 打开编辑器并修改提交信息
+* `git commit --amend --no-edit -m 'new commmit message'` - 直接修改提交信息
+
+:::warning
+这个操作会修改提交信息的 hash 值，如果 commit 已经提交到远程仓库，谨慎使用
+:::
+
+## 配置（config）
+
+* `git config --list` - 查看所有配置信息
+* `git config --list --local/--global` - 查看指定作用域配置信息，`local`：仓库内，`global`：当前用户，`system`：全局
+* `git config --list --show-origin` - 查看所有配置信息，并显示配置来源
+
+## 分支（branch）
+
+### merge
+
+### rebase
+
+## 远程（remote）
+
+* `git remote` - 查看远程仓库
+* `git remote -v` - 查看远程仓库，和url
+* `git remote show <remote_name>` - 查看指定远程详细信息
+* `git remote add <remote_name> <url>` - 添加远程仓库
+* `git fetch <remote_name>` - 将远程仓库的内容拉取到本地仓库，如果只有一个远程仓库，则不用指定 `<remote_name>`
+* `git push <remote_name> <local_branch>` - 将本地的仓库的指定分支提交到指定的远程仓库
+* `git remote rename <old_name> <new_name>` - 重命名远程仓库
+* `git remote remove <remote_name>` - 删除远程仓库
+
+## 日志（log）
+
+* `git log` - 查看提交信息
+* `git log -p -1` - 查看上一次提交的详细信息 `-p`：显示提交内所有文件对比的详细信息，`-1`：最近的一次提交
+* `git log -1 --stat` - 查看上一次提交的内容的简短信息，只显示文件新增或修改的统计信息
+* `git log --graph` - 查看提交信息，并以字符图像方式显示分支、合并信息
+* `git log --oneline` - 每个提交只显示一行简单信息
+* `git log --oneline --parents` - 显示提交的从哪次提交过来，方便查看分支合并信息
+
+## 忽略文件
+
+在当前仓库根目录添加 `.gitignore` 文件
+
+```bash
+# 忽略项目内所有名称包含 aaa 的文件
+aaa
+
+# 忽略所有的 html 文件
+*.html
+
+# 忽略 .gitignore 文件根目录下 bbb 目录内的所有文件
+/bbb/*
+
+# 在上面忽略条件的情况下排除 public.txt 文件，也就是不忽略 /bbb/public.txt 文件
+!/bbb/public.txt
+
+# 忽略 /ccc 目录及其子目录下的所有 class 文件
+/ccc/**/*.class
+```
+
+:::info[不使用 `.gitignore` 忽略文件]
+将上面的条件添加到 `.git\info\exclude` 文件内
+
+假设你有一个公共的仓库，需要在这个仓库内放一些不能提交到的文件，也不想放在 `.gitignore` 里面忽略，可以使用这种方式
+:::
+
+## 分支冲突
+
+## 重置/撤销
+
+### reset
+
+### revert
+
+## 操作日志（reflog）
+
+## 压缩（squash）
+
+## 隐藏（stash）
+
+## 标签（tags）
+
+* `git tag` - 查看所有 tag
+* `git tag -a '<tag_name>' -m '<message>'` - 给**本地仓库**内最新的一次提交打 tag
+* `git tag -a '<tag_name>' -m '<message>' <commit_hash>` - 给**本地仓库**内指定的提交打 tag
+* `git show <tab_name>` - 查看指定 tag 的详细信息
+* `git tag -d <tag_name>` - 删除本地的标签
+* `git push origin <tab_name>` - 将指定标签推送到远程仓库
+* `git push origin --tags` - 将远程仓库没用的标签推送到远程仓库
+* `git push origin --delete <tag_name>` - 删除远程仓库上指定的标签，默认删除本地的标签不会删除远程的标签，需要单独执行这条命令删除
+* `git checkout -b <branch_name> <tab_name>` - 使用指定 tag 的提交创建一个分支。方便查看某个 tag 的时仓库的详细信息
+
+## Cherry Pick
+
+## Bisect
+
 ## 子模块
 
 * 位于仓库下的`.gitmodules`文件
@@ -210,11 +216,9 @@ git submodule deinit -f --all
     ignore = all
 ```
 
+---
+
 ## git操作示例
-
-### 删除切换分支时后之前分支的空文件夹
-
-* 使用`git clean -df`删除
 
 ### 将历史某一次提交删除
 
@@ -230,14 +234,9 @@ git submodule deinit -f --all
 
 * `git remote add origin https://oauth2:[token]@github.com/<user_name>/<repo_name>.git`
 
-### 删除远程仓库上的tag
-
-* `git push origin --delete <tag_name>`
-
 ---
 
 ## commit规范参考
-
 
 ### commit组成部分
 
@@ -287,6 +286,10 @@ git config --global gui.encoding utf-8            # 图形界面编码
 git config --global i18n.commit.encoding utf-8    # 处理提交信息编码 
 git config --global i18n.logoutputencoding utf-8  # 输出 log 编码 
 ```
+
+### 删除切换分支时后之前分支的空文件夹
+
+* 使用`git clean -df`删除
 
 ### 解除SSL验证
 
