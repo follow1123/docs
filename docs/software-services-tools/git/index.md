@@ -2,92 +2,175 @@
 
 * [官网](https://git-scm.com/)
 * [下载地址](https://git-scm.com/downloads)
-* 推荐使用[Lazygit](https://github.com/jesseduffield/lazygit)工具
+* 推荐使用 [Lazygit](https://github.com/jesseduffield/lazygit) 工具
 
-## 常用命令
+## 概念
 
+* 工作区
+* 暂存区
+* 本地仓库
+* 远程仓库
 
-| 命令   | 描述    |
-|--------------- | --------------- |
-| [git branch](#git-branch)   | 分支相关   |
-| [git merge](#git-merge)   | 分支合并相关   |
-| [git checkout](#git-checkout)   | 切换分支或恢复文件   |
-| [git reset](#git-reset)   | 重置相关   |
-| [git submodule](#git-submodule)   | 子模块相关相关   |
+---
 
-#### git branch
+## 仓库初始化
+
+使用 `git init` 命令初始化一个本地仓库
 
 ```bash
-# 查看分支
-git branch
+# 创建仓库的文件夹，并进入
+mkdir example-repo
+cd example-repo
 
-# 修改分支名称
-git branch -M 新名称
-
-# 删除分支
-git branch -d 分支名
+# 初始化仓库
+git init
 ```
 
-#### git merge
+使用 `git clone` 克隆一个远程仓库到本地
 
 ```bash
-# 合并分支，先切换到一个需要被合并的分支
-git merge 分支名
+# 克隆远程仓库到当前目录下，目录名称就是仓库名
+git clone <remote_url>
+
+# 克隆远程仓库到当前目录下，仓库名称为 example-clone
+# 克隆下来的地址可以指定相对路径或绝对路径
+git clone <remote_url> example-clone
 ```
 
-#### git checkout
+如果需要克隆指定的分支或 tag 可以使用 `-b` 或 `--branch` 选项
 
 ```bash
-# 切换分支
-git checkout 分支名
+# 克隆指定的分支
+git clone -b <branch_name> <remote_url>
 
-# 切换分支，没有则新建一个
-git checkout -b 分支名
-
-# 恢复删除的文件
-git checkout -- 文件名
+# 克隆指定的 tag
+git clone -b <tag_name> <remote_url>
 ```
 
-#### git reset
+克隆下来的仓库对应的远程名称默认是 origin 可以使用 `--origin` 选项修改
 
 ```bash
-# 将当前工作区文件的版本还原到指定的版本，版本号使用git log可以获取
-git reset 版本号 文件名
-
-# 撤掉操作
-git reset --hard reflog_id
-```
-
-#### git reset
-
-```bash
-# 将当前工作区文件的版本还原到指定的版本，版本号使用git log可以获取
-git reset 版本号 文件名
-
-# 撤掉操作
-git reset --hard reflog_id
-```
-
-#### git submodule
-
-```bash
-# 初始化子模块
-git submodule init 
-
-# 添加子模块
-git submodule add https://github.com/example/scripts.git scripts
-
-# 删除所有子模块
-git submodule deinit -f --all
+git clone --origin <remote_name> <remote_url>
 ```
 
 ---
 
-## 初始化
+## 提交文件到仓库
 
-* `git init` - 初始化 git 本地仓库
-* `git clone <url>` - 克隆远程仓库到本地
-* `git clone -b <branch_name>/<tab_name> <url>` - 克隆远程仓库到本地，指定克隆的分支或 tag
+创建一个本地仓库
+
+```bash
+mkdir example-commit
+cd example-commit
+
+git init
+```
+
+使用编辑器新建一个文件 `a.txt`，并添加以下内容
+
+```txt
+123456
+```
+
+使用 `git add` 命令将文件添加到**暂存区**
+
+```bash
+git add a.txt
+
+# 也可以使用这个命令将当前工作区内的所有文件都添加暂存区
+git add .
+```
+
+使用 `git status` 命令查看文件状态信息，如果添加成功，一般会显示绿色的 `new file: a.txt`
+
+```bash
+git status
+```
+
+使用 `git commit` 命令将**暂存区**内的文件提交到本地仓库，使用 `-m` 选项添加提交信息
+
+```bash
+git commit -m 'A: add a.txt file'
+```
+
+使用 `git log` 查看仓库内的提交记录，使用 `-p` 选项查看提交的文件内容
+
+```bash
+git log -p
+```
+
+### 文件的状态
+
+Git 仓库内可以分为：**工作目录** **暂存区** **本地仓库** **远程仓库**这几个区域，其中的文件可以分为：**未跟踪** **已暂存** **未修改** **已修改**这几个状态
+
+![文件的状态](/img/git/git-file-status.drawio.png) 
+
+1. 在之前仓库的基础上，添加一个 `b.txt` 文件，添加以下内容，此时这个 `b.txt` 文件的状态就是**未跟踪**，使用 `git status` 命令查看状态，会显示 `Untracked files：` 等字样
+
+```bash
+abcdef
+```
+
+2. 使用 `git add .` 命令将 `b.txt` 添加进暂存区，此时这个文件的状态就是**已暂存**
+
+3. 使用 `git commit -m 'B add b.txt file'` 将这个文件提交到本地仓库，此时这个文件的状态就是**未修改**
+
+4. 使用 `echo gh >> b.txt` 修改 `b.txt` 此时这个文件的状态就是**已修改**，使用 `git status` 命令查看会显示 `modified: b.txt` 等字样
+
+5. 使用 `git add . && git commit -m 'C update b.txt file'` 将修改后的 `b.txt` 文件提交后，使用 `git rm --cached b.txt` 命令将这个文件直接从本地仓库中删除，此时这个文件的状态从**未修改**直接变成了**未跟踪**
+
+:::info
+此时使用 `git status` 命令发现 `b.txt` 确实变成了**未跟踪**状态，但是显示了一个 `deleted: b.txt` 提示，这个是因为一旦提交到**本地仓库**时，就会创建一个永久的副本，即使将文件从**工作区**中删除，这个文件的副本也会在**本地仓库**的历史内保存，只会标记这个文件已删除，所以会出现一个 `b.txt` 文件已删除的标记
+:::
+
+---
+
+### clean
+
+清除工作区未跟踪的文件
+
+* `git clean`
+    * `-d` - 删除空目录
+    * `-f` - 强制删除
+    * `-x` - 将 `.gitignore` 内忽略的文件也删除
+    * `-n` - 打印将要删除的文件，不进行删除操作
+    * `-i` - 交互方式删除
+
+```bash
+# 强制清除当前工作区内未跟踪的文件和空目录
+git clean -df
+
+# 演示删除
+git clean -dnf
+```
+
+### 贮藏（stash）
+
+贮藏当前工作区的文件，（默认情况下只贮藏**已跟踪**的文件）
+
+* `git stash`
+    * `-S/--staged` - 只贮藏已经暂存的文件
+    * `-u/--inculde-untracked` - 贮藏包含任何**未跟踪**文件
+    * `-a/--all` - 包含忽略文件
+
+```bash
+# 贮藏当前工作区所有文件
+git stash -u
+
+# 列出贮藏列表
+git stash list
+
+# 将栈顶的一次贮藏应用到当前分支上
+git stash apply
+
+# 丢弃栈顶的贮藏
+git stash drop
+
+# apply + drop 弹出栈顶的贮藏，并应用到当前分支上
+git stash pop
+```
+
+---
 
 ## 提交（commit）
 
@@ -124,7 +207,56 @@ git submodule deinit -f --all
 
 ## 分支（branch）
 
+* `git branch`
+    * `-l/--list` - 列出所有本地的分支
+    * `-a/--all` - 列出所有的分支，包括远程分支
+    * `-v/-vv/--verbose` - 显示分支详细信息，`-vv` 选项会显示改分支绑定的上游分支信息
+    * `-d/--delete` - 删除分支
+    * `-D` - 强制删除分支
+    * `-m/--move` - 移动，重命名分支
+    * `-M` - 强制移动，重命名分支
+    * `-c/--copy` -  复制一个分支
+    * `-C` -  强制复制一个分支
+    * `-f/--force` - 强制执行某个操作，上面的大写命令就是组合这个选项
+    * `-u <upstream>/--set-upstream-to=<upstream>` - 指定当前分支的上游分支，就是设置当前分支对应远程的哪个分支
+    * `--unset-upstream` - 移除当前分支对应的远程分支信息
+
+```bash
+# 查看分支
+git branch
+
+# 修改当前分支名称
+git branch -M <new_name>
+
+# 删除分支
+git branch -d <branch_name>
+
+# 从当前分支复制一个新分支出来，不会切换到新分支
+git branch -c <branch_name>
+
+# 设置指定分支的上游分支
+git branch -u <remote_name>/<remote_branch_name> <local_branch_name>
+```
+
+#### git checkout
+
+```bash
+# 切换分支
+git checkout 分支名
+
+# 切换分支，没有则新建一个
+git checkout -b 分支名
+
+# 恢复删除的文件
+git checkout -- 文件名
+```
+
 ### merge
+
+```bash
+# 合并分支，先切换到一个需要被合并的分支
+git merge 分支名
+```
 
 ### rebase
 
@@ -147,6 +279,8 @@ git submodule deinit -f --all
 * `git log --graph` - 查看提交信息，并以字符图像方式显示分支、合并信息
 * `git log --oneline` - 每个提交只显示一行简单信息
 * `git log --oneline --parents` - 显示提交的从哪次提交过来，方便查看分支合并信息
+* `git log -S <string>` - 在所有提交内搜索指定字符串
+
 
 ## 忽略文件
 
@@ -181,13 +315,19 @@ aaa
 
 ### reset
 
+```bash
+# 将当前工作区文件的版本还原到指定的版本，版本号使用git log可以获取
+git reset 版本号 文件名
+
+# 撤掉操作
+git reset --hard reflog_id
+```
+
 ### revert
 
 ## 操作日志（reflog）
 
 ## 压缩（squash）
-
-## 隐藏（stash）
 
 ## 标签（tags）
 
@@ -206,6 +346,17 @@ aaa
 ## Bisect
 
 ## 子模块
+
+```bash
+# 初始化子模块
+git submodule init 
+
+# 添加子模块
+git submodule add https://github.com/example/scripts.git scripts
+
+# 删除所有子模块
+git submodule deinit -f --all
+```
 
 * 位于仓库下的`.gitmodules`文件
 ```txt
@@ -346,3 +497,4 @@ jobs:
 ## 参考
 
 * [如何写出干净的 Git Commit](https://mp.weixin.qq.com/s?__biz=Mzg4MjY3NTk5OA==&mid=2247484976&idx=1&sn=63ef68b9eb8c76f048809026ee48ca44&chksm=cf525e41f825d7571d4aaefcf3595ce91e1d3268934340fabdc0118d7797da486495a44f041a&scene=90&subscene=245&sessionid=1714743143&clicktime=1051534&enterid=1051534&ascene=56&fasttmpl_type=0&fasttmpl_fullversion=7185892-zh_CN-zip&fasttmpl_flag=0&realreporttime=1714743485555&devicetype=android-30&version=28002c51&nettype=WIFI&abtest_cookie=AAACAA%3D%3D&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQujZ49ALiz1b2lAHlSpFXHRLcAQIE97dBBAEAAAAAAMlhBc%2FBdTAAAAAOpnltbLcz9gKNyK89dVj0f0rgg4PuZXnCh6Cj4xkhWRbID1qy2a4q9hJh%2FmqGguBwNDK0CujFrUmRh9Rrdxrqv6F4LUcVfkoR6SD0f42%2FO7DqtiwXfeT7%2BkC96Oj2TFZygMcKEFpT%2BPkjDHlqTx%2BgcTGrgcUaKaJ9Ssspu8CWCIaWG7hJUaPYMCDZC3TGuX23uYg6qfE3K9BNNyrAbu5DPdjBGyZ0yai8yAdjyTjS9I9xvfsNnHPoA3P5CA48jKhWr8H31V8%3D&pass_ticket=au9gdHuUfoKzzjLeSGcY27eaxRYcdNltC%2FoyQc9revXol%2Fe%2BRvchc2yC1r3VcdABrODy5HQGUb5CSn5XS%2FfwOQ%3D%3D&wx_header=3)
+* [git checkout/switch/restore的区别](https://webdeveloper.beehiiv.com/p/ditch-git-checkout-use-git-switch-and-git-restore-instead)
