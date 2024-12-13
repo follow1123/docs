@@ -99,6 +99,8 @@ git commit -m 'A: add a.txt file'
 git log -p
 ```
 
+---
+
 ### 文件的状态
 
 Git 仓库内可以分为：**工作目录** **暂存区** **本地仓库** **远程仓库**这几个区域，其中的文件可以分为：**未跟踪** **已暂存** **未修改** **已修改**这几个状态
@@ -125,7 +127,154 @@ abcdef
 
 ---
 
-### clean
+### 恢复文件
+
+* **Working Tree** - 工作区（Working Directory，沙盒）
+* **Index** - 暂存区（Staging Area，准备提交的文件）
+* **HEAD** - 本地仓库最新的提交（上次提交的快照）
+
+![恢复文件](/img/git/git-restore-file.drawio.png) 
+
+准备仓库
+
+```bash
+mkdir example-restore
+cd example-restore
+
+git init
+echo 'apple' > fruits.md
+git add . && git commit -m 'A: add apple'
+echo 'banana' > fruits.md
+```
+
+使用 `git restore` 配合 `-W` 或 `--worktree`选项（默认选项），从**暂存区**副本内恢复**工作区**的文件
+
+```bash
+# 发现文件被覆盖而不是修改
+cat fruits.md
+
+# 将暂存区内的文件副本恢复到工作区内
+git restore fruits.md
+
+# 重新添加
+echo 'banana' >> fruits.md
+git add . && git commit -m 'B: add banana'
+```
+
+使用 `git restore` 配合 `-S` 或 `--staged` 选项，从**HEAD**副本内恢复**暂存区**的文件
+
+```bash
+# 添加orange
+echo 'oraege' >> fruits.md
+git add .
+
+# 发现单词写错了，但是文件已经提交到暂存区内了，使用-S选项恢复
+git restore -S fruits.md
+
+# 修改后继续提交
+git add . && git commit -m 'C: add orange'
+```
+
+使用 `git restore` 配合 `-S` 和 `-W` 选项，从**HEAD**副本内恢复**暂存区**和**工作区**的文件
+
+```bash
+# 添加西瓜
+echo 'watermlon' >> fruits.md
+git add .
+
+# 发现单词又写错了，这次直接恢复到上次提交时的版本，使用-SW选项恢复
+git restore -SW fruits.md
+
+# 从新添加后继续提交
+echo 'watermelon' >> fruits.md
+git add . && git commit -m 'D: add watermelon'
+```
+
+使用 `git restore` 配合 `-s` 或 `--source` 选项，从**指定某次**提交的副本内恢复**暂存区**或**工作区**的文件
+
+```bash
+# 查询提交信息
+git log --oneline
+
+# 将文件fruits文件恢复到添加banana时的版本
+git restore -s HEAD~2 -SW fruits.md
+# 或查询到commit hash后直接指定
+git restore -s <commit_hash> -SW fruits.md
+```
+
+:::note[实现单个文件的cherry-pick]
+`git restore` 的 `-s` 或 `--source` 选项还可以指定**其他分支**的 commit hash，能将指定分支的**这个文件内不同的功能**添加进**当前分支**的这个文件内：`git restore -s <commit_hash> -SW <filename>`
+:::
+
+---
+
+### 重置提交
+
+和[恢复文件](#恢复文件)类似，`git reset` 可以恢复所有文件到指定的提交副本
+
+![重置提交](/img/git/git-reset-commit.drawio.png) 
+
+准备仓库
+
+```bash
+mkdir example-reset
+cd example-reset
+
+git init
+
+echo 'apple' >> fruits.md
+git add . && git commit -m 'A: add apple'
+
+echo 'banana' >> fruits.md
+git add . && git commit -m 'B: add banana'
+
+echo 'orange' >> fruits.md
+git add . && git commit -m 'C: add orange'
+```
+
+使用 `git reset` 配合 `--soft` 选项将**HEAD副本**的文件恢复到上次提交，并保存**工作区**和**暂存区**内当前的文件
+
+```bash
+git reset --soft HEAD~
+```
+
+使用 `git reset` 配合 `--mixed` 选项（默认选项）将**HEAD副本**和**暂存区**处的文件恢复到上次提交，并保存**工作区**内当前的文件
+
+```bash
+git reset HEAD~
+```
+
+使用 `git reset` 配合 `--hard` 选项将**HEAD副本**，**暂存区**和**工作区**处的文件恢复到上次提交，所有文件都会丢弃
+
+```bash
+git reset --hard HEAD~
+```
+
+:::note[重置提交的位置]
+* `git reset HEAD~` - 重置到上次提交
+* `git reset HEAD~2` - 重置到上上次提交
+* `git reset <commit_hash>` - 重置到指定的提交
+:::
+
+---
+
+### 删除文件
+
+使用 `git rm` 命令将**工作区**和**暂存区**内的这个文件删除
+
+```bash
+# 将文件从工作区和暂存区内的这个文件删除
+git rm <filename>
+# 这个命令就是下一操作的简化
+rm <filename>
+git add .
+```
+
+使用 `git rm --cached` 命令将和**暂存区**内的这个文件删除，保留**工作区**这个文件
+
+---
+
+### 清空工作区
 
 清除工作区未跟踪的文件
 
@@ -144,68 +293,11 @@ git clean -df
 git clean -dnf
 ```
 
-### 贮藏（stash）
-
-贮藏当前工作区的文件，（默认情况下只贮藏**已跟踪**的文件）
-
-* `git stash`
-    * `-S/--staged` - 只贮藏已经暂存的文件
-    * `-u/--inculde-untracked` - 贮藏包含任何**未跟踪**文件
-    * `-a/--all` - 包含忽略文件
-
-```bash
-# 贮藏当前工作区所有文件
-git stash -u
-
-# 列出贮藏列表
-git stash list
-
-# 将栈顶的一次贮藏应用到当前分支上
-git stash apply
-
-# 丢弃栈顶的贮藏
-git stash drop
-
-# apply + drop 弹出栈顶的贮藏，并应用到当前分支上
-git stash pop
-```
-
 ---
 
-## 提交（commit）
+## 创建分支
 
-* `git status` - 查看**工作区**和**暂存区**状态信息
-* `git status -s` - 查看**工作区**和**暂存区**简短的状态信息
-* `git commit` - 提交**暂存区**内的所有文件。这个命令会打开一个编辑器用于编写提交信息（使用 `git config --global core.editor` 配置）
-* `git commit -m '<message>'` - 提交**暂存区**内的所有文件，直接指定提交信息
-* `git rm -f <file>` - 将**暂存区**和**工作区**的指定文件一起删除。`-f`：强制移除
-* `git rm --cached <file>` - 将已经存放到**暂存区**的文件移除，不删除**工作区**内的这个文件
-* `git mv <path_file> <to_path_file>` - 将**暂存区**内的文件移动或重命名
-* `git diff` - 查看**工作区**内的这个文件和这个文件上一次提交的版本进行对比
-* `git diff --staged/--cached` - 查看**暂存区**内的这个文件和这个文件上一次提交的版本进行对比
-* `git commit --amend` - 修正提交，提交后发现有个文件忘改了，可以修改后使用这个命令直接怼进上一次提交里面，这个命令也会打开编辑器编写提交信息
-* `git commit --amend --no-edit` - 修正提交，不指定提交信息
-* `git restore <file>` - 将**工作区**内的指定文件恢复成上次提交的样子，撤消对文件的修改
-* `git restore --staged <file>` - 将**暂存区**内的指定文件恢复成上次提交的样子
-
-### 修正上次提交
-
-将当前工作区内已经暂存的文件直接加入到上次的提交内
-
-* `git commit -amend` - 打开编辑器并修改提交信息
-* `git commit --amend --no-edit -m 'new commmit message'` - 直接修改提交信息
-
-:::warning
-这个操作会修改提交信息的 hash 值，如果 commit 已经提交到远程仓库，谨慎使用
-:::
-
-## 配置（config）
-
-* `git config --list` - 查看所有配置信息
-* `git config --list --local/--global` - 查看指定作用域配置信息，`local`：仓库内，`global`：当前用户，`system`：全局
-* `git config --list --show-origin` - 查看所有配置信息，并显示配置来源
-
-## 分支（branch）
+创建分支
 
 * `git branch`
     * `-l/--list` - 列出所有本地的分支
@@ -238,6 +330,126 @@ git branch -c <branch_name>
 git branch -u <remote_name>/<remote_branch_name> <local_branch_name>
 ```
 
+切换分支
+
+* `git switch`
+    * `-c/--create` - 以当前分支为基础创建一个分支并切换
+    * `-C` - 强制创建并切换
+    * `-d/--detach` - 从指定提交处分离一个临时分支并切换过去
+
+```bash
+# 切换到指定分支
+git switch <branch_name>
+
+# 创建新分支并切换
+git switch -c <new_branch_name>
+
+# 切换到指定提交的临时分支
+git switch -d <commit_hash>
+
+# 切换到指定tag处
+git switch -d <tag_name>
+
+# 切换到上次切换的分支处，如果是某次提交或某个tag，则需要添加-d参数切换过去
+git switch -
+```
+
+---
+
+### 分支合并（merge）
+
+准备仓库
+
+```bash
+mkdir example-merge
+cd example-merge
+
+git init
+echo 'apple' >> fruits.md
+git add . && git commit -m 'A: add apple'
+echo 'banana' >> fruits.md
+git add . && git commit -m 'B: add banana'
+
+git switch -c featureA
+echo 'orange' >> fruits.md
+git add . && git commit -m 'C: add orange'
+```
+
+使用 `git merge` 将 `featureA` 分支的提交合并到主分支内
+
+```bash
+# 确保当前分支处于主分支，main或master
+git switch main
+
+
+# 将featureA分支的提交合并到主分支内
+git merge featureA
+```
+
+---
+
+### 分支变基（rebase）
+
+---
+
+## 创建远程分支
+
+* `git remote` - 查看远程仓库
+* `git remote -v` - 查看远程仓库，和url
+* `git remote show <remote_name>` - 查看指定远程详细信息
+* `git remote add <remote_name> <url>` - 添加远程仓库
+* `git fetch <remote_name>` - 将远程仓库的内容拉取到本地仓库，如果只有一个远程仓库，则不用指定 `<remote_name>`
+* `git push <remote_name> <local_branch>` - 将本地的仓库的指定分支提交到指定的远程仓库
+* `git remote rename <old_name> <new_name>` - 重命名远程仓库
+* `git remote remove <remote_name>` - 删除远程仓库
+
+---
+
+## 贮藏（stash）
+
+贮藏当前工作区的文件，（默认情况下只贮藏**已跟踪**的文件）
+
+* `git stash`
+    * `-S/--staged` - 只贮藏已经暂存的文件
+    * `-u/--inculde-untracked` - 贮藏包含任何**未跟踪**文件
+    * `-a/--all` - 包含忽略文件
+
+```bash
+# 贮藏当前工作区所有文件
+git stash -u
+
+# 列出贮藏列表
+git stash list
+
+# 将栈顶的一次贮藏应用到当前分支上
+git stash apply
+
+# 丢弃栈顶的贮藏
+git stash drop
+
+# apply + drop 弹出栈顶的贮藏，并应用到当前分支上
+git stash pop
+```
+
+---
+
+### 修正上次提交
+
+将当前工作区内已经暂存的文件直接加入到上次的提交内
+
+* `git commit -amend` - 打开编辑器并修改提交信息
+* `git commit --amend --no-edit -m 'new commmit message'` - 直接修改提交信息
+
+:::warning
+这个操作会修改提交信息的 hash 值，如果 commit 已经提交到远程仓库，谨慎使用
+:::
+
+## 配置（config）
+
+* `git config --list` - 查看所有配置信息
+* `git config --list --local/--global` - 查看指定作用域配置信息，`local`：仓库内，`global`：当前用户，`system`：全局
+* `git config --list --show-origin` - 查看所有配置信息，并显示配置来源
+
 #### git checkout
 
 ```bash
@@ -250,26 +462,6 @@ git checkout -b 分支名
 # 恢复删除的文件
 git checkout -- 文件名
 ```
-
-### merge
-
-```bash
-# 合并分支，先切换到一个需要被合并的分支
-git merge 分支名
-```
-
-### rebase
-
-## 远程（remote）
-
-* `git remote` - 查看远程仓库
-* `git remote -v` - 查看远程仓库，和url
-* `git remote show <remote_name>` - 查看指定远程详细信息
-* `git remote add <remote_name> <url>` - 添加远程仓库
-* `git fetch <remote_name>` - 将远程仓库的内容拉取到本地仓库，如果只有一个远程仓库，则不用指定 `<remote_name>`
-* `git push <remote_name> <local_branch>` - 将本地的仓库的指定分支提交到指定的远程仓库
-* `git remote rename <old_name> <new_name>` - 重命名远程仓库
-* `git remote remove <remote_name>` - 删除远程仓库
 
 ## 日志（log）
 
@@ -310,18 +502,6 @@ aaa
 :::
 
 ## 分支冲突
-
-## 重置/撤销
-
-### reset
-
-```bash
-# 将当前工作区文件的版本还原到指定的版本，版本号使用git log可以获取
-git reset 版本号 文件名
-
-# 撤掉操作
-git reset --hard reflog_id
-```
 
 ### revert
 
@@ -366,6 +546,26 @@ git submodule deinit -f --all
     active = true
     ignore = all
 ```
+
+---
+
+## Git 命令表
+
+| 命令 | 说明 |
+| -------------- | --------------- |
+| `git status` | 查看**工作区**和**暂存区**状态信息 |
+| `git status -s` | 查看**工作区**和**暂存区**简短的状态信息 |
+| `git commit` | 提交**暂存区**内的所有文件。这个命令会打开一个编辑器用于编写提交信息（使用 `git config --global core.editor` 配置） |
+| `git commit -m '<message>'` | 提交**暂存区**内的所有文件，直接指定提交信息 |
+| `git rm -f <file>` | 将**暂存区**和**工作区**的指定文件一起删除。`-f`：强制移除 |
+| `git rm --cached <file>` | 将已经存放到**暂存区**的文件移除，不删除**工作区**内的这个文件 |
+| `git mv <path_file> <to_path_file>` | 将**暂存区**内的文件移动或重命名 |
+| `git diff` | 查看**工作区**内的这个文件和这个文件上一次提交的版本进行对比 |
+| `git diff --staged/--cached` | 查看**暂存区**内的这个文件和这个文件上一次提交的版本进行对比 |
+| `git commit --amend` | 修正提交，提交后发现有个文件忘改了，可以修改后使用这个命令直接怼进上一次提交里面，这个命令也会打开编辑器编写提交信息 |
+| `git commit --amend --no-edit` | 修正提交，不指定提交信息 |
+| `git restore <file>` | 将**工作区**内的指定文件恢复成上次提交的样子，撤消对文件的修改 |
+| `git restore --staged <file>` | 将**暂存区**内的指定文件恢复成上次提交的样子 |
 
 ---
 
