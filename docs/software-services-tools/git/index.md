@@ -53,6 +53,13 @@ git clone -b <tag_name> <remote_url>
 git clone --origin <remote_name> <remote_url>
 ```
 
+如果只需要下载源码编译成软件，只需要添加 `--depth` 选项，指定只下载少量的提交历史，加快克隆速度
+
+```bash
+# 克隆指定仓库，只下载最近的一次历史和整个仓库的文件
+git clone --depth 1 <remote_url>
+```
+
 ---
 
 ## 提交文件到仓库
@@ -293,9 +300,67 @@ git clean -df
 git clean -dnf
 ```
 
+### 修正提交
+
+将当前工作区内已经暂存的文件直接加入到上次的提交内
+
+* `git commit --amend` - 将**暂存区**内新添加的文件**修正**进上次提交内，打开一个编辑器修改提交信息
+    * `--no-edit` - 不打开编辑器修改提交信息，只将修正上次提交
+    * `-m <message>` - 直接编辑上次的提交信息
+
+:::warning
+这个操作会修改提交信息的 hash 值，如果 commit 已经提交到远程仓库，谨慎使用
+:::
+
 ---
 
-## 创建分支
+## 查看仓库信息
+
+### 对比文件信息
+
+![对比文件信息](/img/git/git-diff-file.drawio.png) 
+
+* `git diff` - 对比**工作区**和**暂存区**的文件内容
+    * `--cached` - 对比**暂存区**和**HEAD副本**内的文件内容
+* `git diff HEAD~` - 对比**工作区**和上次提交的**HEAD副本**内的文件内容
+* `git diff HEAD HEAD~2 <file_path>` - 对比当前**HEAD副本**和上上次提交的**HEAD副本**内的文件内容
+
+---
+
+### 查看单个提交的信息
+
+* `git show` - 查到当前最新的**HEAD副本**的信息
+* `git show HEAD~` - 查到上次提交的**HEAD副本**的信息
+* `git show HEAD~ <file_path>` - 查到上次提交的**HEAD副本**内指定文件的信息
+
+---
+
+### 查看提交历史信息
+
+* `git log` - 查看提交历史信息
+    * `--all` - 查看所有提交信息，包括其他所有分支的提交历史
+    * `-1` - 只查看上次提交的信息，`-2` 表示前两次提交的信息
+    * `-p` - 查看提交的每个文件的信息 diff 信息
+    * `--graph` - 已图像方式显示所有提交的路径
+    * `--stat` - 显示每个文件修改的统计信息
+    * `--oneline` - 一行内简要显示提交信息
+    * `--parents` - 显示每个提交的父提交的 commit hash
+    * `-S <string>` - 在所有提交内搜索指定字符串
+
+---
+
+### 查看操作日志
+
+* `git reflog` - 查看操作日志
+* `git reflog <branch_name>` - 查看指定分支的操作日志
+
+:::note[恢复操作日志]
+使用 `git reflog` 查看操作日志时，每次操作都有一个 `HEAD@{n}` 的标识，使用 `git reset --hard HEAD@{n}` 或者 `git reset --hard <commit_hash>` 恢复到指定的操作处
+:::
+
+---
+
+## 仓库分支
 
 创建分支
 
@@ -330,6 +395,7 @@ git branch -c <branch_name>
 git branch -u <remote_name>/<remote_branch_name> <local_branch_name>
 ```
 
+<a id="gitswitch"></a>
 切换分支
 
 * `git switch`
@@ -358,11 +424,15 @@ git switch -
 
 ### 分支合并（merge）
 
+#### Fast-forward Merge
+
+![Fast-forward Merge](/img/git/git-fast-forward-merge.drawio.png)
+
 准备仓库
 
 ```bash
-mkdir example-merge
-cd example-merge
+mkdir example-fast-forward-merge
+cd example-fast-forward-merge
 
 git init
 echo 'apple' >> fruits.md
@@ -378,7 +448,7 @@ git add . && git commit -m 'C: add orange'
 使用 `git merge` 将 `featureA` 分支的提交合并到主分支内
 
 ```bash
-# 确保当前分支处于主分支，main或master
+# 确保当前处于主分支，main或master
 git switch main
 
 
@@ -386,22 +456,367 @@ git switch main
 git merge featureA
 ```
 
+:::note[Fast-forward Merge]
+这种情况下，主分支在创建 `featureA` 分支后没有进行任何提交，执行 `git merge featureA` 命令执行的是一次 `Fast-forward` merge，相当于直接将**主分支**指向 `featureA` 分支的最新提交处
+:::
+
+#### 合并冲突
+
+![合并冲突](/img/git/git-merge.drawio.png)
+
+准备仓库
+
+```bash
+mkdir example-merge
+cd example-merge
+
+git init
+echo 'apple' >> fruits.md
+git add . && git commit -m 'A: add apple'
+echo 'banana' >> fruits.md
+git add . && git commit -m 'B: add banana'
+
+git switch -c featureA
+echo 'orange' >> fruits.md
+git add . && git commit -m 'C: add orange'
+
+git switch main
+echo 'watermelon' >> fruits.md
+git add . && git commit -m 'D: add watermelon'
+```
+
+使用 `git merge` 将 `featureA` 分支的提交合并到主分支内
+
+```bash
+# 确保当前处于主分支，main或master
+git switch main
+
+
+# 将featureA分支的提交合并到主分支内
+git merge featureA
+```
+
+此时会出现 `CONFLICT (content): ...` 等提示，说明合并出现了冲突，使用 `git status` 命令就会显示当前有冲突未合并，`cat fruits.md` 显示一下内容：
+
+```markdown
+apple
+banana
+<<<<<<< HEAD
+watermelon
+=======
+orange
+>>>>>>> featureA
+```
+
+因为在**主分支**和 `featureA` 分支内最新的一次提交都修改了第三行，所以会产生冲突
+
+* `<<<<<<< HEAD` - 当前分支最新提交的内容
+* `=======` - 分隔符
+* `>>>>>>> featureA` - 合并分支的最新提交
+
+只需要将这三个符号删除，并手动调整需要哪个分支的内容，这里只需要主分支的内容：
+
+```txt
+apple
+banana
+watermelon
+```
+
+完成合并
+
+```bash
+git add .
+
+# 弹出指定编辑器编辑合并提交信息
+git commit
+```
+
+:::note
+如果不需要合并操作可以使用 `git merge --abort` 取消合并
+:::
+
 ---
 
 ### 分支变基（rebase）
 
+![分支变基](/img/git/git-rebase.drawio.png)
+
+准备仓库
+
+```bash
+mkdir example-rebase
+cd example-rebase
+
+git init
+echo 'apple' >> fruits.md
+git add . && git commit -m 'A: add apple'
+echo 'banana' >> fruits.md
+git add . && git commit -m 'B: add banana'
+
+git switch -c featureA
+echo 'orange' >> fruits.md
+git add . && git commit -m 'C: add orange'
+
+git switch main
+echo 'watermelon' >> fruits.md
+git add . && git commit -m 'D: add watermelon'
+```
+
+使用 `git merge-base` 查看**主分支**和 `featureA` 分支的**公共祖先**（`featureA` 分支是从**主分支**的哪次提交创建的）
+
+```bash
+git merge-base main featureA
+```
+
+使用 `git rebase` 将 `featureA` 分支和**主分支**的**公共祖先**修改成**主分支**内最新的一次提交
+
+```bash
+# 确保当前处于featureA分支内
+git switch featureA
+
+# 变基featureA的公共祖先到main分支的最新提交
+git rebase main
+```
+
+和[合并冲突](#合并冲突)类似，这里也出现了冲突，手动修复冲突的方式和之前一样，只不过处理的方式有些不同：
+
+```bash
+# 修复完所有冲突后将所有文件添加到暂存区，相当于标记冲突已经解决
+git add .
+
+# 弹出编辑器修改提交信息
+git rebase --continue
+```
+
+此时再使用 `git merge-base` 命令查看**主分支**和 `featureA` 分支的**公共祖先**，这时 `featureA` 的**公共祖先**变成了**主分支**的最新提交
+
+```bash
+git merge-base main featureA
+```
+
+:::note
+如果不需要继续变基可以使用 `git rebase --abort` 取消变基
+:::
+
+:::info
+变基操作时会创建一个临时分支，所有变基操作会在这个临时分支上操作
+
+变基并不会将 `featureA` 分支的内容自动合并到**主分支**上，需要切换到**主分支**上执行 `git merge featureA` 进行一次 **Fast-Forward** Merge 才会合并到**主分支**上
+:::
+
+:::warning
+变基操作会修改提交历史，如果分支已经提交到公共的远程仓库上，不建议使用这个操作
+:::
+
 ---
 
-## 创建远程分支
+### 远程分支
+
+#### 操作分支
 
 * `git remote` - 查看远程仓库
-* `git remote -v` - 查看远程仓库，和url
+    * `-v` - 查看远程仓库，和 url
 * `git remote show <remote_name>` - 查看指定远程详细信息
 * `git remote add <remote_name> <url>` - 添加远程仓库
-* `git fetch <remote_name>` - 将远程仓库的内容拉取到本地仓库，如果只有一个远程仓库，则不用指定 `<remote_name>`
-* `git push <remote_name> <local_branch>` - 将本地的仓库的指定分支提交到指定的远程仓库
 * `git remote rename <old_name> <new_name>` - 重命名远程仓库
 * `git remote remove <remote_name>` - 删除远程仓库
+
+#### 更新分支
+
+![更新分支](/img/git/git-fetch-remote-branch.drawio.png)
+
+准备仓库
+
+```bash
+mkdir example-remote
+cd example-remote
+
+git init
+echo 'apple' >> fruits.md
+git add . && git commit -m 'A: add apple'
+
+cd ../
+# 这里使用本地的另一个仓库模拟远程仓库
+git clone ./example-remote example-local
+cd example-local
+```
+
+分别修改**远程仓库**和**本地仓库**的文件
+
+```bash
+# 进入模拟的远程仓库目录内
+cd example-remote
+echo 'banana' >> fruits.md
+git add . && git commit -m 'B: add banana'
+
+# 进入本地仓库目录内
+cd ../example-local
+echo 'orange' >> fruits.md
+git add . && git commit -m 'B: add orange'
+```
+
+使用 `git fetch` 命令将远程仓库的提交更新回本地仓库
+
+```bash
+# 更新远程仓库的提交到本次仓库，不影响本地仓库的提交
+git fetch
+
+# 查看远程仓库指定分支的信息
+git log origin/main
+```
+
+:::note
+`git fetch` 只是将远程的分支的提交拉取到本地，对本地分支没有任何影响
+:::
+
+#### 拉取分支
+
+![拉取分支](/img/git/git-pull-remote.drawio.png)
+
+准备仓库
+
+```bash
+mkdir example-remote
+cd example-remote
+git init --bare
+
+cd ../
+# 这里使用本地的另一个仓库模拟远程仓库
+git clone ./example-remote example-local1
+cd example-local1
+echo 'apple' >> fruits.md
+git add . && git commit -m 'A: add apple'
+git push
+
+cd ../
+git clone ./example-remote example-local2
+cd example-local2
+echo 'banana' >> fruits.md
+git add . && git commit -m 'B: add banana'
+
+cd ../example-local1
+echo 'orange' >> fruits.md
+git add . && git commit -m 'B: add orange'
+git push
+```
+
+拉取分支和[分支合并](#分支合并merge)类似，只不过要合并的分支在远程仓库
+
+使用 `git pull` 命令拉取远程分支的提交并合并，默认时使用 `merge` 策略合并，使用 `-r` 选项进行 `rebase` 策略合并
+
+```bash
+# 切换到第二个仓库
+cd ../example-local2
+
+# 拉取分支
+git pull
+# 或者使用-r选项进行rebase合并
+git pull -r
+```
+
+#### 推送分支
+
+`git push` 默认将当前分支的提交推送到远程的指定分支，需要使用 `git branch -u <remote_name>/<branch_name> <local_branch_name>` 指定上游分支
+
+如果没有设置上游分支，使用 `git push <remote_name>/<branch_name> <local_branch_name>` 将本地的指定分支提交到远程仓库的指定分支
+
+---
+
+## 忽略文件
+
+在当前仓库根目录添加 `.gitignore` 文件
+
+```bash
+# 忽略项目内所有名称包含 aaa 的文件
+aaa
+
+# 忽略所有的 html 文件
+*.html
+
+# 忽略 .gitignore 文件根目录下 bbb 目录内的所有文件
+/bbb/*
+
+# 在上面忽略条件的情况下排除 public.txt 文件，也就是不忽略 /bbb/public.txt 文件
+!/bbb/public.txt
+
+# 忽略 /ccc 目录及其子目录下的所有 class 文件
+/ccc/**/*.class
+```
+
+:::info[不使用 `.gitignore` 忽略文件]
+将上面的条件添加到 `.git\info\exclude` 文件内
+
+假设你有一个公共的仓库，需要在这个仓库内放一些不能提交到的文件，也不想放在 `.gitignore` 里面忽略，可以使用这种方式
+:::
+
+---
+
+## 仓库配置
+
+### 新版命令
+
+* `git config list` - 查看所有配置信息
+    * `--show-scope` - 显示配置所属哪个作用域 `system`：系统 `global`：用户 `local`：本仓库
+    * `--show-origin` - 显示配置文件位置
+    * `--local/--global/--system` - 查看某个作用域的配置
+* `git config get <config_name>` - 查看某个配置，其他选项和上面类似
+* `git config set <config_name> <value>` - 设置配置
+* `git config unset <config_name> <value>` - 删除配置
+* `git config remove-section <section_name>` - 删除配置，删除一整项配置
+* `git config edit --local/--global/--system` - 打开本地仓库级、用户级、系统级配置文件
+
+### 旧版命令
+
+* `git config --list` - 查看所有配置信息
+* `git config --get <config_name>` - 查看某个配置，其他选项和上面类似
+* `git config --set <config_name> <value>` - 设置配置
+* `git config --unset <config_name> <value>` - 删除配置
+* `git config --remove-section <section_name>` - 删除配置，删除一整项配置
+* `git config --edit --local/--global/--system` - 打开本地仓库级、用户级、系统级配置文件
+
+### 常用配置
+
+| 配置 | 说明 |
+| -------------- | --------------- |
+| `user.name` | 用户名 |
+| `user.email` | 用户邮箱 |
+| `init.defaultBranch` | 修改 `git init` 创建分支时**主分支**的名称 |
+
+#### 本地永久保存 Token
+
+1. `git config set --global credential.helper store`
+2. 下次拉取或推送时提示需要输入用户名和密码，用户名输入**账户名称**，密码就输入 Token
+    * 凭证保存在 `~/.git-credentials`
+
+---
+
+## 标签（tags）
+
+* `git tag` - 查看所有 tag
+* `git tag -a '<tag_name>' -m '<message>'` - 给**本地仓库**内最新的一次提交打 tag
+* `git tag -a '<tag_name>' -m '<message>' <commit_hash>` - 给**本地仓库**内指定的提交打 tag
+* `git show <tab_name>` - 查看指定 tag 的详细信息
+* `git tag -d <tag_name>` - 删除本地的标签
+* `git push origin <tab_name>` - 将指定标签推送到远程仓库
+* `git push origin --tags` - 将远程仓库没用的标签推送到远程仓库
+* `git push origin --delete <tag_name>` - 删除远程仓库上指定的标签，默认删除本地的标签不会删除远程的标签，需要单独执行这条命令删除
+* `git checkout -b <branch_name> <tab_name>` - 使用指定 tag 的提交创建一个分支。方便查看某个 tag 的时仓库的详细信息
+
+---
+
+## git checkout 命令
+
+如果需要使用切换分支功能，建议使用 [git switch](#gitswitch) 命令。如果要恢复文件，建议使用 [git restore](#恢复文件) 命令
+
+当合并分支出现冲突时，使用以下命令应用哪边的内容
+
+```bash
+# 应用当前分支的内容
+git checkout --ours <filename>
+
+# 应用合并分支的内容
+git checkout --theirs <filename>
+```
 
 ---
 
@@ -432,100 +847,16 @@ git stash pop
 ```
 
 ---
-
-### 修正上次提交
-
-将当前工作区内已经暂存的文件直接加入到上次的提交内
-
-* `git commit -amend` - 打开编辑器并修改提交信息
-* `git commit --amend --no-edit -m 'new commmit message'` - 直接修改提交信息
-
-:::warning
-这个操作会修改提交信息的 hash 值，如果 commit 已经提交到远程仓库，谨慎使用
-:::
-
-## 配置（config）
-
-* `git config --list` - 查看所有配置信息
-* `git config --list --local/--global` - 查看指定作用域配置信息，`local`：仓库内，`global`：当前用户，`system`：全局
-* `git config --list --show-origin` - 查看所有配置信息，并显示配置来源
-
-#### git checkout
-
-```bash
-# 切换分支
-git checkout 分支名
-
-# 切换分支，没有则新建一个
-git checkout -b 分支名
-
-# 恢复删除的文件
-git checkout -- 文件名
-```
-
-## 日志（log）
-
-* `git log` - 查看提交信息
-* `git log -p -1` - 查看上一次提交的详细信息 `-p`：显示提交内所有文件对比的详细信息，`-1`：最近的一次提交
-* `git log -1 --stat` - 查看上一次提交的内容的简短信息，只显示文件新增或修改的统计信息
-* `git log --graph` - 查看提交信息，并以字符图像方式显示分支、合并信息
-* `git log --oneline` - 每个提交只显示一行简单信息
-* `git log --oneline --parents` - 显示提交的从哪次提交过来，方便查看分支合并信息
-* `git log -S <string>` - 在所有提交内搜索指定字符串
-
-
-## 忽略文件
-
-在当前仓库根目录添加 `.gitignore` 文件
-
-```bash
-# 忽略项目内所有名称包含 aaa 的文件
-aaa
-
-# 忽略所有的 html 文件
-*.html
-
-# 忽略 .gitignore 文件根目录下 bbb 目录内的所有文件
-/bbb/*
-
-# 在上面忽略条件的情况下排除 public.txt 文件，也就是不忽略 /bbb/public.txt 文件
-!/bbb/public.txt
-
-# 忽略 /ccc 目录及其子目录下的所有 class 文件
-/ccc/**/*.class
-```
-
-:::info[不使用 `.gitignore` 忽略文件]
-将上面的条件添加到 `.git\info\exclude` 文件内
-
-假设你有一个公共的仓库，需要在这个仓库内放一些不能提交到的文件，也不想放在 `.gitignore` 里面忽略，可以使用这种方式
-:::
-
-## 分支冲突
-
-### revert
-
-## 操作日志（reflog）
-
 ## 压缩（squash）
 
-## 标签（tags）
-
-* `git tag` - 查看所有 tag
-* `git tag -a '<tag_name>' -m '<message>'` - 给**本地仓库**内最新的一次提交打 tag
-* `git tag -a '<tag_name>' -m '<message>' <commit_hash>` - 给**本地仓库**内指定的提交打 tag
-* `git show <tab_name>` - 查看指定 tag 的详细信息
-* `git tag -d <tag_name>` - 删除本地的标签
-* `git push origin <tab_name>` - 将指定标签推送到远程仓库
-* `git push origin --tags` - 将远程仓库没用的标签推送到远程仓库
-* `git push origin --delete <tag_name>` - 删除远程仓库上指定的标签，默认删除本地的标签不会删除远程的标签，需要单独执行这条命令删除
-* `git checkout -b <branch_name> <tab_name>` - 使用指定 tag 的提交创建一个分支。方便查看某个 tag 的时仓库的详细信息
 
 ## Cherry Pick
 
 ## Bisect
 
 ## 子模块
+
+* 参考：[官方文档](https://git-scm.com/book/zh/v2/Git-%e5%b7%a5%e5%85%b7-%e5%ad%90%e6%a8%a1%e5%9d%97)
 
 ```bash
 # 初始化子模块
@@ -549,27 +880,7 @@ git submodule deinit -f --all
 
 ---
 
-## Git 命令表
-
-| 命令 | 说明 |
-| -------------- | --------------- |
-| `git status` | 查看**工作区**和**暂存区**状态信息 |
-| `git status -s` | 查看**工作区**和**暂存区**简短的状态信息 |
-| `git commit` | 提交**暂存区**内的所有文件。这个命令会打开一个编辑器用于编写提交信息（使用 `git config --global core.editor` 配置） |
-| `git commit -m '<message>'` | 提交**暂存区**内的所有文件，直接指定提交信息 |
-| `git rm -f <file>` | 将**暂存区**和**工作区**的指定文件一起删除。`-f`：强制移除 |
-| `git rm --cached <file>` | 将已经存放到**暂存区**的文件移除，不删除**工作区**内的这个文件 |
-| `git mv <path_file> <to_path_file>` | 将**暂存区**内的文件移动或重命名 |
-| `git diff` | 查看**工作区**内的这个文件和这个文件上一次提交的版本进行对比 |
-| `git diff --staged/--cached` | 查看**暂存区**内的这个文件和这个文件上一次提交的版本进行对比 |
-| `git commit --amend` | 修正提交，提交后发现有个文件忘改了，可以修改后使用这个命令直接怼进上一次提交里面，这个命令也会打开编辑器编写提交信息 |
-| `git commit --amend --no-edit` | 修正提交，不指定提交信息 |
-| `git restore <file>` | 将**工作区**内的指定文件恢复成上次提交的样子，撤消对文件的修改 |
-| `git restore --staged <file>` | 将**暂存区**内的指定文件恢复成上次提交的样子 |
-
----
-
-## git操作示例
+## git 操作示例
 
 ### 将历史某一次提交删除
 
@@ -587,9 +898,9 @@ git submodule deinit -f --all
 
 ---
 
-## commit规范参考
+## commit 规范参考
 
-### commit组成部分
+### commit 组成部分
 
 * header 是必要的
 * body 也是必要的，除了类型为 docs 之外，body 的内容必须大于 20 个字符
@@ -611,7 +922,7 @@ fix: 简要说明
 关闭某个pr
 ```
 
-### commit的header类型
+### commit 的 header 类型
 
 | 类型 | 描述 |
 | --- | :-- |
@@ -624,42 +935,13 @@ fix: 简要说明
 | refactor | 既不修复错误也不添加功能的代码更改 |
 | test | 添加缺失测试或更正现有测试 |
 
-
 ---
 
-## 常见问题
+## GitHub
 
-### 设置git日志输出的编码格式
+### GitHub Actions
 
-```bash
-git config --global core.quotepath false          # 显示 status 编码 
-git config --global gui.encoding utf-8            # 图形界面编码 
-git config --global i18n.commit.encoding utf-8    # 处理提交信息编码 
-git config --global i18n.logoutputencoding utf-8  # 输出 log 编码 
-```
-
-### 删除切换分支时后之前分支的空文件夹
-
-* 使用`git clean -df`删除
-
-### 解除SSL验证
-
-* `git config --global http.sslVerify false`
-
-### 设置项目push时buffer的大小
-
-* 本地仓库配置：`git config http.postBuffer 1024000000`
-* 全局配置：`git config –global http.postBuffer 1024000000`
-
-### 本地永久保存Token
-
-* 配置凭证保存方式：`git config --global credential.helper store`
-* 下次拉取或推送时提示需要输入用户名和密码
-    * 用户名输入账户名称
-    * 密码就输入Token
-    * 凭证保存在`~/.git-credentials`
-
-### GitHub Actions自动发布
+#### 自动构建项目
 
 1. 当前仓库下创建`.github/workflows/release.yml`文件
 
