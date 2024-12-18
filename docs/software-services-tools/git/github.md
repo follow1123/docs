@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 7
 ---
 
 # GitHub
@@ -8,7 +8,7 @@ sidebar_position: 6
 
 ### 自动构建项目
 
-1. 当前仓库下创建`.github/workflows/release.yml`文件
+1. 当前仓库下创建 `.github/workflows/release.yml` 文件
 
 ```yaml
 name: Build Release
@@ -34,12 +34,11 @@ jobs:
           files: <package-name> # 软件包名
 ```
 
-2. 打开仓库，进入`Settings`页面
-3. 找到`Actions`点击下面的`General`进入
-4. 找到`Workflow permissions`部分
-5. 选择`Read and write permissions`，勾选`Allow GitHub Actions to create and approve pull requests`
+2. 打开仓库，进入 `Settings` 页面
+3. 找到 `Actions` 点击下面的 `General` 进入
+4. 找到 `Workflow permissions` 部分
+5. 选择 `Read and write permissions`，勾选 `Allow GitHub Actions to create and approve pull requests`
 
 ## 使用 token 推送到 github
 
 * `git remote add origin https://oauth2:[token]@github.com/<user_name>/<repo_name>.git`
-

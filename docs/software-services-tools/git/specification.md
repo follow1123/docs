@@ -1,5 +1,5 @@
 ---
-sidebar_position: 7
+sidebar_position: 8
 ---
 
 # 规范
@@ -20,9 +20,7 @@ sidebar_position: 7
 <footer>
 ```
 
-* 示例
-
-```txt
+```txt title="示例"
 fix: 简要说明
 详细说明
 关闭某个pr
@@ -32,11 +30,11 @@ fix: 简要说明
 
 | 类型 | 描述 |
 | --- | :-- |
-| build	| 影响构建系统或外部依赖的更改 (示例范围：gulp, broccoli, npm) |
-| ci | 对CI配置文件和脚本的更改 (示例：CircleCi, SauceLabs, GitHub Workflow) |
-| docs | 仅文档更改 |
-| feat | 新功能 |
-| fix | 错误修复 |
-| perf | 改善性能的代码更改 |
-| refactor | 既不修复错误也不添加功能的代码更改 |
-| test | 添加缺失测试或更正现有测试 |
+| **build**    | 影响构建系统或外部依赖的更改 (示例范围：gulp, broccoli, npm) |
+| **ci** | 对CI配置文件和脚本的更改 (示例：CircleCi, SauceLabs, GitHub Workflow) |
+| **docs** | 仅文档更改 |
+| **feat** | 新功能 |
+| **fix** | 错误修复 |
+| **perf** | 改善性能的代码更改 |
+| **refactor** | 既不修复错误也不添加功能的代码更改 |
+| **test** | 添加缺失测试或更正现有测试 |

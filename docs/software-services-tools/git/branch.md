@@ -510,8 +510,8 @@ git remote remove <remote_name>
 #### 准备仓库
 
 ```bash
-mkdir example-fetch-remote
-cd example-fetch-remote
+mkdir example-remote
+cd example-remote
 
 git init
 echo 'apple' >> fruits.md
@@ -521,18 +521,18 @@ git add . && git commit -m 'B: add banana'
 
 cd ..
 # 使用本地分支模拟远程分支
-git clone ./example-fetch-remote example-fetch-local
-cd example-fetch-local
+git clone ./example-remote example-local
+cd example-local
 echo 'orange' >> fruits.md
 git add . && git commit -m 'C: add orange'
 
-cd ../example-fetch-remote
+cd ../example-remote
 echo 'cabbage' >> vegetables.md
 git add . && git commit -m 'X: add cabbage'
 echo 'tomato' >> vegetables.md
 git add . && git commit -m 'Y: add tomato'
 
-cd ../example-fetch-local
+cd ../example-local
 ```
 
 #### 使用 `git fetch` 命令将 <u>远程仓库</u> 的提交更新回 <u>本地仓库</u>
@@ -552,69 +552,183 @@ git log --all --oneline --graph
 `git fetch` 只是将远程的分支的提交拉取到本地，对本地分支没有任何影响
 :::
 
+---
+
 ### 拉取分支
 
-![拉取分支](/img/git/git-pull-merge-remote.drawio.png)
+#### 拉取分支并 merge
 
-准备仓库
+![拉取分支并 merge](/img/git/git-pull-merge-remote.drawio.png)
+
+##### 准备仓库
+
+测试仓库和[上面](#准备仓库-6)一样
+
+##### 拉取并 merge
 
 ```bash
-mkdir example-remote
-cd example-remote
-git init --bare
+# 拉取分支默认进行 merge 操作
+git pull
 
-cd ../
-# 这里使用本地的另一个仓库模拟远程仓库
-git clone ./example-remote example-local1
-cd example-local1
-echo 'apple' >> fruits.md
-git add . && git commit -m 'A: add apple'
-git push
-
-cd ../
-git clone ./example-remote example-local2
-cd example-local2
-echo 'banana' >> fruits.md
-git add . && git commit -m 'B: add banana'
-
-cd ../example-local1
-echo 'orange' >> fruits.md
-git add . && git commit -m 'B: add orange'
-git push
+# 相当于以下操作
+git fetch
+git merge origin/main
 ```
 
-拉取分支和[分支合并](#分支合并merge)类似，只不过要合并的分支在远程仓库
+---
 
-使用 `git pull` 命令拉取远程分支的提交并合并，默认时使用 `merge` 策略合并，使用 `-r` 选项进行 `rebase` 策略合并
+#### 拉取分支并 rebase
+
+![拉取分支并 rebase](/img/git/git-pull-rebase-remote.drawio.png)
+
+##### 准备仓库
+
+测试仓库和[上面](#准备仓库-6)一样
+
+##### 拉取并 rebase
 
 ```bash
-# 切换到第二个仓库
-cd ../example-local2
-
-# 拉取分支
-git pull
 # 或者使用-r选项进行rebase合并
 git pull -r
+
+# 相当于以下操作
+git fetch
+git rebase origin/main
 ```
+
+:::info
+`git pull` 默认执行 merge 操作，配置 `pull.rebase` 默认执行 `rebase` 操作
+
+```bash
+git config set --local pull.rebase true
+```
+:::
+
+:::info
+如果遇到合并冲突，参考[合并冲突处理](#合并冲突处理)和[变基冲突处理](#变基冲突处理)
+:::
+
+---
 
 ### 推送分支
 
-`git push` 默认将当前分支的提交推送到远程的指定分支，需要使用 `git branch -u <remote_name>/<branch_name> <local_branch_name>` 指定上游分支
+![推送分支](/img/git/git-push-remote.drawio.png)
 
-如果没有设置上游分支，使用 `git push <remote_name>/<branch_name> <local_branch_name>` 将本地的指定分支提交到远程仓库的指定分支
+#### 准备仓库
 
+```bash
+mkdir example-push-remote
+cd example-push-remote
 
-## 压缩（squash）
+git init
+git config set --local receive.denyCurrentBranch ignore
+echo 'apple' >> fruits.md
+git add . && git commit -m 'A: add apple'
+echo 'banana' >> fruits.md
+git add . && git commit -m 'B: add banana'
+
+cd ..
+# 使用本地分支模拟远程分支
+git clone ./example-push-remote example-push-local
+cd example-push-local
+echo 'orange' >> fruits.md
+git add . && git commit -m 'C: add orange'
+```
+
+#### 推送
+
+```bash
+# 推送本地仓库最新提交到远程仓库
+git push
+```
+
+:::info
+如果**本地分支**未绑定**远程分支**，可以使用 `git push <remote_name>/<branch_name> <local_branch_name>` 将**当前分支**的所有最新提交推送到指定**远程仓库**的**指定分支**内
+
+还可以使用 `git branch -u <remote_name>/<branch_name> <local_branch_name>` 绑定一个**远程仓库**的分支到**当前分支**，直接推送
+:::
+
+---
 
 ## Cherry Pick
 
-### 将历史某一次提交删除
+### 准备仓库
 
-* 假如对分支A进行操作，需要删除提交m
-* 先将基于当前分支创建一个新分支B
-* 将分支A重置到m提交前一次提交`git reset --hard`
-* 再将分支B内m提交后所有提交摘取到分支A上
-  * `git cherry-pick 提交id`摘取一个提交
-  * `git cherry-pick 提交idA..提交idB`摘取从A到B所有提交，不包括提交A
-  * `git cherry-pick 提交idA^..提交idB`摘取从A到B所有提交，包括提交A
+```bash
+mkdir example-cherry-pick
+cd example-cherry-pick
 
+git init
+echo 'cabbage' >> vegetables.md
+git add . && git commit -m 'A: add cabbage'
+
+git switch -c b1
+echo 'apple' >> fruits.md
+git add . && git commit -m 'B: add apple'
+echo 'banana' >> fruits.md
+git add . && git commit -m 'C: add banana'
+echo 'orange' >> fruits.md
+git add . && git commit -m 'D: add orange'
+echo 'watermelon' >> fruits.md
+git add . && git commit -m 'E: add watermelon'
+
+git switch main
+```
+
+---
+
+### 将 <u>其他分支</u> 最新的一次提交 pick 到 <u>主分支</u>
+
+![pick 最新提交](/img/git/git-cherry-pick-latest.drawio.png)
+
+```bash
+git cherry-pick b1
+```
+
+---
+
+### 将 <u>其他分支</u> 某一次提交 pick 到 <u>主分支</u>
+
+![pick 指定提交](/img/git/git-cherry-pick-specified-commit.drawio.png)
+
+```bash
+# 替换 commit hash 并 pick
+git cherry-pick <commit_hash>
+```
+
+:::info[pick <u>公共祖先</u> 后面的一次提交的]
+```bash
+# 查看 b1 分支从 公共祖先 开始的所有分支，第一个就是
+git log $(git merge-base main b1)..b1 --pretty=oneline --reverse
+```
+:::
+
+---
+
+### 将 <u>其他分支</u> 从 <u>公共祖先</u> 开始，所有的提交 pick 到 <u>主分支</u>
+
+![pick 所有提交](/img/git/git-cherry-pick-all-commit.drawio.png)
+
+```bash
+git cherry-pick ..b1
+```
+
+:::note
+这个操作和 fast-forward merge 的区别就是会创建新的提交
+:::
+
+---
+
+### 将 <u>其他分支</u> 内 <u>某个范围</u> 的提交 pick 到 <u>主分支</u>
+
+![pick 某个范围的提交](/img/git/git-cherry-range-commit-exclude-start.drawio.png)
+
+```bash
+git cherry-pick <commit_hash>..<commit_hash>
+```
+
+![pick 某个范围的提交](/img/git/git-cherry-range-commit-include-start.drawio.png)
+
+```bash
+git cherry-pick <commit_hash>^..<commit_hash>
+```

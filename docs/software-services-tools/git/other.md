@@ -109,6 +109,7 @@ git config --edit --local/--global/--system
 | `user.name` | 用户名 |
 | `user.email` | 用户邮箱 |
 | `init.defaultBranch` | 修改 `git init` 创建分支时**主分支**的名称 |
+| `pull.rebase` | 修改 `git pull` 命令默认操作，默认进行 merge 操作，改为进行 rebase 操作 |
 
 #### 本地永久保存 Token
 
