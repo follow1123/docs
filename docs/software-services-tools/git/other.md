@@ -198,6 +198,10 @@ git stash pop
 
 ## Bisect
 
+参考：[官方文档](https://git-scm.com/book/zh/v2/Git-%e5%b7%a5%e5%85%b7-%e4%bd%bf%e7%94%a8-Git-%e8%b0%83%e8%af%95)
+
+---
+
 ## 子模块（submodule）
 
 参考：[官方文档](https://git-scm.com/book/zh/v2/Git-%e5%b7%a5%e5%85%b7-%e5%ad%90%e6%a8%a1%e5%9d%97)
