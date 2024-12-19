@@ -89,7 +89,7 @@ git config --list
 git config --get <config_name>
 
 # 设置配置
-git config --set <config_name> <value>
+git config --add <config_name> <value>
 
 # 删除配置
 git config --unset <config_name> <value>
