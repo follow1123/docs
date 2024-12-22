@@ -196,6 +196,24 @@ git stash pop
 
 ---
 
+## 还原（revert）
+
+```bash
+# 还原当前分支最新一次提交
+git revert HEAD
+
+# 还原上次提交
+git revert HEAD~
+
+# 还原指定提交
+git revert <commit_hash>
+
+# 还原某个范围的提交
+git revert <commit_hash>..<commit_hash>
+```
+
+---
+
 ## Bisect
 
 参考：[官方文档](https://git-scm.com/book/zh/v2/Git-%e5%b7%a5%e5%85%b7-%e4%bd%bf%e7%94%a8-Git-%e8%b0%83%e8%af%95)
