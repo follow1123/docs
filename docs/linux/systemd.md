@@ -4,74 +4,105 @@ sidebar_position: 5
 
 # Systemd
 
-> 管理linux进程
+linux 服务管理
 
-## 常用命令
+## 服务
 
-### 服务相关
+服务启停
 
-* `systemctl status 服务名` 查看服务运行状态
-    * `start/stop/restart/reload` 服务启停相关
+```bash
+#   start   启动
+#   stop    停止
+#   restart 重启
+#   reload  重新加载
+#   status  查看服务状态
+systemctl start <unit_name>`
+```
 
-* `systemctl show 服务名` 显示服务的参数
+服务自启动
 
-* `systemctl daemon-reload` 重新加载服务配置文件(在修改服务配置文件后执行)
+```bash
+#   enable      启用
+#   disable     禁用
+#   is-enabled  是否启用
+# 启用或禁用后需要执行 systemctl daemon-reload 重新加载配置才生效
+systemctl enable <unit_name>
+```
 
-* `systemctl list-unit-files` 查看所有服务
+服务列表
 
-* `systemctl list-dependencies 服务名` 查看服务的依赖关系
+```bash
+#   list-units          列出已经启动的单元
+#   list-dependencies   列出单元依赖
+#   list-unit-files     列出所有单元自启动配置
+#   list-timers         列出所有定时任务
+systemctl list-unit-files
+```
 
-* `systemctl cat 服务名` 查看服务名的配置文件
+其他
 
-* `systemctl edit 服务名` 编辑服务名的配置文件
+```bash
+#   help 显示帮助信息
+#   show 显示配置项
+#   cat  查看单元配置文件
+#   edit 编辑单元配置文件
+systemctl show
+```
 
+## 日志
 
-### 性能分析相关
+```bash
+# 查看某个服务的日志
+journalctl -u <unit_name>
 
-> systemd-analyze
+# 当前系统启动日志
+#
+# 上次系统启动日志 -2 就是上上次
+# journalctl -b -1
+journalctl -b
+```
 
-* `systemd-analyze` 查看启动耗时
+## 启动分析
 
-* `systemd-analyze blame` 查看每个服务的启动耗时
+```bash
+# 服务启动分析
+systemd-analyze
 
-* `systemd-analyze critical-chain 服务名` 查看服务的启动流程
+# 查看每个服务的启动耗时
+systemd-analyze blame
 
-### 系统管理相关
+# 查看服务的启动流程
+systemd-analyze critical-chain <unit_name>
+```
 
-* `systemctl reboot` 重启
+## 电源管理
 
-* `systemctl poweroff` 关机
+```bash
+#   reboot     重启
+#   poweroff   关机
+#   suspend    休眠（数据保存到内存）
+#   hibernate  冬眠（数据保存到硬盘）
+systemctl reboot
+```
 
-* `systemctl suspend` 休眠(数据保存到内存)
+## 其他
 
-* `systemctl hibernate` 冬眠(数据保存到硬盘)
+* `hostnamectl` - 主机信息
+* `localectl` - 本地化
+* `timedatectl` - 时区
+* `loginctl` - 用户管理
 
-### 日志相关
+## 配置
 
-> journalctl 
+### Unit 配置路径
 
-* `journalctl -u 服务名称` 查看某个服务的日志
+> 优先级从高到低
 
+1. `/etc/systemd/system` - 系统级别配置文件
+2. `/run/systemd/system`
+3. `/lib/systemd/system` - 包管理工具下载的服务配置文件
 
-### 主机信息相关
-
-> hostnamectl
-
-### 本地化相关
-
-> localectl
-
-### 时区相关
-
-> timedatectl
-
-### 登录相关
-
-> loginctl
-
-#### 登录管理器配置文件
-
-* 默认路径
+### 登录管理器配置路径
 
 ```bash
 /etc/systemd/logind.conf
@@ -79,26 +110,13 @@ sidebar_position: 5
 /run/systemd/logind.conf.d/*.conf
 /usr/lib/systemd/logind.conf.d/*.conf
 ```
-## 常用配置项说明
 
-> 参考[archwiki](https://man.archlinux.org/man/logind.conf.5.en)
+部分配置项说明，参考[archwiki](https://man.archlinux.org/man/logind.conf.5.en)
 
-
-* `HandlePowerKey` 按下电源键操作
-
-* `IdleAction` 电脑空闲时的操作
-
-* `IdleActionSec` 电脑空闲多少时间后执行空闲操作
-
-* `HandleLidSwitch` 笔记本合盖操作
-
-### Unit配置保存路径
-
-* 优先级从高到低
-
-1. `/etc/systemd/system` 系统级别配置文件
-2. `/run/systemd/system`
-3. `/lib/systemd/system` 包管理工具下载的服务配置文件
+* `HandlePowerKey` - 按下电源键操作
+* `IdleAction` - 电脑空闲时的操作
+* `IdleActionSec` - 电脑空闲多少时间后执行空闲操作
+* `HandleLidSwitch` - 笔记本合盖操作
 
 ## 常见问题
 
