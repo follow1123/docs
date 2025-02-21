@@ -148,38 +148,6 @@ const config = {
       },
       footer: {
         style: 'dark',
-        links: [
-          {
-            title: 'Docs',
-            items: [
-              {
-                label: 'Docs',
-                to: '/',
-              },
-              {
-                label: 'Linux',
-                to: '/linux/',
-              },
-              {
-                label: 'Git',
-                to: '/git/',
-              },
-              {
-                label: 'Java',
-                to: '/java/',
-              },
-            ],
-          },
-          {
-            title: 'More',
-            items: [
-              {
-                label: 'GitHub Repository',
-                href: 'https://github.com/follow1123/docs',
-              },
-            ],
-          },
-        ],
         copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
       },
       prism: {
