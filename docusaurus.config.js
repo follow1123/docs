@@ -71,6 +71,16 @@ const config = {
       '@docusaurus/plugin-content-docs',
       /** @type {import('@docusaurus/plugin-content-docs').Options} */
       ({
+        id: 'git',
+        path: 'git',
+        routeBasePath: '/git',
+        sidebarPath: './sidebarsGit.js',
+      })
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      /** @type {import('@docusaurus/plugin-content-docs').Options} */
+      ({
         id: 'java',
         path: 'java',
         routeBasePath: '/java',
@@ -117,6 +127,12 @@ const config = {
             activeBaseRegex: `/linux/`,
           },
           {
+            to: '/git/',
+            position: 'left',
+            label: 'Git',
+            activeBaseRegex: `/git/`,
+          },
+          {
             to: '/java/',
             position: 'left',
             label: 'Java',
@@ -143,6 +159,10 @@ const config = {
               {
                 label: 'Linux',
                 to: '/linux/',
+              },
+              {
+                label: 'Git',
+                to: '/git/',
               },
               {
                 label: 'Java',
