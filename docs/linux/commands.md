@@ -1096,7 +1096,7 @@ pkill -P <ppid>
 
 ### systemctl
 
-* 参考[systemctl](./systemd#服务相关)
+* 参考[systemctl](./systemd#服务)
 
 ### service
 
@@ -1784,7 +1784,7 @@ lastlog -t 10
 
 ### journalctl
 
-* 参考[systemctl](./systemd#日志相关)
+* 参考[systemctl](./systemd#日志)
 
 ---
 
