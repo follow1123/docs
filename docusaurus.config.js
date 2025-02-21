@@ -61,6 +61,16 @@ const config = {
       '@docusaurus/plugin-content-docs',
       /** @type {import('@docusaurus/plugin-content-docs').Options} */
       ({
+        id: 'linux',
+        path: 'linux',
+        routeBasePath: '/linux',
+        sidebarPath: './sidebarsLinux.js',
+      })
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      /** @type {import('@docusaurus/plugin-content-docs').Options} */
+      ({
         id: 'java',
         path: 'java',
         routeBasePath: '/java',
@@ -101,6 +111,12 @@ const config = {
             label: 'Docs',
           },
           {
+            to: '/linux/',
+            position: 'left',
+            label: 'Linux',
+            activeBaseRegex: `/linux/`,
+          },
+          {
             to: '/java/',
             position: 'left',
             label: 'Java',
@@ -123,6 +139,10 @@ const config = {
               {
                 label: 'Docs',
                 to: '/',
+              },
+              {
+                label: 'Linux',
+                to: '/linux/',
               },
               {
                 label: 'Java',
