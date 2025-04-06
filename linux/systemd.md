@@ -62,6 +62,108 @@ journalctl -u <unit_name>
 journalctl -b
 ```
 
+## 网络管理
+
+### systemd-networkd
+
+systemd 集成的网络管理工具
+
+#### 基础配置
+
+配置文件开头的数字越低，启动的优先级就越高
+
+```ini title="/etc/systemd/network/10-wireless-dhcp.network"
+[Match]
+Name=wlp*
+
+[Network]
+DHCP=yes
+```
+
+如果配置了 DHCP 又需要使用 systemd-resolved 本地的 DNS 解析服务，可以添加以下配置
+
+```ini
+[Match]
+Name=wlp*
+
+[Network]
+DHCP=yes
+# 本地的 systemd-resolved 默认监听 127.0.0.53 作为 DNS 解析服务
+DNS=127.0.0.53
+
+[DHCPv4]
+# 不使用从 DHCP 获取的 DNS
+UseDNS=false
+```
+
+#### 常用命令
+
+```bash
+# 列出所有的网络接口
+networkctl
+
+# 查看某个接口的详细信息
+networkctl status <device>
+```
+
+### systemd-resolved
+
+可能需要单独安装 `sudo apt install systemd-resolved`
+
+systemd 集成的DNS解析工具，这个服务可以单独使用，和 systemd-networkd 互相不依赖
+
+#### 基础配置
+
+```ini title="/etc/systemd/resolved.conf"
+[Resolve]
+# DNS 服务，多个使用空格分割
+DNS=114.114.114.114 223.5.5.5
+# 开启缓存
+Cache=yes
+```
+
+#### 常用命令
+
+```bash
+# 列出所有 DNS 配置
+resolvectl
+
+# 查询网址 ip 和 nslookup 一样
+resolvectl query <url>
+
+# 清空 DNS 缓存
+resolvectl flush-caches
+
+# 监控 DNS 访问操作
+resolvectl monitor
+
+# 统计 DNS 的解析信息
+resolvectl statistics
+```
+
+### 网络管理工具迁移
+
+#### 从 ipupdown（Debian默认网络管理工具）迁移至 systemd-networkd
+
+```bash
+# 移动默认配置文件，防止相关依赖服务根据配置自启动
+sudo mv /etc/network/interfaces /etc/network/interfaces.save
+sudo mv /etc/network/interfaces.d /etc/network/interfaces.d.save
+
+# 禁用相关服务
+sudo systemctl disable --now networking.service
+# WiFi 相关
+sudo systemctl disable --now wpa_supplicant.service
+
+# 启用systemd-nowworkd 服务
+sudo systemctl enable --now systemd-networkd
+# 如果需要本地 DNS 解析服务可以启动 systemd-resolved 服务
+sudo systemctl enable --now systemd-resolved
+
+# WiFi 相关
+sudo systemctl disable --now wpa_supplicant@<interface>.service
+```
+
 ## 启动分析
 
 ```bash

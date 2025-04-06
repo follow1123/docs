@@ -250,6 +250,59 @@ du -hac --max-depth=1 /home
 
 ## 网络配置
 
+### ifupdown
+
+Debian 系列系统下面默认的网络管理工具
+
+配置文件：`/etc/network/interfaces`
+
+TODO
+
+### NetworkManager
+
+图像界面管理网络工具
+
+TODO
+
+### systemd
+
+参考 [systemd-networkd](./systemd#网络管理)
+
+### WiFi 管理
+
+#### wpa supplicant
+
+安装：`sudo apt install wpasupplicant`
+
+##### 基础配置
+
+查看 wpa 相关服务：`ls /lib/systemd/system | grep wpa`
+
+一般使用 `wpa_supplicant@.service` 这个服务指定特定接口监听
+
+配置文件
+
+这里在创建好这个配置文件后也可以使用 `wpa_passphrase "WiFi名" 密码 >> /etc/wpa_supplicant/wpa_supplicant-<interface>.conf` 命令添加 WiFi 信息到文件内
+
+或者使用 `wpa_cli`、`wpa_gui(需要安装)` 等工具管理
+
+
+```conf title="/etc/wpa_supplicant/wpa_supplicant-<interface>.conf"
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+    ssid="WiFi名"
+    psk=密码
+}
+```
+
+
+启动
+
+```bash
+sudo systemctl enable --now wpa_supplicant@<interface>.service
+```
+
 ### Linux 网络环境配置
 
 #### 自动获取
