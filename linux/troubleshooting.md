@@ -127,31 +127,19 @@ systemctl reboot
 # 重启后查看是否修改成功
 uname -a
 ```
+
 ### 删除多余的内核文件
 
 ```bash
-
-# 查看当前系统内安装的内核文件
+# 查看正在使用的内核、
+uname -a
+# 或
 ls /lib/modules
 
 # 删除内核
-apt autoremove --purge linux-image-内核名字
+apt remove --purge linux-image-内核名字
+apt remove --purge linux-headers-内核名字
 ```
-
-### 删除旧的内核
-
-```bash
-
-# 查看正在使用的内核、
-uname -a
-
-# 查看内核列表
-dpkg --get-selections | grep linux
-
-# 找到多余的内核后删除
-dpkg --purge --force-remove-essential linux-image-版本号
-```
-
 
 ## 缺少ifconfig命令
 

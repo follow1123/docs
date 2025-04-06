@@ -512,6 +512,11 @@ deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main 
 * `apt list --upgradable` - 查看所有可以更新的软件
 * `apt list --installed` - 查看所有已经安装的软件
 * `apt remove <name>` - 删除软件
+* `apt remove --purge <name>` - 删除软件，连同配置文件一起删除
+* `apt purge <name>` - 删除软件，连同配置文件一起删除，和 `apt remove --purge` 一样
+* `apt autoremove` - 删除所有未被依赖的软件包
+* `apt autoremove --purge <name>` - 删除所有未被依赖的软件包，连同配置文件一起删除
+* `apt autopurge` - 删除所有未被依赖的软件包，连同配置文件一起删除，和 `apt autoremove --purge` 一样
 * `apt list <name> --all-versions` - 查看软件所有版本
 * `apt show <name>` - 查看软件详细信息
 * `apt-mark hold <package_name>` - 固定软件包版本
