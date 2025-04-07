@@ -68,7 +68,7 @@ sidebar_position: 1
 | [top](#top) | 实时显示进程信息和系统资源使用情况 |
 | [kill](#kill) | 终止指定的进程 |
 | [pkill](#pkill) | 根据名称终止进程 |
-| [systemctl](#systemctl) | systemd服务管理 |
+| [systemctl](./systemd#服务) | systemd服务管理 |
 | [service](#service) | SysVinit服务管理 |
 
 ## 网络
@@ -130,7 +130,7 @@ sidebar_position: 1
 | --- | --- |
 | [crontab](#crontab) | 设置定期执行的任务 |
 | [at](#at) | 一次性执行任务 |
-| [systemd-timer](#systemd-timer) | systemd配置定时任务 |
+| [systemd-timer](./systemd#定时任务) | systemd 定时任务 |
 
 ## 磁盘/设备
 
@@ -142,6 +142,7 @@ sidebar_position: 1
 | [blkid](#blkid) | 查看块设备的 UUID 和文件系统类型 |
 | [lspci](#lspci) | 列出所有 PCI 设备 |
 | [fdisk](#fdisk) | 管理磁盘分区 |
+| [parted](#parted) | 管理磁盘分区 |
 | [mkfs](#mkfs) | 创建文件系统 |
 | [mount](#mount) | 挂载文件系统 |
 | [umount](#umount) | 卸载文件系统 |
@@ -156,7 +157,8 @@ sidebar_position: 1
 | [last](#last) | 显示用户的登录历史 |
 | [lastb](#lastb) | 显示失败的登录尝试历史 |
 | [lastlog](#lastlog) | 显示系统中所有用户的最后登录信 |
-| [journalctl](#journalctl) | systemd日志管理 |
+| [faillog](#faillog) | 显示系统中所有用户的登陆失败次数 |
+| [journalctl](./systemd#日志) | systemd日志管理 |
 
 ## 其他
 
@@ -164,12 +166,17 @@ sidebar_position: 1
 | --- | --- |
 | [date](#date) | 显示时间 |
 | [cal](#cal) | 显示日历 |
+| [bc](#bc) | 计算机 |
 | which | 显示输入的命令所在目录 |
 | where | 显示输入的命令所在目录，目录是链接显示原始目录（这个命令好像只在的debian下才有） |
 | whereis | 显示输入的命令所在目录、帮助文件目录等 |
 | history | 历史命令 |
 | [tee](#tee) | 从标准输入读取数据，并将其输出到标准输出和一个或多个文件中 |
 | [xargs](#xargs) | 将标准输入的数据转换为命令行参数，并执行指定命令 |
+| [watch](#watch) | 在控制台持续监控指定的命令 |
+| [ssh](#ssh) | 加密通道远程连接服务器 |
+| [scp](#scp) | 加密通道远程传输文件到服务器 |
+| [curl](#curl) | 支持多种协议的网络传输工具 |
 
 ---
 
@@ -875,7 +882,7 @@ unzip -l a.zip
 
 #### 字段说明
 
-##### `ps -ef`
+##### `ps -ef` 标准格式
 
 * `UID` - 用户id
 * `PID` - 进程id
@@ -886,7 +893,7 @@ unzip -l a.zip
 * `TIME` - 该进程占用CPU累计的总时间
 * `CMD` - 启动进程的命令和参数
 
-##### `ps axu`
+##### `ps axu` BSD风格格式
 
 * `USER` - 用户id
 * `PID` - 进程id
@@ -916,7 +923,7 @@ unzip -l a.zip
 * `TIME` - 该进程占用CPU累计的总时间
 * `COMMAND` - 启动进程的命令和参数
 
-##### `ps axjf`
+##### `ps axjf` 树形结构格式
 
 * `PPID` - 父进程id
 * `PID` - 进程id
@@ -1094,10 +1101,6 @@ pkill <pname>
 # 指定父进程id发送终止信号到其下得所有子进程
 pkill -P <ppid>
 ```
-
-### systemctl
-
-* 参考[systemctl](./systemd#服务)
 
 ### service
 
@@ -1414,10 +1417,35 @@ chmod -d <userhome> <username>
 
 ```bash
 # 修改指定文件的所属用户
-chown <username> <filename>
+chown <username> <filepath>
 
 # 递归修改指定目录及其下面的所有文件和目录的所属用户和组
-chown -R <username>:<groupname> <dir>
+chown -R <username>:<groupname> <directory>
+
+# 字符方式
+#   u - user 用户
+#   g - group 组
+#   o - other 其他用户
+#   a - all 所有
+#
+# u+x - 用户添加执行权限 
+# g+w - 所属组的用户添加写权限
+# o-r - 其他用户移除读权限
+chmod u+x,g+w,o-r <filepath>
+
+# 所有用户添加读权限
+chmod a+w <filepath>
+
+# 数字方式
+#   r - 4
+#   w - 2
+#   x - 1
+#
+# 第一位表示所有者，第二位表示组，第三位表示其他
+#   6 - 用户拥有读、写权限
+#   6 - 所属组的用户拥有读、写权限
+#   4 - 其他用户只有读权限
+chmod 664 <filepath>
 ```
 
 ### chgrp
@@ -1607,10 +1635,6 @@ at now+1minutes -f <scriptfile>
 at tomorrow -f <scriptfile>
 ```
 
-### systemd-timer
-
-* TODO
-
 ---
 
 ### df
@@ -1669,7 +1693,23 @@ du -hc --max-depth=3 /home
 
 ### fdisk
 
-* TODO
+* `-l` - 显示系统内所有磁盘的所有分区信息
+
+```bash
+# 必须指定硬盘名称进行操作，不能使用 /dev/sda1 之类的分区文件
+# 进入 fdisk 的交互式命令环境
+# m  显示所有命令列表
+# p  显示磁盘分区
+# n  新增分区
+# d  删除分区
+# w  写入并退出
+sudo fdisk /dev/<device_name>
+
+```
+
+### parted
+
+和 fdisk 类似的命令行分区工具，进入交互式环境后输入 help 显示帮助信息
 
 ### mkfs
 
@@ -1682,6 +1722,8 @@ mkfs -t ext4 /dev/<devname>
 ```
 
 ### mount
+
+被挂载的目录必须要提前创建
 
 * `-t FSTYPE` - 指定文件系统类型（如 ext4、xfs、ntfs 等）
 * `-o OPTIONS` - 指定挂载选项，例如 ro（只读）、rw（读写）、noexec（禁止执行文件）
@@ -1790,9 +1832,19 @@ lastlog
 lastlog -t 10
 ```
 
-### journalctl
+### faillog
 
-* 参考[systemctl](./systemd#日志)
+```bash
+
+# 默认之显示有登陆错误过的用户的信息
+faillog
+
+# 显示所有信息
+faillog -a
+
+# 显示指定用户的信息
+faillog -u <username>
+```
 
 ---
 
@@ -1821,6 +1873,24 @@ cal
 cal 2024
 ```
 
+### bc
+
+计算器，支持浮点数
+
+```bash
+# 默认进入交互式命令默认，直接输入 1+1 表达式计算
+# 要显示小数使用 scale=2; 10/3
+# 输入 quit 命令或使用 ctrl+d 退出交互模式
+bc
+
+
+# 使用管道直接计算结果
+echo "1+1" | bc
+
+# 保留 2 为小数
+echo "scale=2; 10/3" | bc
+```
+
 ### tee
 
 * `-a` - 追加文件
@@ -1847,4 +1917,128 @@ ls *.txt | xargs cat
 
 # 依次输出1到4
 echo "1,2,3,4" | xargs -d "," -n 1 echo
+```
+
+### watch
+
+```bash
+# 监控 free 命令的输出，默认 2 秒执行一次
+watch free
+
+# 比较输出的不同字符
+watch -d free
+
+# 每秒执行一次
+watch -n 1 free
+```
+
+### ssh
+
+SSH 是一种网络协议，用于通过加密通道，安全地远程访问另一台计算机，被连接的服务器必须启动 ssh 服务
+
+客户端安装：`apt install openssh-client`
+服务端安装：`apt install openssh-server`
+
+```bash
+# 连接远程主机
+ssh <username>@<hostname/ip>
+
+# 指定远程服务运行 ssh 服务时的端口
+ssh -p <port> <username>@<hostname/ip>
+
+# 指定免登陆密钥文件路径
+ssh -i <path> <username>@<hostname/ip>
+```
+
+#### 免登陆配置
+
+```bash
+# 生成密钥对，默认保存在 ~/.ssh 目录下
+# id_rsa.pub 公钥
+# id_rsa 私钥
+ssh-keygen -t rsa -b 2048
+
+# 将公钥上传到远程服务器：
+ssh-copy-id <username>@<hostname/ip>
+```
+
+#### 服务器配置
+
+在管理多个远程服务的情况下，每次连接时都需要输出用户名和主机，使用配置文件简化连接时输入的命令
+
+配置文件在 `~/.ssh/config`
+
+```conf title="~/.ssh/config"
+Host myserver
+    HostName <ip>
+    User <username>
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
+```
+
+直接使用服务名连接
+
+```bash
+ssh myserver
+```
+
+### scp
+
+通过 SSH 协议安全地复制文件或目录的命令
+
+```bash
+# 将本机的指定文件复制到远程的指定目录下
+scp <local_path> <username>@<ip>:<remote_path>
+
+# 如果添加了远程服务的配置，则可以直接使用服务名简化操作
+scp <local_path> <server_name>:<remote_path>
+
+# 递归复制
+scp -r <dir_path> <server_name>:<remote_path>
+```
+
+### curl
+
+在命令行界面进行网络数据传输，支持许多协议，包括 HTTP、HTTPS、FTP、FTPS、SFTP、SMTP 等等
+
+#### HTTP
+
+```bash
+# 默认 GET 请求
+curl http://example.com
+
+# 使用 POST 请求，发送urlencoding 数据
+curl -X POST -d "username=john&password=1234" http://example.com/login
+
+# 发送文件
+curl -X POST -F "file=@path/to/file.txt" http://example.com/upload
+
+# 指定 Content-Type 发送 json 数据
+curl -X POST -H "Content-Type: application/json" -d '{"username": "john", "password": "1234"}' http://example.com/api/login
+
+# 查看响应头和响应体信息 -I 只查看响应头
+curl -i http://example.com
+
+# 显示详细信息，用于调试
+curl -v http://example.com
+
+# 跟随重定向
+curl -L http://example.com
+
+# 下载文件，指定文件名
+curl -o filename.txt http://example.com/a.txt
+
+# 下载文件，就使用连接的文件名
+curl -O http://example.com/a.txt
+```
+
+
+#### FTP
+
+```bash
+# 下载文件
+curl -O ftp://example.com/file.txt
+
+# 上传文件
+curl -T file.txt ftp://example.com/upload/
 ```

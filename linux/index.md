@@ -4,36 +4,101 @@ sidebar_position: 0
 
 # Linux 基础
 
-## 组管理和权限管理
+## 文件系统
 
-### 用户和组相关文件
+Linux 的文件系统采用 单一根目录（/），所有文件和目录都从根目录开始。所有挂载的磁盘和文件系统都会整合到这个层次结构中
 
-#### `/etc/passwd`
+### 文件层次
 
-**用户**配置文件，记录用户的各种信息
+```bash
+/       # C盘，系统文件一般存放在这里
+├─bin   # 可执行文件
+├─boot  # 启动引导文件，如内核文件
+├─dev   # 设备文件（如硬盘、终端、USB 设备等）
+├─etc   # 系统配置文件
+├─home  # 用户主目录
+├─lib   # 系统共享库
+├─media # 可移动媒体（如 CD-ROM、U 盘等）
+├─mnt   # 临时挂载目录
+├─opt   # 可选应用程序软件包
+├─proc  # 进程信息虚拟文件系统
+├─root  # 根用户的主目录
+├─run   # 运行时文件（如进程 PID 文件）
+├─sbin  # 系统管理命令文件
+├─srv   # 服务数据
+├─sys   # 系统信息文件（如硬件信息）
+├─tmp   # 临时文件
+├─usr   # 用户程序文件
+└─var   # 可变数据文件（如日志文件、数据库文件等）
+```
 
-`用户名` : `口令` : `用户标识号` : `组标识号` : `注释性描述` : `主目录` : `shell`
+:::note
+在 Debian 系列系统下 `/bin`，`/sbin`，`/lib` 这几个文件夹是连接到 `/usr` 目录下对应的文件夹
+:::
 
-#### `/etc/shadow`
+#### 软件数据存放路径
 
-**口令**的配置文件
+Linux 下有几个存放软件数据的位置，分别对应不同的情况
 
-`登录名` : `加密口令` : `最后一次修改时间` : `最小时间间隔` : `最大时间间隔` : `警告时间` : `不活动时间` : `失效时间` : `标志`
+* `/usr` - 存放包管理安装的软件数据，里面的软件一般给所有用户和管理员使用
+* `/usr/local` - 存放手动安装并可以给所有用户使用的软件
+* `~/.local` - 根据 [freedesktop](https://specifications.freedesktop.org/basedir-spec/latest/) 规范，存放当前用户自己安装的软件，软件只有当前用户可以使用
+* `/opt` - 第三方闭源软件安装路径
 
-#### `/etc/group`
+`/usr`，`/usr/local`，`~/.local` 这三个路径下的目录格式基本一样
 
-**组**配置文件，记录Linux包含的组的信息
+* `bin` - 存放可执行文件
+* `include` - 头文件
+* `lib` - 库文件
+* `share` - 软件数据
+    * `share/applications` - 软件对应的 `.desktop` 文件，桌面环境下使用
+    * `share/fonts` - 字体
+    * `share/icons` - 图标
+    * `share/man` - 帮助手册
+    * `share/doc` - 文档
+* `src` - 源码
 
-`组名` : `口令` : `组标识号` : `组内用户列表`
+#### 配置存放路径
 
-:::info
-在 linux 中的每个用户必须属于一个组，不能独立于组外
+* `/etc` - 系统级别软件配置文件存放路径，（包管理器、防火墙等）
+* `~/.config` - 用户级别软件存放路径，以前全放在用户家目录下，根据 [freedesktop](https://specifications.freedesktop.org/basedir-spec/latest/) 规范，调整为这个目录
 
-在 linux 中每个文件有**所有者**、**所在组**、**其它组**的概念
+---
+
+### 文件类型
+
+使用 `ls -l` 命令每行的第一个字符就表示文件的类型
+
+| 文件类型 | 标识符 | 描述 |
+| --- | --- | --- |
+| 普通文件 | `-` | 存储数据的文件，可以是文本文件、二进制文件、图像等 |
+| 目录文件 | `d` | 用于存储文件的容器，包含其他文件和目录的路径 |
+| 符号链接文件 | `l` | 指向另一个文件或目录的链接 |
+| 硬链接文件 | `-` | 共享相同数据块的文件，没有区别于普通文件，但指向相同的数据块 |
+| 字符设备文件 | `c` | 用于与字符设备（如终端、串口）通信的文件 |
+| 块设备文件 | `b` | 用于与块设备（如硬盘、USB 驱动器）通信的文件 |
+| 管道文件（FIFO） | `p` | /tmp/mypipe 用于进程间通信的特殊文件，允许进程间传递数据 |
+| 套接字文件 | `s` | 用于网络通信和进程间通信的特殊文件 |
+
+
+:::note
+使用 `file <filename>` 查看文件的类型名称
+
+使用 `stat <filename>` 查看文件详细信息
 :::
 
 
-### 文件、目录所有者
+---
+
+### 常用命令
+
+[参考](./commands#文件目录)
+
+---
+
+## 权限
+
+### 所有者
 
 文件或目录的创建用户
 
@@ -50,25 +115,17 @@ chown <user>:<group> <file_or_folder>
 chgrp <group> <file_or_folder>
 ```
 
-### 权限说明
+---
+
+### 读/写/执行权限
 
 `ls -l` 显示的第一列信息，由 `r`、`w`、`x` 等字符组成
 
-#### 字符说明
+第一位表示[文件类型](#文件类型)，后面所有字符都表示文件权限
 
-第一个字符表示文件类型
-
-* `-` - 文件
-* `d` - 目录
-* `I` - 链接，相当于快捷方式
-* `c` - 字符设备文件，鼠标，键盘
-* `b` - 块设备，比如硬盘
-
-后面所有字符都表示文件权限
-
-* `2~4` - 所有者权限
-* `5~7` - 组权限
-* `8~10` - 其他用户权限
+* `2~4位` - 所有者权限
+* `5~7位` - 组权限
+* `8~10位` - 其他用户权限
 
 #### 权限说明
 
@@ -81,176 +138,140 @@ chgrp <group> <file_or_folder>
 ##### 目录
 
 * `r` - read（读），可以读取，ls 查看目录内容
-* `w` - write（写），可以修改，可以在目录内进行`创建`、`删除`、`重命名`等操作
+* `w` - write（写），可以修改，可以在目录内进行**创建**、**删除**、**重命名**等操作
 * `x` - execute（执行），可以进入该目录
 
-#### 修改权限
+使用 <code>[chmod](./commands#chmod)</code> 命令修改文件或目录的权限
 
-`chmod` 命令
+---
 
-```bash
-# 字符方式
-#   u - user 用户
-#   g - group 组
-#   o - other 其他用户
-#   a - all 所有
-#
-# u+x - 用户添加执行权限 
-# g+w - 所属组的用户添加写权限
-# o-r - 其他用户移除读权限
-chmod u+x,g+w,o-r <file_or_folder>
+### 相关文件说明
 
-# 所有用户添加读权限
-chmod a+w <file_or_folder>
+| 文件 | 说明 | 格式 |
+| --------------- | --------------- | --------------- |
+| `/etc/passwd` | **用户**文件，记录用户的各种信息 | `用户名` : `口令` : `用户标识号` : `组标识号` : `注释性描述` : `主目录` : `shell` |
+| `/etc/shadow` | **口令**文件 | `登录名` : `加密口令` : `最后一次修改时间` : `最小时间间隔` : `最大时间间隔` : `警告时间` : `不活动时间` : `失效时间` : `标志` : `登录名` : `加密口令` : `最后一次修改时间` : `最小时间间隔` : `最大时间间隔` : `警告时间` : `不活动时间` : `失效时间` : `标志` |
+| `/etc/group` | **组**文件，记录Linux包含的组的信息 | `组名` : `口令` : `组标识号` : `组内用户列表` |
 
-# 数字方式
-#   r - 4
-#   w - 2
-#   x - 1
-#
-# 第一位表示所有者，第二位表示组，第三位表示其他
-#   6 - 用户拥有读、写权限
-#   6 - 所属组的用户拥有读、写权限
-#   4 - 其他用户只有读权限
-chmod 664 <file_or_folder>
+:::info
+在 linux 中的每个用户必须属于一个组，不能独立于组外
+
+在 linux 中每个文件有**所有者**、**所在组**、**其它组**的概念
+:::
+
+## 终端
+
+### 终端模拟器
+
+终端模拟器（Terminal Emulator）是一个软件程序，提供了一个图形化的用户界面，用来模拟一个传统的硬件终端（Terminal）。它允许用户输入命令并显示命令的输出
+
+常见的终端模拟器
+
+* [ghostty](https://ghostty.org)
+* [alacritty](https://github.com/alacritty/alacritty)
+* [wezterm](https://wezfurlong.org/wezterm)
+
+### Shell
+
+[参考](./shell)
+
+---
+
+## 程序
+
+在 Linux 系统中，程序后系统会创建一个运行时实例（进程）
+
+每个进程都会分配一个 pid（进程ID）
+
+```mermaid
+flowchart LR
+a(程序) --启动后--> b(进程)
+b --只能在终端内运行--> c(命令行程序)
+b --只能在GUI（图像界面）下运行--> d(GUI程序)
+c --占用终端并执行任务，直到完成--> c1(前台进程)
+c --运行后不退出并提供服务，不占用终端控制权--> c2(后台进程/服务)
+c --运行后进入程序提交的交互环境并使用内置的命令操作-->c3(交互式进程)
+c --运行后在终端使用字符渲染界面进行操作-->c4(TUI进程)
 ```
 
-## 定时任务
+常用命令
 
-### crond 任务调度
+* <code>[top](./commands#top)</code> - 一个**TUI进程**，用于查看系统所有内进程信息
+* <code>[ps](./commands#ps)</code> - 一个**前台进程**，用于在控制台输出系统内所有进程信息
+* [其他](./commands#进程服务)
+
+---
+
+### 服务管理
+
+服务（service）本质就是进程，但是运行在后台，通常会监听某个端口，等待其他程序的请求，比如：mysqld、sshd、firewalld等，也可以称为守护进程
+
+#### service 命令（已过时）
+
+推荐使用 [systemctl](#systemctl) 管理
+
+```bash
+# 操作服务
+# start
+# stop 
+# restart 
+# reload 
+# statue
+service <service_name> start
+
+# 查看服务自启动状态
+chkconfig <service_name> --list
+
+# 指定服务在某个系统运行级别自启动
+chkconfig --level <level> <service_name> [on|off]
+```
+---
+
+#### systemctl
+
+systemd 服务管理命令，参考 [systemctl](./systemd#服务)
+
+---
+
+### 定时任务
+
+#### cron
 
 任务调度：是指系统在某个时间执行的特定的命令或程序
 
-`crontab` 命令
+安装：`apt install cron`
 
-```bash
-# 编辑定时任务，打开编辑器进行编辑
-# 格式：'<cron_expr> <command>'
-crontab -e
+使用：[参考](./commands#crontab)
 
-# 查看已有的任务
-crontab -l
+---
 
-# 删除已有的任务
-crontab -r
-```
+#### at
 
-#### cron 表达式
+`at` 是一次性定时任务，`at` 的守护进程 `atd` 会以后台模式检查任务队列运行
 
-cron 表达式由5个特殊符号组成
+安装：`apt install at`，确保 `atd` 服务是否运行 `ps -ef | grep atd` 
 
-##### 位置说明
+`atd` 守护进程默认每60秒检查任务队列，有任务时，会检查任务运行时间，如果时间与当前时间匹配，则运行此任务
 
-| 位置    | 含义    | 范围    |
-|---------------- | --------------- | --------------- |
-| 第一位    | 一小时当中的第几分钟    | 0~59    |
-| 第二位    | 一天当中的第几小时    | 0~23    |
-| 第三位 | 一个月当中的第几天 | 1~31 |
-| 第四位 | 一年当中的第几月 | 1~12 |
-| 第五位 | 一周当中的星期几 | 0~7（0和7都代表星期日）|
+`at` 命令是一次性定时任务，任务执行完成后不会重复执行
 
-##### 占位符说明
+使用：[参考](./commands#at)
 
-* `*` - 任何时间。比如第一个 `*` 就代表一小时中的每分钟都执行一次
-* `,` - 不连续的时间。比如 `0 8,12,16 * * * command`，就代表在每天的8点，12点，16点都执行一次
-* `-` - 连续的时间范围。比如 `0 5 * * 1-6 command`，代表周一到周六的5点0分执行
-* `*/n` - 每隔多久执行一次。比如 `*/10 * * * * command` ，代表每隔10分钟就执行一次
+---
 
-#### 常见定时任务
+#### systemd
 
-| 时间   | 含义    |
-|--------------- | --------------- |
-| `45 22 * * * command`   | 在22点45分执行   |
-| `0 17 * * 1 command` | 每周一的17点0分执行 |
-| `0 5 1,15 * * command` | 每月1号到15号的5点0分执行 |
-| `40 4 * * 1-5 command` | 每周一到周五的4点40分执行 |
-| `*/10 4 * * * command` | 每天4点，每隔10分钟执行一次 |
-| `0 0 1,15 * 1 command` | 每月1号到15号，每周1的0点0分执行 |
+[参考](./systemd#定时任务)
 
-### at 定时任务
+---
 
-`at` 命令是一次性定时计划任务，at的守护进程atd会以后台模式运行，检查作业队列来运行
+## 网络
 
-默认情况下，atd 守护进程每60秒检查作业队列，有作业时，会检查作业运行时间，如果时间与当肓时间匹配，则运行此作业
+### 网络配置
 
-`at` 命令是一次性定时计划任务，执行完一个任务后不再执行此任务了
+网络一般可以配置静态 ip 或动态获取，参考具体网络工具的配置
 
-在使用 `at` 命令的时候，一定要保证 `atd` 进程的启动，使用 `ps -ef | grep atd` 查看atd是否运行
-
-## 磁盘分区、挂载
-
-### Linux分区
-
-Linux 来说无论有几个分区，分给哪一目录使用，它归根结底就只有一个根目录，一个独立且唯一的文件结构，Linux 中每个分区都是用来组成整个文件系统的一部分
-
-Linux 采用了一种叫**载入**的处理方法，它的整个文件系统中包含了一整套的文件和目录，且将个分区和一个目录联系起来。
-
-### 硬盘
-
-Linux硬盘分 IDE 硬盘和 SCSI 硬盘，目前基本上是 SCSI 硬盘
-
-IDE硬盘，驱动器标识符为`hdx~`
-
-* `hd` - 表明分区所在设备的类型，这里是指 IDE 硬盘
-* `x` - 为盘号，`a`：基本盘，`b`：基本从属盘，`c`：辅助主盘，`d`：辅助从属盘
-* `~` - 代表分区，前四个分区用数字1到4表示，它们是主分区或扩展分区，从5开始就是逻辑分区
-    * hda3 表示为第一个 IDE 硬盘上的第三个主分区或扩展分区，hdb2 表示为第二个IDE硬盘上的第二个主分区或扩展分区
-
-SCSI硬盘则标识为 `sdx~`，SCSI硬盘是用“sd”来表示分区所在设备的类型的，其余则和IDE硬盘的表示方法一样
-
-### 挂载一块新硬盘
-
-1. 插入一块新硬盘
-2. 查看分区详细信息：`lsblk -f`，输出信息内会显示新硬盘对应的文件，以 `/dev/sdb` 为例
-3. 使用 `fdisk /dev/sdb` 对新硬盘进行分区，`fdisk` 是一个交互式命令，内置分区相关的命令
-    * `m` - 显示所有命令列表
-    * `p` - 显示磁盘分区
-    * `n` - 新增分区
-    * `d` - 删除分区
-    * `w` - 写入并退出
-4. 进入交互式命令后输入 `n` 新建分区，再输入 `p` 选择新建主分区，输入 `1` 分成一个区，最后输入 `w` 保存退出
-5. 此时新建的分区名称为 `dev/sdb1`，使用 `mkfs -t ext4 /dev/sdb2` 格式化文件系统为 `ext4`
-6. 挂载磁盘：
-    * 将 `dev/sdb1` 挂载到指定的目录下：`mount /dev/sdb1 目录`
-    * 卸载：`unmount /dev/sdb1`
-7. 永久挂载磁盘，上面使用命令挂载的方式只是临时挂载，重启后就失效了
-    * 使用 `blkid` 命令查看 `/dev/sdb1` 磁盘对应的UUID
-    * 编辑 `/etc/fstab` 文件
-
-```bash
-# 最后一行添加
-UUID=blkid里面的UUID    挂载的目录  ext4    defaults    0   0
-```
-
-8. 重启系统
-
-### 常用命令
-
-`df`
-
-```bash
-# 查看磁盘详细信息
-df -h
-```
-
-`du`
-
-查看指定目录磁盘占用情况
-
-部分选项：
-    * `-h`：带计量单位
-    * `-a`：包含文件
-    * `--max-depth`：子目录深度
-    * `-c`：汇总值
-
-```bash
-# 查看/home目录占用情况
-du -hac --max-depth=1 /home
-```
-
-## 网络配置
-
-### ifupdown
+#### ifupdown
 
 Debian 系列系统下面默认的网络管理工具
 
@@ -258,23 +279,29 @@ Debian 系列系统下面默认的网络管理工具
 
 TODO
 
-### NetworkManager
+---
+
+#### NetworkManager
 
 图像界面管理网络工具
 
 TODO
 
-### systemd
+---
+
+#### systemd
 
 参考 [systemd-networkd](./systemd#网络管理)
 
-### WiFi 管理
+---
 
-#### wpa supplicant
+#### WiFi 配置
+
+##### wpa supplicant
 
 安装：`sudo apt install wpasupplicant`
 
-##### 基础配置
+###### 基础配置
 
 查看 wpa 相关服务：`ls /lib/systemd/system | grep wpa`
 
@@ -303,205 +330,189 @@ network={
 sudo systemctl enable --now wpa_supplicant@<interface>.service
 ```
 
-### Linux 网络环境配置
+---
 
-#### 自动获取
-
-登陆后，通过界面的来设置自动获取ip
-Linux 启动后会自动获取IP缺点是每次自动获取的ip地址可能不一样
-
-#### 指定ip
-
-* 直接修改配置文件来指定IP，并可以连接到外网
-* 编辑 `vim /etc/sysconfig/network-scripts/ifcfg-ens33`
+### 主机名
 
 ```bash
-PROXY_METHOD="none"
-BROWSER_ONLY="no"
-# 自动分配
-# BOOTPROTO="dhcp"
-# 静态分配
-BOOTPROTO="static"
-DEFROUTE="yes"
-IPV4_FAILURE_FATAL="no"
-IPV6INIT="yes"
-IPV6_AUTOCONF="yes"
-IPV6_DEROUTE="yes"
-IPV6_FAILURE_FATAL="no"
-IPV6_ADDR_GEN_MODE="stable-privacy"
-NAME"ens33"
-UUID="30734a5b-0ac8-4eba-903f-13c464dede24"
-DEVICE="ens33"
-ONBOOT="yes"
-# 自定义ip地址
-IPADDR=192.168.111.123
-# 网关
-GATEWAY=192.168.111.2
-# 域名解析器
-DNS1=192.168.111.2
-DNS2=114.114.114.114
+# 查看主机名
+# 如果需要修改主机名，在 /etc/hostname 文件内修改，修改后重启系统
+hostname
 ```
-* 保存退出后重启网络服务 `service network restart` 或重启 `reboot` 即可
+---
 
-### 设置主机名和host映射
+### DHCP
 
-#### 设置主机名
+DHCP（动态主机配置协议，Dynamic Host Configuration Protocol）是一种用于在局域网（LAN）中自动分配 IP 地址和其他网络配置参数的协议。它使得设备（如计算机、打印机、路由器等）能够动态地获得 IP 地址及相关网络配置，而不需要手动配置每台设备
 
-* `hostname` 查看主机名
-* 在 `/etc/hostname` 文件内修改主机名
-* 修改后重启才生效
+在使用 `ifupdown` 配置网络时，如果需要使用 DHCP 连接开启了 DHCP 服务的网关，则需要配合 `dhclient` 命令连接
 
-#### hosts映射
+在使用 `systemd-networkd` 配置网络时，则只需要添加启用 DHCP 的配置，`systemd-networkd` 内置了一个 DHCP 客户端
 
-* 编辑 `/etc/hosts` 文件
+---
+
+### DNS
+
+DNS（Domain Name System，域名系统） 互联网的一项基础服务，它的主要功能是将人类可读的域名（例如 `www.example.com`）转换成计算机可识别的 IP 地址（如 192.0.2.1）。这个转换过程称为“域名解析”，它允许我们通过易记的域名访问网站或其他网络资源，而无需记住复杂的 IP 地址
+
+#### hosts 文件
+
+当系统进行域名解析时，它首先会查找 `/etc/hosts` 文件。如果在该文件中找到匹配的条目，则使用该 IP 地址
+
+文件格式
 
 ```bash
-ip 名称
+127.0.0.1   localhost
+192.168.1.10 myserver myserver.local
 ```
 
-### 主机名解析过程分析（Hosts、DNS）
+#### 本地域名解析服务
 
-`hosts` - 一个文本文件，用来记录 IP 和 hostname（主机名）的映射关系
-`DNS` - Domain Name System 的缩写，域名系统，是互联网上作为域名和IP地址相互映射的一个分布式数据库
+在本地启动的DNS服务，用于提高解析速度、添加缓存、加密等功能
 
-#### 主机名解析机制分析（hosts、DNS）
+* systemd 提供的域名解析服务：[systemd-resolved](./systemd#systemd-resolved)
 
-浏览器输入 `www.baidu.com`
+---
 
-1. 浏览器先检查浏览器缓存中有没有该域名解析IP地址，有就先调用这个IP完成解析;如果没有检查操作系统DNS解析器缓存，如果有直接返回IP完成解析。这两个缓存，可以理解为本地解析器缓存
-2. 一般来说，当电脑第一次成功访问某一网站后，在一定时间内，浏览器或操作系统会缓存他的IP地址（DNS解析记录)
-   * 如在cmd窗口中输入
-     * `ipconfig /displaydns`  DNS域名解析缓存
-     * `ipconfig /flushdns`  手动清理dns缓存
-3. 如果本地解析器缓存没有找到对应映射，检查系统中hosts文件中有没有配置对应的域名IP映射，如果有，则完成解析并返回.
-4. 如果本地DNS解析器缓存和hosts文件中均没有找到对应的IP，则到域名服务DNS进行解析域
+### 防火墙
 
-## 进程管理
+* `iptables` - 直接的防火墙工具，处理流量过滤
+* `nftables` - `iptables` 的替代工具，改进性能和灵活性
+* <code>[firewalld](./commands#firewall-cmd)</code> - 基于 `iptables` 或 `nftables` 防火墙管理工具，提供动态规则管理
+* `ufw` - 简化防火墙配置工具，基于 `iptables` 或 `nftables`
 
-在LINUX中，每个执行的程序都称为一个进程。每一个进程都分配一个ID号(pid,进程号)
+---
 
-每个进程都可能以两种方式存在的。前台与后台，所谓前台进程就是用户目前的屏幕上可以进行操的。后台进程则是实际在操作，但由于屏幕上无法看到的进程，通常使用后台方式执行
+## 磁盘管理
 
-一般系统的服务都是以后台进程的方式存在，而且都会常驻在系统中。直到关机才才结束
+在 Linux 系统中，硬盘、存储设备和分区等通常会以特定的命名格式进行标识。不同类型的存储设备（如 SATA、SCSI 和 NVMe）都有不同的命名规则
 
-### 常用命令
+SATA/SCSI 硬盘
 
-#### ps
+* `sda` - 第一个 SATA 或 SCSI 设备
+    * `sda1` - 第一个 SATA 或 SCSI 设备的第一个分区
+    * `sda2` - 第一个 SATA 或 SCSI 设备的第二个分区
+* `sdb` - 第二个 SATA 或 SCSI 设备
+    * `sdb1` - 第二个 SATA 或 SCSI 设备的第二个分区
 
-* 两种风格
+NVMe 硬盘
 
-##### 标准风格
+* `nvme0n1` - 第一个 NVMe 设备的第一个命名空间
+    * `nvme0n1p1` - 第一个 NVMe 设备的第一个分区
+    * `nvme0n1p2` - 第一个 NVMe 设备的第二个分区
+* `nvme1n1` - 第二个 NVMe 设备的第一个命名空间
+    * `nvme1n1p1` - 第二个 NVMe 设备的第一个分区
 
-* `ps -ef`
-* 列说明
-    * `UID`：用户id
-    * `PID`：进程id
-    * `PPID`：父进程id
-    * `C：`cpu用于计算执行优先级因子。值越大，表明进程是cpu密集型运算，执行优先级会降低，值越小，表明进程是I/O密集型运算，必须优先级会提高
-    * `STIME`：进程启动的时间
-    * `TTY`：终端名称
-    * `TIME`：cpu时间
-    * `CMD`：启动进程的命令和参数
+---
 
-##### BSD风格
+### 分区
 
-* `ps -aux`
-* 列说明
-    * `USER`：用户名称
-    * `PID`：进程号
-    * `%CPU`：进程占用CPU的百分比
-    * `%MEM`：进程占用物理内存的百分比
-    * `VSZ`：进程占用的虚拟内存大小(单位:KB)
-    * `RSS`：进程占用的物理内存大小(单位:KB )
-    * `TTY`：终端名称,缩写．
-    * `STAT`：进程状态，其中S-睡眠，s-表示该进程是会话的先导进程，N-表示进程拥有比普通优先级更低的优先级，R-正在运行，D-短期等待，Z-僵死进程，T-被跟踪或者被停止等等
-    * `STARTED`：进程的启动时间
-    * `TIME`：CPU时间，即进程使用CPU的总时间
-    * `COMMAND`：启动进程所用的命令和参数，如果过长会被截断显示
-  * 以全格式显示当前进程
+分区是磁盘管理中非常重要的一部分，它涉及将一个物理磁盘分割成多个逻辑单元（分区），每个分区可以用于存储不同的文件系统或操作系统
 
-#### kill
-  
-* 终止进程
+#### 分区表类型
+
+##### MBR（主引导记录）
+
+MBR 是较旧的分区表格式，它支持最多 4 个主分区，或者 3 个主分区加 1 个扩展分区。MBR 分区表位于磁盘的第一个扇区（通常是磁盘的 512 字节）。MBR 还包含启动加载程序，启动操作系统时会执行该程序
+
+* 最大支持磁盘容量：2TB
+* 最多主分区数：4 个主分区，或者 3 个主分区 + 1 个扩展分区
+* 局限性：不支持大于 2TB 的磁盘，也不支持更多的分区
+
+##### GPT（GUID 分区表）
+
+GPT 是一种更现代的分区表格式，它克服了 MBR 的许多限制，尤其是支持更大的磁盘和更多的分区。GPT 是基于 GUID（全局唯一标识符）的，具有更强的可扩展性和灵活性。GPT 存储在磁盘的多个地方，因此它具有更好的可靠性
+
+* 最大支持磁盘容量：9.4 ZB（泽字节，极其巨大的存储空间）
+* 最多分区数：理论上可以支持 128 个分区（在 Linux 中），不过可以根据需要扩展
+* 优势：支持大于 2TB 的磁盘，并且具有冗余保护，增强了数据的安全性
+
+##### 分区命令
+
+* [lsblk](./commands#lsblk) - 查看系统内磁盘分区信息
+* [fdisk](./commands#fdisk) - 对磁盘进行分区
+* [parted](./commands#fdisk) - 对磁盘进行分区
+
+---
+
+### 格式化
+
+分区格式化 是将存储设备（如硬盘或 SSD）的分区创建成文件系统的过程。这个过程不仅会在硬盘上分配空间，还会创建特定类型的文件系统，以便操作系统能够存储和访问数据
+
+常见的 Linux 文件系统类型
+
+* `ext4` - （Fourth Extended File System）这是 Linux 最常用的文件系统之一，广泛应用于桌面、服务器等各种环境。它支持大文件、日志、延迟分配等特性
+* `xfs` - XFS 是一个高性能的日志型文件系统，尤其适用于大文件和高负载的环境。它是许多 Linux 发行版的默认文件系统，特别是在企业级环境中
+* `btrfs` - 这是一个现代的文件系统，具有快照、压缩、内建 RAID 支持等特性。它在功能和灵活性方面优于 ext4 和 xfs，但在稳定性和成熟度上还在逐步改进中
+* `f2fs` - 优化的闪存文件系统，专为 NAND 闪存设备设计，尤其适用于 SSD
+* `swap` - 这种文件系统用于交换空间（交换分区），与其他文件系统不同，它不存储数据文件，而是用于临时数据交换
+
+使用 <code>[mkfs](./commands#mkfs)</code> 命令格式化分区
+
+---
+
+### 挂载
+
+Linux 使用一种统一的文件系统结构（树状结构），所有的存储设备（包括硬盘、U 盘、网络文件系统等）都挂载到该树状结构的某个目录中。这个挂载点（mount point）可以是任何空目录
+
+使用 <code>[mount](./commands#mount)</code> 命令挂载设备，使用 <code>[umount](./commands#umount)</code> 卸载设备
+
+#### 永久挂载设备
+
+对 `/etc/fstab` 文件进行操作
+
+1. 创建一个目录用于挂载，一般在 `/media`（临时挂载）目录或 `/mnt`（永久挂载）目录下创建
+2. 使用 <code>[blkid](./commands#blkid)</code> 查看格式化后的分区文件的 UUID
+3. 将以下内容添加进 `/etc/fstab` 文件内
 
 ```bash
-# 杀死对应id的进程 
-kill 进程id
-
-# 强制杀死一个进程
-kill -9 进程id
-
-# 杀死对应进程名的进程
-killall 进程名
+UUID=<UUID>     <dir>  <fs_type>    defaults    0   0
 ```
+4. 系统重启后就会自动挂载这个文件内指定的所有设备
 
-#### pstree
-
-```bash
-# 以树状形式显示进程信息并显示进程id
-pstree -p
-
-# 以树状形式显示进程信息并显示进程登录的用户
-pstree -u
-```
-
-### 服务管理
-
-* 服务（service）本质就是进程，但是运行在后台，通常会监听某个端口，等待其他程序的请求，比如（mysqld，sshd，防火墙等），因此我们又称为守护进程
-
-#### Service管理命令
-
-* 格式：`service 服务名 [start | stop | restart | reload | statue]`
-* `service`命令管理的服务再`/etc/init.d`下查看
-* `service`大部分Linux发行版都不再使用，使用`systemd`替换
-
-#### 其他命令
-
-* 使用`setup`命令查看全部服务，管理开机自启的服务
-* `chkconfig`命令
-  * `chkconfig 服务名 --list` 查看服务
-  * `chkconfig --level 系统级别 服务名 on/off `设置某个服务在那个系统级别自启动
-
-* `systemctl`命令
-  * `systemctl [start|stop|restart|status] 服务名`
-  * `systemctl list-unit-files` 查看开机启动的状态
-  * `systemctl ebable 服务名` 设置服务开机启动
-  * `systemctl disable 服务名` 关闭服务开机启动
-  * `systemctl is-enabled` 查看某个服务是否开机自启 
-
-* `firewall`命令
-  * `firewall-cmd --permanent --add-port=端口号/协议` 打开端口
-  * `firewall-cmd --permanent --remove-port=端口号/协议` 关闭端口
-  * `firewall-cmd --reload` 重载端口，打开和关闭端口后必须重载才能生效
-  * `firewall-cmd --query-port=端口号/协议` 查询端口号是否打开
-
-* `top`命令
-  * `top -d 秒数` 每隔多少秒更新一次
-  * `top -i` 不显示闲置和僵死进程
-  * `top -p 进程id` 通过id监控某个指定的进程
-
-* **动态监控进程**
-* 输入`top`命令后可以输入以下命令进行交互
-  * `P` 以CPU使用率排序（默认）
-  * `M` 以内存使用率排序
-  * `N` 以进程id排序
-  * `q` 退出
-
-* 查看网络情况
-  * `netstat -an` 按顺序排序输出
-  * `netstat -p` 显示那个进程在调用
-  * 常用使用直接输入`netstat -anp` 
-
+---
 
 ## 包管理器
 
-### apt
+### Debian 系列
 
-#### 配置源
+Debian 系列系统下的包管理工具
 
-* Debian11
+---
+
+#### dpkg
+
+Debian 系列系统的底层包管理工具
 
 ```bash
+# 直接安装 .deb 文件
+dpkg -i <package-file>.deb
+
+# 显示所有已经安装的包
+dpkg -l
+
+# 显示软件包详细信息
+dpkg -s <package-name>
+
+# 显示软件包内所有文件存放的路径
+dpkg -L <package-name>
+
+# 搜索指定关键字匹配的软件安装路径
+dpkg -S <pattern>
+```
+
+---
+
+#### apt
+
+高级包管理工具，用于处理**依赖关系**和**从仓库安装软件包**
+
+##### 软件包源
+
+<details>
+<summary>Debian 11 (bullseye)</summary>
+
+```bash title="/etc/apt/sources.list"
 ## tencentyun
 deb http://mirrors.tencentyun.com/debian bullseye main contrib non-free
 deb http://mirrors.tencentyun.com/debian bullseye-updates main contrib non-free
@@ -533,284 +544,200 @@ deb https://mirrors.ustc.edu.cn/debian/ bullseye-backports main contrib non-free
 deb https://mirrors.ustc.edu.cn/debian-security/ bullseye-security main contrib non-free
 ```
 
-* Debian12
+</details>
 
-```txt
-deb https://mirrors.aliyun.com/debian/ bookworm main non-free non-free-firmware contrib
-deb https://mirrors.aliyun.com/debian/ bookworm-updates main non-free non-free-firmware contrib
-deb https://mirrors.aliyun.com/debian/ bookworm-backports main non-free non-free-firmware contrib
-deb https://mirrors.aliyun.com/debian-security/ bookworm-security main
+<details>
+<summary>Debian 12 (bookworm)</summary>
 
+```bash title="/etc/apt/sources.list"
+# 清华
+deb https://mirrors.ustc.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
+deb https://mirrors.ustc.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
+deb https://mirrors.ustc.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
+deb https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main contrib non-free non-free-firmware
+
+# 网易
 deb https://mirrors.163.com/debian/ bookworm main non-free non-free-firmware contrib
 deb https://mirrors.163.com/debian-security/ bookworm-security main
 deb https://mirrors.163.com/debian/ bookworm-updates main non-free non-free-firmware contrib
 deb https://mirrors.163.com/debian/ bookworm-backports main non-free non-free-firmware contrib
 
-deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
-deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
-deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
-deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
+# 阿里
+deb https://mirrors.aliyun.com/debian/ bookworm main non-free non-free-firmware contrib
+deb https://mirrors.aliyun.com/debian/ bookworm-updates main non-free non-free-firmware contrib
+deb https://mirrors.aliyun.com/debian/ bookworm-backports main non-free non-free-firmware contrib
+deb https://mirrors.aliyun.com/debian-security/ bookworm-security main
+
+# 腾讯
+deb https://mirrors.cloud.tencent.com/debian/ bookworm main contrib non-free non-free-firmware
+deb https://mirrors.cloud.tencent.com/debian/ bookworm-updates main contrib non-free non-free-firmware
+deb https://mirrors.cloud.tencent.com/debian/ bookworm-backports main contrib non-free non-free-firmware
+deb https://mirrors.cloud.tencent.com/debian-security/ bookworm-security main contrib non-free non-free-firmware
 ```
-* ppa源
-    * `apt install software-properties-common` - 软件安装
-    * `add-apt-repository "url"` - 添加ppa源
-    * `add-apt-repository -r "url"` - 删除ppa源
+</details>
 
-#### 常用命令
+##### 常用命令
 
-* `apt serach <name>` - 搜索软件
-* `apt install <name>` - 安装软件
-* `apt update` - 从配置的源内更新包信息
-* `apt upgrade` - 更新所有软件
-* `apt list --upgradable` - 查看所有可以更新的软件
-* `apt list --installed` - 查看所有已经安装的软件
-* `apt remove <name>` - 删除软件
-* `apt remove --purge <name>` - 删除软件，连同配置文件一起删除
-* `apt purge <name>` - 删除软件，连同配置文件一起删除，和 `apt remove --purge` 一样
-* `apt autoremove` - 删除所有未被依赖的软件包
-* `apt autoremove --purge <name>` - 删除所有未被依赖的软件包，连同配置文件一起删除
-* `apt autopurge` - 删除所有未被依赖的软件包，连同配置文件一起删除，和 `apt autoremove --purge` 一样
-* `apt list <name> --all-versions` - 查看软件所有版本
-* `apt show <name>` - 查看软件详细信息
-* `apt-mark hold <package_name>` - 固定软件包版本
+搜索
 
-### rpm包管理
+```bash
+# 搜索软件
+apt serach <package_name>
 
-* rpm用于互联网下载包的打包及安装工具，它包含在某些Linux分发版中。它生成具有.RPM扩展名的文件。RPM是RedHat Package Manager（RedHat软件包管理工具）的缩写，类似windows的setup.exe，这一文件格式名称虽然打上了RedHat的标志，但理念是通用的。
-* Linux的分发版本都有采用（suse,redhat, centos等等），可以算是公认的行业标准了。
+# 查看所有可以更新的软件
+apt list --upgradable
 
-#### 常用命令
+# 查看所有已经安装的软件
+apt list --installed
 
-* `rpm -qa` 查询安装的所有软件包
-* `rpm - q 软件名` 查询该软件是否安装
-* `rpm -qi 软件名` 查询该软件的详细信息
-* `rpm -ql 软件名` 查询该软件包包含哪些文件
-* `rpm -qf 文件全路径` 查询该文件输入那个软件
-* `rpm -e 软件包名` 卸载相命令
-* `rpm -ivh 软件包全明` 安装软件包
-    * `-i` 安装
-    * `-v` 提示
-    * `-h` 进度条
+# 查看软件所有版本
+apt list <package_name> --all-versions
 
-### yum包管理
+# 查看软件详细信息
+apt show <package_name>
+```
 
-* Yum是一Shell前端软件包管理器。基于RPM包管理，能够从指定的服务器自动下载RPM包并且安装，可以自动处理依赖性关系，并且一次安装所有依赖的软件包。
+安装
 
-#### 配置源
+```bash
+# 安装软件
+apt install <package_name>
 
-1. `cd /etc/yum.repos.d/` 切到/etc/yum.	.d目录
-2. `mv CentOS-Base.repo CentOS-Base.repo.backup` 备份CentOS-Base.repo文件
-3. `wget http://mirrors.aliyun.com/repo/Centos-7.repo` 使用`wget`下载阿里的源文件
-   1. 使用`wget`如果报无法解析主机名则需要手动配置DNS
-   2. `vim /etc/resolv.conf` 编辑/etc/resolv.conf文件
-      1. `service resatrt network`重启网络服务后`wget`就可以使用了
-      2. 如果重启网络后/etc/resolv.conf内的数据恢复原样，就看文件头是否有Generated by NetworkManager注释字样
-      3. 有则需要关闭NetworkManager服务，因为DNS被NetworkManager服务自动生成了
-      4. `systemctl stop NetworkManager` 关闭NetworkManager服务
-      5. `systemctl disable NetworkManager` 关闭NetworkManager服务的开机自启
-4. `mv Centos-7.repo CentOS-Base.repo`将下载好的Centos-7.repo文件重命名为CentOS-Base.repo
-5. `yum clean all` 清理缓存
-6. `yum makecache` 生成缓存
+# 从配置的源内更新包信息
+apt update
 
-#### 常用命令
+# 更新所有软件
+apt upgrade
+```
 
-* `yum listlgrep 软件列表` 查询yum服务器是否有需要安装的软件
-* `yum install 软件包名` 安装指定软件
+卸载
+
+```bash
+# 删除软件
+apt remove <package_name>
+
+# 删除软件，连同配置文件一起删除
+apt remove --purge <package_name>
+
+# 删除软件，连同配置文件一起删除，和 `apt remove --purge` 一样
+apt purge <package_name>
+
+# 删除所有未被依赖的软件包
+apt autoremove
+
+# 删除所有未被依赖的软件包，连同配置文件一起删除
+apt autoremove --purge <package_name>
+
+# 删除所有未被依赖的软件包，连同配置文件一起删除，和 `apt autoremove --purge` 一样
+apt autopurge
+```
+
+禁止自动更新
+
+```bash
+# 禁止指定软件包版本自动更新
+apt-mark hold <package_name>
+
+# 查看所有被禁止自动更新的软件包
+apt-mark showhold
+
+# 解除禁止自动更新
+apt-mark unhold <package_name>
+```
+
+---
+
+### RedHat 系列
+
+#### rpm
+
+Red Hat 系列的核心包管理工具，负责管理 .rpm 格式的软件包。RPM 主要用于安装、查询、升级和删除单个软件包。它处理的是包的基本操作，并不处理软件包间的依赖关系
+
+##### 常用命令
+
+```bash
+# 查询安装的所有软件包
+rpm -qa
+
+# 查询该软件是否安装
+rpm -q <package_name>
+
+# 查询该软件的详细信息
+rpm -qi <package_name>
+
+# 查询该软件包包含哪些文件
+rpm -ql <package_name>
+
+# 查询该文件输入那个软件
+rpm -qf <file_path>
+
+# 卸载相命令
+rpm -e <package_name>
+
+# 安装软件包
+# -i 安装
+# -v 提示
+# -h 进度条
+#
+rpm -ivh <package_name>
+```
+
+---
+
+#### dnf
+
+TODO
+
+---
 
 ## 运行级别
 
-### 基本介绍
-* 0：关机
-* 1：单用户【找回丢失密码】
-* 2：多用户状态没有网络服务
-* 3：多用户状态有网络服务
-* 4：系统未使用保留给用户5:图形界面
-* 6：系统重启
-* 常用运行级别是3和5,也可以指定默认运行级别
-* 命令:`init[0123456]`应用案例:通过`init`来切换不同的运行级别，比如动5-3，然后关机。
+SysV Init
 
-### 指定运行级别
-* CentOS7后运行级别说明
-* 在centos7以前,/etc/inittab文件中
-* 进行了简化，如下:
-    * multi-user.target: analogous to runlevel 3
-    * graphical.target: analogous to runlevel 5
-    * `systemctl get-default` 查看当前气筒处于那个运行级别
-    * `systemctl set-default xxx.target` 设置系统为那个运行级别
+* `0` - 关机
+* `1` - 单用户【找回丢失密码】
+* `2` - 多用户状态没有网络服务
+* `3` - 多用户状态有网络服务
+* `4` - 系统未使用保留给用户
+* `5` - 图形界面
+* `6` - 系统重启
 
-## 安装jdk
+Systemd
 
-1. 在/opt目录下创建jdk目录存放jdk压缩文件`mkdir /opt/jdk`
-2. 在/usr/local目录下创建java目录存放解压后的文件`mkdir /usr/local/java`
-3. 将/opt/jdk目录下的压缩文件解压到/usr/local/java目录下`tar -zxvf 压缩包名 -C /usr/local/java`
-4. 配置环境变量`vim /etc/profile`
-5. 添加如下代码
+* `emergency.target` - 紧急模式，类似 runlevel 1，但更基础
+* `rescue.target` - 类似 runlevel 1 的单用户模式，但提供更多功能
+* `graphical.target` - 图形界面模式，类似 runlevel 5
+* `multi-user.target` - 多用户模式，类似 runlevel 3，但没有图形界面
+
+systemd 下切换运行级别
 
 ```bash
-export JAVA_HOME=/usr/local/java/jdk1.8.0_281
-export PATH=$JAVA_HOME/bin:$PATH
+# 获取默认的运行级别
+systemctl get-default
+
+# 设置默认运行级别
+systemctl set-default xxx.target
+
+# 切换到指定运行级别
+systemctl isolate xxx.target
 ```
 
-## Shell编程
+---
 
-* Shell是一个命令行解释器，它为用户提供了一个向Linux内核发送请求以便运行程序的界面系统级程序，用户可以用Shell来启动、挂起、停止甚至是编写一些程序。
-* 创建一个以.sh结尾的文件，编写相应的bash脚本并保存
-* 修改所有者拥有执行权限使用`./文件名`执行文件
-* 或者不用修改权限直接使用`sh 文件名` 执行文件
+## 日志
 
-### 变量
+日志文件是重要的系统信息文件，其中记录了许多重要的系统事件，包括用户的登录信息、系统的启动信息、系统的安全信息、邮件相关信息、各种服务相关信息等
 
-`$HOME`、`$PATH`、`$PWD`等为系统变量
+| 文件 | 说明 |
+| -------------- | --------------- |
+| `/var/log/boot.log` | 系统启动日志（开机时一闪而过的信息） |
+| `/var/log/btmp` | 登录错误日志，使用 <code>[lastb](./commands#lastb)</code> 命令查看 |
+| `/var/log/lastlog` | 用户最后一次的登录时间日志，使用 <code>[lastlog](./commands#lastlog)</code> 命令查看 |
+| `/var/log/faillog` | 用户登陆错误次数入职，使用 <code>[faillog](./commands#faillog)</code> 命令查看 |
+| `/var/log/wtmp` | 记录所有用户的登录、注销、启动、重启、关机事件，使用 <code>[last](./commands#last)</code> 命令查看 |
+| `/var/run/utmp` | 当前登录的用户信息，使用 `w`、`who`、`users` 命令查看 |
 
-#### 位置参数变量
+其他命令
 
-* 获取执行shell脚本时后面带的参数
-* 例如`var.sh 100`后面的100就是参数
-    * 文件内使用`$1~$9`获取文件后的1~9位参数而`$0`为文件名本身
-    * 第十个参数往后使用大括号包裹数组`${11}`来获取
-    * 使用`$*`是将参数看作一个整体获取，相当于获取到一个所有参数组成的字符串
-    * 使用`$@`获取到所有参数组成的集合
-    * 使用`$#`获取所有参数的个数
-
-#### 预定义变量
-
-* 就是shell设计者事先已经定义好的变量，可以直接在shell脚本中使用
-    * `$$` 当前进程的进程号(PID ) 
-    * `$!` 后台运行的最后一个进程的进程号（PID ) 
-    * `$?`（最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行;如果这个变量的值为非0(具体是哪个数，由命令自己来决定），则证明上一个命令执行不正确了
-
-### 运算符
-
-* 使用`$((运算式))`或者`$[运算式]`
-* 或者`expr 运算式`这里的运算式必须有空格
-
-### 流程控制
-
-#### if
-
-* 语法：
-
-```bash
-if [ 条件 ]
-then
-    分支一
-elif [ 条件 ]
-then
-    分支二
-else
-    分支三
-fi
-```
-
-* 数值比较
-    * `-lt` 小于、`-le` 小于等于、`-eq` 等于、`-gt` 大于、`-ge` 大于等于、`-ne` 不等于
-* 文件权限判断
-    * `-r` 是否有读的权限
-    * `-w` 是否有写的权限
-    * `-x` 是否有执行的权限
-* 文件类型判断
-    * `-f` 文件是否存在并且是一个常规的文件
-    * `-e` 文件是否存在
-    * `-d` 文件是否存在并且是一个目录
-
-#### case
-
-* 语法
-
-```bash
-case 值 in
-"匹配值1")
-    echo one
-;;
-"匹配值2")
-    echo two
-;;
-*)
-    echo other
-;;
-esac
-```
-
-#### for循环
-
-* 语法
-
-```bash
-for 变量 in 值
-do
-    循环体
-done
-
-# 遍历1到100
-for(( i=1; i<=100; i++ ))
-do
-      循环体
-done
-```
-
-#### while循环
-
-* 语法
-
-```bash
-while [ 条件 ]
-do
-    循环体
-done
-```
-
-#### read
-
-* 读取控制台输入
-* 选项：
-    * `-p` 指定读取值时的提示符;
-    * `-t` 指定读取值时等待的时间(秒），如果没有在指定的时间内输入，就不再等待了。.参数
-
-### 函数
-
-#### 系统函数
-
-* `basename 路径` 获取路径里的文件名
-* `basename 路径 后缀` 获取路径里的文件名并去掉文件名的后缀
-* `basedir 路径` 获取过文件的路径
-
-#### 自定义函数
-
-```bash
-# 定义函数
-function 函数名(){
-    函数体
-}
-
-# 调用函数
-函数名 参数……
-```
-
-##  日志管理
-
-* 日志文件是重要的系统信息文件，其中记录了许多重要的系统事件，包括用户的登录信息、系统的启动信息、系统的安全信息、邮件相关信息、各种服务相关信息等。
-* 日志对于安全来说也很重要，它记录了系统每天发生的各种事情，通过日志来检查错误发生的原因或者受到攻击时攻击者留下的痕迹。
-
-### 系统常用的日志说明
-
-* `/var/log/boot.log`：系统启动日志
-* `/var/log/cron`：记录云系统定时任务相关的日志
-* `/var/log/cups/`：打印信息日志
-* `/var/log/dmesg`：系统开机时内核自检的信息，使用`dmesg`命令查看
-* `/var/log/btmp`：记录错误登录的日志，这个日志时二进制文件，需要使用`lastb`命令查看
-* `/var/log/lastlog`：系统中所有用户最后一次的登录时间日志，这个文件也是二进制文件，使用`lastlog`命令查看
-* `/var/log/mailog`：邮件信息日志
-* `/var/log/messages`：系统重要消息日志，如果系统出现问题，可以先检查这个文件
-* `/var/log/secure`：认证授权信息，系统登录、ssh登录、su切换用户、sudo授权、添加用户、修改密码等操作都会记录在这个日志内
-* `/var/log/wtmp`：永久记录所有用户的登录、注销信息，同时记录系统的启动、重启、关机事件，使用`last`命令查看
-* `/var/tun/ulmp`：当前已经登录的用户信息，这个文件会随着用户的登录和注销而不断变化，只是记录当前登录用户的信息，十四爷`w`、`who`、`users`等命令查看
-* `rsyslogd`服务管理这常用的系统日志
-* `/etc/rsyslog.conf`文件为`rsyslog`日志进程的配置文件
-
-### 常用命令
-
-* `journalctl` 可以查看内存日志,这里我们看看常用的命令journalctl##查看全部
-* `journalctl -n3` ##查看最新3条
-* `journalctl --since 19:00 --until 19:10:10` #查看起始时间到结束时间的日志可加日期journalctl -p err ##报错日志
-* `journalctl -o verbose` ##日志详细内容
-* `journalctl_PiD=1245_COMM=sshd` ##查看包含这些参数的日志（在详细日志查看)
+* <code>[dmesg](./commands#dmesg)</code> - 查看系统内核信息
+* <code>[journalctl](./systemd#日志)</code> - systemd 基础的日志管理工具，查看服务、系统内核日志等（推荐使用）
