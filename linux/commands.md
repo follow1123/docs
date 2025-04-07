@@ -97,6 +97,7 @@ sidebar_position: 1
 | [useradd](#useradd) | 添加用户 |
 | [userdel](#userdel) | 删除用户 |
 | [usermod](#usermod) | 修改用户信息 |
+| [gpasswd](#gpasswd) | 修改用户的组信息 |
 | passwd | 修改密码 |
 | [chage](#chage) | 更改用户密码的过期信息 |
 | [su](#su) | 切换用户 |
@@ -1332,7 +1333,14 @@ usermod -d 目录 用户名
 usermod -s /bin/bash <username>
 
 # 添加用户到多个组
-usermod -aG <username> <groupname1>,<groupname2>
+usermod -aG <groupname> <username>
+```
+
+### gpasswd
+
+```bash
+# 将用户从指定组内移除
+gpasswd -d <username> <groupname>
 ```
 
 ### chage
