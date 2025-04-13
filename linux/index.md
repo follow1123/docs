@@ -377,7 +377,7 @@ DNS（Domain Name System，域名系统） 互联网的一项基础服务，它�
 ### 防火墙
 
 * `iptables` - 直接的防火墙工具，处理流量过滤
-* `nftables` - `iptables` 的替代工具，改进性能和灵活性
+* <code>[nftables](./commands#nftables)</code> - `iptables` 的替代工具，改进性能和灵活性
 * <code>[firewalld](./commands#firewall-cmd)</code> - 基于 `iptables` 或 `nftables` 防火墙管理工具，提供动态规则管理
 * `ufw` - 简化防火墙配置工具，基于 `iptables` 或 `nftables`
 

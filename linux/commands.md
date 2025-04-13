@@ -83,6 +83,7 @@ sidebar_position: 1
 | [route](#route) | 路由 |
 | [arp](#arp) | 查看和管理 ARP 缓存 |
 | [firewall-cmd](#firewall-cmd) | 用于管理 firewalld 防火墙服务 |
+| [nftables](#nftables) | 防火墙规则框架 |
 | [wget](#wget) | 从网络下载文件 |
 
 ## 用户/组/权限
@@ -1259,6 +1260,12 @@ firewall-cmd --reload
 # 再次查询
 firewall-cmd --query-port=22/tcp
 ```
+
+### nftables
+
+* [wiki](https://wiki.nftables.org/wiki-nftables/index.php/Main_Page)
+* [wiki 基础文档](https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes)
+* `man nft`
 
 ### wget
 
