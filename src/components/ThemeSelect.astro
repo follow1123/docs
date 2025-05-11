@@ -1,0 +1,116 @@
+---
+import { Icon } from "@astrojs/starlight/components";
+---
+
+<custom-theme-select>
+  <Icon name="laptop" />
+  <Icon name="moon" class="hidden" />
+  <Icon name="sun" class="hidden" />
+</custom-theme-select>
+
+<style>
+  custom-theme-select {
+    padding: 0.5em;
+    margin: -0.5em;
+    display: flex;
+    align-items: center;
+  }
+
+  custom-theme-select > *:hover {
+    opacity: 0.66;
+  }
+
+  custom-theme-select > * {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .hidden {
+    display: none;
+  }
+</style>
+
+{/* Inlined to avoid FOUC. Uses global scope from `ThemeProvider.astro` */}
+<script is:inline>
+  StarlightThemeProvider.updatePickers();
+</script>
+
+<script>
+  type Theme = "auto" | "dark" | "light";
+
+  /** Key in `localStorage` to store color theme preference at. */
+  const storageKey = "starlight-theme";
+
+  /** Get a typesafe theme string from any JS value (unknown values are coerced to `'auto'`). */
+  const parseTheme = (theme: unknown): Theme =>
+    theme === "auto" || theme === "dark" || theme === "light" ? theme : "auto";
+
+  /** Load the user’s preference from `localStorage`. */
+  const loadTheme = (): Theme =>
+    parseTheme(
+      typeof localStorage !== "undefined" && localStorage.getItem(storageKey),
+    );
+
+  /** Store the user’s preference in `localStorage`. */
+  function storeTheme(theme: Theme): void {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(
+        storageKey,
+        theme === "light" || theme === "dark" ? theme : "",
+      );
+    }
+  }
+
+  /** Get the preferred system color scheme. */
+  const getPreferredColorScheme = (): Theme =>
+    matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+
+  /** Update select menu UI, document theme, and local storage state. */
+  function onThemeChange(theme: Theme): void {
+    StarlightThemeProvider.updatePickers(theme);
+
+    document.documentElement.dataset.theme =
+      theme === "auto" ? getPreferredColorScheme() : theme;
+    storeTheme(theme);
+  }
+
+  // React to changes in system color scheme.
+  matchMedia(`(prefers-color-scheme: light)`).addEventListener("change", () => {
+    if (loadTheme() === "auto") onThemeChange("auto");
+  });
+
+  class CustomThemeSelect extends HTMLElement {
+    themeIdx = 0;
+    constructor() {
+      super();
+      let defaultTheme = loadTheme();
+      if (defaultTheme === "dark") {
+        this.themeIdx = 1;
+      } else if (defaultTheme === "light") {
+        this.themeIdx = 2;
+      }
+      this.setTheme();
+      this.addEventListener("click", () => {
+        this.themeIdx = (this.themeIdx + 1) % 3;
+        this.setTheme();
+      });
+    }
+
+    setTheme() {
+      const idx = this.themeIdx;
+      const len = this.children.length;
+      for (let i = 0; i < len; i++) {
+        if (i === idx) {
+          this.children[i].classList.remove("hidden");
+        } else {
+          this.children[i].classList.add("hidden");
+        }
+      }
+      onThemeChange(idx === 0 ? "auto" : idx === 1 ? "dark" : "light");
+    }
+  }
+  customElements.define("custom-theme-select", CustomThemeSelect);
+</script>

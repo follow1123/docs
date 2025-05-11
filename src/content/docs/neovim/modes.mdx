@@ -1,0 +1,66 @@
+---
+title: 模式
+sidebar:
+    order: 10
+---
+
+import { Kbd } from "starlight-kbd/components";
+
+常用模式有4种：[Normal](#normal) [Insert](#insert) [Visual](#visual) [Command](#command)
+
+## Normal
+
+进入后默认在 `Normal` 模式下，`Normal` 模式下光标默认是块状样式
+
+| 模式 | 按键                            | 描述                                           |
+| ---- | ------------------------------- | ---------------------------------------------- |
+| `N`  | <Kbd linux="i" />               | 进入 `Insert` 模式，光标在字符的左边           |
+| `N`  | <Kbd linux="a" />               | 进入 `Insert` 模式，光标在字符的右边           |
+| `N`  | <Kbd linux="o" />               | 进入 `Insert` 模式，向下新开一行               |
+| `N`  | <Kbd linux="O" />               | 进入 `Insert` 模式，向上新开一行               |
+| `N`  | <Kbd linux="I" />               | 进入 `Insert` 模式，光标在行首，不包含空白字符 |
+| `N`  | <Kbd linux="g+I" />             | 进入 `Insert` 模式，光标在行首，包含空白字符   |
+| `N`  | <Kbd linux="A" />               | 进入 `Insert` 模式，光标在行尾                 |
+| `N`  | <Kbd linux="c" /> + `{operate}` | 完成文本对象操作并进入 `Insert` 模式           |
+| `N`  | <Kbd linux="C" />               | 从当前光标删除到行尾并进入 `Insert` 模式       |
+
+## Insert
+
+`Insert` 模式下光标默认是 `|` 样式
+
+| 模式 | 按键                   | 描述                                                        |
+| ---- | ---------------------- | ----------------------------------------------------------- |
+| `I`  | <Kbd linux="Esc" />    | 返回 `Normal` 模式                                          |
+| `I`  | <Kbd linux="Ctrl+[" /> | 返回 `Normal` 模式，和 <Kbd linux="Esc" /> 键发送一样的键码 |
+| `I`  | <Kbd linux="Ctrl+c" /> | 返回 `Normal` 模式，中断操作，不会触发 `Insert` 相关事件    |
+
+## Visual
+
+`Visual` 分为三种：
+
+- `Visual` - 按字符选择
+- `Visual-line` - 按行选择
+- `Visual-block` - 按块选择
+
+`Visual` 模式下也可以使用 [Normal](#normal) 模式下的部分键位对文本进行操作
+
+| 模式      | 按键                   | 描述                                           |
+| --------- | ---------------------- | ---------------------------------------------- |
+| `N`       | <Kbd linux="v" />      | 进入 `Visual` 模式                             |
+| `N`       | <Kbd linux="V" />      | 进入 `Visual-line` 模式                        |
+| `N`       | <Kbd linux="Ctrl+v" /> | 进入 `Visual-block` 模式                       |
+| `V`       | <Kbd linux="o" />      | 在 `Visual` 模式下，光标移动到另一个方向       |
+| `V-block` | <Kbd linux="O" />      | 在 `Visual-block` 模式下，光标移动行内的另一头 |
+
+## Command
+
+`Command` 模式下一般输入命令执行特殊操作
+
+| 模式 | 按键                | 描述                |
+| ---- | ------------------- | ------------------- |
+| `N`  | <Kbd linux=":" />   | 进入 `Command` 模式 |
+| `C`  | <Kbd linux="Tab" /> | 补全命令            |
+
+## Replace
+
+在 [Normal](#normal) 模式下按 <Kbd linux="R" /> 进入 `Replace` 模式，输入的字符会替换后面的字符
