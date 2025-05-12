@@ -1,13 +1,130 @@
 ---
+import LinkSelect from "./LinkSelect.astro";
+
+// 详细类型参考：StarlightSidebarTopicsRouteData
+// 这里只需要这三个属性
+type Topic = {
+  isCurrent: boolean;
+  label: string;
+  link: string;
+};
+
 const { topics } = Astro.locals?.starlightSidebarTopics;
+
+const ungroupedName = "1gjkasfrewrdfksjil";
+const groupedTopics = new Map<string, Array<Topic> | Topic>();
+
+topics.forEach((t, i) => {
+  const idx = t.label.indexOf("/");
+  if (idx !== -1) {
+    const groupName = t.label.substring(0, idx);
+    const topic = {
+      ...t,
+      label: t.label.substring(idx + 1),
+    };
+    if (groupedTopics.has(groupName)) {
+      const gts = groupedTopics.get(groupName) as Array<Topic>;
+      gts.push(topic);
+    } else {
+      const gts = new Array();
+      gts.push(topic);
+      groupedTopics.set(groupName, gts);
+    }
+  } else {
+    groupedTopics.set(ungroupedName + i, t);
+  }
+});
+
+const groupedTopicsArr = Array.from(groupedTopics.entries());
+const selectWidth = "7em";
 ---
 
-<nav>
+<nav class="md-nav">
+  <LinkSelect
+    label="主题"
+    options={topics.map((t) => ({
+      label: t.label,
+      selected: t.isCurrent,
+      value: t.link,
+    }))}
+    width={selectWidth}
+  />
+</nav>
+
+<nav class="lg-nav">
   {
-    topics.map((topic) => (
-      <a href={topic.link} aria-current={topic.isCurrent ? "page" : false}>
-        {topic.label}
-      </a>
-    ))
+    groupedTopicsArr.map(([gName, topic]) => {
+      if (gName.startsWith(ungroupedName)) {
+        const t = topic as Topic;
+        return (
+          <a
+            class:list={{ "current-topic": t.isCurrent }}
+            href={t.link}
+            set:text={t.label}
+          />
+        );
+      } else {
+        const ts = topic as Topic[];
+        return (
+          <LinkSelect
+            label={gName}
+            options={ts.map((t) => ({
+              label: t.label,
+              selected: t.isCurrent,
+              value: t.link,
+            }))}
+            width={selectWidth}
+          />
+        );
+      }
+    })
   }
 </nav>
+
+<style>
+  nav {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+
+  nav a {
+    text-decoration: none;
+
+    transition-property:
+      color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.15s;
+    color: color-mix(in oklab, var(--foreground) 80%, transparent);
+  }
+  nav a:hover {
+    color: color-mix(in oklab, var(--foreground) 80%, transparent);
+  }
+
+  nav a.active {
+    color: var(--foreground);
+  }
+
+  .md-nav {
+    display: none;
+  }
+
+  .current-topic {
+    color: var(--sl-color-text-accent);
+  }
+
+  .md-nav,
+  .lg-nav {
+    padding: 0 0.5rem;
+  }
+
+  @media (max-width: 50rem) {
+    .lg-nav {
+      display: none;
+    }
+    .md-nav {
+      display: block;
+    }
+  }
+</style>
