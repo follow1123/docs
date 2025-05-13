@@ -1,0 +1,26 @@
+---
+title: 缩进
+sidebar:
+    order: 0
+---
+
+import { Kbd } from "starlight-kbd/components";
+
+> 详细参考 `:h indent.txt`
+
+| 模式 | 按键                                | 描述             |
+| ---- | ----------------------------------- | ---------------- |
+| `N`  | <Kbd linux=">" /> <Kbd linux=">" /> | 向右缩进         |
+| `N`  | <Kbd linux="<" /> <Kbd linux="<" /> | 向左缩进         |
+| `N`  | <Kbd linux="=" />                   | 自动对齐缩进     |
+| `V`  | <Kbd linux=">" />                   | 选中的行向右缩进 |
+| `V`  | <Kbd linux="<" />                   | 选中的行向左缩进 |
+| `I`  | <Kbd linux="Tab" />                 | 缩进字符         |
+
+## 相关配置
+
+| 模式 | 按键                        | 描述                                                           |
+| ---- | --------------------------- | -------------------------------------------------------------- |
+| `C`  | `:set list` / `:set nolist` | 开启或关闭空白字符显示                                         |
+| `C`  | `:set shiftwitdh={num}`     | 使用 <Kbd linux="<" /> 或 <Kbd linux=">" /> 相关按键缩进的宽度 |
+| `C`  | `:set tabstop={num}`        | 使用 <Kbd linux="Tab" />按键缩进的宽度                         |

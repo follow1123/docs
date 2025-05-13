@@ -1,0 +1,30 @@
+---
+title: 全局过滤
+sidebar:
+    order: 10
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+使用这个命令搜索到的内容会放入 <InternalLink text="quickfix list" href="neovim/positioning-jumping/quickfixlist" /> 内，配合里面的命令实现其他高级操作
+
+```vimscript "{pattern}" "{flags}" "files"
+vimgrep /{pattern}/{flags} files
+```
+
+## `pattern`
+
+正则表达式或字符串
+
+## `flags`
+
+- `g` - 单行匹配多次
+- `j` - 不跳转到匹配的buffer内
+- `f` - 模糊匹配，<strong>pattern</strong>输入字符串
+
+## `files`
+
+多个文件
+
+- `a/*` - a 文件夹下的所有文件
+- `**/*.c` - 所有文件夹下的c文件

@@ -1,0 +1,22 @@
+---
+title: Quickfix List
+sidebar:
+    order: 10
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+> 详细参考 `:h quickfix`
+
+| 模式 | 按键         | 描述                                                                                                                                                                 |
+| ---- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `C`  | `:copen`     | 打开 Quickfix 列表                                                                                                                                                   |
+| `C`  | `:cclose`    | 关闭 Quickfix 列表                                                                                                                                                   |
+| `C`  | `:cnext`     | Quickfix 列表下一条                                                                                                                                                  |
+| `C`  | `:cprevious` | Quickfix 列表上一条                                                                                                                                                  |
+| `C`  | `:cfirst`    | Quickfix 列表第一条                                                                                                                                                  |
+| `C`  | `:clast`     | Quickfix 列表最后一条                                                                                                                                                |
+| `C`  | `:chistory`  | 显示 Quickfix 列表历史记录                                                                                                                                           |
+| `C`  | `:colder`    | 使用上一次 Quickfix 列表操作记录                                                                                                                                     |
+| `C`  | `:cnewer`    | 使用下一次 Quickfix 列表操作记录                                                                                                                                     |
+| `C`  | `:cdo`       | 对 quickfix list 内的内容执行操作<br/>例如 `cdo` 后接 <InternalLink text="substitute" href="neovim/search-replace/substitute" /> 相关操作 <br/> 实现工作区内替换功能 |

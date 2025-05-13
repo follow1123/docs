@@ -1,0 +1,61 @@
+---
+title: 寄存器
+sidebar:
+    order: 15
+---
+
+import { Kbd } from "starlight-kbd/components";
+import InternalLink from "@components/InternalLink.astro";
+
+> 详细参考 `:h registers`
+
+| 模式 | 按键                                             | 描述                                         |
+| ---- | ------------------------------------------------ | -------------------------------------------- |
+| `N`  | <Kbd linux='"' /> `{register}` <Kbd linux="y" /> | 将文本复制到对应的寄存器内                   |
+| `N`  | <Kbd linux='"' /> `{register}` <Kbd linux="p" /> | 粘贴对应的寄存器的内容                       |
+| `I`  | <Kbd linux="ctrl+r" /> `{register}`              | 输入对应的寄存器的内容                       |
+| `C`  | <Kbd linux="ctrl+r" /> `{register}`              | 输入对应的寄存器的内容                       |
+| `C`  | `:registers {register}`                          | 显示对应寄存器的内容，无参数则显示全部寄存器 |
+
+## 未命名寄存器
+
+`"` 修改、删除、复制等操作后的文本都会存入这个寄存器内
+
+## 数字寄存器
+
+`0` 复制的文本都会存入这个寄存器内
+`1-9` 修改或删除后的文本会依次存入这些寄存器内
+
+## 删除寄存器
+
+`-` 删除的内容少于一行时存入这个寄存器
+
+## 字母寄存器
+
+`a-z` / `A-Z` 用户自定义操作的寄存器
+
+## 只读寄存器
+
+- `.` 上次新增的内容
+- `%` 当前buffer文件路径
+- `:` 上次执行的命令
+
+## 备用buffer寄存器
+
+`#` 上次打开的buffer的文件路径
+
+## 表达式寄存器
+
+`=` `Insert` 模式下 <Kbd linux="ctrl+r =" /> 输入在 `Command` 模式下执行命令的结果
+
+## 选择寄存器
+
+`*`/`+` 系统剪切板
+
+## 黑洞寄存器
+
+`_` 和Linux下 `/dev/null` 类似
+
+## 上次修改寄存器
+
+`/` <InternalLink text="搜索" href="neovim/search-replace/search" />后的内容会保存在这个寄存器内

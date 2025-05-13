@@ -1,0 +1,29 @@
+---
+title: 折叠
+sidebar:
+    order: 5
+---
+
+import { Kbd } from "starlight-kbd/components";
+
+> 详细参考 `:h folding`
+
+| 模式 | 按键                | 描述                                           |
+| ---- | ------------------- | ---------------------------------------------- |
+| `N`  | <Kbd linux="z+f" /> | 创建一个折叠块，配合 `foldmethod` 配置才能使用 |
+| `V`  | <Kbd linux="z+f" /> | 创建一个折叠块，配合 `foldmethod` 配置才能使用 |
+| `N`  | <Kbd linux="z+o" /> | 开启折叠块                                     |
+| `N`  | <Kbd linux="z+c" /> | 关闭折叠块                                     |
+| `N`  | <Kbd linux="z+a" /> | 关闭或关闭折叠块                               |
+| `N`  | <Kbd linux="z+A" /> | 关闭或关闭折叠块，递归                         |
+| `N`  | <Kbd linux="z+d" /> | 删除折叠块                                     |
+| `N`  | <Kbd linux="z+j" /> | 下一个折叠块                                   |
+| `N`  | <Kbd linux="z+k" /> | 上一个折叠块                                   |
+
+### 折叠块相关配置
+
+| 模式 | 按键                                        | 描述                                          |
+| ---- | ------------------------------------------- | --------------------------------------------- |
+| `C`  | `:set foldenable` <br/> `:set nofoldenable` | 开启或关闭打开文件自动折叠代码                |
+| `C`  | `:set foldlevel={num}`                      | 最大折叠块深度                                |
+| `C`  | `:set foldmethod={string}`                  | 折叠代码方式<br/>`:h foldmethod` 查看详细信息 |

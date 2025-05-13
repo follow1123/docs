@@ -1,0 +1,21 @@
+---
+title: 编辑
+sidebar:
+    order: 10
+---
+
+import { Kbd } from "starlight-kbd/components";
+
+| 模式 | 按键                                     | 描述                                                                                         |
+| ---- | ---------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `N`  | <Kbd linux="x" />                        | 删除当前光标下的字符                                                                         |
+| `N`  | <Kbd linux="r" />                        | 将当前光标下的字符替换为输入的字符                                                           |
+| `N`  | <Kbd linux="y" /> + `{operate}`          | 复制                                                                                         |
+| `N`  | <Kbd linux="p" /> / <Kbd linux="P" />    | 粘贴，根据粘贴的内容是否为一行<br />粘贴的位置在当前行的下面或上面<br />当前字符的右边或左边 |
+| `N`  | <Kbd linux="ctrl+a" />                   | 增加数字                                                                                     |
+| `N`  | <Kbd linux="ctrl+x" />                   | 减少数字                                                                                     |
+| `V`  | <Kbd linux="g" /> <Kbd linux="ctrl+a" /> | 依次增加选中列的数字                                                                         |
+| `V`  | <Kbd linux="g" /> <Kbd linux="ctrl+x" /> | 依次减少选中列的数字                                                                         |
+| `N`  | <Kbd linux="u" />                        | 撤销                                                                                         |
+| `N`  | <Kbd linux="ctrl+r" />                   | 重做                                                                                         |
+| `N`  | <Kbd linux="~" />                        | 大小写转换                                                                                   |

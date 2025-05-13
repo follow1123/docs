@@ -1,0 +1,103 @@
+---
+title: 文本对象
+sidebar:
+    order: 15
+---
+
+import { Kbd } from "starlight-kbd/components";
+
+`Normal` 模式下快速对部分类型文本进行操作
+
+## 操作
+
+- <Kbd linux="c" /> - 修改（直接进入 `Insert` 模式）
+- <Kbd linux="d" /> - 删除
+- <Kbd linux="y" /> - 复制
+- <Kbd linux="v" /> - 选中
+
+## 范围
+
+- <Kbd linux="i" /> - 在什么里面
+- <Kbd linux="a" /> - 包含外面的字符
+- <Kbd linux="t" /> - 到某个字符前面
+- <Kbd linux="f" /> - 到某个字符
+
+## 对象
+
+- <Kbd linux="w" /> - 单词
+- <Kbd linux="s" /> - 一句
+- <Kbd linux="p" /> - 一段
+- <Kbd linux="(" /> / <Kbd linux=")" /> - 括号范围
+- <Kbd linux="[" /> / <Kbd linux="]" /> - 中扩阔范围
+- <Kbd linux={"{"} /> / <Kbd linux={"}"} /> - 大扩阔范围
+- <Kbd linux="<" /> / <Kbd linux=">" /> - 尖括号范围
+- <Kbd linux="'" /> - 单引号范围
+- <Kbd linux={'"'} /> - 双引号范围
+- <Kbd linux="`" /> - 反括号范围
+- <Kbd linux="t" /> - tag（xml、html等语言的一个 tag） 范围
+- <Kbd linux="%" /> - 任意成对的符号的另一对，
+  <Kbd linux="(" /> / <Kbd linux=")" />、<Kbd linux="'" /> 等
+
+## 示例
+
+### 选中括号内的内容
+
+在第一行任意位置按 <Kbd linux="v+i+(" />
+
+:::note
+其实只要光标在这对括号的前几行，并且保证所有括号都是成对出现的
+
+按下键位后会自动选中向后最近一对扩阔内的内容
+:::
+
+```js "a, b"
+function sum(a, b) {
+    return a + b;
+}
+```
+
+### 删除方法体
+
+<Kbd linux="d+i+{" />
+
+```diff lang="js"
+function sum(a, b) {
+-    return a + b;
+}
+```
+
+### 删除整个 `<p>` 标签并进入 `Insert` 模式
+
+光标放在 `<p>` 标签处 <Kbd linux="c+a+t" />
+
+```diff lang="html"
+<div>
+    <h2>title</h2>
+-    <p>content</p>
+</div>
+```
+
+### 删除一个方法的参数
+
+光标在 a 参数上 <Kbd linux="d+f+," />
+
+```ts del="a: number,"
+function sum(a: number, b: number): number {
+    return a + b;
+}
+```
+
+### 删除一整个代码块
+
+光标放在 else 后面的 `{` 符号上 <Kbd linux="d+%" />
+
+```js del=/(?<=e ){/ del="    // 假设这个逻辑很长..." del=/    }$/
+if(...) {
+    if(...) {
+
+
+    } else {
+    // 假设这个逻辑很长...
+    }
+}
+```

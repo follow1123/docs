@@ -1,0 +1,104 @@
+---
+title: Neovim API
+sidebar:
+    order: 0
+---
+
+Neovim 相关 lua api
+
+## 选项
+
+- `vim.o` - 简写
+- `vim.opt` - 全称
+- `vim.opt_local` - buffer local 选项
+
+Lua api 的选项与 vimscript 对应表
+
+| lua                    | vimscript            |
+| ---------------------- | -------------------- |
+| `vim.o.number`         | `set number`         |
+| `vim.o.relativenumber` | `set relativenumber` |
+| `vim.o.clipboard`      | `set clipboard`      |
+
+```vimscript
+" 查看 clipboard 选项的值
+set clipboard?
+
+" 和上面一样
+echo &clipboard
+```
+
+## 按键映射
+
+`vim.keymap` 对应 vimscript 的 `nmap` 和 `vmap` 等
+
+```lua
+-- 实现nnoremap <M-w> viw
+vim.keymap.set("n", "<M-w>", "viw", {
+ noremap = true
+})
+```
+
+## Lua API
+
+> 详细参考 `h vim.api`
+
+`vim.api` 使用 lua 实现的操作 neovim 的 api
+
+## VimScript API
+
+### `vim.fn`
+
+> 详细参考 `h vim.fn` 或 `h builtin-functions`
+
+| lua                  | vimscript     |
+| -------------------- | ------------- |
+| `vim.fn.getcwd()`    | `getcwd()`    |
+| `vim.fn.line()`      | `line()`      |
+| `vim.fn.buflisted()` | `buflisted()` |
+
+### `vim.cmd`
+
+调用 vimscript 的命令
+
+| lua                | vimscript |
+| ------------------ | --------- |
+| `vim.cmd.e()`      | `:e`      |
+| `vim.cmd.wincmd()` | `:wincmd` |
+| `vim.cmd.pwd()`    | `:pwd`    |
+
+## Language Server Protocol
+
+> 详细参考 `h vim.lsp` 或 `h vim.diagnostic`
+
+- `vim.lsp` - 语言服务
+- `vim.diagnostic` - 代码诊断
+
+## 其他
+
+### 网络编程
+
+> 详细参考 `h vim.uv`
+
+`vim.uv` / `vim.loop` Neovim 内置的 [luv](https://github.com/luvit/luv) 网络编程库
+
+### Event Loop
+
+event-loop 相关函数
+
+- `vim.schedule` - 传递方法体
+- `vim.schedule_wrap` - 传递方法引用
+
+```lua
+function sum(a, b)
+    return a + b
+end
+
+-- 直接定义方法调用
+vim.schedule(function()
+    sum(1, 2)
+end)
+
+-- 包装方法调用
+vim.schedule_wrap(sum)(1, 2)
+```

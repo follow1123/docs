@@ -1,0 +1,23 @@
+---
+title: 标记
+sidebar:
+    order: 15
+---
+
+import { Kbd } from "starlight-kbd/components";
+
+> 详细参考 `mark-motions`
+
+| 模式 | 按键                                                                      | 描述               |
+| ---- | ------------------------------------------------------------------------- | ------------------ |
+| `C`  | `:marks`                                                                  | 打开mark列表       |
+| `N`  | <Kbd linux="m" /> + `{mark}`                                              | 插眼               |
+| `N`  | <Kbd linux="'" /> + `{mark}` / <Kbd linux="`" /> + `{mark}`               | 传送               |
+| `N`  | <Kbd linux="'" /> <Kbd linux="'" /> / <Kbd linux="`" /> <Kbd linux="`" /> | 跳转到上一次的标记 |
+| `C`  | `:delmarks mark`                                                          | 排眼               |
+| `C`  | `:delmarks!`                                                              | 删除所有的标记     |
+
+- `a-z` - 当前buffer的标记
+- `A-Z` - 跨文件的标记
+- `0-9` - 跨项目的标记
+- `<` `>` - `Visual` 模式下选中文本的区域的标记

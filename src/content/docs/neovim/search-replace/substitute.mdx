@@ -1,0 +1,152 @@
+---
+title: 替换
+sidebar:
+    order: 5
+---
+
+import { Steps } from "@astrojs/starlight/components";
+import { Kbd } from "starlight-kbd/components";
+
+> 以下选项只是部分，详情参考：`:h substitute`
+
+```vimscript "[range]" "s[ubstitute]" "{pattern}" "{string}" "[flags]" "[count]"
+[range]s[ubstitute]/{pattern}/{string}/[flags] [count]
+```
+
+## range（可选）
+
+直接指定行号或用 `%` 代表当前整个文件
+
+## substitute
+
+操作名称，可以简写为 s
+
+## pattern
+
+支持正则表达式
+
+<Steps>
+1. 内容
+
+    ```html
+    <a id="mark-a"></a>
+    <a id="mark-b"></a>
+    <a id="mark-c"></a>
+    ```
+
+2. 选中并执行
+
+    ```vimscript
+    s/id="\(\w\+-\(\w\)\)">/href="#\1">\2/g
+    ```
+
+3. 结果
+
+    ```html /href="#mark-[a-z]">[a-z]/
+    <a href="#mark-a">a</a>
+    <a href="#mark-b">b</a>
+    <a href="#mark-c">c</a>
+    ```
+
+</Steps>
+
+## string
+
+> 参考：`h sub-replace-special`
+
+特殊操作和正则表达式的捕获组、大小写转换类似
+
+## flags
+
+- `c` - 替换时确认
+- `e` - 忽略替换时的错误
+- `g` - 替换所有的匹配项
+- `i` - 忽略大小写
+- `I` - 不忽略大小写
+- `n` - 不替换，只显示匹配项的个数
+
+:::tip
+由于搜索最多只能显示99个搜索结果，使用这个方式统计搜索内容的个数
+
+```vimscript
+%s/text//gn
+```
+
+:::
+
+## count
+
+单行替换时将包括当前行内下的 count 行都执行这个替换操作
+
+```vimscript
+" 将当前行所在内以下 5 行内的 `x` 字符替换成 `X` 字符
+s/x/X/g 5
+```
+
+## 分隔符说明
+
+命令分隔符不只可以使用 `/`，还可以使用 `#` `.` `+` 等，和 linux 下的 `sed` 命令类似
+
+```vimscript
+" abc 替换成 def
+s.abc.def.g
+
+" 123 替换成 456
+s#123#456#g
+```
+
+## 配合搜索使用
+
+上次搜索的结果可以直接作为 `pattern`
+
+当前替换时，需要搜索的内容太长时可以进行以下操作
+
+<Steps>
+1. 使用 `*` 直接搜索当前光标下的单词
+
+    ```js "veryLooooooooooooooooooooooooooooooooooooooongName"
+    function veryLooooooooooooooooooooooooooooooooooooooongName() {
+        // ...
+    }
+
+    // ...
+
+    function b() {
+        veryLooooooooooooooooooooooooooooooooooooooongName();
+    }
+
+    // ...
+    veryLooooooooooooooooooooooooooooooooooooooongName();
+    ```
+
+2. 输入命令修改方法名
+
+    ```vimscript
+    %s//shortName/g
+    ```
+
+3. 结果
+
+    ```js "shortName"
+    function shortName() {
+        // ...
+    }
+
+    // ...
+
+    function b() {
+        shortName();
+    }
+
+    // ...
+    shortName();
+    ```
+
+</Steps>
+
+## 相关快捷键
+
+| 模式 | 按键               | 描述                             |
+| ---- | ------------------ | -------------------------------- |
+| `N`  | <Kbd linux="&"/>   | 执行上一次的单行替换操作         |
+| `N`  | <Kbd linux="g+&"/> | 执行上一次的整个 buffer 替换操作 |

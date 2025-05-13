@@ -1,0 +1,22 @@
+---
+title: 其他快捷键
+sidebar:
+    order: 25
+---
+
+import { Kbd } from "starlight-kbd/components";
+
+| 模式 | 按键                                     | 描述                                               |
+| ---- | ---------------------------------------- | -------------------------------------------------- |
+| `N`  | <Kbd linux="ctrl+g" />                   | 底部显示当前 buffer的信息                          |
+| `N`  | <Kbd linux="1" /> <Kbd linux="ctrl+g" /> | 底部显示当前 buffer的信息<br/>绝对路径             |
+| `N`  | <Kbd linux="2" /> <Kbd linux="ctrl+g" /> | 底部显示当前 buffer的信息<br/>buffer number        |
+| `N`  | <Kbd linux="g" /> <Kbd linux="ctrl+g" /> | 显示当前文件的<br/>line、word、char、byte 信息     |
+| `V`  | <Kbd linux="g" /> <Kbd linux="ctrl+g" /> | 显示当前选中区域的<br/>line、word、char、byte 信息 |
+| `C`  | `:set laststatus=0`                      | 隐藏底部输入命令的行高度                           |
+| `C`  | `:set laststatus=2`                      | 设置底部输入命令的行高度                           |
+| `C`  | `:set guifont=*`                         | gui模式下设置字体                                  |
+| `N`  | <Kbd linux="q+:" />                      | 分屏显示历史命令窗口                               |
+| `N`  | <Kbd linux="q+/" />                      | 分屏显示历史搜索记录窗口                           |
+| `N`  | <Kbd linux="q+?" />                      | 分屏显示历史搜索记录窗口                           |
+| `N`  | <Kbd linux=":" /> `{number}`             | 跳转到对应的行号                                   |
