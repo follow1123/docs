@@ -1,0 +1,30 @@
+---
+title: 忽略文件（.gitignore）
+sidebar:
+    order: 0
+---
+
+在当前仓库根目录添加 `.gitignore` 文件
+
+```bash frame="none"
+# 忽略项目内所有名称包含 aaa 的文件
+aaa
+
+# 忽略所有的 html 文件
+*.html
+
+# 忽略 .gitignore 文件根目录下 bbb 目录内的所有文件
+/bbb/*
+
+# 在上面忽略条件的情况下排除 public.txt 文件，也就是不忽略 /bbb/public.txt 文件
+!/bbb/public.txt
+
+# 忽略 /ccc 目录及其子目录下的所有 class 文件
+/ccc/**/*.class
+```
+
+:::tip[其他忽略文件方式]
+将上面的条件添加到 `.git\info\exclude` 文件内
+
+假设你有一个公共的仓库，需要在这个仓库内放一些不能提交到的文件，也不想放在 `.gitignore` 里面忽略，可以使用这种方式
+:::

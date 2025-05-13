@@ -1,0 +1,276 @@
+---
+title: 交互式变基（rebase -i）
+sidebar:
+    order: 5
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+:::danger
+交互式变基会修改提交的 commit 的 hash 值
+
+不要对已经**推送到远程**的提交操作
+:::
+
+## commit 范围
+
+```bash
+# 选取 当前分支 所有提交
+git rebase -i --root
+
+# 选取 当前分支 最新一次提交 和 前两次提交
+git rebase -i HEAD~3
+
+# 选取 当前分支 执行提交 到最新提交的范围，不包含这个提交
+git rebase -i <commit_hash>
+
+# 选取 当前分支 执行提交 到最新提交的范围，包含这个提交
+git rebase -i <commit_hash>^
+```
+
+:::tip
+建议选取所有未提交的历史进行操作
+
+```bash
+# 选取所有未提交的历史
+git rebase -i $(git merge-base <remote_name>/<remote_branch_name> HEAD)
+```
+
+:::
+
+## 重新排序并修改提交信息（reword）
+
+![修改提交信息并重新排序](@assets/git/git-rewrite-history-reword.drawio.png)
+
+<Steps>
+
+1. 准备仓库
+
+    ```bash
+    mkdir example-rewrite-history
+    cd example-rewrite-history
+
+    git init
+    echo 'cabbage' >> vegetables.md
+    git add . && git commit -m 'A: add cabbage'
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'B: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'C: add banana'
+    echo 'tomato' >> vegetables.md
+    git add . && git commit -m 'D: add tomato'
+    echo 'orange' >> fruits.md
+    git add . && git commit -m 'E: add orange'
+    echo 'watermelon' >> fruits.md
+    git add . && git commit -m 'F: add watermelon'
+    ```
+
+2. 开始操作
+
+    ```bash
+    # 修改当前分支所有提交，--root 表示所有提交
+    git rebase -i --root
+    ```
+
+3. 执行修改
+
+    将提交 D 移动到提交 B 的前面
+
+    ```diff lang="txt"
+    pick 86b33f7 A: add cabbage
+    + pick fb88b7c D: add tomato
+    pick 6b2458d B: add apple
+    pick 39afa3c C: add banana
+    - pick fb88b7c D: add tomato
+    pick c4b7caf E: add orange
+    pick 6775f5d F: add watermelon
+
+    # ...
+    ```
+
+    此时保存退出后，git 会依次打开编辑器修改 **fb88b7c** **6b2458d** **39afa3c** 的提交信息
+
+    **fb88b7c** 提交信息修改为：`B: add tomato`  
+    **6b2458d** 提交信息修改为：`C: add apple`  
+    **39afa3c** 提交信息修改为：`D: add apple`
+
+    此时使用 `git log --all --oneline --graph` 查看日志信息
+
+</Steps>
+
+## 删除提交（drop）
+
+![删除提交](@assets/git/git-rewrite-history-drop.drawio.png)
+
+<Steps>
+
+1. 准备仓库
+
+    ```bash
+    mkdir example-rewrite-history
+    cd example-rewrite-history
+
+    git init
+    echo 'cabbage' >> vegetables.md
+    git add . && git commit -m 'A: add cabbage'
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'B: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'C: add banana'
+    echo 'tomato' >> vegetables.md
+    git add . && git commit -m 'D: add tomato'
+    echo 'orange' >> fruits.md
+    git add . && git commit -m 'E: add orange'
+    echo 'watermelon' >> fruits.md
+    git add . && git commit -m 'F: add watermelon'
+    ```
+
+2. 开始操作
+
+    ```bash
+    # 修改当前分支所有提交，--root 表示所有提交
+    git rebase -i --root
+    ```
+
+3. 执行删除
+
+    ```diff lang="txt"
+    pick 86b33f7 A: add cabbage
+    - pick 6b2458d B: add apple
+    pick 39afa3c C: add banana
+    - pick fb88b7c D: add tomato
+    pick c4b7caf E: add orange
+    pick 6775f5d F: add watermelon
+
+    # ...
+    ```
+
+    此时 `fruits.md` 文件内的 `watermelon` 和 `vegetables.md` 文件内的 `tomato` 已经被删除
+
+</Steps>
+
+## 压缩提交（squash）
+
+![压缩提交](@assets/git/git-rewrite-history-squash.drawio.png)
+
+<Steps>
+
+1. 准备仓库
+
+    ```bash
+    mkdir example-rewrite-history
+    cd example-rewrite-history
+
+    git init
+    echo 'cabbage' >> vegetables.md
+    git add . && git commit -m 'A: add cabbage'
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'B: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'C: add banana'
+    echo 'tomato' >> vegetables.md
+    git add . && git commit -m 'D: add tomato'
+    echo 'orange' >> fruits.md
+    git add . && git commit -m 'E: add orange'
+    echo 'watermelon' >> fruits.md
+    git add . && git commit -m 'F: add watermelon'
+    ```
+
+2. 开始操作
+
+    ```bash
+    # 修改当前分支所有提交，--root 表示所有提交
+    git rebase -i --root
+    ```
+
+3. 执行压缩
+
+    ```diff lang="txt"
+    pick 86b33f7 A: add cabbage
+    + squash fb88b7c D: add tomato
+    pick 6b2458d B: add apple
+    - pick 39afa3c C: add banana
+    - pick fb88b7c D: add tomato
+    - pick c4b7caf E: add orange
+    - pick 6775f5d F: add watermelon
+    + squash 39afa3c C: add banana
+    + squash c4b7caf E: add orange
+    + squash 6775f5d F: add watermelon
+
+    # ...
+    ```
+
+    此时 git 会依次打开两次编辑器，用于处理压缩后的提交信息
+
+    第一次修改提交信息为：`A: add cabbage tomato`  
+    第二次修改提交信息为：`B: add apple banana orange watermelon`
+
+    使用 `git log --all --oneline --graph` 查看只有两次提交
+
+</Steps>
+
+## 拆分提交（edit）
+
+![拆分提交](@assets/git/git-rewrite-history-edit.drawio.png)
+
+<Steps>
+
+1. 准备仓库
+
+    ```bash
+    mkdir example-rewrite-history-edit
+    cd example-rewrite-history-edit
+
+    git init
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'A: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'B: add banana'
+    echo 'orange' >> fruits.md
+    git add . && git commit -m 'C: add orange'
+    echo 'cabbage' >> vegetables.md
+    echo 'tomato' >> vegetables.md
+    git add . && git commit -m 'D: add tomato'
+    ```
+
+2. 开始操作
+
+    ```bash
+    # 修改当前分支所有提交，--root 表示所有提交
+    git rebase -i --root
+    ```
+
+3. 执行拆分
+
+    ```diff lang="txt"
+    pick 99662c1 A: add apple
+    pick ab3c217 B: add tomato
+    pick 855ca3f C: add orange
+    - pick 0f25e39 D: add tomato
+    + edit 0f25e39 D: add tomato
+
+    # ...
+    ```
+
+    此时会将标记 `edit` 的提交的分离出来，在临时分支进行操作
+
+    1. 编辑 `vegetables.md` 文件，删除 `cabbage` 所在行
+    2. 执行 `git add . && git commit --amend --no-edit` 命令，修正上次提交，将 `tomato` 内容单独作为一个提交
+    3. 执行 `git restore -s main .\vegetables.md` 命令，恢复 `vegetables.md` 文件内删除的内容，将 `cabbage` 内容恢复
+    4. 执行 `git add . && git commit -m 'E: add cabbage'` 命令，提交 `cabbage` 内容
+    5. 执行 `git rebase --continue` 命令，完成分离操作
+
+    :::note
+    拆分操作只是将指定的提交分离了出来
+
+    具体拆分逻辑还是需要自己手动操作
+
+    完成拆分逻辑后，执行 `git rebase --continue` 会依次向最新的提交合并
+    :::
+
+</Steps>
+
+## 其他操作
+
+- `pick` - 保留当前提交不做任何修改，按照顺序保留该提交
+- `fixup` - 类似于 squash，但不保留当前提交的提交信息。当前提交的内容将被合并到前一个提交中，且不会提示你编辑提交信息

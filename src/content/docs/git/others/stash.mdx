@@ -1,0 +1,30 @@
+---
+title: 贮藏（stash）
+sidebar:
+    order: 15
+---
+
+贮藏当前工作区的文件，（默认情况下只贮藏**已跟踪**的文件）
+
+`git stash`
+
+- `-S/--staged` - 只贮藏已经暂存的文件
+- `-u/--inculde-untracked` - 贮藏包含任何**未跟踪**文件
+- `-a/--all` - 包含忽略文件
+
+```bash
+# 贮藏当前工作区所有文件
+git stash -u
+
+# 列出贮藏列表
+git stash list
+
+# 将栈顶的一次贮藏应用到当前分支上
+git stash apply
+
+# 丢弃栈顶的贮藏
+git stash drop
+
+# apply + drop 弹出栈顶的贮藏，并应用到当前分支上
+git stash pop
+```

@@ -1,0 +1,94 @@
+---
+title: 配置（config）
+sidebar:
+    order: 5
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+## 新版命令
+
+```bash
+# 查看所有配置信息
+git config list
+
+# 显示配置属于哪个作用域
+#  system - 系统
+#  global - 用户
+#  local - 本仓库
+git config list --show-scope
+
+# 显示配置文件所在位置
+git config list --show-scope --show-origin
+
+# 查看指定作用域的配置
+git config list --local
+git config list --global
+git config list --system
+
+# 以下命令包含上面部分选项
+
+# 查看某个配置
+git config get <config_name>
+
+# 设置配置
+git config set <config_name> <value>
+
+# 删除配置
+git config unset <config_name> <value>
+
+# 删除配置，删除整个项的配置
+#
+# [test]
+#     a = aaa
+#     b = bbb
+#
+# 使用 git config remove-section test 直接删除 test.a 和 test.b 两个配置
+git config remove-section <section_name>
+
+# 使用配置的编辑器打开本地仓库级、用户级、系统级配置文件
+git config edit --local
+git config edit --global
+git config edit --system
+```
+
+## 旧版命令
+
+```bash
+# 查看所有配置信息
+git config --list
+
+# 查看某个配置，其他选项和上面类似
+git config --get <config_name>
+
+# 设置配置
+git config --add <config_name> <value>
+
+# 删除配置
+git config --unset <config_name> <value>
+
+# 删除配置，删除一整项配置
+git config --remove-section <section_name>
+
+# 打开本地仓库级、用户级、系统级配置文件
+git config --edit --local/--global/--system
+```
+
+## 常用配置
+
+| 配置                 | 说明                                                                    |
+| -------------------- | ----------------------------------------------------------------------- |
+| `user.name`          | 用户名                                                                  |
+| `user.email`         | 用户邮箱                                                                |
+| `init.defaultBranch` | 修改 `git init` 创建分支时**主分支**的名称                              |
+| `pull.rebase`        | 修改 `git pull` 命令默认操作，默认进行 merge 操作，改为进行 rebase 操作 |
+
+### 本地永久保存 Token
+
+<Steps>
+
+1. `git config set --global credential.helper store`
+
+2. 下次拉取或推送时提示需要输入用户名和密码，用户名输入**账户名称**，密码就输入 Token。 凭证默认保存在 `~/.git-credentials`
+
+</Steps>

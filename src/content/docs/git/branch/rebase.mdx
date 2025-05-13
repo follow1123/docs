@@ -1,0 +1,210 @@
+---
+title: 变基（rebase）
+sidebar:
+    order: 10
+---
+
+import { Steps } from "@astrojs/starlight/components";
+import InternalLink from "@components/InternalLink.astro";
+
+## `其他分支`变基到`主分支`
+
+![分支变基](@assets/git/git-other-rebase-main.drawio.png)
+
+<Steps>
+1. 准备仓库
+
+    ```bash
+    mkdir example-rebase
+    cd example-rebase
+
+    git init
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'A: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'B: add banana'
+
+    git switch -c b1
+    echo 'cabbage' >> vegetables.md
+    git add . && git commit -m 'C: add cabbage'
+    echo 'tomato' >> vegetables.md
+    git add . && git commit -m 'D: add tomato'
+
+    git switch main
+    echo 'watermelon' >> fruits.md
+    git add . && git commit -m 'E: add watermelon'
+    ```
+
+2. 检查两个分支的`公共祖先`的 `commit hash` 和`主分支`最新提交的 `commit hash` 是否相同
+
+    :::tip
+    如果两个 `commit hash` 相同，则无法进行 rebase 操作，因为 rebase 操作就是将`当前分支`的`公共祖先`修改成被 rebase 分支最新的提交
+    :::
+
+    ```bash
+    git merge-base main b1 && git log main -1 --pretty=format:%H
+    ```
+
+3. 使用`git rebase`将`b1分支`变基到`主分支`
+
+    ```bash
+    # 查看分支历史
+    git log --all --oneline --graph
+
+    # 确保当前处于b1分支内
+    git switch b1
+
+    # 变基b1的公共祖先到main分支的最新提交
+    git rebase main
+
+    # 查看两个分支 公共祖先 和主分支 最新提交 是否相同
+    git merge-base main b1 && git log main -1 --pretty=format:%H
+
+    # 查看分支历史
+    git log --all --oneline --graph
+    ```
+
+</Steps>
+
+## `主分支`变基到`其他分支`
+
+![分支变基](@assets/git/git-main-rebase-other.drawio.png)
+
+<Steps>
+
+1. 准备仓库
+
+    ```bash
+    mkdir example-rebase
+    cd example-rebase
+
+    git init
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'A: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'B: add banana'
+
+    git switch -c b1
+    echo 'cabbage' >> vegetables.md
+    git add . && git commit -m 'C: add cabbage'
+    echo 'tomato' >> vegetables.md
+    git add . && git commit -m 'D: add tomato'
+
+    git switch main
+    echo 'watermelon' >> fruits.md
+    git add . && git commit -m 'E: add watermelon'
+    ```
+
+2. 使用 `git rebase` 将`主分支`变基到`b1分支`
+
+    ```bash
+    # 查看分支历史
+    git log --all --oneline --graph
+
+    # 确保当前处于main分支内
+    git switch main
+
+    # 变基main的公共祖先到b1分支的最新提交
+    git rebase b1
+
+    # 查看两个分支 公共祖先 和主分支 最新提交 是否相同
+    git merge-base main b1 && git log b1 -1 --pretty=format:%H
+
+    # 查看分支历史
+    git log --all --oneline --graph
+    ```
+
+</Steps>
+
+## 变基冲突处理
+
+![合并冲突](@assets/git/git-rebase-conflicts.drawio.png)
+
+<Steps>
+
+1. 准备仓库
+
+    ```bash
+    mkdir example-rebase-conflicts
+    cd example-rebase-conflicts
+
+    git init
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'A: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'B: add banana'
+
+    git switch -c b1
+    echo 'orange' >> fruits.md
+    git add . && git commit -m 'C: add orange'
+    echo 'strawberry' >> fruits.md
+    git add . && git commit -m 'D: add strawberry'
+
+    git switch main
+    echo 'watermelon' >> fruits.md
+    git add . && git commit -m 'E: add watermelon'
+    ```
+
+2. 使用 `git rebase` 将`b1分支`变基到`主分支`
+
+    ```bash
+    # 确保当前处于b1分支内
+    git switch b1
+
+    # 变基b1的公共祖先到main分支的最新提交
+    git rebase main
+    ```
+
+3. 此时提交合并冲突
+
+    ### 冲突内容说明
+
+    :::tip
+    rebase 合并冲突时会将**当前分支**的**公共祖先**之后的**所有提交**和被 rebase 分支的**公共祖先**之后**所有提交**进行合并
+
+    此时 **HEAD** 会将**当前分支**后所有提交单独分离出来进行合并操作
+    :::
+
+    ```txt {3-8} title="fruits.md"
+    apple
+    banana
+    <<<<<<< HEAD
+    watermelon
+    =======
+    orange
+    >>>>>>> 69ecd8c (C: add orange)
+    ```
+
+4. 处理冲突
+
+    参考<InternalLink text="合并冲突" href="git/branch/merge/#使用-git-checkout-命令应用指定分支的内容" />时操作
+
+    :::tip
+    取消变基：`git rebase --abort`
+    :::
+
+5. 完成合并
+
+    ```bash
+    # 修复完标记冲突已经解决
+    git add .
+
+    # 弹出编辑器修改提交信息
+    git rebase --continue
+    ```
+
+    :::note
+    rebase 操作可能出现多次合并操作
+    :::
+
+    完成后，检查两个分支的**公共祖先**和**主分支** commit hash 是否相同
+
+    ```bash
+    git merge-base main b1 && git log main -1 --pretty=format:%H
+    ```
+
+    :::warning
+    变基操作会修改提交历史，如果分支已经提交到公共的远程仓库上，不建议使用这个操作
+    :::
+
+</Steps>

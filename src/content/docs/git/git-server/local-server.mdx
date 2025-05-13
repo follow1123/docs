@@ -1,0 +1,34 @@
+---
+title: 本地 Git 服务
+sidebar:
+    order: 0
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+<Steps>
+1. 创建 git 仓库文件夹
+
+    ```bash
+    mkdir local-repo
+    cd local-repo
+    ```
+
+2. 初始化裸仓库
+
+    ```bash
+    git init --bare
+    ```
+
+3. 克隆仓库
+
+    ```bash
+    # 克隆本地仓库
+    git clone ./local-repo repo1
+
+    # 或者使用绝对路径
+
+    git clone file://<absolute_file_path> <repo_nam>
+    ```
+
+</Steps>

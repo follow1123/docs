@@ -1,0 +1,41 @@
+---
+title: 标签（tag）
+sidebar:
+    order: 10
+---
+
+```bash
+# 查看所有 tag
+git tag
+
+# 给**本地仓库**内最新的一次提交打 tag
+git tag -a '<tag_name>' -m '<message>'
+
+# 给**本地仓库**内指定的提交打 tag
+git tag -a '<tag_name>' -m '<message>' <commit_hash>
+
+# 查看指定 tag 的详细信息
+git show <tab_name>
+
+# 删除本地的标签
+git tag -d <tag_name>
+```
+
+## 操作远程仓库的 tag
+
+```bash
+# 将指定标签推送到远程仓库
+git push origin <tab_name>
+
+# 将远程仓库没用的标签推送到远程仓库
+git push origin --tags
+
+# 删除远程仓库上指定的标签，默认删除本地的标签不会删除远程的标签，需要单独执行这条命令删除
+git push origin --delete <tag_name>
+```
+
+## 从指定 tag 创建一个新分支
+
+```bash
+git switch <tag_name> -c <new_branch_name>
+```

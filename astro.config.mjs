@@ -25,6 +25,47 @@ export default defineConfig({
         }),
         starlightSidebarTopics([
           {
+            label: "Git",
+            link: "/git/",
+            items: [
+              "git",
+              {
+                label: "初始化",
+                autogenerate: { directory: "git/initialization" },
+              },
+              {
+                label: "操作仓库",
+                autogenerate: { directory: "git/operation" },
+              },
+              {
+                label: "仓库信息",
+                autogenerate: { directory: "git/information" },
+              },
+              {
+                label: "还原操作",
+                autogenerate: { directory: "git/restore-operations" },
+              },
+              {
+                label: "分支",
+                autogenerate: { directory: "git/branch" },
+              },
+              {
+                label: "重写历史",
+                autogenerate: { directory: "git/rewrite-history" },
+              },
+              {
+                label: "其他",
+                autogenerate: { directory: "git/others" },
+              },
+              {
+                label: "搭建 Git 服务",
+                autogenerate: { directory: "git/git-server" },
+              },
+              "git/specification",
+              "git/github",
+            ],
+          },
+          {
             label: "Neovim",
             link: "/neovim",
             items: [
@@ -55,7 +96,6 @@ export default defineConfig({
               },
               "neovim/neovim-api",
             ],
-          },
           },
         ]),
       ],

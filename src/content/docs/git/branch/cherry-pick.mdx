@@ -1,0 +1,90 @@
+---
+title: Cherry Pick
+sidebar:
+    order: 20
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+## 准备仓库
+
+```bash
+mkdir example-cherry-pick
+cd example-cherry-pick
+
+git init
+echo 'cabbage' >> vegetables.md
+git add . && git commit -m 'A: add cabbage'
+
+git switch -c b1
+echo 'apple' >> fruits.md
+git add . && git commit -m 'B: add apple'
+echo 'banana' >> fruits.md
+git add . && git commit -m 'C: add banana'
+echo 'orange' >> fruits.md
+git add . && git commit -m 'D: add orange'
+echo 'watermelon' >> fruits.md
+git add . && git commit -m 'E: add watermelon'
+
+git switch main
+```
+
+---
+
+## 将`其他分支`最新的一次提交 pick 到`主分支`
+
+![pick 最新提交](@assets/git/git-cherry-pick-latest.drawio.png)
+
+```bash
+git cherry-pick b1
+```
+
+---
+
+## 将`其他分支`某一次提交 pick 到`主分支`
+
+![pick 指定提交](@assets/git/git-cherry-pick-specified-commit.drawio.png)
+
+```bash
+# 替换 commit hash 并 pick
+git cherry-pick <commit_hash>
+```
+
+:::tip[pick `公共祖先`后面的一次提交的]
+
+```bash
+# 查看 b1 分支从 公共祖先 开始的所有分支，第一个就是
+git log $(git merge-base main b1)..b1 --pretty=oneline --reverse
+```
+
+:::
+
+---
+
+## 将`其他分支`从`公共祖先`开始，所有的提交 pick 到`主分支`
+
+![pick 所有提交](@assets/git/git-cherry-pick-all-commit.drawio.png)
+
+```bash
+git cherry-pick ..b1
+```
+
+:::note
+这个操作和 fast-forward merge 的区别就是会创建新的提交
+:::
+
+---
+
+## 将`其他分支`内`某个范围`的提交 pick 到`主分支`
+
+![pick 某个范围的提交](@assets/git/git-cherry-range-commit-exclude-start.drawio.png)
+
+```bash
+git cherry-pick <commit_hash>..<commit_hash>
+```
+
+![pick 某个范围的提交](@assets/git/git-cherry-range-commit-include-start.drawio.png)
+
+```bash
+git cherry-pick <commit_hash>^..<commit_hash>
+```

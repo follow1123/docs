@@ -1,0 +1,25 @@
+---
+title: 反转提交（revert）
+sidebar:
+    order: 10
+---
+
+用于修复已经推送到远程仓库的提交
+
+由于有问题的提交已经推送到远程仓库，直接重置提交对提交历史影响很大
+
+可以使用 `git revert` 生成一个“反转提交”（添加的删除，修改或删除的还原）进行修复
+
+```bash
+# 还原当前分支最新一次提交
+git revert HEAD
+
+# 还原上次提交
+git revert HEAD~
+
+# 还原指定提交
+git revert <commit_hash>
+
+# 还原某个范围的提交
+git revert <commit_hash>..<commit_hash>
+```

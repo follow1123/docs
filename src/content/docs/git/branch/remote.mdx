@@ -1,0 +1,366 @@
+---
+title: 远程分支
+sidebar:
+    order: 15
+---
+
+import { Steps } from "@astrojs/starlight/components";
+import { FileTree } from "@astrojs/starlight/components";
+import InternalLink from "@components/InternalLink.astro";
+
+## 操作分支
+
+```bash
+# 查看所有远程分支名称
+git remote
+
+# 显示远程 URL
+# -v/--verbose 选项
+git remote -v
+
+# 查看指定远程详细信息
+git remote show <remote_name>
+
+# 添加远程仓库
+git remote add <remote_name> <url>
+
+# 重命名远程仓库
+git remote rename <old_name> <new_name>
+
+# 删除远程仓库
+git remote remove <remote_name>
+```
+
+---
+
+## 更新分支
+
+![更新分支](@assets/git/git-fetch-remote-branch.drawio.png)
+
+<Steps>
+
+1. 准备仓库
+
+    ```bash
+    mkdir example-remote
+    cd example-remote
+
+    git init
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'A: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'B: add banana'
+
+    cd ..
+    # 使用本地分支模拟远程分支
+    git clone ./example-remote example-local
+    cd example-local
+    echo 'orange' >> fruits.md
+    git add . && git commit -m 'C: add orange'
+
+    cd ../example-remote
+    echo 'cabbage' >> vegetables.md
+    git add . && git commit -m 'X: add cabbage'
+    echo 'tomato' >> vegetables.md
+    git add . && git commit -m 'Y: add tomato'
+
+    cd ../example-local
+    ```
+
+2. 使用 `git fetch` 命令将`远程仓库`的提交更新回`本地仓库`
+
+    ```bash
+    # 查看所有提交历史
+    git log --all --oneline --graph
+
+    # 更新提交
+    git fetch
+
+    # 再次查看提交历史
+    git log --all --oneline --graph
+    ```
+
+    :::note
+    `git fetch` 只是将远程的分支的提交拉取到本地，对本地分支没有任何影响
+    :::
+
+</Steps>
+
+## 拉取分支
+
+### 拉取分支并 merge
+
+![拉取分支并 merge](@assets/git/git-pull-merge-remote.drawio.png)
+
+<Steps>
+
+1. 准备仓库
+
+    ```bash
+    mkdir example-remote
+    cd example-remote
+
+    git init
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'A: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'B: add banana'
+
+    cd ..
+    # 使用本地分支模拟远程分支
+    git clone ./example-remote example-local
+    cd example-local
+    echo 'orange' >> fruits.md
+    git add . && git commit -m 'C: add orange'
+
+    cd ../example-remote
+    echo 'cabbage' >> vegetables.md
+    git add . && git commit -m 'X: add cabbage'
+    echo 'tomato' >> vegetables.md
+    git add . && git commit -m 'Y: add tomato'
+
+    cd ../example-local
+    ```
+
+2. 拉取并 merge
+
+    ```bash
+    # 拉取分支默认进行 merge 操作
+    git pull
+
+    # 相当于以下操作
+    git fetch
+    git merge origin/main
+    ```
+
+</Steps>
+
+### 拉取分支并 rebase
+
+![拉取分支并 rebase](@assets/git/git-pull-rebase-remote.drawio.png)
+
+<Steps>
+
+1. 准备仓库
+
+    ```bash
+    mkdir example-remote
+    cd example-remote
+
+    git init
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'A: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'B: add banana'
+
+    cd ..
+    # 使用本地分支模拟远程分支
+    git clone ./example-remote example-local
+    cd example-local
+    echo 'orange' >> fruits.md
+    git add . && git commit -m 'C: add orange'
+
+    cd ../example-remote
+    echo 'cabbage' >> vegetables.md
+    git add . && git commit -m 'X: add cabbage'
+    echo 'tomato' >> vegetables.md
+    git add . && git commit -m 'Y: add tomato'
+
+    cd ../example-local
+    ```
+
+2. 拉取并 rebase
+
+    ```bash
+    # 或者使用-r选项进行rebase合并
+    git pull -r
+
+    # 相当于以下操作
+    git fetch
+    git rebase origin/main
+    ```
+
+    :::tip
+    `git pull` 默认执行 merge 操作，配置 `pull.rebase` 默认执行 `rebase` 操作
+
+    ```bash
+    git config set --local pull.rebase true
+    ```
+
+    :::
+
+    :::tip
+    如果遇到合并冲突，参考<InternalLink text="合并冲突处理" href="git/branch/merge/#合并冲突处理" />和<InternalLink text="变基冲突处理" href="git/branch/rebase/#变基冲突处理" />
+    :::
+
+</Steps>
+
+## 推送分支
+
+![推送分支](@assets/git/git-push-remote.drawio.png)
+
+<Steps>
+
+1. 准备仓库
+
+    ```bash
+    mkdir example-push-remote
+    cd example-push-remote
+
+    git init
+    git config set --local receive.denyCurrentBranch ignore
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'A: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'B: add banana'
+
+    cd ..
+    # 使用本地分支模拟远程分支
+    git clone ./example-push-remote example-push-local
+    cd example-push-local
+    echo 'orange' >> fruits.md
+    git add . && git commit -m 'C: add orange'
+    ```
+
+2. 推送
+
+    ```bash
+    # 推送本地仓库最新提交到远程仓库
+    git push
+    ```
+
+    :::tip
+    如果`本地分支`未绑定`远程分支`
+
+    将`当前分支`的所有最新提交推送到指定`远程仓库`的`指定分支`内
+
+    ```bash
+    git push <remote_name>/<branch_name> <local_branch_name>
+    ```
+
+    绑定一个`远程仓库`的分支到`当前分支`，直接推送
+
+    ```bash
+    git branch -u <remote_name>/<branch_name> <local_branch_name>
+    ```
+
+    :::
+
+</Steps>
+
+### 将本地的另一个文件夹作为远程仓库
+
+本地仓库 aaa 另一个文件夹 bbb
+
+<FileTree>
+
+- / 测试路径
+    - aaa/ aaa 仓库
+    - bbb/ bbb 仓库
+
+</FileTree>
+
+<Steps>
+
+1. 准备仓库 aaa
+
+    ```bash
+    mkdir aaa
+    cd aaa
+    git init
+
+    echo test > a.txt
+
+    git add . && git commit -m 'test'
+    ```
+
+2. 准备仓库 bbb
+
+    ```bash
+    mkdir bbb
+    cd bbb
+    git init
+    git config receive.denyCurrentBranch updateInstead
+    ```
+
+    :::note
+    `receive.denyCurrentBranch` 配置的 `updateInstead` 选项，在被推送时，会直接修改工作目录
+
+    如果不想要修改工作目录，修改成 `ignore`
+    :::
+
+3. 在 aaa 仓库内添加 bbb 为远程仓库
+
+    ```bash
+    git remote add bbb ../bbb
+    ```
+
+4. 推送
+
+    ```bash
+    git push bbb main
+    ```
+
+</Steps>
+
+### 将远程服务器上的文件夹作为远程仓库
+
+本地仓库 aaa 远程服务器上的文件夹 bbb
+
+<Steps>
+
+1. 准备仓库 aaa
+
+    ```bash
+    mkdir aaa
+    cd aaa
+    git init
+
+    echo test > a.txt
+
+    git add . && git commit -m 'test'
+    ```
+
+2. 准备仓库 bbb
+
+    登陆到远程服务器上执行以下操作
+
+    ```bash
+    mkdir bbb
+    cd bbb
+    git init
+    git config receive.denyCurrentBranch updateInstead
+    ```
+
+    :::note
+    `receive.denyCurrentBranch` 配置的 `updateInstead` 选项，在被推送时，会直接修改工作目录
+
+    如果不想要修改工作目录，修改成 `ignore`
+    :::
+
+3. 在 aaa 仓库内添加 bbb 为远程仓库
+
+    ```bash
+    git remote add bbb ssh://<user>@<hostname>:/absolute/path/bbb
+    ```
+
+    :::note
+    添加 ssh url 时，远程仓库的路径一定要填绝对路径
+    :::
+
+    :::tip
+    如果在 `~/.ssh/config` 内配置了服务信息，可以简化 url
+
+    ```txt
+    ssh://<servername>:/absolute/path/bbb
+    ```
+
+    :::
+
+4. 推送
+
+    ```bash
+    git push bbb main
+    ```
+
+</Steps>

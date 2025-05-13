@@ -1,0 +1,221 @@
+---
+title: 合并（merge）
+sidebar:
+    order: 5
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+## Fast-forward Merge
+
+![Fast-forward Merge](@assets/git/git-fast-forward-merge.drawio.png)
+
+<Steps>
+
+1. 准备仓库
+
+    ```bash
+    mkdir example-fast-forward-merge
+    cd example-fast-forward-merge
+
+    git init
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'A: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'B: add banana'
+
+    git switch -c b1
+
+    echo 'orange' >> fruits.md
+    git add . && git commit -m 'C: add orange'
+    echo 'watermelon' >> fruits.md
+    git add . && git commit -m 'D: add watermelon'
+    ```
+
+2. 当两个分支的**公共祖先**就是当前分支的**最新提交**，就会出现**Fast-forward** Merge
+
+    ```bash
+    # 查看两个分支 公共祖先，和当前分支最新一次提交的 commit hash
+    # HEAD 表示当前分支，可以使用分支名替换
+    git merge-base HEAD b1 && git log -1 --pretty=format:%H
+    ```
+
+3. 使用 `git merge` 将 `b1` 分支的提交合并到主分支内
+
+    ```bash
+    # 确保当前处于主分支
+    git switch main
+
+
+    # 将 b1分支 的提交合并到 主分支 内
+    #
+    # 此时出现 Fast-forward
+    # 就是将当前分支的 HEAD 指向 b1 分支的最新提交
+    git merge b1
+    ```
+
+</Steps>
+
+## 分支合并
+
+![分支合并](@assets/git/git-merge.drawio.png)
+
+<Steps>
+1. 准备仓库
+
+    ```bash
+    mkdir example-merge
+    cd example-merge
+
+    git init
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'A: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'B: add banana'
+
+    git switch -c b1
+    echo 'cabbage' >> vegetables.md
+    git add . && git commit -m 'C: add cabbage'
+    echo 'tomato' >> vegetables.md
+    git add . && git commit -m 'D: add tomato'
+
+    git switch main
+    echo 'watermelon' >> fruits.md
+    git add . && git commit -m 'E: add watermelon'
+    ```
+
+2. 此时查看两个分支的**公共祖先**和当前分支最新的提交，commit hash 不一样，不会进行 **Fast-forward** Merge
+
+    ```bash
+    # 确保当前处于主分支
+    git switch main
+    git merge-base HEAD b1 && git log -1 --pretty=format:%H
+    ```
+
+3. 使用 `git merge` 将 `b1` 分支的提交合并到主分支内
+
+    ```bash
+    # 确保当前处于主分支
+    git switch main
+
+    # 此时会打开编辑器，提示修改合并的提交信息
+    git merge b1
+
+    # 查看合并后的提交历史
+    git log --all --oneline --graph
+    ```
+
+</Steps>
+
+## 合并冲突处理
+
+![合并冲突](@assets/git/git-merge-conflicts.drawio.png)
+
+<Steps>
+
+1. 准备仓库
+
+    ```bash
+    mkdir example-merge-conflicts
+    cd example-merge-conflicts
+
+    git init
+    echo 'apple' >> fruits.md
+    git add . && git commit -m 'A: add apple'
+    echo 'banana' >> fruits.md
+    git add . && git commit -m 'B: add banana'
+
+    git switch -c b1
+    echo 'orange' >> fruits.md
+    git add . && git commit -m 'C: add orange'
+    echo 'strawberry' >> fruits.md
+    git add . && git commit -m 'D: add strawberry'
+
+    git switch main
+    echo 'watermelon' >> fruits.md
+    git add . && git commit -m 'E: add watermelon'
+    ```
+
+2. 使用 `git merge` 将 `b1` 分支的提交合并到主分支内
+
+    ```bash
+    # 确保当前处于主分支
+    git switch main
+
+
+    # 将 b1分支 的提交合并到 主分支 内
+    git merge b1
+    ```
+
+3. 此时会出现 `CONFLICT (content): Merge conflict in fruits.md` 提示，说明合并出现了冲突
+
+    ### 冲突内容说明
+
+    使用 `git status` 命令就会显示当前有冲突未合并，`cat fruits.md` 显示以下内容：
+
+    ```txt {3-8} title="fruits.md"
+    apple
+    banana
+    <<<<<<< HEAD
+    watermelon
+    =======
+    orange
+    strawberry
+    >>>>>>> b1
+    ```
+
+    因为在**主分支**和 `b1` 分支内最新的一次提交都修改了第三行，所以会产生冲突
+
+    - `<<<<<<< HEAD` - 当前分支最新提交的内容
+    - `=======` - 分隔符
+    - `>>>>>>> b1` - 合并分支的最新提交
+
+    ### 使用 `git checkout` 命令应用指定分支的内容
+
+    如果需要在某个文件内应用指定分支的内容，可以使用 `git checkout` 配合 `--ours` 或 `--theirs` 选项
+
+    ```bash
+    # 应用当前分支的内容
+    git checkout --ours <filename>
+
+    # 将所有产生冲突的文件都应用 当前分支 的内容
+    git checkout --ours .
+
+    # 应用合并分支的内容
+    git checkout --theirs <filename>
+
+    # 将所有产生冲突的文件都应用 合并分支 的内容
+    git checkout --theirs .
+    ```
+
+    如果需要应用两个分支的内容，或需要手动调整，可以直接手动编辑，编辑完成后将特殊符号删除即可
+
+    ```txt {3,5,8} title="fruits.md"
+    apple
+    banana
+    <<<<<<< HEAD
+    watermelon
+    =======
+    orange
+    strawberry
+    >>>>>>> b1
+    ```
+
+    :::tip
+    如果想撤销，可以使用 `git merge --abort` 取消合并
+    :::
+
+4. 完成合并
+
+    ```bash
+    # 完成合并操作
+    git add .
+
+    # 打开编辑器，提示修改合并的提交信息
+    git commit
+
+    # 查看提交历史信息
+    git log --all --oneline --graph
+    ```
+
+</Steps>

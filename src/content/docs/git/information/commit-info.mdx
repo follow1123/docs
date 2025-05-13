@@ -1,0 +1,43 @@
+---
+title: 提交信息
+sidebar:
+    order: 0
+---
+
+## 对比文件信息（diff）
+
+![对比文件信息](@assets/git/git-diff-file.drawio.png)
+
+```bash
+# 对比 工作区 和 暂存区 的文件内容
+git diff
+
+# 对比 暂存区 和 HEAD 内的文件内容
+git diff --cached
+
+# 对比 工作区 和 上次提交 的文件内容
+git diff HEAD~
+
+# 对比当前 HEAD 和 上上次提交 的文件内容
+git diff HEAD HEAD~2 <file_path>
+```
+
+## 查看某次提交的信息（show）
+
+```bash
+# 查到当前 HEAD 信息
+git show
+
+# 查到当前 HEAD 内指定文件的信息
+git show <file_path>
+
+# 查到 上次提交 内指定文件的信息
+git show HEAD~ -- <file_path>
+```
+
+## blame
+
+```bash
+# 查看指定文件每行的提交人和其他提交信息
+git blame <file_path>
+```

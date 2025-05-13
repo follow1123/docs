@@ -1,0 +1,49 @@
+---
+title: Git 守护进程
+sidebar:
+    order: 10
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+<Steps>
+
+1. 切换到一个专门存放 git 仓库的目录
+
+2. 创建裸仓库，配置运行推送
+
+    ```bash
+    mkdir test-repo.git
+    cd test-repo.git
+    git init --bare -b main
+
+    # 配置运行推送
+    git config set daemon.receivepack true
+    # 或
+    git config --add daemon.receivepack true
+    ```
+
+3. 启动服务
+
+    ```bash
+    git daemon --base-path=<git-repo-root> --verbose --export-all --reuseaddr
+    ```
+
+4. 使用本机克隆远程仓库
+
+    ```bash
+    git clone git://<ip_address>/test-repo.git
+    ```
+
+</Steps>
+
+:::note
+Windows 情况下 `git push` 推送时可能会卡死，添加以下配置解决（**在本地仓库内执行**）：
+
+```bash
+git config set sendpack.sideband false
+# 或
+git config --add sendpack.sideband false
+```
+
+:::

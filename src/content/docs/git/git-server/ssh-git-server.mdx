@@ -1,0 +1,66 @@
+---
+title: SSH 协议 Git 服务
+sidebar:
+    order: 5
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+## ssh 密钥登录服务器
+
+<Steps>
+
+1. 安装 ssh server
+
+    ```bash
+    sudo apt install openssh-server
+    ```
+
+2. 生成密钥
+
+    ```bash
+    ssh-keygen -t rsa -b 4096
+    ```
+
+3. 将本地的 `~/.ssh/id_rsa.pub` 文件内容追加到服务器上 `~/.ssh/authorized_keys` 文件内
+
+4. 使用 `ssh <username>@<ip_address>` 命令登录
+
+</Steps>
+
+## 在服务器上创建 git 裸仓库
+
+<Steps>
+
+1. 登录服务器
+
+2. 创建 git 相关用户和组
+
+    ```bash
+    sudo groupadd git
+    sudo useradd -g git gituser
+    ```
+
+3. 添加 ssh 密钥，免密登录，参考[ssh 密钥登录服务器](#ssh-密钥登录服务器)
+
+4. 创建 git 仓库目录并初始化
+
+    ```bash
+    sudo mkdir -p /srv/git/test-repo.git
+    cd /srv/git/test-repo.git
+    sudo git init --bare -b main
+    ```
+
+5. 修改 git 仓库权限
+
+    ```bash
+    sudo chown -R gituser:git /srv/git
+    ```
+
+6. 使用本机克隆远程仓库
+
+    ```bash
+    git clone gituser@<ip_address>/srv/git/test-repo.git
+    ```
+
+</Steps>

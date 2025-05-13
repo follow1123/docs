@@ -1,0 +1,84 @@
+---
+title: 分支基础
+sidebar:
+    order: 0
+---
+
+## 操作分支
+
+```bash
+# 显示所有分支命令，当前分支高亮显示
+git branch
+
+# 显示当前分支
+git branch --show-current
+
+# 列出所有本地的分支 -l 或 --list 选项
+git branch --list
+# 模糊搜索分支
+#
+# 查看所有 feat 开头的分支
+# git branch --list 'feat*'
+git branch --list '<pattern>'
+
+# 列出所有的分支，包括远程分支，-a 或 --all 选项
+git branch -a
+
+# 显示分支详细信息
+#
+# -v/--verbose - 显示当前分支和最新一次提交信息
+# -vv - 显示当前分支绑定的上游分支
+git branch -v
+
+# 删除分支
+#
+# -d/--delete - 删除指定分支
+# -D - 强制删除分支
+git branch -d <branch_name>
+
+# 重命名当前分支
+#
+# -m/--move - 重命名当前分支
+# -M - 强制重命名当前分支
+git branch -m <new_branch_name>
+
+# 在当前分支基础上复制分支，不会切换分支
+#
+# -c/--copy - 复制分支
+# -C - 强制复制分支
+git branch -c <new_branch_name>
+
+# 设置当前分支对应远程的哪个分支
+#
+# -u/--set-upstream-to - 设置上游分支
+git branch -u <remote_name>/<remote_branch_name> <local_branch_name>
+
+# 移除分支对应的远程分支信息
+# 不指定 local_branch_name 则移除当前分支的远程分支信息
+git branch --unset-upstream <local_branch_name>
+```
+
+## 切换分支
+
+```bash
+# 切换到指定分支
+git switch <branch_name>
+
+# 在当前分支基础上创建新分支并切换过去
+#
+# -c/--create 选项
+git switch -c <new_branch_name>
+
+# 分离 HEAD 到指定 commit，相当于切换到指定 commit 的临时分支
+#
+# -d/--detach 选项
+# 切换到指定提交的临时分支
+git switch -d <commit_hash>
+
+# 切换到指定tag处
+git switch -d <tag_name>
+
+# 切换到上次切换的分支处，
+# 如果上次切换的分支是一个 commit 则需要配合 -d 选项
+git switch -
+```

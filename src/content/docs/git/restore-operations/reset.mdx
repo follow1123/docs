@@ -1,0 +1,88 @@
+---
+title: 重置提交（reset）
+sidebar:
+    order: 5
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+:::danger
+重置提交操作可能会删除提交，对提交历史有影响
+
+不要对已经**推送到远程**的提交操作
+:::
+
+和<InternalLink text="恢复文件" href="git/restore-operations/restore" />类似，`git reset` 可以恢复提交内的文件到指定的提交副本
+
+![重置提交](@assets/git/git-reset-commit.drawio.png)
+
+## 准备仓库
+
+```bash
+mkdir example-reset
+cd example-reset
+
+git init
+
+echo 'apple' >> fruits.md
+git add . && git commit -m 'A: add apple'
+
+echo 'banana' >> fruits.md
+git add . && git commit -m 'B: add banana'
+
+echo 'orange' >> fruits.md
+git add . && git commit -m 'C: add orange'
+
+echo 'watermelon' >> fruits.md
+git add . && git commit -m 'D: add watermelon'
+```
+
+## 将 `HEAD` 恢复到上次提交，`暂存区`和`工作区`内保持不变
+
+使用 `git reset` 配合 `--soft` 选项
+
+```bash
+# 重置到上次提交
+git reset --soft HEAD~
+
+# 提交记录重 3 个变成 2 个
+git log
+
+# 查看信息，相当于修改已经添加到暂存区，还没提交
+git status
+```
+
+## 将 `HEAD` 和`暂存区`恢复到上次提交，`工作区`内保持不变
+
+使用 `git reset` 配合 `--mixed` 选项（**默认选项**）
+
+```bash
+git reset HEAD~
+
+# 查看信息，相当于第已经修改完成，还未添加到暂存区
+git status
+```
+
+## 将 `HEAD`，`暂存区`和`工作区`恢复到上次提交
+
+使用 `git reset` 配合 `--hard` 选项
+
+```bash
+git reset --hard HEAD~
+
+# 查看信息，相当于还没修改
+git status
+```
+
+:::note[重置提交的位置]
+
+- `git reset HEAD~` - 重置到上次提交
+- `git reset HEAD~2` - 重置到上上次提交
+- `git reset <commit_hash>` - 重置到指定的提交
+  :::
+
+:::tip[重置记录操作]
+
+- `git reflog` - 查看指定操作日志
+- `git reset --hard 'HEAD@{1}'` - 将仓库恢复到上次操作处
+  :::

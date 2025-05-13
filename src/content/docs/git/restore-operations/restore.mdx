@@ -1,0 +1,143 @@
+---
+title: 恢复文件（restore）
+sidebar:
+    order: 0
+---
+
+- **Working Tree** - 工作区（Working Directory，沙盒）
+- **Index** - 暂存区（Staging Area，准备提交的文件）
+- **HEAD** - 本地仓库最新的提交（上次提交的快照）
+
+![恢复文件](@assets/git/git-restore-file.drawio.png)
+
+## 准备仓库
+
+```bash
+mkdir example-restore
+cd example-restore
+
+git init
+echo 'apple' > fruits.md
+git add . && git commit -m 'A: add apple'
+```
+
+## 从`暂存区`内恢复`工作区`的文件
+
+使用 `git restore` 配合 `-W` 或 `--worktree`选项（**默认选项**）
+
+```bash
+# 添加内容
+echo 'banana' > fruits.md
+
+# 发现文件被覆盖而不是修改
+cat fruits.md
+
+# 将暂存区内的文件副本恢复到工作区内
+git restore fruits.md
+
+# 重新添加
+echo 'banana' >> fruits.md
+git add . && git commit -m 'B: add banana'
+```
+
+## 从 `HEAD` 内恢复`暂存区`的文件
+
+使用 `git restore` 配合 `-S` 或 `--staged` 选项
+
+```bash
+# 添加内容
+echo 'oraege' >> fruits.md
+git add .
+
+# 发现单词写错了，但是文件已经提交到暂存区内了，使用-S选项恢复
+git restore -S fruits.md
+
+# 此时只是将文件从暂存区内移除，内容还没还原
+# 需要修改后继续提交
+git add . && git commit -m 'C: add orange'
+```
+
+## 从 `HEAD` 内恢复`暂存区`或`工作区`的文件
+
+使用 `git restore` 配合 `-S` 和 `-W` 选项
+
+```bash
+# 添加西瓜
+echo 'watermlon' >> fruits.md
+git add .
+
+# 发现单词又写错了，这次直接恢复到上次提交时的版本，使用-SW选项恢复
+git restore -SW fruits.md
+
+# 此时工作区内的这个文件已经被恢复了
+# 需要重新添加后继续提交
+echo 'watermelon' >> fruits.md
+git add . && git commit -m 'D: add watermelon'
+```
+
+## 从`指定提交`内恢复`暂存区`或`工作区`的文件
+
+使用 `git restore` 配合 `-s` 或 `--source` 选项
+
+### 从`上次提交`内恢复`暂存区`或`工作区`的文件
+
+```bash
+# 从上次提交内恢复工作区的这个文件
+git restore -s HEAD~ fruits.md
+
+# 从上次提交内恢复暂存区内的这个文件
+# 此时HEAD内和工作区内的这个文件是最新版本，而暂存区内的这个文件是上次提交的版本
+# 使用 git diff 和 git diff --cached 命令查看详细信息
+git restore -s HEAD~ -S fruits.md
+
+# 从上次提交内恢复工作区和暂存区内的这个文件
+# 相当于将这个文件恢复到上一个版本并添加到暂存区
+git restore -s HEAD~ -SW fruits.md
+```
+
+### 从`其他分支`内恢复`暂存区`或`工作区`的文件
+
+在[测试仓库](#准备仓库)内创建分支并提交内容
+
+```bash
+# 确保到测试仓库内，并清理工作区内的文件
+cd example-restore
+
+git switch -c b1
+
+echo 'strawberry' >> fruits.md
+git add . && git commit -m 'E: add strawberry'
+```
+
+将 **b1 分支**内的文件的新内容添加到**主分支**的工作区这个文件内
+
+```bash
+# 确保当前处于主分支
+git switch main
+
+# 从 b1 分支内获取最新一次提交的内容，添加到 fruits.md 文件内
+git restore -s $(git log --pretty=format:%H -1 b1) fruits.md
+```
+
+### 从`指定提交`内恢复`暂存区`或`工作区`内不存在的文件
+
+在 b1 分支内添加新文件
+
+```bash
+# 确保当前处于 b1 分支
+git switch b1
+
+# 添加一个新文件
+echo 'tomato' >> vegetables.md
+git add . && git commit -m 'F: add tomato'
+```
+
+将 **b1 分支**内的新文件添加到**主分支**的工作区内
+
+```bash
+# 确保当前处于主分支
+git switch main
+
+# 添加其他分支的文件到当前分支内
+git restore -s $(git log --pretty=format:%H -1 b1) vegetables.md
+```

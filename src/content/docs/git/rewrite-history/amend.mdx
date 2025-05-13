@@ -1,0 +1,24 @@
+---
+title: 修正提交（amend）
+sidebar:
+    order: 0
+---
+
+:::danger
+修正提交会修改提交的 commit 的 hash 值
+
+不要对已经**推送到远程**的提交操作
+:::
+
+将当前工作区内已经暂存的文件直接加入到上次的提交内
+
+```bash
+# 将 暂存区 内新添加的文件 修正 进上次提交内，打开一个编辑器修改提交信息
+git commit --amend
+
+# 不打开编辑器修改提交信息，只将修正上次提交
+git commit --amend --no-edit
+
+# 直接编辑上次的提交信息
+git commit --amend --no-edit -m '<message>'
+```

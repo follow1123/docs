@@ -1,0 +1,28 @@
+---
+title: 子模块（submodule）
+sidebar:
+    order: 25
+---
+
+> 参考：[官方文档](https://git-scm.com/book/zh/v2/Git-%e5%b7%a5%e5%85%b7-%e5%ad%90%e6%a8%a1%e5%9d%97)
+
+```bash
+# 初始化子模块
+git submodule init
+
+# 添加子模块
+git submodule add https://github.com/example/scripts.git scripts
+
+# 删除所有子模块
+git submodule deinit -f --all
+```
+
+仓库目录下新增 `.gitmodules` 文件
+
+```toml title=".gitmodules"
+[submodule "子模块名称"]
+    path = "子模块名称"
+    url = "子模块git url"
+    active = true
+    ignore = all
+```
