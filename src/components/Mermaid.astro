@@ -1,0 +1,31 @@
+---
+import mermaidBuilder from "@libs/mermaidBuilder";
+
+const { file, code } = Astro.props;
+mermaidBuilder.build(file, code);
+---
+
+<div>
+  <img
+    src={mermaidBuilder.getLightUrl(file)}
+    alt="Mermaid Diagram"
+    loading="lazy"
+    class="custom-mermaid-light"
+  />
+  <img
+    src={mermaidBuilder.getDarkUrl(file)}
+    alt="Mermaid Diagram"
+    loading="lazy"
+    class="custom-mermaid-dark"
+  />
+</div>
+
+<style>
+  html[data-theme="light"] .custom-mermaid-dark {
+    display: none;
+  }
+
+  html[data-theme="dark"] .custom-mermaid-light {
+    display: none;
+  }
+</style>
