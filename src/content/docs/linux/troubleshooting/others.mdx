@@ -1,0 +1,51 @@
+---
+title: 其他
+sidebar:
+    order: 10
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+## 缺少 ifconfig 命令
+
+```bash
+sudo apt install net-tools
+```
+
+## 禁用 watchdog 程序
+
+watchdog 是一个定期检查服务健康状态的进程，在服务出现故障时进行故障恢复操作，一般用于需要长期运行的服务器
+
+但是在桌面环境下这个功能就没什么用，还会导致`挂起`或`休眠`等操作出现问题
+
+<Steps>
+
+1. 添加配置
+
+    :::note
+    一般情况下 intel CPU 的 watchdog 驱动名称为 `iTCO_wdt`，AMD CPU 的 watchdog 名称为 `sp5100-tco`
+    :::
+
+    ```diff lang="ini" title="/etc/modprobe.d/disable-watchdog.conf"
+    + blacklist iTCO_wdt
+    ```
+
+    :::note
+    使用上面的操作没用的话，可能是驱动名称不一样，使用以下命令搜索
+
+    ```bash
+    lsmod | grep tc
+    # 或
+    lsmod | grep wd
+
+    # 查看模块详细信息
+    # 在 description 处显示 watchdog timer driver 等字样的就是
+    # 在 lsmod 搜索后的第三列表示这个模块被哪个模块引用，只需要禁用那个引用其他模块的模块就可以了
+    modinfo <mod_name>
+    ```
+
+    :::
+
+2. 重启
+
+</Steps>

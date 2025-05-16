@@ -1,0 +1,43 @@
+---
+title: 其他
+sidebar:
+    order: 15
+---
+
+import { Kbd } from "starlight-kbd/components";
+
+## 任务控制
+
+运行中的任务使用 <Kbd linux="ctrl+z" /> 挂起
+
+执行的命令后面接 `&` 将将命令转成后台执行
+
+使用 `jobs` 命令查看所有挂起的进程
+
+使用 `fg` 命令将挂起的进程恢复到前台执行，多个任务的情况下使用 `%` 选择，`%1` 表示第一个编号的任务，等
+
+使用 `bg` 命令将挂起的进程恢复为后台执行，多个任务的情况下使用 `%` 选择，`%1` 表示第一个编号的任务，等
+
+使用 `kill -9 %%` 强制结束上一个挂起的任务
+
+## 配置文件
+
+> 配置文件启动顺序，[参考](https://blog.flowblok.id.au/2013-02/shell-startup-scripts.html)
+
+![配置文件启动顺序](@assets/linux/shell/shell-startup-actual.png)
+
+:::tip
+在使用 bash 的情况下，大部分个人配置放在 `~/.bashrc` 文件内即可，需要全局使用到的配置放在 `/etc/profile` 或 `/etc/profile.d/xxx.sh`（自定义脚本） 即可
+:::
+
+## 快捷键
+
+> 参考 `man bash` 的 `READLINE` 部分
+
+## 历史命令
+
+> 参考 `man bash` 的 `HISTORY EXPANSION` 部分
+
+## 内置命令
+
+> 参考 `man bash` 的 `SHELL BUILTIN COMMANDS` 部分

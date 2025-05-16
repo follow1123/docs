@@ -1,0 +1,40 @@
+---
+title: 终端
+sidebar:
+    order: 10
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+## 终端模拟器
+
+终端模拟器（Terminal Emulator）是一个软件程序，提供了一个图形化的用户界面，用来模拟一个传统的硬件终端（Terminal）。它允许用户输入命令并显示命令的输出
+
+常见的终端模拟器
+
+- [ghostty](https://ghostty.org)
+- [alacritty](https://github.com/alacritty/alacritty)
+- [wezterm](https://wezfurlong.org/wezterm)
+
+## Shell
+
+Shell 是操作系统中提供给用户与内核进行交互的接口。它是你在终端中输入命令并获得结果的环境
+
+简单来说，它是一个 命令解释器（Command Interpreter）
+
+Shell 接收用户输入的命令，翻译成内核可以理解的系统调用，然后再把结果显示出来
+
+### 常见的 Shell
+
+- Bash（最常用） - GNU 项目开发，功能强大，支持脚本、编程
+- sh（Bourne Shell） - 最早的 Unix Shell，兼容性好
+- Zsh - 功能丰富、美化强、适合交互式使用（很多人配合 oh-my-zsh 使用）
+- Ksh（Korn Shell） - 兼容 Bourne Shell，适合脚本
+- Fish - 用户友好、自动补全强，但不兼容 Bash 脚本
+
+> 详细参考：
+>
+> <InternalLink text="变量" href="linux/shell/variable" />
+> <InternalLink text="流程控制" href="linux/shell/flow-control" />
+> <InternalLink text="函数" href="linux/shell/function" />
+> <InternalLink text="其他" href="linux/shell/others" />

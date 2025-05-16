@@ -1,0 +1,68 @@
+---
+title: 系统
+sidebar:
+    order: 30
+---
+
+| 命令                        | 描述                   |
+| --------------------------- | ---------------------- |
+| halt                        | 强制关机               |
+| poweroff                    | 关机                   |
+| reboot                      | 重启                   |
+| [shutdown](#shutdown)       | 关机/重启              |
+| logout                      | 注销用户               |
+| [hostname](#hostname)       | 查看或设置主机名       |
+| [uptime](#uptime)           | 查看系统运行时间和负载 |
+| [uname](#uname)             | 显示系统信息           |
+| [lsb_release](#lsb_release) | 查看 Linux 发行版信息  |
+
+import InternalLink from "@components/InternalLink.astro";
+
+## `shutdown`
+
+> 可以代替`halt` `reboot` `poweroff`命令
+
+- `-H` - 类似`halt`命令，强制关机
+- `-P` - 类似`poweroff`命令，安全的关机（默认行为）
+- `-r` - 重启
+- `--show` - 显示关机任务
+- `-c` - 取消关机任务
+
+```bash
+# 立即关机
+shutdown now
+
+# 1分钟后会关机
+shutdown 1
+
+# 立即重启
+shutdown -r now
+```
+
+## `hostname`
+
+- `-i` - 查看当前主机的IP地址，一般是loopback
+- `-I` - 查看当前主机的IP地址
+
+## `uptime`
+
+- 参考`top`命令的<InternalLink text="第一行信息" href="linux/commands/process-service#顶部信息第一行" />
+
+## `uname`
+
+- `-a` - 显示所有可用的信息，包括操作系统名称、主机名、内核版本、发布日期、处理器架构等
+- `-s` - 显示操作系统名称（默认）
+- `-n` - 显示网络节点的主机名
+- `-r` - 显示内核版本
+- `-v` - 显示内核版本的发布日期
+- `-m` - 显示机器硬件名称（架构）
+- `-p` - 显示处理器架构（如果可用）
+- `-i` - 显示硬件平台（如果可用）
+- `-o` - 显示操作系统名称（通常是 GNU/Linux）
+
+## `lsb_release`
+
+- `-a` - 显示所有可用的信息，包括发行版名称、版本号、代号和描述
+- `-d` - 仅显示发行版的描述
+- `-r` - 仅显示发行版的版本号
+- `-c` - 仅显示发行版的代号

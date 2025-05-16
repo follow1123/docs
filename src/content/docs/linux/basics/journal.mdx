@@ -1,0 +1,25 @@
+---
+title: 日志
+sidebar:
+    order: 40
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+日志文件是重要的系统信息文件，其中记录了许多重要的系统事件，包括用户的登录信息、系统的启动信息、系统的安全信息、邮件相关信息、各种服务相关信息等
+
+| 文件                | 说明                                                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `/var/log/boot.log` | 系统启动日志（开机时一闪而过的信息）                                                                                             |
+| `/var/log/btmp`     | 登录错误日志<br/>使用 <InternalLink text="lastb" href="linux/commands/journal#lastb" /> 命令查看                                 |
+| `/var/log/lastlog`  | 用户最后一次的登录时间日志<br/>使用 <InternalLink text="lastlog" href="linux/commands/journal#lastlog" /> 命令查看               |
+| `/var/log/faillog`  | 用户登陆错误次数<br/>使用 <InternalLink text="faillog" href="linux/commands/journal#faillog" /> 命令查看                         |
+| `/var/log/wtmp`     | 记录所有用户的登录、注销、启动、重启、关机事件<br/>使用 <InternalLink text="last" href="linux/commands/journal#last" /> 命令查看 |
+| `/var/run/utmp`     | 当前登录的用户信息<br/>使用 `w`、`who`、`users` 命令查看                                                                         |
+
+其他命令
+
+- <InternalLink text="dmesg" href="linux/commands/journal#dmesg" /> -
+  查看系统内核信息
+- <InternalLink text="journalctl" href="linux/systemd/journal" /> - systemd
+  基础的日志管理工具，查看服务、系统内核日志等（推荐使用）

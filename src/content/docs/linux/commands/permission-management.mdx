@@ -1,0 +1,253 @@
+---
+title: 用户/组/权限
+sidebar:
+    order: 25
+---
+
+| 命令                  | 描述                         |
+| --------------------- | ---------------------------- |
+| id                    | 查看用户信息                 |
+| whoami                | 查看当前是那个用户登录       |
+| [who](#who)           | 查看当前登录的用户           |
+| [w](#w)               | 显示当前登录用户及其活动状态 |
+| users                 | 显示当前登录系统的所有用户   |
+| [useradd](#useradd)   | 添加用户                     |
+| [userdel](#userdel)   | 删除用户                     |
+| [usermod](#usermod)   | 修改用户信息                 |
+| [gpasswd](#gpasswd)   | 修改用户的组信息             |
+| passwd                | 修改密码                     |
+| [chage](#chage)       | 更改用户密码的过期信息       |
+| [su](#su)             | 切换用户                     |
+| groups                | 显示当前用户再那些组下       |
+| [groupadd](#groupadd) | 新增组                       |
+| [groupmod](#groupmod) | 修改组                       |
+| [groupdel](#groupdel) | 删除组                       |
+| [chmod](#chmod)       | 更改文件或目录的权限         |
+| [chown](#chown)       | 更改文件或目录的所有者       |
+| [chgrp](#chgrp)       | 更改文件或目录的所属组       |
+| [sudo](#sudo)         | 以指定用户执行命令           |
+
+## `who`
+
+- `-a` - 显示所有信息，包括用户的登录时间、活动状态等
+- `-b` - 显示系统上次重启的时间
+- `-m` - 仅显示当前终端的用户
+- `-q` - 只显示用户的名字和数量
+- `-H` - 在输出中显示列标题
+
+## `w`
+
+### 字段说明
+
+- **USER** - 用户名
+- **TTY** - 终端
+- **FROM** - 用户登录的主机
+- **LOGIN** - ：登录时间
+- **IDLE** - 用户在当前会话中空闲的时间
+- **JCPU** - 用户在该终端上运行的所有进程的 CPU 时间
+- **PCPU** - 当前进程的 CPU 时间
+- **WHAT** - 当前正在执行的命令
+
+## `useradd`
+
+```bash
+# 添加用户
+useradd 用户名
+
+# 添加用户并指定该用户的家目录地址
+# 可以在/etc/skel目录下获取用户家目录模板文件
+useradd -d 目录路径 用户名
+
+# 添加用户并添加该用户到那个组内
+useradd -g 组名 用户名
+```
+
+## `userdel`
+
+```bash
+# 删除用户
+userdel 用户名
+
+# 删除用户，并删除该用户的家目录
+userdel -r 用户名
+```
+
+## `usermod`
+
+```bash
+# 修改用户组
+usermod -g 组名 用户名
+
+# 修改用户home目录
+usermod -d 目录 用户名
+
+# 指定用户的shell
+usermod -s /bin/bash <username>
+
+# 添加用户到多个组
+usermod -aG <groupname> <username>
+```
+
+## `gpasswd`
+
+```bash
+# 将用户从指定组内移除
+gpasswd -d <username> <groupname>
+```
+
+## `chage`
+
+- `-l` - 列出指定用户的密码过期信息
+- `-m <days>` - 设置用户密码的最小使用天数（密码在这段时间内无法更改）
+- `-M <days>` - 设置用户密码的最大有效天数（超过此天数需要更改密码）
+- `-I <days>` - 设置密码过期后，用户在此天数内未使用账户将被锁定
+- `-E <date>` - 设置用户账户的到期日期（格式为YYYY-MM-DD）
+- `-W <days>` - 设置在密码到期前的警告天数（用户在此期间会收到通知）
+
+```bash
+# 查看指定用户密码过期信息
+chage -l <username>
+
+# 指定用户的密码30天后过期
+chage -M 30 <username>
+```
+
+## `su`
+
+> 登录时尽量少用root帐号登录，因为它是系统管理员，最大的权限，避免操作失误。可以利用普通用户登录，登录后再用`su 用户名`命令来切换成系统管理员身份，或者使用`sudo`以管理员权限执行相关命令
+
+```bash
+# 不带参数默认切换到root用户
+# 切换到a用户
+su a
+```
+
+## `groupadd`
+
+```bash
+# 创建一个新组
+groupadd <groupname>
+
+# 创建一个新组，并指定组id
+groupadd -g <groupid> <groupname>
+
+# 强制创建一个新组
+groupadd -f <groupname>
+```
+
+## `groupmod`
+
+```bash
+# 修改组名称
+groupmod -n <newgroupname> <groupname>
+
+# 修改组id
+groupmod -g <groupid> <groupname>
+```
+
+## `groupdel`
+
+```bash
+# 删除指定的组
+groupdel <groupname>
+```
+
+## `chmod`
+
+```bash
+# 修改目录权限
+chmod 700 <dir>
+
+# 修改用户家目录
+chmod -d <userhome> <username>
+```
+
+## `chown`
+
+```bash
+# 修改指定文件的所属用户
+chown <username> <filepath>
+
+# 递归修改指定目录及其下面的所有文件和目录的所属用户和组
+chown -R <username>:<groupname> <directory>
+
+# 字符方式
+#   u - user 用户
+#   g - group 组
+#   o - other 其他用户
+#   a - all 所有
+#
+# u+x - 用户添加执行权限
+# g+w - 所属组的用户添加写权限
+# o-r - 其他用户移除读权限
+chmod u+x,g+w,o-r <filepath>
+
+# 所有用户添加读权限
+chmod a+w <filepath>
+
+# 数字方式
+#   r - 4
+#   w - 2
+#   x - 1
+#
+# 第一位表示所有者，第二位表示组，第三位表示其他
+#   6 - 用户拥有读、写权限
+#   6 - 所属组的用户拥有读、写权限
+#   4 - 其他用户只有读权限
+chmod 664 <filepath>
+```
+
+## `chgrp`
+
+- `-R` - 递归修改
+- `-v` - 显示修改的详细信息
+
+```bash
+# 修改文件所属组
+chgrp <groupname> <filename>
+
+# 递归修改指定目录及其下面的所有文件和目录的组，并显示详细信息
+chgrp -R -v <groupname> <dir>
+```
+
+## `sudo`
+
+> 这个命令可能需要额外安装`sudo apt install sudo`
+
+- `-l` - 查看当前用户可以使用的权限
+- `-k` - 时当前会话的密码过期
+- `-u <username>` - 以指定用户的身份指定命令
+
+```bash
+# 查看当前用户可以使用的权限
+sudo -l
+
+# 以指定用户指定ping命令
+sudo -u <username> /bin/ping
+
+# 使用管理员权限执行指定命令
+sudo /bin/ls /root
+```
+
+### `/etc/sudoers`文件
+
+- 使用`visudo`命令直接打开并编辑这个文件
+- 配置用户权限
+- 用户权限配置：`username ALL(ALL:ALL) ALL`，用户可以在**任意主机**用**任意用户:组**的身份执行**任意命令**
+    - 第一个ALL表示主机
+    - 第二个ALL表示用户
+    - 第三个ALL表示组
+    - 最后一个ALL表示命令，多个以`,`分割
+- 组权限配置：`%groupname ALL(ALL:ALL) ALL`
+- 一般在`/etc/sudoers.d`目录下创建对应用户名称的文件并配置权限
+
+```bash
+# 创建用户文件
+sudo touch /etc/sudoers.d/<username>
+
+# 添加用户权限
+echo "<username> ALL=(ALL) ALL" | sudo tee -a /etc/sudoers.d/<username>
+
+# 安装软件
+sudo apt install <softname>
+```

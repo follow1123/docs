@@ -1,0 +1,76 @@
+---
+title: NVIDIA
+sidebar:
+    order: 0
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+## 安装 NVIDIA 显卡驱动
+
+> [官网](https://www.nvidia.cn/drivers/lookup/)下载驱动文件
+
+<Steps>
+
+1. 安装依赖
+
+    ```bash
+    sudo apt install build-essential libglvnd-dev linux-source linux-headers-$(uname -r) -y
+    ```
+
+2. 禁用 nouveau 驱动
+
+    ```bash
+    echo "blacklist nouveau" | sudo tee -a /etc/modprobe.d/blacklist.conf
+    ```
+
+3. 安装驱动
+
+    :::note
+    如果出现 X server 相关提示，加上 `-no-x-check` 选项解决
+
+    卸载驱动则使用 `--uninstall` 选项
+    :::
+
+    ```bash
+    sudo bash <驱动文件> -no-x-check
+    ```
+
+</Steps>
+
+## Linux 更新内核后 NVIDIA 驱动挂了
+
+### 卸载驱动后重新安装 Linux 内核源码
+
+<Steps>
+
+1. 卸载驱动文件
+
+    ```bash
+    sudo bash <驱动文件> --uninstall
+    ```
+
+2. 安装内核源码包、内核头文件包
+
+    ```bash
+    sudo apt install linux-source
+    sudo apt install linux-headers-$(uname -r)
+    ```
+
+3. 重新安装
+
+    ```bash
+    sudo bash 驱动文件 -no-x-check
+    ```
+
+</Steps>
+
+### 禁用 Linux 内核更新
+
+:::caution[不推荐]
+:::
+
+```bash
+sudo apt-mark hold linux-image-amd64
+sudo apt-mark hold linux-image-$(uname -r)
+```

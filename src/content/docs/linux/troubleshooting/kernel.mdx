@@ -1,0 +1,63 @@
+---
+title: 内核
+sidebar:
+    order: 5
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+## 切换Linux内核
+
+<Steps>
+
+1. 查找你系统中已安装的内核版本
+
+    ```bash
+    dpkg --list | grep linux-image
+    ```
+
+2. 修改 GRUB 配置文件
+
+    ```diff lang="ini" title="/etc/default/grub"
+    - GRUB_DEFAULT=0
+    + GRUB_DEFAULT=<内核名称>
+    ```
+
+3. 更新 GRUB 配置
+
+    ```bash
+    update-grub
+    ```
+
+4. 重启
+
+</Steps>
+
+## 删除多余的内核文件
+
+<Steps>
+
+1. 列出已安装的内核版本
+
+    ```bash
+    dpkg --list | grep linux-image
+    ```
+
+2. 查看当前使用的内核版本
+
+    ```bash
+    uname -r
+    ```
+
+3. 删除旧的内核版本
+
+    :::caution
+    确保内核名称和正在使用的内核命令不一样
+    :::
+
+    ```bash
+    apt remove --purge linux-image-<内核名字>
+    apt remove --purge linux-headers-<内核名字>
+    ```
+
+</Steps>

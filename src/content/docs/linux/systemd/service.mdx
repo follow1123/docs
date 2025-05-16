@@ -1,0 +1,49 @@
+---
+title: 服务
+sidebar:
+    order: 0
+---
+
+## 服务启停
+
+```bash
+#   start   启动
+#   stop    停止
+#   restart 重启
+#   reload  重新加载
+#   status  查看服务状态
+systemctl start <unit_name>`
+```
+
+## 服务自启动
+
+```bash
+#   enable      启用
+#   disable     禁用
+#   is-enabled  是否启用
+# 启用或禁用后需要执行 systemctl daemon-reload 重新加载配置才生效
+systemctl enable <unit_name>
+```
+
+## 服务列表
+
+```bash
+#   list-units          列出已经启动的单元
+#   list-dependencies   列出单元依赖
+#   list-unit-files     列出所有单元自启动配置
+#   list-timers         列出所有定时任务
+systemctl list-unit-files
+
+# 查看所有启动失败的服务
+systemctl --failed
+```
+
+## 其他
+
+```bash
+#   help 显示帮助信息
+#   show 显示配置项
+#   cat  查看单元配置文件
+#   edit 编辑单元配置文件
+systemctl show
+```

@@ -1,0 +1,96 @@
+---
+title: 流程控制
+sidebar:
+    order: 5
+---
+
+## if
+
+```bash
+if [ 条件 ]; then
+    分支一
+elif [ 条件 ]; then
+    分支二
+else
+    分支三
+fi
+```
+
+数值比较
+
+> 参考：`man bash` 的 `SHELL BUILTIN COMMANDS` 部分
+
+- `-lt` - 小于
+- `-le` - 小于等于
+- `-eq` - 等于
+- `-gt` - 大于
+- `-ge` - 大于等于
+- `-ne` - 不等于
+
+```bash
+if [ 1 -lt 2 ]; then
+    echo 1
+else
+    echo 2
+fi
+```
+
+文件权限判断
+
+- `-r` - 是否有读的权限
+- `-w` - 是否有写的权限
+- `-x` - 是否有执行的权限
+
+文件类型判断
+
+- `-f` - 文件是否存在并且是一个常规的文件
+- `-e` - 文件是否存在
+- `-d` - 文件是否存在并且是一个目录
+
+:::note
+其他参考 `man bash` 的 **CONDITIONAL EXPRESSIONS** 部分
+:::
+
+## case
+
+```bash
+case 值 in
+"匹配值1")
+    echo one
+;;
+"匹配值2")
+    echo two
+;;
+*)
+    echo other
+;;
+esac
+```
+
+## for 循环
+
+```bash
+for 变量 in 值; do
+    循环体
+done
+
+# 遍历1到10
+for(( i=1; i<=100; i++ )); do
+      循环体
+done
+```
+
+## while 循环
+
+```bash
+while [ 条件 ]; do
+    循环体
+done
+```
+
+## read
+
+读取控制台输入
+
+- `-p` - 指定读取值时的提示符;
+- `-t` - 指定读取值时等待的时间(秒）

@@ -1,0 +1,93 @@
+---
+title: 说明
+sidebar:
+    order: 0
+---
+
+import Mermaid from "@components/Mermaid.astro";
+
+## 图形显示服务器
+
+### X Window System
+
+<Mermaid
+    code={`
+flowchart TD
+a(X Client1) <--> d(X Server)
+b(X Client2) <--> d
+c(X Client3) <--> d
+d <--> e(keyboard)
+d <--> f(mouse)
+d <--> g(display)
+d <--> h(other devs)
+`}
+/>
+
+#### X Client
+
+- **X Client**就是应用程序
+
+#### X Server(Xorg)
+
+> 参考：[官网](https://www.x.org/wiki/)，[ArchWiki](https://wiki.archlinux.org/title/Xorg)
+
+一个基于**X11（X Window System version 11）**实现的**X server**
+
+- `X11` - `X Window System` 的第11个版本，也是 `X Server` 和 `X Client` 通信的一种协议
+- `X` - 就是 `X Window System`
+
+### Wayland
+
+> 参考：[官网](https://wayland.freedesktop.org/)，[ArchWiki](https://wiki.archlinux.org/title/Wayland)
+
+现代的显示服务器协议，取代传统的 X Window System（X11）
+
+## freedesktop.org
+
+> [官网](https://www.freedesktop.org/wiki/)
+
+也叫XDG，专注于开源图形和桌面系统的互操作性和共享技术
+
+用于统一不同桌面环境下桌面图标格式，软件配置存放位置等
+
+> 部分规范详细参考[官方规范文档](https://www.freedesktop.org/wiki/Specifications/)或 [ArchWiki](https://wiki.archlinux.org/title/Category:Freedesktop.org)：
+>
+> - 桌面图标 - [Desktop entries](https://wiki.archlinux.org/title/Desktop_entries)
+> - 基本目录 - [XDG Base Directory](https://wiki.archlinux.org/title/XDG_Base_Directory)
+> - 用户目录 - [XDG user directories](https://wiki.archlinux.org/title/XDG_user_directories)
+
+## 显示管理器（Display Manager）
+
+用于启动图形显示服务器
+
+部分显示管理器：
+
+- [GDM (GNOME Display Manager)](https://help.gnome.org/admin/gdm/stable/gdm.html) - GNOME自带
+- [SDDM (Simple Desktop Display Manager)](https://github.com/sddm/sddm/) - KDE自带
+- [LightDM](https://wiki.archlinux.org/title/LightDM) - 轻量
+- [Ly](https://github.com/fairyglade/ly) - 终端显示管理器
+
+## 窗口管理器/合成器（Window Manager/Compositors）
+
+- `窗口管理器` - 基于Xorg下对软件窗口控制的系统软件
+- `窗口合成器` - 和上面类似，由于Wayland特性所以叫合成器
+
+详细窗口管理器或合成列表参考：
+
+- [窗口管理器](https://wiki.archlinux.org/title/Window_manager)
+- [窗口合成器](https://wiki.archlinux.org/title/Wayland#Compositors)
+
+## 电源管理
+
+> 参考：[Power management](https://wiki.archlinux.org/title/Power_management#)，[logind.conf](https://man.archlinux.org/man/logind.conf.5)
+
+管理开机、关机、休眠相关操作
+
+## 桌面环境
+
+集成以上所以部分的环境
+
+常见桌面环境：
+
+- [GNOME](https://www.gnome.org/)
+- [KDE](https://kde.org/)

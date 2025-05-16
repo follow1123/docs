@@ -25,6 +25,41 @@ export default defineConfig({
         }),
         starlightSidebarTopics([
           {
+            label: "Linux",
+            link: "/linux/",
+            items: [
+              "linux",
+              {
+                label: "Linux 基础",
+                autogenerate: { directory: "linux/basics" },
+              },
+              {
+                label: "常用命令",
+                autogenerate: { directory: "linux/commands" },
+              },
+              {
+                label: "Shell",
+                autogenerate: { directory: "linux/shell" },
+              },
+              {
+                label: "Systemd",
+                autogenerate: { directory: "linux/systemd" },
+              },
+              {
+                label: "桌面环境",
+                autogenerate: { directory: "linux/desktop-environment" },
+              },
+              {
+                label: "进程通信",
+                autogenerate: { directory: "linux/process-communication" },
+              },
+              {
+                label: "常见问题",
+                autogenerate: { directory: "linux/troubleshooting" },
+              },
+            ],
+          },
+          {
             label: "Git",
             link: "/git/",
             items: [

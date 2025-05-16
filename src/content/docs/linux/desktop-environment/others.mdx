@@ -1,0 +1,38 @@
+---
+title: 其他
+sidebar:
+    order: 10
+---
+
+## 常见问题
+
+### windows远程dwm桌面环境
+
+```bash
+# 在用户家目录下添加.xsession文件
+touch ~/.xsession
+echo "exec dwm" >> ~/.xsession
+
+# 安装xrdp并启动
+apt install xrdp
+sudo /etc/init.d/xrdp start
+```
+
+### 笔记本电源管理相关
+
+- 笔记本合盖休眠配置文件：`/etc/systemd/logind.conf`
+- linux 引导页面配置文件：`/etc/default/grub`
+- 将`GRUB_TIMEOUT`设置为`0`则可以跳过引导页面
+
+### Linux设置键盘速率
+
+```bash
+# 250毫秒后开始重复，每60毫秒重复一次
+xset r rate 250 60
+```
+
+## 参考
+
+- [X Window System介绍](https://www.cnblogs.com/nuoforever/p/13928856.html)
+- [X-Window介绍与使用](https://blog.csdn.net/weixin_56291477/article/details/130431953)
+- [了解自己机器上的 X Window](https://cnblogs.com/youxia/p/linux003.html)

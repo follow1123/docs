@@ -1,0 +1,93 @@
+---
+title: 日志
+sidebar:
+    order: 45
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+| 命令                                                            | 描述                             |
+| --------------------------------------------------------------- | -------------------------------- |
+| [dmesg](#dmesg)                                                 | 查看内核环缓冲区的消息           |
+| [last](#last)                                                   | 显示用户的登录历史               |
+| [lastb](#lastb)                                                 | 显示失败的登录尝试历史           |
+| [lastlog](#lastlog)                                             | 显示系统中所有用户的最后登录信   |
+| [faillog](#faillog)                                             | 显示系统中所有用户的登陆失败次数 |
+| <InternalLink text="journalctl" href="linux/systemd/journal" /> | systemd日志管理                  |
+
+## `dmesg`
+
+- `-f` - 显示特定类型的日志
+    - `kern` - kernel messages
+    - `user` - random user-level messages
+    - `mail` - mail system
+    - `daemon` - system daemons
+    - `auth` - security/authorization messages
+    - `syslog` - messages generated internally by syslogd
+    - `lpr` - line printer subsystem
+    - `news` - network news subsystem
+- `-l` - 显示指定级别的日志
+    - `emerg` - system is unusable
+    - `alert` - action must be taken immediately
+    - `crit` - critical conditions
+    - `err` - error conditions
+    - `warn` - warning conditions
+    - `notice` - normal but significant condition
+    - `info` - informational
+    - `debug` - debug-level messages
+- `-u` - 只显用户空间的日志
+- `-T` - 将时间戳转换为可读格式
+- `-J` - 输出json格式信息
+- `--help` - 显示详细帮助
+
+```bash
+# 只显示错误日志，并将日志转换为可读
+dmesg -T -l err
+
+# 只显示邮件相关信息
+dmesg -f mail
+```
+
+## `last`
+
+- `-a` - 显示最后登录的主机名
+- `-n N` - 显示最近 N 条记录
+- `-x` - 显示系统重启和运行级别变化的信息
+- `-R` - 不显示主机名
+- `-F` - 显示完整的时间信息，包括日期和时间
+
+```bash
+# 显示最后10条登录信息
+last -F -n 10
+```
+
+## `lastb`
+
+- 选项参数和[last](#last)类似，只显示失败的登录记录，需要管理员权限执行
+
+## `lastlog`
+
+- `-u USER` - 显示特定用户的最后登录信息
+- `-t DAYS` - 显示在指定天数内登录的用户信息
+
+```bash
+# 查看系统内所有用户的登录记录
+lastlog
+
+# 查看10天内登录系统的用户
+lastlog -t 10
+```
+
+## `faillog`
+
+```bash
+
+# 默认之显示有登陆错误过的用户的信息
+faillog
+
+# 显示所有信息
+faillog -a
+
+# 显示指定用户的信息
+faillog -u <username>
+```

@@ -1,0 +1,70 @@
+---
+title: 其他
+sidebar:
+    order: 20
+---
+
+- `hostnamectl` - 主机信息
+- `localectl` - 本地化
+- `timedatectl` - 时区
+- `loginctl` - 用户管理
+
+## 启动分析
+
+```bash
+# 服务启动分析
+systemd-analyze
+
+# 查看每个服务的启动耗时
+systemd-analyze blame
+
+# 查看服务的启动流程
+systemd-analyze critical-chain <unit_name>
+```
+
+## 电源管理
+
+```bash
+#   reboot     重启
+#   poweroff   关机
+#   suspend    休眠（数据保存到内存）
+#   hibernate  冬眠（数据保存到硬盘）
+systemctl reboot
+```
+
+## 配置
+
+### Unit 配置路径
+
+- `/etc/systemd/system` - 系统级别单元配置
+- `/lib/systemd/system` - 包管理工具下载的单元配置
+- `$XDG_CONFIG_HOME/systemd/user` - 用户自定义单元配置
+- 其他路径使用 `man systemd.unit` 查看详细信息
+
+### 登录管理器配置路径
+
+```bash
+/etc/systemd/logind.conf
+/etc/systemd/logind.conf.d/*.conf
+/run/systemd/logind.conf.d/*.conf
+/usr/lib/systemd/logind.conf.d/*.conf
+```
+
+部分配置项说明，参考[archwiki](https://man.archlinux.org/man/logind.conf.5.en)
+
+- `HandlePowerKey` - 按下电源键操作
+- `IdleAction` - 电脑空闲时的操作
+- `IdleActionSec` - 电脑空闲多少时间后执行空闲操作
+- `HandleLidSwitch` - 笔记本合盖操作
+
+## 常见问题
+
+### 切换 `systemctl edit` 命令的默认编辑器
+
+```bash
+# 添加编辑器
+sudo update-alternatives --install "$(which editor)" editor "$(which 编辑器名称)" 15
+
+# 配置
+sudo update-alternatives --config editor
+```

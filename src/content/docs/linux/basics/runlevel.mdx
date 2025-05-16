@@ -1,0 +1,35 @@
+---
+title: 运行级别
+sidebar:
+    order: 35
+---
+
+SysV Init
+
+- `0` - 关机
+- `1` - 单用户【找回丢失密码】
+- `2` - 多用户状态没有网络服务
+- `3` - 多用户状态有网络服务
+- `4` - 系统未使用保留给用户
+- `5` - 图形界面
+- `6` - 系统重启
+
+Systemd
+
+- `emergency.target` - 紧急模式，类似 runlevel 1，但更基础
+- `rescue.target` - 类似 runlevel 1 的单用户模式，但提供更多功能
+- `graphical.target` - 图形界面模式，类似 runlevel 5
+- `multi-user.target` - 多用户模式，类似 runlevel 3，但没有图形界面
+
+systemd 下切换运行级别
+
+```bash
+# 获取默认的运行级别
+systemctl get-default
+
+# 设置默认运行级别
+systemctl set-default xxx.target
+
+# 切换到指定运行级别
+systemctl isolate xxx.target
+```

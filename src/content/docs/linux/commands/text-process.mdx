@@ -1,0 +1,400 @@
+---
+title: 文本处理
+sidebar:
+    order: 5
+---
+
+| 命令              | 描述                                     |
+| ----------------- | ---------------------------------------- |
+| [cat](#cat)       | 显示文件内容                             |
+| more              | 显示文件内容，空格翻页                   |
+| less              | 显示文件内容，more增强版，支持vi按键操作 |
+| [head](#head)     | 显示文件起始部分内容                     |
+| [tail](#tail)     | 显示文件结束部分内容                     |
+| [find](#find)     | 查找文件                                 |
+| [locate](#locate) | 查找文件                                 |
+| [grep](#grep)     | 过滤                                     |
+| [awk](#awk)       | 过滤，格式化                             |
+| [sed](#sed)       | 编辑                                     |
+| [sort](#sort)     | 对文本行进行排序                         |
+| [uniq](#uniq)     | 去除重复的行                             |
+| [wc](#wc)         | 统计文件的行数、字数和字符数             |
+| [paste](#paste)   | 将多个文件的行并排合并                   |
+
+## `cat`
+
+- `-E` - 显示文件内的换行符号
+- `-n` - 显示行号
+
+```bash
+# 显示文件内容
+cat <filename>
+
+# 显示行号
+cat -n <filename>
+```
+
+## `head`
+
+- `-c` - 显示前多少个字符
+- `-n` - 显示前多少行内容
+
+```bash
+# 查看文件前20行内容
+head -n 20 <filename>
+
+# 查看文件前5个字符
+head -c 5 <filename>
+```
+
+## `tail`
+
+- `-c` - 显示后多少个字符
+- `-n` - 显示后多少行内容
+- `-f` - 阻塞终端实时显示文件尾部内容
+
+```bash
+# 查看文件后20行内容
+tail -n 20 <filename>
+
+# 实时显示文件尾部内容（ctrl+c退出）
+tail -f <filename>
+```
+
+## `find`
+
+```bash
+# 显示指定目录下的所以文件和目录
+find <dir>
+
+# 在home目录下查找包含linux的文件或目录
+find ~ -name '*linux*'
+
+# 在当前目录下查找的文件大小大于10兆使用 `-`表示要查找的文件大小必须小于10m
+find ~ -size +10m
+```
+
+## `locate`
+
+> 使用前必须使用`updatedb`对当前文件系统创建一个文件索引，查找速度快
+
+```bash
+locate <content>
+```
+
+## `grep`
+
+- `-i` - 搜索时忽略大小写
+- `-v` - 显示不包含匹配项的所有行
+- `-n` - 显示匹配内容在文件的行号
+- `-E` - 支持正则表达式
+- `-l` - 在多个文件内搜索时，只显示匹配到内容对应的文件名
+- `-c` - 只显示匹配到的行数
+- `--color` - 高亮显出匹配内容
+- `-m [num]` - 在匹配到指定个数的搜索值后不进行搜索了
+- `-A [num]` - 显示匹配行的前num行
+- `-B [num]` - 显示匹配行的后num行
+- `-C [num]` - 显示匹配行的前后num行
+- `-r` - 递归搜索目录下的所有文件
+- `--exclude` - 忽略指定文件
+
+```bash
+# 在a.txt文件内搜索包含abc字符串的行，并显示对应行号和前后3行内容
+grep -in -C 3 --color 'abc' a.txt
+
+# 搜索b.txt内所有不以abc字符串结尾的行
+grep -vE 'abc$' b.txt
+
+# 递归搜索当前目录下的所有包含abc字符串的文件，忽略log文件，只显示匹配的文件
+grep -rl --exclude='*.log' 'abc' ./*
+```
+
+## `awk`
+
+- `-F` - 指定字段分隔符
+- `-v` - 传递Shell变量
+- `-f` - 使用awk脚本文件
+
+### awk测试文件
+
+```bash
+tee users.txt <<eof
+zs 20 1435123141234
+ls 31 942109348430
+ww 25 447934543523
+zl 18 43543435345
+eof
+```
+
+- 使用
+
+```bash
+# 只显示第一列和第三列
+awk '{print $1, $3}' users.txt
+
+# 第一列显示当前家目录
+awk -v hm="$HOME" '{print hm, $1}' users.txt
+
+# 将awk脚本写入文件内使用
+echo "{print \$1, \$2}" > awk-script.awk
+awk -f awk-script.awk users.txt
+
+# 使用1作为字段分隔符
+awk -F'1' '{print $1}' users.txt
+```
+
+### 语法
+
+- `awk 'pattern { action } file'`
+- `pattern` - 用于匹配行
+- `action` - 对匹配到的行进行的具体操作
+
+```bash
+# 只显示年龄大于20的用户
+awk '$2 > 20{print $0}' users.txt
+
+# 只显示第2条数据
+awk 'NR == 2{print $0}' users.txt
+
+# 搜索以z开头的数据处理
+awk '/^z/{print $0}' users.txt
+```
+
+### 字段和记录
+
+- awk将每行文本所为记录，将每个单词（默认以空格分割）作为一个字段
+- `$1`代表记录中的第一个字段，`$2`代表第二个，以此类推
+- `$0`代表所有字段
+
+### 内置变量
+
+- `NR` - 当前行号
+- `NF` - 当前行的字段数量
+- `FS` - 字段分隔符（默认是空格）
+- `OFS` - 输出字符分隔符（默认是空格）
+- `RS` - 记录分隔符（默认是换行符号）
+- `ORS` - 输出记录分隔符（默认是换行符号）
+- `FILENAME` - 当前处理的文件名
+- `FNR` - 当前文件的行号
+- `ENVIRON` - 一个数组，包含当前环境变量
+- `ARGV` - 是一个数组，包含所有传递的参数
+- `ARGC` - 传递给awk脚本的参数数量
+
+```bash
+# 显示行号和当前字段个数
+awk '{print NR, $1, $2}' users.txt
+awk '{print NR, NF, $1, $2}' users.txt
+
+# 这种方式也可以修改字段分隔符
+awk 'FS=1{print $1, $2}' users.txt
+
+# 每个字段以，分割
+awk 'OFS=","{print $1, $2}' users.txt
+
+# 多个文件时可以显示对应的文件名
+awk '{print FILENAME, $0}' filename1 filename2 ...
+
+# 多个文件时区分各个文件的行号
+# 在多个文件的情况下NR变量会将所有文件合并起来统一显示行号
+# 而FNR只会显示这个记录在当前文件内的行号
+awk '{print FNR, $0}' filename1 filename2 ...
+
+# 显示环境变量
+awk '{print ENVIRON["HOME"]}' users.txt
+
+# 显示参数的个数，和具体的参数
+awk '{print ARGC, ARGV[0], ARGV[1], ARGV[2]}' users.txt
+```
+
+### 内置函数
+
+#### 字符串
+
+- `length(s)` - 返回字符串`s`的长度
+- `substr(s, start, length)` - 返回字符串`s`从`start`开始的`length`个字符
+- `index(s, t)` - 返回字符串`t`在字符串`s`中首次出现的位置（从 1 开始），未找到返回 0
+- `toupper(s)` - 转换为大写
+- `tolower(s)` - 转换为小写
+- `gsub(regex, replacement, s)` - 在字符串`s`中，用`replacement`替换所有匹配`regex`的部分，返回替换的次数
+
+```bash
+awk '{print length($3)}' users.txt
+
+awk '{print substr($3, 0, 3)}' users.txt
+
+awk '{print toupper($1)}' users.txt
+```
+
+#### 数值
+
+- `int(n)` - 返回数值`n`的整数部分
+- `rand()` - 返回0到1之间的随机数
+- `srand()` - 设置随机数生成器的种子，需要配合`rand()`使用
+- `sqrt(n)` - 返回数值`n`的平方根
+- `exp(n)` - 返回`e`的`n`次方
+- `log(n)` - 返回数值 n 的自然对数
+
+```bash
+# 获取0~10之间的随机数
+awk '{print int(rand() * 10)}' users.txt
+```
+
+#### 时间函数
+
+- `systime()` - 返回当前的UNIX时间戳（自1970-01-01 00:00:00 UTC起的秒数）
+- `strftime(format, timestamp)` - 将时间戳`timestamp`格式化为指定的字符串格式，`format`使用C语言的`strftime`函数的格式
+
+```bash
+awk '{print systime()}' users.txt
+
+# 格式化时间
+awk '{print strftime("%Y-%m-%d %H:%M:%S", systime())}' users.txt
+```
+
+#### 流程控制
+
+- 和其他变量语言的流程控制语句类似，包含`if-elseif`，`for`，`while`，`do-while`
+    - 其中可以使用`break`跳出当前循环，使用`continue`跳出当次循环
+
+```bash
+# 根据年龄判断新旧用户
+awk '{ if($2 < 20)print $1, "new user"; else print $1, "old user" }' users.txt
+```
+
+### BEGIN/END块
+
+#### BEGIN
+
+- BEGIN块中的代码在任何输入行被处理之前执行。通常用于初始化变量、设置输出格式或打印标题等
+
+```bash
+# 在处理前打印标题
+awk 'BEGIN { print "Name Age Phone" } { print $1, $2, $3 }' users.txt
+```
+
+#### END
+
+- END块中的代码在所有输入行处理完成后执行。通常用于输出总结、清理资源或打印最终结果
+
+```bash
+# 求和某age字段的数据
+awk '{ total += $2 } END { print "Total:", total }' users.txt
+```
+
+## `sed`
+
+### 选项
+
+- `-n` - 禁止输出模式空间内容，通常与`p`命令结合使用来打印特定行
+- `-e` - 允许同时输入多个脚本命令
+- `-f` - 从文件中读取sed脚本
+- `-i` - 直接在输入文件中进行替换（编辑原文件）
+
+### 命令
+
+- `i` - 插入
+- `a` - 追加
+- `d` - 删除
+- `s` - 替换
+- `p` - 打印
+
+```bash
+# 测试文件
+tee users.txt <<eof
+zs 20 1435123141234
+ls 31 942109348430
+ww 25 447934543523
+zl 18 43543435345
+eof
+
+# 在第二行插入一条新数据
+sed '2i\zs1 21 342543523' users.txt
+
+# 在第一行的后面添加test文本
+sed '1a\test' users.txt
+
+# 删除第3行数据
+sed '3d' users.txt
+
+# 修改第2行数据的名字
+sed 's/ls/lisi/g' users.txt
+
+# 只打印第3行数据，需要配合-n使用
+sed -n '3p' users.txt
+
+# 修改第一行数据的名字，配合-i选项直接修改原文件
+sed -i 's/zs/zhangsan/g' users.txt
+
+# 删除第2到4行
+sed '2,4d' users.txt
+
+# 删除第一行并修改ww的名字，一个命令要执行多个操作可以使用-e选项
+sed -e '1d' -e 's/ww/wangwu/g' users.txt
+
+# 删除以z开头的行
+sed '/^z/d' users.txt
+```
+
+## `sort`
+
+- `-n` - 按数字排序
+- `-r` - 逆序排序
+- `-u` - 只输出唯一的行
+
+```bash
+# 按数字排序，只是对比每行第一列的字符，不会完全对比数字
+sort -n <filename>
+
+# 按数字排序，降序排序
+sort -nr <filename>
+
+# 输出所有唯一的行
+sort -u <filename>
+```
+
+## `uniq`
+
+> 常与`sort`命令结合使用，因为`uniq`只会删除相邻的重复行，单独使用`uniq`时要保证文件是有序的
+
+- `-c` - 计数每个唯一行的出现次数，并在前面显示该计数
+- `-d` - 只显示重复的行
+- `-u` - 只输出唯一的行
+- `-i` - 忽略大小写进行比较
+
+```bash
+# 统计文件内重复行的数量，文件必须有序
+uniq -c <filename>
+
+# 忽略大小写匹配行，并只显示重复的行
+uniq -id <filename>
+```
+
+## `wc`
+
+- `-l` - 统计行
+- `-w` - 统计word
+- `-c` - 统计字节（byte）
+- `-m` - 统计字符（char）
+- `-L` - 显示最长的行的长度
+
+## `paste`
+
+- `-d` - 指定分隔符，默认为制表符（`\t`）
+
+```bash
+# 准备两个文件
+tee a.txt <<eof
+a
+b
+c
+eof
+
+tee b.txt <<eof
+1
+2
+3
+eof
+
+# 合并两个文件
+paste -d ',' a.txt b.txt
+```

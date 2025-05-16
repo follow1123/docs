@@ -1,0 +1,215 @@
+---
+title: 其他
+sidebar:
+    order: 50
+---
+
+| 命令            | 描述                                                                             |
+| --------------- | -------------------------------------------------------------------------------- |
+| [date](#date)   | 显示时间                                                                         |
+| [cal](#cal)     | 显示日历                                                                         |
+| [bc](#bc)       | 计算机                                                                           |
+| which           | 显示输入的命令所在目录                                                           |
+| where           | 显示输入的命令所在目录，目录是链接显示原始目录（这个命令好像只在的debian下才有） |
+| whereis         | 显示输入的命令所在目录、帮助文件目录等                                           |
+| history         | 历史命令                                                                         |
+| [tee](#tee)     | 从标准输入读取数据，并将其输出到标准输出和一个或多个文件中                       |
+| [xargs](#xargs) | 将标准输入的数据转换为命令行参数，并执行指定命令                                 |
+| [watch](#watch) | 在控制台持续监控指定的命令                                                       |
+| [ssh](#ssh)     | 加密通道远程连接服务器                                                           |
+| [scp](#scp)     | 加密通道远程传输文件到服务器                                                     |
+| [curl](#curl)   | 支持多种协议的网络传输工具                                                       |
+
+## `date`
+
+```bash
+# 显示当前时间
+date
+
+# 格式化显示时间
+date "+%Y-%m-%d %H:%M:%S"
+
+# 显示UTC时间
+date -u
+```
+
+## `cal`
+
+> 可能需要手动安装sudo apt install bsdmainutils
+
+```bash
+# 显示当月日历
+cal
+
+# 显示2024年的日历
+cal 2024
+```
+
+## `bc`
+
+计算器，支持浮点数
+
+```bash
+# 默认进入交互式命令默认，直接输入 1+1 表达式计算
+# 要显示小数使用 scale=2; 10/3
+# 输入 quit 命令或使用 ctrl+d 退出交互模式
+bc
+
+
+# 使用管道直接计算结果
+echo "1+1" | bc
+
+# 保留 2 为小数
+echo "scale=2; 10/3" | bc
+```
+
+## `tee`
+
+- `-a` - 追加文件
+
+```bash
+# 将文本打印到终端并且写入到a.txt文件内
+echo 'this is line' | tee a.txt
+
+# 将所有进程信息保存到b.txt文件内并过滤指定服务打印到终端
+ps -ef | tee b.txt | grep <servicename>
+
+# 将文件追加到root目录下的c.txt文件内
+echo 111 | tee -a /root/c.txt
+```
+
+## `xargs`
+
+- `-n N` - 每次调用命令时传递N个参数
+- `-d DELIMITER` - 指定输入项的使用指定分隔符（默认是空格或换行）
+
+```bash
+# 显示当前目录下所有txt文件的内容
+ls *.txt | xargs cat
+
+# 依次输出1到4
+echo "1,2,3,4" | xargs -d "," -n 1 echo
+```
+
+## `watch`
+
+```bash
+# 监控 free 命令的输出，默认 2 秒执行一次
+watch free
+
+# 比较输出的不同字符
+watch -d free
+
+# 每秒执行一次
+watch -n 1 free
+```
+
+## `ssh`
+
+SSH 是一种网络协议，用于通过加密通道，安全地远程访问另一台计算机，被连接的服务器必须启动 ssh 服务
+
+客户端安装：`apt install openssh-client`
+服务端安装：`apt install openssh-server`
+
+```bash
+# 连接远程主机
+ssh <username>@<hostname/ip>
+
+# 指定远程服务运行 ssh 服务时的端口
+ssh -p <port> <username>@<hostname/ip>
+
+# 指定免登陆密钥文件路径
+ssh -i <path> <username>@<hostname/ip>
+```
+
+### 免登陆配置
+
+```bash
+# 生成密钥对，默认保存在 ~/.ssh 目录下
+# id_rsa.pub 公钥
+# id_rsa 私钥
+ssh-keygen -t rsa -b 2048
+
+# 将公钥上传到远程服务器：
+ssh-copy-id <username>@<hostname/ip>
+```
+
+### 服务器配置
+
+在管理多个远程服务的情况下，每次连接时都需要输出用户名和主机，使用配置文件简化连接时输入的命令
+
+配置文件在 `~/.ssh/config`
+
+```ini title="~/.ssh/config"
+Host myserver
+    HostName <ip>
+    User <username>
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
+```
+
+直接使用服务名连接
+
+```bash
+ssh myserver
+```
+
+## `scp`
+
+通过 SSH 协议安全地复制文件或目录的命令
+
+```bash
+# 将本机的指定文件复制到远程的指定目录下
+scp <local_path> <username>@<ip>:<remote_path>
+
+# 如果添加了远程服务的配置，则可以直接使用服务名简化操作
+scp <local_path> <server_name>:<remote_path>
+
+# 递归复制
+scp -r <dir_path> <server_name>:<remote_path>
+```
+
+## `curl`
+
+在命令行界面进行网络数据传输，支持许多协议，包括 HTTP、HTTPS、FTP、FTPS、SFTP、SMTP 等等
+
+### HTTP
+
+```bash
+# 默认 GET 请求
+curl http://example.com
+
+# 使用 POST 请求，发送urlencoding 数据
+curl -X POST -d "username=john&password=1234" http://example.com/login
+
+# 发送文件
+curl -X POST -F "file=@path/to/file.txt" http://example.com/upload
+
+# 指定 Content-Type 发送 json 数据
+curl -X POST -H "Content-Type: application/json" -d '{"username": "john", "password": "1234"}' http://example.com/api/login
+
+# 查看响应头和响应体信息 -I 只查看响应头
+curl -i http://example.com
+
+# 显示详细信息，用于调试
+curl -v http://example.com
+
+# 跟随重定向
+curl -L http://example.com
+
+# 下载文件，指定文件名
+curl -o filename.txt http://example.com/a.txt
+
+# 下载文件，就使用连接的文件名
+curl -O http://example.com/a.txt
+```
+
+### FTP
+
+```bash
+# 下载文件
+curl -O ftp://example.com/file.txt
+
+# 上传文件
+curl -T file.txt ftp://example.com/upload/
+```

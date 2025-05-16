@@ -1,0 +1,55 @@
+---
+title: 安装
+sidebar:
+    order: 5
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+## 字体
+
+```bash
+# 设置字体大小
+dpkg-reconfigure console-setup
+
+# 设置字体
+dpkg-reconfigure locales
+```
+
+## 输入法
+
+### fcitx5 输入法
+
+```bash
+sudo apt install fcitx5 fcitx5-frontend-qt5 fcitx5-frontend-gtk3 fcitx5-frontend-gtk2 fcitx5-chinese-addons
+```
+
+## 音频
+
+- `alsa` - 音频底层
+- `pulseaudio` - 音频服务
+- `pipewire` - 新版音频服务
+    - `wireplumber` - pipewire 客户端
+    - `qpwgraph` - pipewire 的图形界面客户端
+
+## 蓝牙
+
+- `bluez` - 蓝牙协议底层
+- `bluetooth` - 蓝牙服务，自带 `bluetoothctl` 交互命令
+
+## 物理机安装 Debian
+
+<Steps>
+
+1. 制作一个[微pe](https://www.wepe.com.cn/)的u盘
+2. 在 BIOS 内设置电脑硬盘启动顺序为u盘启动
+
+    开机出现图标不停按F12，不同电脑按键不同
+
+3. 重启后自动进入 Debian 安装界面
+
+    :::note
+    如果安装时提示缺少固件，需要在[固件官网](https://packages.debian.org/stable)或[固件git网站](https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git)下载 nofree 的固件先放在u盘内的 `firmware` 文件夹（没有就新建一个）内
+    :::
+
+</Steps>

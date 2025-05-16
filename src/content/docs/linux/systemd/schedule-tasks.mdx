@@ -1,0 +1,67 @@
+---
+title: 定时任务
+sidebar:
+    order: 10
+---
+
+systemd 使用 .timer 文件作为定时任务的配置文件
+
+定义一个简单的定时任务
+
+service 配置，具体的执行脚本
+
+```ini title="~/.config/systemd/user/notify-me.service"
+[Unit]
+Description=Notify Me
+
+[Service]
+ExecStart=/bin/notify-send "hello"
+```
+
+timer 配置，定义执行时间
+
+```ini title="~/.config/systemd/user/notify-me.timer"
+[Unit]
+Description=Notify Me Timer
+
+[Timer]
+# 启动 timer 1秒后还是执行这个 service
+OnActiveSec=1s
+# service 启动后 3秒再次执行
+OnUnitActiveSec=3s
+# 这个选项表示 systemd 每隔多长时间检查一次这个定时任务是否可以执行，默认是 1分钟
+# 这里使用秒为单位测试，所以调整为 0秒
+# 如果使用秒为单位测试时，不填这个属性会导致这个 timer 固定 1分钟执行一次的未定义行为
+AccuracySec=0s
+# 如果 service 名称和 timer 的名称一样，可以不填这个属性
+# Unit=notify-me.service
+```
+
+:::info
+由于是在用户级别下测试，所以以下命令都添加 `--user` 选项
+:::
+
+执行
+
+```bash
+systemctl --user daemon-reload
+
+# 启动
+systemctl --user start notify-me.timer
+```
+
+相关命令
+
+```bash
+systemctl --user list-timers
+```
+
+相关文档
+
+```bash
+# timer 配置文档
+man systemd.timer
+
+# 部分时间相关选项的时间格式文档
+man systemd.time
+```

@@ -1,0 +1,90 @@
+---
+title: 磁盘管理
+sidebar:
+    order: 25
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+在 Linux 系统中，硬盘、存储设备和分区等通常会以特定的命名格式进行标识。不同类型的存储设备（如 SATA、SCSI 和 NVMe）都有不同的命名规则
+
+SATA/SCSI 硬盘
+
+- `sda` - 第一个 SATA 或 SCSI 设备
+    - `sda1` - 第一个 SATA 或 SCSI 设备的第一个分区
+    - `sda2` - 第一个 SATA 或 SCSI 设备的第二个分区
+- `sdb` - 第二个 SATA 或 SCSI 设备
+    - `sdb1` - 第二个 SATA 或 SCSI 设备的第二个分区
+
+NVMe 硬盘
+
+- `nvme0n1` - 第一个 NVMe 设备的第一个命名空间
+    - `nvme0n1p1` - 第一个 NVMe 设备的第一个分区
+    - `nvme0n1p2` - 第一个 NVMe 设备的第二个分区
+- `nvme1n1` - 第二个 NVMe 设备的第一个命名空间
+    - `nvme1n1p1` - 第二个 NVMe 设备的第一个分区
+
+## 分区
+
+分区是磁盘管理中非常重要的一部分，它涉及将一个物理磁盘分割成多个逻辑单元（分区），每个分区可以用于存储不同的文件系统或操作系统
+
+### 分区表类型
+
+#### MBR（主引导记录）
+
+MBR 是较旧的分区表格式，它支持最多 4 个主分区，或者 3 个主分区加 1 个扩展分区。MBR 分区表位于磁盘的第一个扇区（通常是磁盘的 512 字节）。MBR 还包含启动加载程序，启动操作系统时会执行该程序
+
+- 最大支持磁盘容量：2TB
+- 最多主分区数：4 个主分区，或者 3 个主分区 + 1 个扩展分区
+- 局限性：不支持大于 2TB 的磁盘，也不支持更多的分区
+
+#### GPT（GUID 分区表）
+
+GPT 是一种更现代的分区表格式，它克服了 MBR 的许多限制，尤其是支持更大的磁盘和更多的分区。GPT 是基于 GUID（全局唯一标识符）的，具有更强的可扩展性和灵活性。GPT 存储在磁盘的多个地方，因此它具有更好的可靠性
+
+- 最大支持磁盘容量：9.4 ZB（泽字节，极其巨大的存储空间）
+- 最多分区数：理论上可以支持 128 个分区（在 Linux 中），不过可以根据需要扩展
+- 优势：支持大于 2TB 的磁盘，并且具有冗余保护，增强了数据的安全性
+
+#### 分区命令
+
+- <InternalLink text="lsblk" href="linux/commands/disk-device#lsblk" /> -
+  查看系统内磁盘分区信息
+- <InternalLink text="fdisk" href="linux/commands/disk-device#fdisk" /> -
+  对磁盘进行分区
+- <InternalLink text="parted" href="linux/commands/disk-device#parted" /> -
+  对磁盘进行分区
+
+## 格式化
+
+分区格式化 是将存储设备（如硬盘或 SSD）的分区创建成文件系统的过程。这个过程不仅会在硬盘上分配空间，还会创建特定类型的文件系统，以便操作系统能够存储和访问数据
+
+常见的 Linux 文件系统类型
+
+- `ext4` - （Fourth Extended File System）这是 Linux 最常用的文件系统之一，广泛应用于桌面、服务器等各种环境。它支持大文件、日志、延迟分配等特性
+- `xfs` - XFS 是一个高性能的日志型文件系统，尤其适用于大文件和高负载的环境。它是许多 Linux 发行版的默认文件系统，特别是在企业级环境中
+- `btrfs` - 这是一个现代的文件系统，具有快照、压缩、内建 RAID 支持等特性。它在功能和灵活性方面优于 ext4 和 xfs，但在稳定性和成熟度上还在逐步改进中
+- `f2fs` - 优化的闪存文件系统，专为 NAND 闪存设备设计，尤其适用于 SSD
+- `swap` - 这种文件系统用于交换空间（交换分区），与其他文件系统不同，它不存储数据文件，而是用于临时数据交换
+
+使用 <InternalLink code text="mkfs" href="linux/commands/disk-device#mkfs" /> 命令格式化分区
+
+## 挂载
+
+Linux 使用一种统一的文件系统结构（树状结构），所有的存储设备（包括硬盘、U 盘、网络文件系统等）都挂载到该树状结构的某个目录中。这个挂载点（mount point）可以是任何空目录
+
+使用 <InternalLink code text="mount" href="linux/commands/disk-device#mount" /> 命令挂载设备，使用 <InternalLink code text="umount" href="linux/commands/disk-device#umount" /> 卸载设备
+
+### 永久挂载设备
+
+对 `/etc/fstab` 文件进行操作
+
+1. 创建一个目录用于挂载，一般在 `/media`（临时挂载）目录或 `/mnt`（永久挂载）目录下创建
+2. 使用 <InternalLink code text="blkid" href="linux/commands/disk-device#blkid" /> 查看格式化后的分区文件的 UUID
+3. 将以下内容添加进 `/etc/fstab` 文件内
+
+```bash
+UUID=<UUID>     <dir>  <fs_type>    defaults    0   0
+```
+
+4. 系统重启后就会自动挂载这个文件内指定的所有设备

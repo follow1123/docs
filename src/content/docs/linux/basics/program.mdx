@@ -1,0 +1,86 @@
+---
+title: 程序
+sidebar:
+    order: 15
+---
+
+import InternalLink from "@components/InternalLink.astro";
+import Mermaid from "@components/Mermaid.astro";
+
+在 Linux 系统中，程序后系统会创建一个运行时实例（进程）
+
+每个进程都会分配一个 pid（进程ID）
+
+<Mermaid
+    code={`
+flowchart LR
+a(程序) --启动后--> b(进程)
+b --只能在终端内运行--> c(命令行程序)
+b --只能在GUI（图像界面）下运行--> d(GUI程序)
+c --占用终端并执行任务，直到完成--> c1(前台进程)
+c --运行后不退出并提供服务，不占用终端控制权--> c2(后台进程/服务)
+c --运行后进入程序提交的交互环境并使用内置的命令操作-->c3(交互式进程)
+c --运行后在终端使用字符渲染界面进行操作-->c4(TUI进程)
+`}
+/>
+
+常用命令
+
+- <InternalLink code text="top" href="linux/commands/process-service#top" /> -
+  一个**TUI进程**，用于查看系统所有内进程信息
+- <InternalLink code text="ps" href="linux/commands/process-service#ps" /> -
+  一个**前台进程**，用于在控制台输出系统内所有进程信息
+
+## 服务管理
+
+服务（service）本质就是进程，但是运行在后台，通常会监听某个端口，等待其他程序的请求，比如：mysqld、sshd、firewalld等，也可以称为守护进程
+
+### service 命令（已过时）
+
+推荐使用 [systemctl](#systemctl) 管理
+
+```bash
+# 操作服务
+# start
+# stop
+# restart
+# reload
+# statue
+service <service_name> start
+
+# 查看服务自启动状态
+chkconfig <service_name> --list
+
+# 指定服务在某个系统运行级别自启动
+chkconfig --level <level> <service_name> [on|off]
+```
+
+### systemctl
+
+> systemd 服务管理命令，参考 <InternalLink text="systemctl" href="linux/systemd/service" />
+
+## 定时任务
+
+### cron
+
+任务调度：是指系统在某个时间执行的特定的命令或程序
+
+安装：`apt install cron`
+
+> <InternalLink text="参考" href="linux/commands/schedule-tasks/#crontab" />
+
+### at
+
+`at` 是一次性定时任务，`at` 的守护进程 `atd` 会以后台模式检查任务队列运行
+
+安装：`apt install at`，确保 `atd` 服务是否运行 `ps -ef | grep atd`
+
+`atd` 守护进程默认每60秒检查任务队列，有任务时，会检查任务运行时间，如果时间与当前时间匹配，则运行此任务
+
+`at` 命令是一次性定时任务，任务执行完成后不会重复执行
+
+> <InternalLink text="参考" href="linux/commands/schedule-tasks/#at" />
+
+### systemd
+
+> <InternalLink text="参考" href="linux/systemd/schedule-tasks" />

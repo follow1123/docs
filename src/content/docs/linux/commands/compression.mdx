@@ -1,0 +1,202 @@
+---
+title: 压缩解压
+sidebar:
+    order: 10
+---
+
+| 命令                | 描述                                                  |
+| ------------------- | ----------------------------------------------------- |
+| [gzip](#gzip)       | 使用Lempel-Ziv编码（LZ77）进行压缩                    |
+| [gunzip](#gunzip)   | 解压缩gzip压缩的文件                                  |
+| zcat                | 查看gzip压缩的文件                                    |
+| [bzip2](#bzip2)     | 用Burrows-Wheeler变换和Huffman编码进行压缩            |
+| [bunzip2](#bunzip2) | 解压缩bzip2压缩的文件                                 |
+| bzcat               | 查看bzip2压缩的文件                                   |
+| [xz](#xz)           | 使用LZMA（Lempel-Ziv-Markov chain Algorithm）进行压缩 |
+| [unxz](#unxz)       | 解压缩xz压缩的文件                                    |
+| xzcat               | 查看xz压缩的文件                                      |
+| [tar](#tar)         | 打包，配合以上压缩算法使用                            |
+| [zip](#zip)         | 跨平台压缩（在各个平台都有对于的实现）                |
+| [unzip](#unzip)     | 解压缩zip压缩的文件                                   |
+
+## `gzip`
+
+```bash
+# 压缩a.txt文件，会在当前目录下生成后的a.txt.gz覆盖掉a.txt文件
+gzip a.txt
+
+# 压缩a.txt文件，不覆盖原始文件
+gzip -k a.txt
+
+# 压缩a.txt文件，显示压缩时的信息
+gzip -v a.txt
+```
+
+## `gunzip`
+
+```bash
+# 解压a.txt.gz文件，会在当前目录下生成后的a.txt覆盖掉a.txt.gz文件
+gunzip a.txt.gz
+
+# 解压a.txt.gz文件，不覆盖原始文件
+gunzip -k a.txt.gz
+
+# 解压a.txt.gz文件，显示解压时的信息
+gunzip -v a.txt.gz
+```
+
+## `bzip2`
+
+> 基础使用方法和[gzip](#gzip)一样，压缩文件以`bz2`结尾，相比`gzip`有更高的压缩率，但压缩速度相对较慢
+
+## `bunzip2`
+
+> 基础使用方法和[gunzip](#gunzip)一样
+
+## `xz`
+
+> 基础使用方法和[gzip](#gzip)一样，压缩文件以`xz`结尾，相比`gzip`和`bzip2`有更高的压缩率，但压缩速度相对较慢
+
+## `unxz`
+
+> 基础使用方法和[gunzip](#gunzip)一样
+
+## `tar`
+
+- 操作参数
+
+    - `-c` 创建
+    - `-r` 追加
+    - `-t` 显示
+    - `-u` 更新
+    - `-x` 提取
+
+- 参数选项
+
+    - `-C` 指定解压目录
+    - `-f` 后面接上压缩文件
+    - `-z` 使用gzip命令算法
+    - `-j` 使用bzip2命令算法
+    - `-J` 使用xz命令算法
+    - `-v` 操作时显示详细信息
+
+- 打包、压缩
+
+```bash
+# 将a目录打包生成a.tar归档文件
+tar -cvf a.tar a
+
+# 将a目录打包并使用gzip命令算法压缩生成a.tar.gz文件
+tar -czvf a.tar.gz a
+
+# 将a目录打包并使用bzip2命令算法压缩生成a.tar.bz2文件
+tar -cjvf a.tar.bz2 a
+
+# 将a目录打包并使用xz命令算法压缩生成a.tar.xz文件
+tar -cJvf a.tar.xz a
+```
+
+- 解压
+
+```bash
+# 将a.tar归档文件提取到~/Downloads目录下
+tar -xvf a.tar -C ~/Downloads/
+
+# 将a.tar.gz文件解压到~/Downloads目录下
+tar -xzvf a.tar.gz -C ~/Downloads/
+
+# 将a.tar.bz2文件解压到~/Downloads目录下
+tar -xjvf a.tar.bz2 -C ~/Downloads/
+
+# 将a.tar.xz文件解压到~/Downloads目录下
+tar -xJvf a.tar.xz -C ~/Downloads/
+```
+
+- 显示
+
+```bash
+# a.tar.gz内目录结构
+# ./a
+# ├── 1.txt
+# └── b
+#     └── 2.txt
+
+# 列出a.tar.gz压缩文件目录下的所有文件
+tar -tf a.tar.gz
+
+# 输出
+# a/
+# a/b/
+# a/b/2.txt
+# a/1.txt
+```
+
+- 提取
+
+```bash
+# a.tar.gz内目录结构
+# ./a
+# ├── 1.txt
+# └── b
+#     └── 2.txt
+
+# 将a.tar.gz内的b目录下的2.txt文件单独提取出来
+tar -xvf a.tar.gz a/b/2.txt
+
+# 默认提取到当前目录下，提取后的目录结构
+# ./a
+# └── b
+#     └── 2.txt
+
+# 单独提取文件不支持-C参数指定提取到的目录，需要先进入到指定的目录再提取
+```
+
+- 追加
+
+> 只能对归档文件进行操作，不能对压缩后的文件操作
+
+```bash
+# a.tar内目录结构
+# ./a
+# ├── 1.txt
+# └── b
+#     └── 2.txt
+
+# 将3.txt追加到a.tar归档内
+tar -rvf a.tar 3.txt
+
+# 追加后的归档内容
+# a/
+# a/b/
+# a/b/2.txt
+# a/1.txt
+# 3.txt
+
+# 默认只能将将文件追加归档文件的根目录下，如果需要指定追加到归档文件的某个目录内需要提取后在操作
+# 重复执行刚才的追加命令不会将归档内的3.txt文件覆盖
+
+```
+
+- 更新
+
+> 和追加操作类似，不同的是更新会覆盖掉之前的文件
+
+## `zip`
+
+```bash
+# 将a.txt压缩生成a.zip
+zip a.zip a.txt
+
+# 将a目录压缩生成a.zip文件
+zip -r a.zip a
+```
+
+## `unzip`
+
+```bash
+# 将a.zip文件解压到~/Downloads目录下
+unzip a.zip -d ~/Downloads
+
+# 显示a.zip内的内容
+unzip -l a.zip
+```

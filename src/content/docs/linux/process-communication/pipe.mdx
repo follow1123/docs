@@ -1,0 +1,29 @@
+---
+title: 管道
+sidebar:
+    order: 5
+---
+
+二进制流读取或写入数据
+
+## 匿名管道
+
+### `pipe(pipefd)`
+
+创建管道，pipefd 参数是 长度为 2 的数组，用于存储读写文件描述符，`pipefd[0]` 为读，`pipefd[1]` 为写
+
+### `pipe2(pipefd, flags)`
+
+创建管道，第一个参数和上面一样，flags 表示模式，`O_NONBLOCK`：非阻塞模式，`O_CLOEXEC`：执行 `execve()` 系统调用时关闭管道等
+
+:::caution
+这个管道是往内核空间写入数据，尽量不要同时写入大量数据
+:::
+
+## 有名管道
+
+### `mkfifo(pathname, mode)`
+
+创建有名管道，pathname 是一个特殊的文件，用于读取和写入
+
+pathname 文件需要手动创建，这个文件不会存储任何内容，只是标记这个管道，文件的类型是 `p`

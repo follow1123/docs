@@ -1,0 +1,112 @@
+---
+title: 网络
+sidebar:
+    order: 20
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+## 网络配置
+
+网络一般可以配置静态 ip 或动态获取，参考具体网络工具的配置
+
+### ifupdown
+
+Debian 系列系统下面默认的网络管理工具
+
+配置文件：`/etc/network/interfaces`
+
+TODO
+
+### NetworkManager
+
+图像界面管理网络工具
+
+TODO
+
+### systemd
+
+> 参考 <InternalLink text="systemd-networkd" href="linux/systemd/network" />
+
+### WiFi 配置
+
+#### wpa supplicant
+
+安装：`sudo apt install wpasupplicant`
+
+##### 基础配置
+
+查看 wpa 相关服务：`ls /lib/systemd/system | grep wpa`
+
+一般使用 `wpa_supplicant@.service` 这个服务指定特定接口监听
+
+配置文件
+
+这里在创建好这个配置文件后也可以使用 `wpa_passphrase "WiFi名" 密码 >> /etc/wpa_supplicant/wpa_supplicant-<interface>.conf` 命令添加 WiFi 信息到文件内
+
+或者使用 `wpa_cli`、`wpa_gui(需要安装)` 等工具管理
+
+```nginx title="/etc/wpa_supplicant/wpa_supplicant-<interface>.conf"
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+    ssid="WiFi名"
+    psk=密码
+}
+```
+
+启动
+
+```bash
+sudo systemctl enable --now wpa_supplicant@<interface>.service
+```
+
+## 主机名
+
+```bash
+# 查看主机名
+# 如果需要修改主机名，在 /etc/hostname 文件内修改，修改后重启系统
+hostname
+```
+
+## DHCP
+
+DHCP（动态主机配置协议，Dynamic Host Configuration Protocol）是一种用于在局域网（LAN）中自动分配 IP 地址和其他网络配置参数的协议。它使得设备（如计算机、打印机、路由器等）能够动态地获得 IP 地址及相关网络配置，而不需要手动配置每台设备
+
+在使用 `ifupdown` 配置网络时，如果需要使用 DHCP 连接开启了 DHCP 服务的网关，则需要配合 `dhclient` 命令连接
+
+在使用 `systemd-networkd` 配置网络时，则只需要添加启用 DHCP 的配置，`systemd-networkd` 内置了一个 DHCP 客户端
+
+## DNS
+
+DNS（Domain Name System，域名系统） 互联网的一项基础服务，它的主要功能是将人类可读的域名（例如 `www.example.com`）转换成计算机可识别的 IP 地址（如 192.0.2.1）。这个转换过程称为“域名解析”，它允许我们通过易记的域名访问网站或其他网络资源，而无需记住复杂的 IP 地址
+
+### hosts 文件
+
+当系统进行域名解析时，它首先会查找 `/etc/hosts` 文件。如果在该文件中找到匹配的条目，则使用该 IP 地址
+
+文件格式
+
+```bash
+127.0.0.1   localhost
+192.168.1.10 myserver myserver.local
+```
+
+### 本地域名解析服务
+
+在本地启动的DNS服务，用于提高解析速度、添加缓存、加密等功能
+
+- systemd 提供的域名解析服务：<InternalLink text="systemd-resolved" href="linux/systemd/network#systemd-resolved" />
+
+## 防火墙
+
+- `iptables` - 直接的防火墙工具，处理流量过滤
+- <InternalLink code text="nftables" href="linux/commands/network#nftables" />-
+  `iptables` 的替代工具，改进性能和灵活性
+- <InternalLink
+      code
+      text="firewalld"
+      href="linux/commands/network#firewall-cmd"
+  />
+  - 基于 `iptables` 或 `nftables` 防火墙管理工具，提供动态规则管理
+- `ufw` - 简化防火墙配置工具，基于 `iptables` 或 `nftables`

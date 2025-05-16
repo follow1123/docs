@@ -1,0 +1,212 @@
+---
+title: 包管理器
+sidebar:
+    order: 30
+---
+
+## Debian 系列
+
+Debian 系列系统下的包管理工具
+
+### dpkg
+
+Debian 系列系统的底层包管理工具
+
+```bash
+# 直接安装 .deb 文件
+dpkg -i <package-file>.deb
+
+# 显示所有已经安装的包
+dpkg -l
+
+# 显示软件包详细信息
+dpkg -s <package-name>
+
+# 显示软件包内所有文件存放的路径
+dpkg -L <package-name>
+
+# 搜索指定关键字匹配的软件安装路径
+dpkg -S <pattern>
+```
+
+### apt
+
+高级包管理工具，用于处理**依赖关系**和**从仓库安装软件包**
+
+#### 软件包源
+
+<details>
+<summary>Debian 11 (bullseye)</summary>
+
+```bash title="/etc/apt/sources.list"
+## tencentyun
+deb http://mirrors.tencentyun.com/debian bullseye main contrib non-free
+deb http://mirrors.tencentyun.com/debian bullseye-updates main contrib non-free
+deb http://mirrors.tencentyun.com/debian bullseye-backports main contrib non-free
+deb http://mirrors.tencentyun.com/debian bullseye-proposed-updates main contrib non-free
+
+## 163
+deb http://mirrors.163.com/debian/ bullseye main non-free contrib
+deb https://mirrors.163.com/debian-security/ bullseye-security main
+deb http://mirrors.163.com/debian/ bullseye-updates main non-free contrib
+deb http://mirrors.163.com/debian/ bullseye-backports main non-free contrib
+
+## huawei
+deb https://mirrors.huaweicloud.com/debian/ bullseye main non-free contrib
+deb https://mirrors.huaweicloud.com/debian-security/ bullseye-security main
+deb https://mirrors.huaweicloud.com/debian/ bullseye-updates main non-free contrib
+deb https://mirrors.huaweicloud.com/debian/ bullseye-backports main non-free contrib
+
+## tsinghua.edu
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-backports main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free
+
+## ustc.edu
+deb https://mirrors.ustc.edu.cn/debian/ bullseye main contrib non-free
+deb https://mirrors.ustc.edu.cn/debian/ bullseye-updates main contrib non-free
+deb https://mirrors.ustc.edu.cn/debian/ bullseye-backports main contrib non-free
+deb https://mirrors.ustc.edu.cn/debian-security/ bullseye-security main contrib non-free
+```
+
+</details>
+
+<details>
+<summary>Debian 12 (bookworm)</summary>
+
+```bash title="/etc/apt/sources.list"
+# 清华
+deb https://mirrors.ustc.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
+deb https://mirrors.ustc.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
+deb https://mirrors.ustc.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
+deb https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main contrib non-free non-free-firmware
+
+# 网易
+deb https://mirrors.163.com/debian/ bookworm main non-free non-free-firmware contrib
+deb https://mirrors.163.com/debian-security/ bookworm-security main
+deb https://mirrors.163.com/debian/ bookworm-updates main non-free non-free-firmware contrib
+deb https://mirrors.163.com/debian/ bookworm-backports main non-free non-free-firmware contrib
+
+# 阿里
+deb https://mirrors.aliyun.com/debian/ bookworm main non-free non-free-firmware contrib
+deb https://mirrors.aliyun.com/debian/ bookworm-updates main non-free non-free-firmware contrib
+deb https://mirrors.aliyun.com/debian/ bookworm-backports main non-free non-free-firmware contrib
+deb https://mirrors.aliyun.com/debian-security/ bookworm-security main
+
+# 腾讯
+deb https://mirrors.cloud.tencent.com/debian/ bookworm main contrib non-free non-free-firmware
+deb https://mirrors.cloud.tencent.com/debian/ bookworm-updates main contrib non-free non-free-firmware
+deb https://mirrors.cloud.tencent.com/debian/ bookworm-backports main contrib non-free non-free-firmware
+deb https://mirrors.cloud.tencent.com/debian-security/ bookworm-security main contrib non-free non-free-firmware
+```
+
+</details>
+
+#### 常用命令
+
+搜索
+
+```bash
+# 搜索软件
+apt serach <package_name>
+
+# 查看所有可以更新的软件
+apt list --upgradable
+
+# 查看所有已经安装的软件
+apt list --installed
+
+# 查看软件所有版本
+apt list <package_name> --all-versions
+
+# 查看软件详细信息
+apt show <package_name>
+```
+
+安装
+
+```bash
+# 安装软件
+apt install <package_name>
+
+# 从配置的源内更新包信息
+apt update
+
+# 更新所有软件
+apt upgrade
+```
+
+卸载
+
+```bash
+# 删除软件
+apt remove <package_name>
+
+# 删除软件，连同配置文件一起删除
+apt remove --purge <package_name>
+
+# 删除软件，连同配置文件一起删除，和 `apt remove --purge` 一样
+apt purge <package_name>
+
+# 删除所有未被依赖的软件包
+apt autoremove
+
+# 删除所有未被依赖的软件包，连同配置文件一起删除
+apt autoremove --purge <package_name>
+
+# 删除所有未被依赖的软件包，连同配置文件一起删除，和 `apt autoremove --purge` 一样
+apt autopurge
+```
+
+禁止自动更新
+
+```bash
+# 禁止指定软件包版本自动更新
+apt-mark hold <package_name>
+
+# 查看所有被禁止自动更新的软件包
+apt-mark showhold
+
+# 解除禁止自动更新
+apt-mark unhold <package_name>
+```
+
+## RedHat 系列
+
+### rpm
+
+Red Hat 系列的核心包管理工具，负责管理 .rpm 格式的软件包。RPM 主要用于安装、查询、升级和删除单个软件包。它处理的是包的基本操作，并不处理软件包间的依赖关系
+
+#### 常用命令
+
+```bash
+# 查询安装的所有软件包
+rpm -qa
+
+# 查询该软件是否安装
+rpm -q <package_name>
+
+# 查询该软件的详细信息
+rpm -qi <package_name>
+
+# 查询该软件包包含哪些文件
+rpm -ql <package_name>
+
+# 查询该文件输入那个软件
+rpm -qf <file_path>
+
+# 卸载相命令
+rpm -e <package_name>
+
+# 安装软件包
+# -i 安装
+# -v 提示
+# -h 进度条
+#
+rpm -ivh <package_name>
+```
+
+### dnf
+
+TODO
