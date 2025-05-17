@@ -132,6 +132,11 @@ export default defineConfig({
               "neovim/neovim-api",
             ],
           },
+          {
+            label: "其他/Nginx",
+            link: "/nginx",
+            items: ["nginx", "nginx/configuration", "nginx/commands"],
+          },
         ]),
       ],
       title: "Docs",
