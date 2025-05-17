@@ -1,0 +1,251 @@
+---
+title: 网络
+sidebar:
+    order: 15
+---
+
+import InternalLink from "@components/InternalLink.astro";
+import { Steps } from "@astrojs/starlight/components";
+
+> 参考：<InternalLink text="docker 网络命令" href="docker/commands#网络相关" />
+
+进行容器之间的互联和通信以及端口映射
+
+容器 ip 变动时可以通过服务名连接，通信不受影响
+
+## 网络模式
+
+docker 会在宿主机虚拟一个网桥（docker0），启动一个容器时 docker 会根据这个虚拟网桥的网段分配给容器一个ip
+
+可以将虚拟网桥（docker0）理解为一个交换机，宿主机通过这个交换机连接到每一个容器
+
+| 网络模式  | 简介                                                                                                |
+| --------- | --------------------------------------------------------------------------------------------------- |
+| bridge    | 为每一个容器都分配一个虚拟网络、设置 ip 等，并将容器连接到一个 docker0， 虚拟网桥，默认就是这个模式 |
+| host      | 使用宿主机的 ip 和端口                                                                              |
+| none      | 不进行任何网络设置                                                                                  |
+| container | 创建的容器和指定的容器共享 ip、端口等                                                               |
+
+### bridge
+
+将容器的网络连接到虚拟网桥（docker0）上，根据虚拟网桥的的网段分配一个 ip 给容器
+
+```bash
+# 模式就是bridge网络模式，使用宿主机ip+8080访问
+docker run -d --name n3 --network bridge -p 8080:80 nginx
+```
+
+### host
+
+直接使用宿主机的ip与外界通信
+
+```bash
+# 使用宿主机ip+80访问
+docker run -d --name n3 --network host nginx
+```
+
+:::caution
+docker desktop 在 4.34 之前无法支持 host 模式
+:::
+
+### none
+
+禁用网络
+
+```bash
+# 宿主机无法通过网络访问容器
+docker run -d --name n3 --network none nginx
+```
+
+### container
+
+新建的容器和指定的容器共享 ip 配置
+
+:::caution
+`docker run` 时 `--network container:容器名` 参数无法和 `-p` 参数一起使用
+
+由于两个容器使用同一个网络配置，如果两个容器内服务默认端口相同，后启动的容器因为端口冲突无法启动
+:::
+
+### 示例
+
+nginx 代理 tomcat
+
+启动 nginx 和 tomcat 两个容器，tomcat 共享 nginx 的网络，实现 nginx 代理 tomcat 服务
+
+<Steps>
+
+1. 启动两个容器
+
+    ```bash
+    # 启动nginx容器映射到宿主机的80端口
+    docker run -d --name n1 -p 80:80 nginx
+    # 启动tomcat容器并和nginx容器共享网络
+    docker run -d --name t1 --network container:n1 tomcat
+    ```
+
+2. 测试两个容器是否可以互相访问
+
+    ```bash
+    # 在nginx容器内执行curl命令访问tomcat服务
+    docker exec -it n1 curl http://localhost:8080
+
+    # 在tomcat容器内执行curl命令访问nginx服务
+    docker exec -it n1 curl http://localhost:80
+    ```
+
+3. 添加自定义tomcat首页
+
+    ```bash
+    # 进入tomcat容器内
+    docker exec -it t1 bash
+
+    # 由于容器默认就在tomcat相关目录下所以之间进入项目目录
+    cd webapps
+
+    # 创建文件夹并新建简单的html文件
+    mkdir myapp
+    cd myapp
+    touch index.html
+    tee index.html <<eof
+    <h1>Hello Tomcat!</h1>
+    eof
+    ```
+
+4. 配置 nginx 代理 tomcat 地址
+
+    ```bash
+    docker run -d --name n1 -p 80:80 nginx
+
+    # 进入容器内部
+    docker exec -it n1 bash
+
+    # 添加tomcat代理配置
+    sed -i '12i\
+    location /myapp/ {\
+        proxy_pass http://localhost:8080;\
+    }' /etc/nginx/conf.d/default.conf
+
+    # 重新加载nginx配置
+    nignx -s reload
+    ```
+
+5. 访问 `localhost:80/myapp`
+
+    :::caution
+    两个容器共享网络的情况下如果nginx容器重启了，tomcat容器必须也重启，不然无法访问
+    :::
+
+</Steps>
+
+## 自定义网络
+
+### nignx 代理 2 个 tomcat，不使用自定义网络
+
+<Steps>
+
+1. 启动并配置两个tomcat
+
+    ```bash
+    # 配置第一个tomcat
+    docker run -d --name t1 -p 8081:8080 tomcat:9.0
+    docker exec -it t1 bash
+    mkdir webapps/app1 && touch webapps/app1/index.html && tee webapps/app1/index.html <<eof
+    <h1>Tomcat1</h1>
+    eof
+
+    # 退出容器
+    exit
+
+    # 配置第二个tomcat
+    docker run -d --name t2 -p 8082:8080 tomcat:9.0
+    docker exec -it t2 bash
+    mkdir webapps/app2 && touch webapps/app2/index.html && tee webapps/app2/index.html <<eof
+    <h1>Tomcat2</h1>
+    eof
+    ```
+
+2. 启动并配置代理两个tomcat
+
+    使用 `http://localhost/app1/` 访问 Tomcat1，使用 `http://localhost/app2/` 访问 Tomcat2
+
+    ```bash
+    docker run -d --name n1 -p 80:80 nginx
+    docker exec -it n1 bash
+    # 下面的ip根据自己容器内ip填写
+    sed -i '12i\
+    location /app1/ {\
+        proxy_pass http://172.17.0.2:8080;\
+    }\
+    location /app2/ {\
+        proxy_pass http://172.17.0.3:8080;\
+    }' /etc/nginx/conf.d/default.conf
+
+    nginx -s reload
+    ```
+
+3. 测试
+
+    如果此时将 t2 停止启动一个 t3，t3 访问地址和 t2 一样
+
+    此时访问 `http://localhost/app2/` 就会出现 Tomcat3 的内容
+
+    ```bash
+    # 停止t2容器
+    docker stop t2
+
+    # 启动并配置t3容器
+    docker run -d --name t3 -p 8083:8080 tomcat:9.0
+    docker exec -it t3 bash
+    mkdir webapps/app2 && touch webapps/app2/index.html && tee webapps/app2/index.html <<eof
+    <h1>Tomcat3</h1>
+    eof
+    ```
+
+</Steps>
+
+### 使用自定义网络
+
+<Steps>
+
+1. 新建自定义网络
+
+    ```bash
+    docker network create custom_network
+    ```
+
+2. 使用自定义网络启动
+
+    ```bash
+    # 断开之前的网络配置，也可以再容器创建时加上--network custom_network指定自定义网络
+    docker network disconnect bridge t1
+    docker network disconnect bridge t2
+    docker network disconnect bridge n1
+
+    # 连接自定义网络配置
+    docker network connect custom_network t1
+    docker network connect custom_network t2
+    docker network connect custom_network n1
+
+
+    # 进入nginx容器内并删除之前的配置
+    docker exec -it n1 bash
+    sed -i '12,17d' /etc/nginx/conf.d/default.conf
+
+    # 使用容器名替换ip
+    sed -i '12i\
+    location /app1/ {\
+        proxy_pass http://t1:8080;\
+    }\
+    location /app2/ {\
+        proxy_pass http://t2:8080;\
+    }' /etc/nginx/conf.d/default.conf
+
+    nginx -s reload
+    ```
+
+3. 测试
+
+    此时再关闭 t2 启动 t3 后，`http://localhost/app2/` 就无法访问
+
+</Steps>

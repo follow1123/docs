@@ -1,0 +1,307 @@
+---
+title: 常用命令
+sidebar:
+    order: 5
+---
+
+## 帮助启动相关
+
+| 命令                       | 描述                 |
+| -------------------------- | -------------------- |
+| `systemctl start docker`   | 启动 docker          |
+| `systemctl stop docker`    | 停止 docker          |
+| `systemctl restart docker` | 重启 docker          |
+| `systemctl status docker`  | 查看 docker状态      |
+| `systemctl enable docker`  | 开机启动 docker      |
+| `docker info`              | 查看 docker 该药信息 |
+| `docker --help`            | docker 帮助文档      |
+| `docker <子命令> --help`   | docker 命令帮助文档  |
+
+## 镜像相关
+
+| 命令                            | 描述                           |
+| ------------------------------- | ------------------------------ |
+| [docker images](#docker-images) | 列出docker内的镜像             |
+| [docker search](#docker-search) | 搜索镜像                       |
+| [docker pull](#docker-pull)     | 从仓库拉取镜像                 |
+| **docker system df**            | 查看镜像/容器/数据卷所占用空间 |
+| [docker rmi](#docker-rmi)       | 删除镜像                       |
+
+## 容器相关
+
+| 命令                            | 描述                                                 |
+| ------------------------------- | ---------------------------------------------------- |
+| [docker run](#docker-run)       | 新建+启动容器                                        |
+| [docker ps](#docker-ps)         | 列出当前所有正在运行的容器                           |
+| **docker start**                | 启动容器                                             |
+| **docker restart**              | 重启容器                                             |
+| **docker stop**                 | 停止容器                                             |
+| **docker kill**                 | 强制停止容器                                         |
+| **docker stats**                | 查看运行中容器的状态                                 |
+| [docker rm](#docker-rm)         | 删除已经停止的容器                                   |
+| [docker logs](#docker-logs)     | 查看容器日志信息                                     |
+| **docker top**                  | 查看容器内部运行的进程                               |
+| **docker inspect**              | 查看容器内部细节                                     |
+| [docker exec](#docker-exec)     | 进入正在运行的容器以命令行交互                       |
+| **docker attach**               | 进入正在运行的容器以命令行交互，退出时会之间停止容器 |
+| [docker cp](#docker-cp)         | 将容器内文件复制到主机下                             |
+| [docker export](#docker-export) | 导出容器                                             |
+| [docker import](#docker-import) | 导入镜像                                             |
+| [docker commit](#docker-commit) | 将容器打包为镜像并提交到本地                         |
+
+## 数据卷相关
+
+| 命令                      | 描述               |
+| ------------------------- | ------------------ |
+| **docker volume ls**      | 列出数据卷         |
+| **docker volume create**  | 新建数据卷         |
+| **docker volume inspect** | 显示数据卷详细信息 |
+| **docker volume rm**      | 删除数据卷         |
+
+## 网络相关
+
+| 命令                          | 描述                       |
+| ----------------------------- | -------------------------- |
+| **docker network ls**         | 列出网络                   |
+| **docker network create**     | 新建网络                   |
+| **docker network inspect**    | 显示网络详细信息           |
+| **docker network rm**         | 删除网络                   |
+| **docker network connect**    | 将一个容器连接到某个网络上 |
+| **docker network disconnect** | 将一个容器从某个网络上断开 |
+| **docker network prune**      | 删除未使用的网络           |
+
+## 容器编排相关
+
+> docker compose 相关命令都需要在`docker-compose.yaml`文件同级目录下执行
+
+| 命令                       | 描述                               |
+| -------------------------- | ---------------------------------- |
+| **docker compose up**      | 启动所有服务                       |
+| **docker compose down**    | 停止并删除容器、网络、数据卷、镜像 |
+| **docker compose exec**    | 进入指定容器内部                   |
+| **docker compose ps**      | 显示所有编排的容器                 |
+| **docker compose top**     | 显示所有编排的容器内的进程         |
+| **docker compose logs**    | 查看指定容器内日志                 |
+| **docker compose config**  | 查看配置                           |
+| **docker compose start**   | 启动服务                           |
+| **docker compose restart** | 重启服务                           |
+| **docker compose stop**    | 停止服务                           |
+
+## 命令详情
+
+### `docker images`
+
+列出docker内所有镜像
+
+列说明
+
+- `REPOSITORY` - 镜像的仓库源
+- `TAG` - 镜像标签版本号
+- `IMAGE ID` - 镜像id
+- `CREATED` - 镜像创建时间
+- `SIZE` - 镜像大小
+
+:::note
+同一个仓库源可以有多个 TAG 版本，代表这个仓库源的不同版本
+
+如果不指定镜像的版本标签，默认使用 `镜像名:latest` 镜像
+:::
+
+```bash
+docker images
+# 列出本地所有的镜像
+docker images -a
+# 只显示镜像的id
+docker images -q
+```
+
+### `docker search`
+
+> 从[官方镜像仓库](https://hub.docker.com/)搜索镜像
+
+列说明
+
+- `NAME` - 镜像名称
+- `DESCRIPTION` - 镜像说明
+- `STARS` - 点赞数
+- `OFFICIAL` - 是否官方
+- `AUTOMATED` - 是否自动构建
+
+```bash
+# 只显示前5条搜索信息
+docker search --limit 5 redis
+```
+
+### `docker pull`
+
+下载镜像
+
+格式：`docker pull 镜像名:[TAG]`
+
+```bash
+# 下载最新版
+docker pull redis
+# 下载指定版本
+docker pull redis:6.2
+```
+
+### `docker rmi`
+
+删除镜像
+
+格式：`docker rmi 镜像id`
+
+```bash
+# 根据镜像id删除镜像id使用docker images查看
+docker rmi f7d0a5ed08a2
+
+# 强制删除
+docker rmi -f f7d0a5ed08a2
+
+# 删除多个
+docker rmi -f redis7.4.0 redis:6.2
+
+# 删除所有镜像
+docker rmi -f $(docker images -qa)
+```
+
+### `docker run`
+
+格式：
+
+```bash
+docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+```
+
+选项说明
+
+- `--name='容器名称'` - 为容器指定一个名称
+- `-d` - 后台运行容器并返回一个容器id，也叫启动守护式容器（后台运行）
+- `-P` - 随机端口映射，大写P
+- `-p` - 指定端口映射，小写p
+- `-i` - 以交互模式运行容器，通常与 `-t` 同时使用
+- `-t` - 为容器重新分配一个伪终端，通常与 `-i` 同时使用
+- `-v` - 指定目录映射
+- `--volumes-from` - 继承某个容器的目录映射关系
+- `--network` - 指定容器的网络模式
+- `--restart=always` - docker程序启动后自动启动这个容器
+
+```bash
+# 后台启动容器并指定一个名称（启动守护式容器）
+docker run -d --name='debian1' debian
+
+# 后台启动容器并将容器的/usr/share/nginx目录映射到主机的/usr/local/web目录
+docker run -d -v /usr/local/web:/usr/share/nginx --name='nginx' nginx
+
+# 后台启动名称为n2的nginx容器，目录关系继承至nginx容器
+docker run -d -volumes-from nginx --name n2 nginx
+
+# 启动容器并运行容器内的shell与容器进行交互
+docker run -it debian /bin/bash
+```
+
+### `docker ps`
+
+选项说明
+
+- `-a` - 列出当前所有正在运行的容器+之前运行过的容器
+- `-l` - 显示最近创建的容器
+- `-n` - 显示最近n个创建的容器
+- `-q` - 只显示容器的编号
+
+```bash
+# 查看所有容器
+docker ps -a
+
+# 显示前3个创建的容器
+docker ps -n 3
+
+# 显示所有容器的编号
+docker ps -q
+
+# 查看所以从debian镜像启动的容器
+docker ps -af ancestor=debian -q
+```
+
+### `docker rm`
+
+删除容器
+
+```bash
+# 删除指定容器，如果容器正在运行则无法删除
+docker rm f7d0a5ed08a2
+
+# 删除指定容器
+docker rm -f f7d0a5ed08a2
+
+# 强制删除所有容器
+docker rm -f $(docker ps -a -q)
+```
+
+### `docker logs`
+
+日志
+
+```bash
+# 查看指定id容器的日志
+docker logs f7d0a5ed08a2
+
+# 查看容器日志最后5行
+docker logs -n 5 f7d0a5ed08a2
+
+# 类似linux的tail -f命令
+docker logs -f f7d0a5ed08a2
+```
+
+### `docker exec`
+
+执行容器内部命令
+
+```bash
+# 以交互式命令行进入容器内部
+docker exec -it debian1 /bin/bash
+```
+
+:::note
+和 `docker attach` 的区别是 `docker exec` 进入容器后退出不会关闭容器，而 `docker attach` 会
+:::
+
+### `docker cp`
+
+复制容器内部文件
+
+```bash
+# 将debian容器内/tmp目录下的a.txt文件复制到当前目录下
+docker cp debian1:/tmp/a.txt ./a.txt
+```
+
+### `docker export`
+
+将运行中的容器导出为文件
+
+可以保存容器内程序生产的内容
+
+```bash
+# 将这个容器导出为debian1.tar文件
+docker export debian1 > debian1.tar
+```
+
+### `docker import`
+
+配合 `docker export` 使用
+
+导入后会生成一个新的镜像
+
+```bash
+# 导入镜像，导入的镜像名称custom/debian2版本为1.0
+docker import debian1.tar custom/debian2:1.0
+```
+
+### `docker commit`
+
+推送镜像
+
+```bash
+# 将之间的镜像新加一个软件后提交到本地
+docker commit -m "add new software" -a "y" debian1 y/deb:1.1
+```

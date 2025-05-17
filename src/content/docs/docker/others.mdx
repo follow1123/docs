@@ -1,0 +1,90 @@
+---
+title: 其他
+sidebar:
+    order: 25
+---
+
+## 添加镜像源
+
+```json title="/etc/docker/daemon.json"
+{
+    "registry-mirrors": [
+        "https://registry.docker-cn.com",
+        "http://hub-mirror.c.163.com",
+        "https://docker.mirrors.ustc.edu.cn",
+        "https://cr.console.aliyun.com",
+        "https://mirror.ccs.tencentyun.com"
+    ]
+}
+```
+
+## docker 相关工具
+
+- 可视化工具[portainer](https://www.portainer.io/)
+- 容器监控 `cAdvisor` + `InfluxDB` + `Granfana`
+
+## 常见问题
+
+### 虚悬镜像是什么
+
+仓库名和标签都是 `<none>`
+
+### docker 挂载主机目录访问如果出现 `cannot open directory .: Permission denied`
+
+在挂在目录后加 `--privileged=true` 参数即可
+
+### 没有 ip 或 ifconfig 等查看网络命令怎么查看 linux 的 ip
+
+```bash
+cat /proc/net/fib_trie
+```
+
+<details>
+<summary>`/proc/net/fib_trie` 文件内查看 ip</summary>
+
+以下面文本为例，这个容器的 ip 为 `127.17.0.2`
+
+```txt "172.17.0.2"
+Main:
+  +-- 0.0.0.0/0 3 0 5
+     |-- 0.0.0.0
+        /0 universe UNICAST
+     +-- 127.0.0.0/8 2 0 2
+        +-- 127.0.0.0/31 1 0 0
+           |-- 127.0.0.0
+              /8 host LOCAL
+           |-- 127.0.0.1
+              /32 host LOCAL
+        |-- 127.255.255.255
+           /32 link BROADCAST
+     +-- 172.17.0.0/16 2 0 2
+        +-- 172.17.0.0/30 2 0 2
+           |-- 172.17.0.0
+              /16 link UNICAST
+           |-- 172.17.0.2
+              /32 host LOCAL
+        |-- 172.17.255.255
+           /32 link BROADCAST
+Local:
+  +-- 0.0.0.0/0 3 0 5
+     |-- 0.0.0.0
+        /0 universe UNICAST
+     +-- 127.0.0.0/8 2 0 2
+        +-- 127.0.0.0/31 1 0 0
+           |-- 127.0.0.0
+              /8 host LOCAL
+           |-- 127.0.0.1
+              /32 host LOCAL
+        |-- 127.255.255.255
+           /32 link BROADCAST
+     +-- 172.17.0.0/16 2 0 2
+        +-- 172.17.0.0/30 2 0 2
+           |-- 172.17.0.0
+              /16 link UNICAST
+           |-- 172.17.0.2
+              /32 host LOCAL
+        |-- 172.17.255.255
+           /32 link BROADCAST
+```
+
+</details>

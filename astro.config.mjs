@@ -154,6 +154,18 @@ export default defineConfig({
               "http/version",
             ],
           },
+          {
+            label: "其他/Docker",
+            link: "/docker",
+            items: [
+              "docker",
+              "docker/commands",
+              "docker/dockerfile",
+              "docker/network",
+              "docker/compose",
+              "docker/others",
+            ],
+          },
         ]),
       ],
       title: "Docs",

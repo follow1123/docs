@@ -1,0 +1,98 @@
+---
+title: Dockerfile
+sidebar:
+    order: 10
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+Dockerfile 是用来构建 docker 镜像的文本文件，是由一条条构建镜像所需的指令和参数构成的脚本。
+
+## 指令
+
+:::note
+每个指令必须为大写
+
+指令从上到下顺序执行
+
+`#` 表示注释
+:::
+
+| 指令                      | 说明                                                                                      |
+| ------------------------- | ----------------------------------------------------------------------------------------- |
+| **FROM**                  | 基础镜像，当前新镜像是基于哪个镜像构建的，指定一个已存在的镜像作为模板，第一条必须是 FROM |
+| **MAINTAINER**            | 镜像维护者的姓名和邮箱                                                                    |
+| **RUN**                   | 容器构建时需要运行的命令                                                                  |
+| **EXPOSE**                | 当前容器对外暴露的端口                                                                    |
+| **WORKDIR**               | 指定容器创建后，终端默认登录进来的目录                                                    |
+| **USER**                  | 指定镜像以什么用户执行，默认 root                                                         |
+| **ENV**                   | 用来在构建镜像过程中设置环境变量                                                          |
+| **ADD**                   | 将宿主机下的文件拷贝进镜像内，如果是 tar 文件则会自动解压，支持 URL 地址下载文件          |
+| **COPY**                  | 拷贝文件或目录到镜像内                                                                    |
+| **VOLUME**                | 容器数据卷                                                                                |
+| [CMD](#cmd)               | 指定容器启动后执行的命令                                                                  |
+| [ENTRYPOINT](#entrypoint) | 也是用来指定容器启动后执行的命令                                                          |
+
+### CMD
+
+有两种格式：
+
+- shell格式 - `CMD 命令 参数1 参数2`
+- exec格式 - `CMD ["可执行文件" "参数1" "参数2"]`
+
+:::note
+配合 [ENTRYPOINT](#entrypoint) 则 CMD 后接参数 `CMD ["参数1" "参数2"]`
+
+Dockerfile 中只能有一条 CMD 指令。如果编写了多个 CMD 指令，则只有最后一个生效
+
+CMD 会被 `docker run` 命令最后一个命令参数覆盖
+
+CMD 在 `docker run` 的时候执行，RUN 是在 `docker build` 时执行
+:::
+
+### ENTRYPOINT
+
+类似 CMD 指令，但是不会被 `docker run` 后面的命令覆盖，`docker run` 后面的命令会被当作ENTRYPOINT执行可执行程序的参数
+
+ENTRYPOINT 与 CMD 命令配合则 ENTRYPOINT 为指定`可执行命令`，而 CMD 指定`命令的参数`
+
+### 示例
+
+基于 ubuntu:24.0.4 构建一个带 jdk17 的镜像
+
+<Steps>
+
+1. 将 jdk 压缩包和 Dockerfile 放在同一个目录下
+2. 编写 Dockerfile 文件
+
+    ```dockerfile
+    FROM ubuntu:24.04
+
+    WORKDIR /usr/local/jdk
+
+    ADD ./jdk-17.0.11_linux-x64_bin.tar.gz /usr/local/jdk
+
+    ENV JAVA_HOME /usr/local/jdk/jdk-17.0.11
+    ENV PATH $PATH:$JAVA_HOME/bin
+
+    RUN java -version
+
+    CMD /bin/bash
+    ```
+
+</Steps>
+
+## 虚悬镜像
+
+可以构建一个虚悬镜像的 Dockerfile：
+
+```dockerfile
+FROM ubuntu:24.04
+CMD echo 123
+```
+
+执行 `docker build .` 命令就会生成一个虚悬镜像
+
+使用 `docker images -f dangling=true` 命令查询所以的虚悬镜像
+
+使用 `docker rmi $(docker images -qf dangling=true)` 命令删除所有的虚悬镜像
