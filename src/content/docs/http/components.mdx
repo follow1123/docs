@@ -1,0 +1,46 @@
+---
+title: 组成部分
+sidebar:
+    order: 5
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+## HTTP 请求
+
+HTTP 请求由三个主要部分组成：
+
+- **请求行** - 包含<InternalLink text="请求方法" href="http/methods" />、请求 URL 和 HTTP 版本
+- **请求头** - 包括请求的一些元数据，例如内容类型、授权信息、缓存控制等
+- **请求体（可选）** - 在 POST、PUT 等请求中，用于发送数据到服务器
+
+```bash frame="none"
+GET /index.html HTTP/1.1 # 请求行
+Host: www.example.com    # 请求头
+User-Agent: Mozilla/5.0
+Accept: text/html
+
+                         # 请求体
+```
+
+## HTTP 响应
+
+HTTP 响应由三个部分组成：
+
+- **状态行** - 包含 HTTP 版本、状态码和状态消息
+- **响应头** - 包含关于响应的一些元数据，例如内容类型、服务器信息、缓存控制等
+- **响应体** - 服务器返回的数据，通常是 HTML、JSON、图片或其他内容
+
+```txt
+HTTP/1.1 200 OK                             # 状态行
+Content-Type: text/html                     # 响应头
+Content-Length: 138
+Date: Tue, 10 Nov 2024 14:00:00 GMT
+
+<html>                                      # 响应体
+  <head><title>Example Page</title></head>
+  <body>
+    <h1>Welcome to the Example Page</h1>
+  </body>
+</html>
+```

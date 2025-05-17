@@ -142,6 +142,18 @@ export default defineConfig({
             link: "/redis",
             items: ["redis"],
           },
+          {
+            label: "其他/HTTP",
+            link: "/http",
+            items: [
+              "http",
+              "http/components",
+              "http/methods",
+              "http/status-code",
+              "http/headers",
+              "http/version",
+            ],
+          },
         ]),
       ],
       title: "Docs",

@@ -1,0 +1,25 @@
+---
+title: 头部
+sidebar:
+    order: 20
+---
+
+HTTP 头部包含了请求和响应的元数据
+
+> 参考 [mdn](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers)
+
+## 请求头
+
+- `User-Agent` - 客户端的信息（浏览器、操作系统等）
+- `Accept` - 客户端可接受的内容类型（如 application/json、text/html）
+- `Content-Type` - 请求体的内容类型（如 application/x-www-form-urlencoded）
+- `Authorization` - 身份验证信息，通常为 token 或用户名密码
+- `Cache-Control` - 缓存控制，指定缓存策略
+
+## 响应头
+
+- `Content-Type` - 响应体的内容类型（如 text/html）
+- `Content-Length` - 响应体的长度（以字节为单位）
+- `Location` - 通常用于重定向，指示新资源的 URL
+- `Set-Cookie` - 设置浏览器中的 cookies
+- `Cache-Control` - 指定响应是否可缓存
