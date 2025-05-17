@@ -1,0 +1,15 @@
+---
+import baseUrl from "@libs/baseUrl";
+
+interface Props {
+  text: string;
+  href: string;
+  code?: boolean;
+}
+
+const { text, href, code = false } = Astro.props;
+const url = baseUrl(href);
+const aElementStr = `<a href=${url}>${text}</a>`;
+---
+
+{code ? <code set:html={aElementStr} /> : <Fragment set:html={aElementStr} />}
