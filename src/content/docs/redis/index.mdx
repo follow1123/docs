@@ -1,0 +1,78 @@
+---
+title: 说明
+sidebar:
+    order: 0
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+> [官网](https://redis.io/) [下载地址](https://redis.io/downloads/)
+
+## 安装
+
+<Steps>
+
+1. 下载 redis 文件，这里以 redis-6.2.4.tar.gz 为例
+2. 解压
+
+    ```bash
+    tar -zxvf redis-6.2.4.tar.gz -C <目标目录>
+    ```
+
+3. 安装依赖
+
+    ```bash
+    apt install gcc automake autoconf libtool make
+    ```
+
+4. 编译
+
+    ```bash
+    make PREFIX=<编译文件的目录> install
+    ```
+
+</Steps>
+
+## 配置
+
+```ini title="redis.conf"
+dir data文件夹
+
+logfile 日志文件夹
+
+requirepass 密码
+```
+
+## 使用systemctl管理redis服务
+
+<Steps>
+
+1. 在 `lib/systemd/system` 文件夹下添加 `redis.service` 文件
+
+    ```ini title="redis.service" {6-8}
+    [Unit]
+    Description=Redis
+    After=network.target
+    [Service]
+    Type=forking
+    ExecStart=/usr/local/depends/redis/bin/redis-server /usr/local/depends/redis/redis.conf
+    ExecReload=/usr/local/depends/redis/bin/redis-server -s reload
+    ExecStop=/usr/local/depends/redis/bin/redis-server -s stop
+    PrivateTmp=true
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+2. 刷新 systemctl 配置
+
+    ```bash
+    systemctl daemon-reload
+    ```
+
+3. 将 redis 服务设置为开机启用
+
+    ```bash
+    systemctl enable redis.service
+    ```
+
+</Steps>

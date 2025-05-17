@@ -137,6 +137,11 @@ export default defineConfig({
             link: "/nginx",
             items: ["nginx", "nginx/configuration", "nginx/commands"],
           },
+          {
+            label: "其他/Redis",
+            link: "/redis",
+            items: ["redis"],
+          },
         ]),
       ],
       title: "Docs",
