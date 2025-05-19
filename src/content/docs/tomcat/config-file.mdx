@@ -1,0 +1,16 @@
+---
+title: 配置
+sidebar:
+    order: 10
+---
+
+Tomcat 配置相关文件在安装目录下 `conf` 目录下
+
+- `server.xml` - 核心配置文件，配置了 Tomcat 的服务器和连接器以及虚拟主机等
+- `web.xml` - Web 应用的部署描述文件，用来配置 Web 应用的上下文（servlet、JSP、过滤器、监听器等）
+- `context.xml` - 用于配置 Web 应用的特定上下文信息
+- `catalina.properties` - 用于设置 Tomcat 容器的属性，例如类加载器的设置、JVM 参数、文件编码、系统属性等
+- `logging.properties` - 记录日志，logging.properties 文件用于配置日志记录的级别、日志输出的格式和位置
+- `tomcat-users.xml` - 用于配置 Tomcat 用户的权限和角色，通常用于设置管理界面（如 manager 或 host-manager）的用户及其权限
+
+作为开发人员，我们主要关注 `server.xml` 和 `web.xml`，[官方文档（tomcat9为例）](https://tomcat.apache.org/tomcat-9.0-doc/config/index.html)

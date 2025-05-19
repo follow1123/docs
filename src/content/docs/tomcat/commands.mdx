@@ -1,0 +1,34 @@
+---
+title: 常用命令
+sidebar:
+    order: 5
+---
+
+> Windows 平台下的命令都以 `.bat` 结尾
+
+Tomcat 命令相关文件在安装目录下 `bin` 目录下
+
+| 命令                  | 说明                                 |
+| --------------------- | ------------------------------------ |
+| [catalina](#catalina) | 主命令                               |
+| startup               | 启动服务，对应 `catalina start` 命令 |
+| shutdown              | 停止服务，对应 `catalina stop` 命令  |
+
+### catalina
+
+```bash
+# 显示帮助信息
+catalina
+
+# 查看版本信息
+catalina version
+
+# 启动服务，新开启一个终端
+catalina start
+
+# 关闭服务
+catalina stop
+
+# 启动服务，在当前终端启动
+catalina run
+```

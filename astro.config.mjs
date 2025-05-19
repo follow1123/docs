@@ -201,6 +201,16 @@ export default defineConfig({
               "mysql/others",
             ],
           },
+          {
+            label: "其他/Tomcat",
+            link: "/tomcat",
+            items: [
+              "tomcat",
+              "tomcat/commands",
+              "tomcat/config-file",
+              "tomcat/troubleshooting",
+            ],
+          },
         ]),
       ],
       title: "Docs",

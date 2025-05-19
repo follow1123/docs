@@ -1,0 +1,31 @@
+---
+title: 常见问题
+sidebar:
+    order: 15
+---
+
+import { Steps } from "@astrojs/starlight/components";
+import { Kbd } from "starlight-kbd/components";
+
+## Windows 下启动后终端乱码问题
+
+这个主要是 Windows 的锅，Windows 10 默认情况下 cmd 终端的默认编码格式是 GBK，而 tomcat 启动后输出的日志格式是 UTF-8，所以导致乱码
+
+这里提供一个影响最小的解决方式
+
+### 使用 `catalina run` 代替 `startup` 或 `catalina start` 命令
+
+```batch
+chcp 65001 >nul && catalina run
+```
+
+### 将 `chcp 65001 >nul` 命令直接放入 `catalina.bat` 脚本内
+
+```diff lang="batch" title="Tomcat安装目录/bin/catalina.bat"
+@echo off
++ chcp 65001 >nul
+
+...
+```
+
+然后就可以 <Kbd linux="Win+r" /> `catalina run`
