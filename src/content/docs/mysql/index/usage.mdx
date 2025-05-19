@@ -1,0 +1,275 @@
+---
+title: 使用
+sidebar:
+    order: 15
+---
+
+import { Steps } from "@astrojs/starlight/components";
+import InternalLink from "@components/InternalLink.astro";
+
+## 语法
+
+```sql
+-- 创建索引，如果同时填写多个字段，则创建的索引为联合索引
+CREATE [UNIQUE | FULLTEXT] INDEX index_name ON table_name(col_name1, col_name2, ...);
+
+-- 查看索引
+SHOW INDEX FROM table_name;
+
+-- 删除索引
+DROP INDEX index_name ON table_name;
+```
+
+## 最左前缀法则
+
+如果索引了多列（联合索引），要遵守最左前缀法则
+
+最左前缀法则指的是查询从索引的最左列开始，并且不跳过索引中的列，如果跳跃某一列，索引将部分失效（后面的字段索引失效）
+
+<Steps>
+
+1. 准备<InternalLink text="测试数据" href="mysql/view#测试数据" />
+
+2. 添加索引
+
+    ```sql
+    -- 添加联合索引
+    CREATE index idx_name_age_email on app_user(name, age, email);
+
+    -- 添加单列索引
+    CREATE INDEX idx_phone ON app_user(phone);
+    ```
+
+3. 测试
+
+    此时 `app_user` 表内的 `name`，`age`，`email` 这三个字段组成了联合索引
+
+    `索引成功` 最左边的字段都在，都走了索引，索引长度在递减
+
+    ```sql "name = '用户1'"
+    EXPLAIN SELECT * FROM app_user WHERE name = '用户1' AND age = 27 AND email = '2637298275qq.com';
+    EXPLAIN SELECT * FROM app_user WHERE name = '用户1' AND age = 27;
+    EXPLAIN SELECT * FROM app_user WHERE name = '用户1';
+    ```
+
+    `索引失效` 最左边的字段不在，没走索引
+
+    ```sql
+    EXPLAIN SELECT * FROM app_user WHERE age = 27 AND email = '2637298275qq.com';
+    EXPLAIN SELECT * FROM app_user WHERE age = 27;
+    ```
+
+    `部分索引` 最左边的字段在，但跳过了一个字段，相当于只有 name 走了索引，email 字段没走索引
+
+    ```sql
+    EXPLAIN SELECT * FROM app_user WHERE name = '用户1' AND email = '2637298275qq.com';
+    ```
+
+    `乱序条件` name 条件在中间也走了索引，因为最左前缀法则和条件的位置没关系，只看索引最左边的字段是否存在
+
+    ```sql "name = '用户1'"
+    EXPLAIN SELECT * FROM app_user WHERE age = 27 AND name = '用户1' AND email = '2637298275qq.com';
+    ```
+
+</Steps>
+
+## 范围查询
+
+联合索引中，出现范围查询（>，&lt;），范围查询右侧的索引列失效
+
+```sql "name = '用户1' AND age > 27" ">="
+-- 使用范围查询的索引其后面的列的索引会失效，相当于只走了name和age的索引
+EXPLAIN SELECT * FROM app_user WHERE name = '用户1' AND age > 27 AND email = '2637298275qq.com';
+
+-- 在业务允许的情况下，范围的条件添加一个=可以避免这种情况
+EXPLAIN SELECT * FROM app_user WHERE name = '用户1' AND age >= 27 AND email = '2637298275qq.com';
+```
+
+## 索引失效的情况
+
+### 索引列运算操作
+
+在索引列上进行运算操作，索引会失效
+
+```sql "SUBSTR(phone, 9, 2) = '58'"
+EXPLAIN SELECT * FROM app_user WHERE phone = '181494517358';
+EXPLAIN SELECT * FROM app_user WHERE SUBSTR(phone, 9, 2) = '58';
+```
+
+### 字符串不加引号
+
+字符串字段使用时，不加引号，索引会失效
+
+```sql "phone = 181494517358"
+EXPLAIN SELECT * FROM app_user WHERE phone = '181494517358';
+EXPLAIN SELECT * FROM app_user WHERE phone = 181494517358;
+```
+
+### 模糊查询
+
+如果只是尾部模糊匹配，索引不会失效。如果是头部模糊匹配，索引失效
+
+```sql "%"
+-- 索引不失效
+EXPLAIN SELECT * FROM app_user WHERE phone LIKE '18149451%';
+
+-- 索引失效
+EXPLAIN SELECT * FROM app_user WHERE phone LIKE '%94517358';
+```
+
+### or 连接的条件
+
+用 or 分割开的条件
+
+如果 or 两边条件中的如果一侧有索引，另一侧没有索引，那么涉及到的索引都不会被用到
+
+```sql "age = 63"
+-- 因为 age 字段没有索引，以下 SQL 都不会用到索引
+EXPLAIN SELECT * FROM app_user WHERE id = 1 OR age = 63;
+EXPLAIN SELECT * FROM app_user WHERE id = 1 OR age = 63 ;
+EXPLAIN SELECT * FROM app_user WHERE phone = '1839405813' OR age = 63;
+```
+
+### 数据分布影响
+
+如果 MySQL 评估使用索引比全表更慢，则不使用索引
+
+```sql
+-- 给age字段添加索引后，查询年龄大于20岁的用户
+-- 因为数据库内大部分数据年龄都大于20岁，所以没有走索引
+explain SELECT * from app_user where age > 20;
+
+-- 年龄大于90岁的很少，所以需要走索引
+explain SELECT * from app_user where age > 90;
+```
+
+## SQL 提示
+
+SQL 提示，是优化数据库的一个重要的手段，就是在 SQL 语句中加入一些人为的提示来达到优化操作的目的
+
+<Steps>
+
+1. 给 name 字段单独添加一个索引，使用[上面](#最左前缀法则)的步骤
+
+    此时 name 字段有一个单列索引，还有一个联合索引
+
+    ```sql
+    CREATE INDEX idx_name ON app_user(name);
+    ```
+
+    使用 name 单独查询时，分析中 possible_key 有联合索引和单列索引，但实际用的是联合索引
+
+    ```sql
+    EXPLAIN SELECT * FROM app_user WHERE name = '用户1';
+    ```
+
+2. 使用
+
+    添加使用单列索引的建议
+
+    ```sql
+    -- 建议MySQL使用name字段的单列索引
+    EXPLAIN SELECT * FROM app_user USE INDEX(idx_name) WHERE name = '用户1';
+    ```
+
+    添加忽略联合索引建议
+
+    ```sql
+    -- 建议MySQL忽略name字段的联合索引，此时possible_key就只有单列索引
+    EXPLAIN SELECT * FROM app_user IGNORE INDEX(idx_name_age_email) WHERE name = '用户1';
+    ```
+
+    强制使用索引
+
+    ```sql
+    -- 强制MySQL使用指定的索引
+    EXPLAIN SELECT * FROM app_user FORCE INDEX(idx_name_age_email) WHERE name = '用户1';
+    ```
+
+</Steps>
+
+## 覆盖索引
+
+尽量使用覆盖索引（查询使用了索引，并且需要返回的列，在该索引中已经全部能找到），减少 `select *`
+
+explain 时，<InternalLink text="extra 字段出现的内容" href="mysql/index/performance#explain-执行计划各字段含义" />
+
+```sql
+-- 删除多余的索引，只保留name,age,email的联合索引
+
+-- name email age 为联合索引，而id是联合索引的叶子节点，所以不需要回表查询
+EXPLAIN SELECT id, name, age, email FROM app_user WHERE name = '用户0' AND email = '2737973569qq.com' AND age = 63;
+
+-- phone字段在联合索引内查不到，所以需要根据叶子节点的id字段在聚合索引内查询
+EXPLAIN SELECT id, name, age, email, phone FROM app_user WHERE name = '用户0' AND email = '2737973569qq.com' AND age = 63;
+```
+
+## 前缀索引
+
+当前字段类型为字符串（varchar, text等）时，有时候需要索引很长的字符串，这会让索引变得很大，浪费大量的磁盘IO，影响查询效率
+
+此时可以只将字符串的一部分前缀建立索引，这样可以大大节约索引空间，从而提高索引效率
+
+语法
+
+```sql
+CREATE INDEX index_name ON table_name(column(n));
+```
+
+前缀长度：
+
+可以根据索引的 `选择性` 来决定，`选择性` 是指 `不重复的索引值（基数）` 和 `数据表的记录总数` 的比值，索引选择性越高则查询效率越高，选择性越接近1，性能越好
+
+```sql
+-- 查询用户表内有多少数据
+SELECT COUNT(*) FROM app_user;
+
+-- 查询用户表内不重复的email字段有多少数据
+SELECT COUNT(DISTINCT email) FROM app_user;
+
+-- 查询email字段的选择性
+SELECT COUNT(DISTINCT email) / count(*) FROM app_user;
+
+-- 截取email字段前几个字符查询选择性，发现前8个字符的选择性和email字段的选择性差不多
+SELECT COUNT(DISTINCT SUBSTR(email, 1, 8)) / COUNT(*) FROM app_user;
+
+-- 根据email前8个字符创建索引
+CREATE INDEX idx_email_8 ON app_user(email(8));
+
+-- 使用了索引
+EXPLAIN SELECT * FROM app_user WHERE email = '2737973569qq.com';
+```
+
+:::note
+
+前缀索引查询过程
+
+以 `SELECT * FROM app_user WHERE email = '2737973569qq.com';` 为例
+
+1. 根据查询条件的前 8 位走索引查询
+2. 查询到 27379735 的叶子节点对应的 id 再走聚合索引
+3. 根据 id 在聚合索引内查到对应的字段后，再比较 email 字段后面的字段是否对的上
+4. 如果对的上则返回数据，继续查询
+5. 如果对不上则返回到前缀索引上继续查询
+
+:::
+
+## 单列索引和联合索引
+
+- 单列索引 - 即一个索引只包含单个列
+- 联合索引 - 一个索引包含多列
+
+在业务场景中，如果存在多个查询条件，在对于查询字段建立索引时，建议建立联合索引，而非单列索引
+
+```sql
+-- app_user表中email和phone都有单独的索引
+
+-- 此时使用email和phone字段查询时，只会使用一个索引，并会进行回表查询
+EXPLAIN SELECT id, email, phone FROM app_user WHERE email = '2737973569qq.com' AND phone = '1839405813';
+
+-- 创建email和phone的联合索引
+CREATE INDEX idx_email_phone ON app_user(email, phone);
+
+-- 查询时指定使用联合索引，此时就避免了回表查询
+EXPLAIN SELECT id, email, phone FROM app_user USE INDEX(idx_email_phone) WHERE email = '2737973569qq.com' AND phone = '1839405813';
+```

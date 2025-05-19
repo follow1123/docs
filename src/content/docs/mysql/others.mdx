@@ -1,0 +1,54 @@
+---
+title: 其他
+sidebar:
+    order: 60
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+## mysql data 文件迁移
+
+Windows 下迁移过程
+
+<Steps>
+
+1. mysql 目录复制 `data` 数据目录时，只保留 `data` 目录下的 `所有文件夹` 和 `ibdata1` 文件
+
+2. 修改 `my.ini` 文件里面对应的路径
+
+    ```diff lang="ini"
+    [mysql]
+    # 设置mysql客户端默认字符集
+    default-character-set=utf8
+    [mysqld]
+    #设置3306端口
+    port=3306
+    # 设置mysql的安装目录
+    - basedir=D:/software/mysql/5.7.30
+    + basedir=new/path
+    # 设置mysql数据库的数据的存放目录
+    - datadir=D:/software/mysql/5.7.30/data
+    + datadir=new/path/data
+    # 允许最大连接数
+    max_connections=200
+    # 服务端使用的字符集默认为8比特编码的latin1字符集
+    character-set-server=utf8
+    # 创建新表时将使用的默认存储引擎
+    default-storage-engine=INNODB
+    ```
+
+3. 修改注册表
+
+    打开注册表管理器输入：`HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MySQL`
+
+    最后的目录是自己的 mysql 服务名称，修改 ImagePath 为新的目录地址
+
+4. 以管理员启动 cmd 输入 `net start mysql` 启动成功
+
+    :::note
+    如果遇到 `发生系统错误 2。找不到指定文件` 报错
+
+    运行 `mysqld --remove` 和 `mysqld --install` 命令后再次重启
+    :::
+
+</Steps>

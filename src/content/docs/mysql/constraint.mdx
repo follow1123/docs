@@ -1,0 +1,95 @@
+---
+title: 约束
+sidebar:
+    order: 15
+---
+
+约束是作用于表中字段上的规则，用于限制存储在表中的数据
+
+保证数据库中数据的正确、有效性和完整性
+
+可以在创建或修改表的时候添加约束
+
+## 字段约束
+
+| 约束                           | 关键字        | 描述                                                        |
+| ------------------------------ | ------------- | ----------------------------------------------------------- |
+| 非空约束                       | `NOT NULL`    | 限制该字段的数据不能为 NULL                                 |
+| 唯一约束                       | `UNIQUE`      | 保证该字段的所有数据都是唯一<br/>不重复的                   |
+| 主键约束                       | `PRIMARY KEY` | 主键是一行数据中为唯一表示<br/>要求非空切唯一               |
+| 默认约束                       | `DEFAULT`     | 保存数据时，如果未指定该字段的值<br/>则采用默认值           |
+| 检查约束<br />（8.0.16版本后） | `CHECK`       | 保证字段满足某个条件                                        |
+| 外键约束                       | `FOREIGN KEY` | 用来让两张表之间的数据建立连接<br/>保证数据的一致性和完整性 |
+
+```sql "PRIMARY KEY" "NOT NULL" "UNIQUE" "CHECK (age > 0 && age <= 120)" "DEFAULT 1"
+CREATE TABLE IF NOT EXISTS user_table(
+    id INT PRIMARY KEY AUTO_INCREMENT, -- 主键约束，自动递增
+    name VARCHAR(10) NOT NULL UNIQUE COMMENT '姓名', -- 非空约束，唯一约束
+    age INT CHECK (age > 0 && age <= 120) COMMENT '年龄', -- 检查约束
+    status CHAR(1) DEFAULT 1 COMMENT '状态', -- 默认约束
+    gender CHAR(1) COMMENT '性别'
+);
+```
+
+## 外键约束
+
+```sql
+-- 创建表时添加外键
+CREATE TABLE 表名(
+    字段名 数据类型,
+    ...
+    CONSTRAINT 外键名称 FOREIGN KEY(外键字段名) REFERENCES 主表(主表列名)
+)
+
+-- 修改表时添加外键
+ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY(外键字段名) REFERENCES 主表(主表列明);
+
+-- 删除外键
+ALTER TABLE 表名 DROP FOREIGN KEY 外键名;
+```
+
+准备员工表和部门表，员工表内的 `dept_id` 外键关联部门表的 `id` 字段
+
+```sql {23}
+-- 部门表
+CREATE TABLE IF NOT EXISTS dept(
+    id INT AUTO_INCREMENT COMMENT 'id' PRIMARY KEY,
+    name VARCHAR(50) NOT NULL COMMENT '部门名'
+)COMMENT '部门表';
+
+INSERT INTO dept (id, name) VALUES
+(1, '研发部'),(2, '市场部'), (3, '财务部'), (4, '销售部'), (5, '总经办');
+
+CREATE TABLE IF NOT EXISTS emp(
+    id INT AUTO_INCREMENT COMMENT 'id' PRIMARY KEY,
+    name VARCHAR(50) NOT NULL COMMENT '姓名',
+    age INT COMMENT '年龄',
+    job VARCHAR(20) COMMENT '职位',
+    dept_id INT COMMENT '部门id',
+)COMMENT '员工表';
+
+INSERT INTO emp(id, name, age, job, dept_id) VALUES
+(1, '1', 66, '1', 5), (2, '2', 20, '2', 1), (3, '3', 33, '3', 1),
+(4, '4', 48, '4', 1), (5, '5', 43, '5', 1), (6, '6', 19, '6', 1);
+
+-- 添加外键关联
+ALTER TABLE EMP ADD CONSTRAINT fk_emp_dept_id FOREIGN KEY(dept_id) REFERENCES dept(id);
+
+-- 此时就无法删除部门表和员工表关联的数据
+DELETE FROM dept WHERE id = 1; -- 无法删除
+```
+
+### 外键约束的`删除`/`更新`行为
+
+| 行为          | 说明                                                                                                                         |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `NO ACTION`   | 当在父表删除/更新对应记录时<br/>首先检查该记录是否右对应的外键<br/>如果有则不允许删除/更新。（与RESTRICT一致，默认）         |
+| `RESTRICT`    | 当在父表删除/更新对应记录时<br/>首先检查该记录是否右对应的外键<br/>如果有则不允许删除/更新。（与NO ACTION一致）              |
+| `CASCADE`     | 当在父表删除/更新对应记录时<br/>首先检查该记录是否右对应的外键<br/>如果有，则也删除/更新外键在子表中的记录                   |
+| `SET NULL`    | 当在父表删除对应记录时<br/>首先检查该记录是否右对应的外键，如果有<br/>则设置子表中该外键值为NULL（这就要求该外键允许取NULL） |
+| `SET DEFAULT` | 父表有变更时<br/>子表将外键设置成一个默认的值（innodb不支持）                                                                |
+
+```sql "ON UPDATE CASCADE ON DELETE CASCADE"
+-- 在添加外键时设置更新行为，指定更新时的行为或删除时的行为
+ALTER TABLE 表名 ADD CONSTRAINT 外键名称 FOREIGN KEY(外键字段名) REFERENCES 主表(主表列明) ON UPDATE CASCADE ON DELETE CASCADE;
+```

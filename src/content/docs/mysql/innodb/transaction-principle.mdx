@@ -1,0 +1,37 @@
+---
+title: 事务原理
+sidebar:
+    order: 15
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+<InternalLink text="事务" href="mysql/transaction" />的
+`原子性`、`一致性`、`持久性` 是使用 `redo log` 和 `undo log` 实现的
+
+事务的 `隔离性` 是使用 `锁` 和 `MVCC` 实现的
+
+## redo log
+
+重做日志，记录的是事务提交时数据页的物理修改，是用来实现事务的 `持久性`
+
+该日志文件由两部分组成：`重做日志缓冲（redo log buffer）` 以及 `重做日志文件（redo log file）`，前者是在内存中，后者在磁盘中
+
+当事务提交之后会把所有修改信息都存到该日志文件中，用于在刷新脏页到磁盘，发生错误时，进行数据恢复使用
+
+由于 Redolog Buffer 在写入日志时是直接追加信息到 redo log 文件内，这种机制也叫 `WAL(Write-Ahead-Logging)` 先写日志
+
+## undo log
+
+事务的 `原子性` 是通过 undo log 实现的
+
+回滚日志，用于记录数据被修改前的信息，作用包含两个：提供回滚和 MVCC（多版本并发控制）
+
+undo log 和 redo log 记录物理日志不一样，它是逻辑日志
+
+可以认为当 delete 一条记录时，undo log 中会记录一条对应的 insert 记录，反之亦然，当 update 一条记录时，它记录一条对应相反的 update 记录
+
+当执行 rollback 时，就可以从 undo log 中的逻辑记录读取到相应的内容并进行回滚
+
+- `Undo log销毁` - undo log 在事务执行时产生，事务提交时，并不会立即删除 undo log，因为这些日志可能还用于 MVCC
+- `Undo log存储` - undo log 采用段的方式进行管和记录，存放在前面介绍的 rollback segment 回滚段中，内部包含 1024 个 undo log segment

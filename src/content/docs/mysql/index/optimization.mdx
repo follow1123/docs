@@ -1,0 +1,454 @@
+---
+title: SQL 优化
+sidebar:
+    order: 25
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import InternalLink from "@components/InternalLink.astro";
+import { Steps } from "@astrojs/starlight/components";
+import Mermaid from "@components/Mermaid.astro";
+
+## 插入优化
+
+### insert 优化
+
+批量插入
+
+:::note
+一次批量插入的数据不建议超过 1000 条
+:::
+
+```sql
+INSERT INTO table_name VALUES
+(value1, value2, ...), (value1, value2, ...),
+(value1, value2, ...), (value1, value2, ...);
+```
+
+手动提交事务
+
+```sql
+START TRANSACTION
+
+-- 插入1000条
+INSERT INTO table_name VALUES
+(value1, value2, ...), (value1, value2, ...),
+(value1, value2, ...), (value1, value2, ...);
+
+-- 插入1000条
+INSERT INTO table_name VALUES
+(value1, value2, ...), (value1, value2, ...),
+(value1, value2, ...), (value1, value2, ...);
+
+-- 插入1000条
+INSERT INTO table_name VALUES
+(value1, value2, ...), (value1, value2, ...),
+(value1, value2, ...), (value1, value2, ...);
+
+COMMIT;
+```
+
+主键顺序插入
+
+```sql /(?<!\w)[0-9]/
+INSERT INTO table_name (id, column1, column2, ...) VALUES
+(1, value1, value2, ...),
+(2, value1, value2, ...),
+(3, value1, value2, ...),
+(4, value1, value2, ...);
+```
+
+### 大批量插入数据
+
+<Steps>
+
+1. 准备<InternalLink text="测试表" href="mysql/view#测试数据" />
+
+2. 准备测试文件 `app_user.txt`
+
+    ```csv title="app_user.txt"
+    3253452,zs,5872673547@qq.com,29743974574349,1,hgufswqer[ujiwjerj,28
+    3253453,zs1,582673547@qq.com,2743974574349,0,hgufsujiwjerewrqqewj,30
+    3253454,ls,587267357@qq.com,29743974349,1,hgufsuwreeqwjiwjerj,43
+    3253455,ww,587267547@qq.com,9743974574349,0,hgufsujiwsdjfhjerj,20
+    ```
+
+3. 加载数据文件
+
+    使用 `mysql --local-infile -u 用户名 -p` 进入
+
+    ```sql
+    -- 开启从本地加载文件导入数据的开关
+    set global local_infile = 1;
+
+    -- 使用指定数据库
+    use datebase_name;
+
+    -- 执行load指令将准备好的数据，加载到表结构中
+    load data local infile '文件存放路径/app_user.txt' into table `app_user` fields terminated by ',' lines terminated by '\n';
+    ```
+
+</Steps>
+
+## 主键优化
+
+在 InnoDB 存储引擎中，表数据都是根据主键顺序组织存放的，这种存储方式的表称为 `索引组织表`（index organized table / IOT）
+
+### 页分裂
+
+页可以为空，页可以填充一半，页可以填充 1000%。每个页包含 2-N 行数据（如果一行数据过大，会行溢出），根据之间排列
+
+在 B+Tree 的特殊结构下，我们插入的数据都是根据主键顺序存放在叶子节点上的
+
+而叶子节点具体是存放在 Page 上的，一个 Page 具体大小是固定的
+
+在主键乱序插入的情况下，可能出现 Page 上的数据满了，需要往里面插入一条新数据，但Page没空间了，此时就会出现 `页分裂`
+
+#### 主键顺序插入的情况
+
+假设每行数据的大小是一样的，每页只能保存 3 行数据
+
+1. 依次插入主键为1、2、3的数据
+
+在插入主键为 4 的数据时，页已经满了，需要新申请一页存放数据并建立两个页之间的双向指针
+
+<Mermaid
+    code={`
+flowchart LR
+a[1, 2, 3] --> b[4]
+b --> a
+`}
+/>
+
+2. 依次插入主键为 5、6、7、8 的数据的操作和上面类似
+
+<Mermaid
+    code={`
+flowchart LR
+a[1, 2, 3] --> b[4, 5, 6]
+b --> c[7, 8]
+b --> a
+c --> b
+`}
+/>
+
+#### 主键乱序插入的情况
+
+1. 假设和上面一样，但是依次插入1、5、9、23、47、50的数据后，结构如下
+
+<Mermaid
+    code={`
+flowchart LR
+a[1, 5, 9] --> b[23, 47, 50]
+b --> a
+`}
+/>
+
+2. 当再插入 id 为 11 的数据时，由于第一页（包含 1 的是第一页，包含 23 的是第二页）已经满了，需要进行页分裂
+
+    - 将第一页后 50% 的数据取出， 和新插入的数据放入新分配的页内（第三页）
+    - 再修改第一页的指针指向第三页，第三页的指针指向第二页，如下
+
+<Mermaid
+    code={`
+flowchart LR
+a[1, 5] --> b[9, 11]
+b --> a
+b --> c[23, 47, 50]
+c --> b
+`}
+/>
+
+### 页合并
+
+当删除一行记录是，实际上记录并没有物理删除，只是被标记（flaged）为删除并且它的空间变得允许被其他记录声明使用
+
+当页删除的记录达到 `MERGE_THRESHOLD`（默认为页的 50%）
+
+InnoDB 会开始寻找最靠近的页（前或后），看看是否可以将两个页合并以优化空间使用
+
+- `MERGE_THRESHOLD` - 合并页阈值，可以自己设置，在创建表或创建索引时指定
+
+#### 页合并情况
+
+假设每行数据的大小是一样的，每页只能保存3行数据
+
+1. 依次插入1、2、3、4、5、6、7、8
+
+<Mermaid
+    code={`
+flowchart LR
+a[1, 2, 3] --> b[4, 5, 6]
+b --> a
+b --> c[7, 8]
+c --> b
+`}
+/>
+
+2. 删除 5、6，此时数据不会被物理删除，而是标记删除这里我使用 `x` 代表
+
+<Mermaid
+    code={`
+flowchart LR
+a[1, 2, 3] --> b[4, 5x, 6x]
+b --> a
+b --> c[7, 8]
+c --> b
+`}
+/>
+
+3. 由于第二页的空间小于 50%，开始进行页合并
+
+- 查找到后面的页（第三页）刚好可以合并，将第三页的数据合并进来，覆盖之前标记删除的数据
+- 此时第三页不会被释放，只是数据为空，等待后续数据插入
+
+<Mermaid
+    code={`
+flowchart LR
+a[1, 2, 3] --> b[4, 7, 8]
+b --> a
+b --> c[空]
+c --> b
+`}
+/>
+
+### 主键设计原则
+
+满足业务需求情况下，尽量降低主键长度
+
+插入数据时，尽量选择顺序插入，选择使用 `AUTO_INCREMENT` 自增主键
+
+尽量不要使用 UUID 做主键或者是其他自然主键，如身份证号
+
+业务操作时，避免对主键进行修改
+
+## order by 优化
+
+准备<InternalLink text="测试表" href="mysql/view#测试数据" />，只保留主键索引
+
+使用 explain 分析 SQL 查看 <InternalLink text="extra" href="mysql/index/performance#explain-执行计划各字段含义" /> 的属性
+
+- `using filesort` - 表示需要额外的排序
+- `using inext` - 表示直接根据索引顺序完成排序
+
+### 联合索引解决 `using filesort`
+
+根据 gender, phone 升序排序时，出现了 `using filesort`
+
+```sql
+EXPLAIN SELECT id, gender, phone FROM app_user ORDER BY gender, phone;
+
+-- 创建 gender, phone 的联合索引
+CREATE INDEX idx_gender_phone ON app_user(gender, phone);
+
+-- 此时再查则是 using index
+EXPLAIN SELECT id, gender, phone FROM app_user ORDER BY gender, phone;
+```
+
+### `Backward index scan` 情况
+
+如果根据 gender 倒序和 phone 倒叙查询会出现：`Backward index scan; Using index` 表示反向使用索引查找
+
+```sql "DESC"
+EXPLAIN SELECT id, gender, phone FROM app_user ORDER BY gender DESC, phone DESC;
+```
+
+### 左前缀法则
+
+如果排序时调换 phone 和 gender 的顺序会出现：`Using index; Using filesort`，排序也遵循最左前缀法则
+
+```sql
+EXPLAIN SELECT id, gender, phone FROM app_user ORDER BY phone, gender;
+```
+
+### 不同排序方式问题
+
+如果根据 gender 升序排序根据 phone 降序排序会出现：`Using index; Using filesort`
+
+```sql "ASC" "DESC"
+EXPLAIN SELECT id, gender, phone FROM app_user ORDER BY gender ASC, phone DESC;
+
+-- 上面的情况需要创建根据升序的 gender 和降序的 phone 创建一个联合索引
+CREATE INDEX idx_gender_phone_ad ON app_user(gender ASC, phone DESC);
+```
+
+## group by 优化
+
+准备<InternalLink text="测试表" href="mysql/view#测试数据" />，只保留主键索引
+
+使用 explain 分析 SQL 查看 <InternalLink text="extra" href="mysql/index/performance#explain-执行计划各字段含义" /> 的属性
+
+- `using temporary` - 使用临时表进行分组
+- `using inext` - 使用到了索引
+
+### `using temporary` 问题
+
+在没有索引的情况下根据 email 分组查询时，出现了 `using temporary`
+
+```sql
+EXPLAIN SELECT email, COUNT(*) same_email FROM app_user GROUP BY email;
+
+-- 创建一个 email 和 phone 的联合索引
+CREATE INDEX idx_email_phone ON app_user(email, phone);
+
+-- 此时再根据 email 进行分组查询出现 using index，使用到了联合索引的最左前缀
+EXPLAIN SELECT email, COUNT(*) same_email FROM app_user GROUP BY email;
+
+-- 使用 email 和 phone 分组查询也一样
+EXPLAIN SELECT email, phone, COUNT(*) FROM app_user GROUP BY email, phone;
+```
+
+### 添加 `WHERE` 条件
+
+将 email 作为 where 条件，再根据 phone 进行分组查询，也是 `using index`
+
+:::note
+group by 和 where 可以同时使用，只要遵守最左前缀法则
+:::
+
+```sql "WHERE email = '2548928007qq.com' GROUP BY phone"
+EXPLAIN SELECT email, phone, COUNT(*) FROM app_user WHERE email = '2548928007qq.com' GROUP BY phone;
+```
+
+## limit 优化
+
+一个常见的问题是 `limit 1000000000,10`，此时需要 MySQL 排序前 1000000010 记录，仅仅返回 1000000000 - 1000000010 的记录，其他记录丢弃，查询排序的代价非常大
+
+优化思路：一般分页查询时，通过创建覆盖所有能够比较好的提高性能，可以通过覆盖索引加子查询的形式进行优化
+
+```sql "(SELECT id FROM app_user ORDER BY id LIMIT 1000000,10)"
+-- 分页查询100万条后面的数据时非常卡
+SELECT * FROM app_user au LIMIT 1000000, 10;
+
+-- 根据id索引排序后只查询id的情况下，大概优化了40%
+SELECT id FROM app_user ORDER BY id LIMIT 1000000,10;
+
+-- 配合子查询查询每行数据
+SELECT a.* FROM app_user a, (SELECT id FROM app_user ORDER BY id LIMIT 1000000,10) b
+WHERE a.id = b.id
+```
+
+## count 优化
+
+MyISAM 引擎把一个表的总行数存在磁盘上，因此执行 `COUNT(*)` 的时候会直接返回这个个数，效率很高
+
+InnoDB 引擎它执行 `COUNT(*)` 的时候，需要把数据一行一行地从引擎里面读取出来，然后累计计数
+
+所以 count 的优化思路就是使用其他方式自己维护一个累加值
+
+### count 的用法
+
+`COUNT()` 是一个聚合函数，对于返回的结果集，一行行地判断，如果count函数的参数不是 NULL，累计值就加一，否则不加，最后返回累计值
+
+四种用法：
+
+- `COUNT(主键)` - InnoDB 引擎会遍历整张表，把每一行的主键值都取出来，返回给服务层。服务层拿到主键后，直接按行进行累加（主键不可能为null）
+- `COUNT(字段)`
+    - `没有not null约束` - InnoDB 引擎会遍历整张表把每一行的字段值都取出来，返回给服务层，服务层判断是否为null，不为null，计数累加
+    - `有not null约束` - InnoDB 引擎会遍历整张表把每一行的字段值都取出来吗， 返回给服务层，直接按行进行累加
+- `COUNT(1)` - InnoDB 引擎会遍历整张表，但不取值。服务层对于返回的每一行，放一个数字1进去，直接按行进行累加
+- `COUNT(*)` - InnoDB 引擎不会把全部字段取出来，而是专门做了优化，不取值，服务层直接按行进行累加
+
+按照效率排序
+
+`COUNT(*)` 约等于 `COUNT(1)` > `COUNT(主键)` > `COUNT(字段)`
+
+所以尽量使用 `COUNT(*)`
+
+## update 优化
+
+准备 SQL
+
+```sql
+CREATE TABLE account(
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    name VARCHAR(10) COMMENT '姓名',
+    money INT COMMENT '余额'
+) COMMENT '账户表';
+
+INSERT INTO account VALUES (NULL, 'zhangsan', 2000), (NULL, 'lisi', 2000);
+```
+
+### 使用主键更新数据
+
+打开两个命令行窗口，使用 `mysql -u 用户名 -p` 登录两个 session
+
+<Tabs>
+
+<TabItem label="session1">
+
+    ```sql
+    -- 1. 开启事务
+    START TRANSACTION;
+
+    -- 3. 更新id为1的数据
+    UPDATE account SET money = 1000 WHERE id = 1;
+
+    -- 提交事务
+    COMMIT;
+    ```
+
+</TabItem>
+
+<TabItem label="session2">
+
+    ```sql
+    -- 2. 开启事务
+    START TRANSACTION;
+
+    -- 4. 更新id为2的数据，此时正常更新
+    UPDATE account SET money = 2000 WHERE id = 2;
+
+    -- 提交事务
+    COMMIT;
+    ```
+
+</TabItem>
+
+</Tabs>
+
+### 使用其他字段更新数据（未加索引的字段）
+
+打开两个命令行窗口，使用 `mysql -u 用户名 -p` 登录两个 session
+
+<Tabs>
+
+<TabItem label="session1">
+
+    ```sql
+    -- 1. 开启事务
+    START TRANSACTION;
+
+    -- 3. 更新name为zhangsan的数据
+    UPDATE account SET money = 1000 WHERE name = 'zhangsan';
+
+    -- 提交事务
+    COMMIT;
+    ```
+
+</TabItem>
+
+<TabItem label="session2">
+
+    ```sql
+    -- 2. 开启事务
+    START TRANSACTION;
+
+    -- 4. 更新id为2的数据，此时会卡住
+    -- 由于上一个事务更新时使用了未加索引的字段进行作为条件 导致这张表被锁了，无法更新
+    -- 需要上一个事务提交后才能继续执行
+    UPDATE account SET money = 2000 WHERE id = 2;
+
+    -- 提交事务
+    COMMIT;
+    ```
+
+</TabItem>
+
+</Tabs>
+
+从上面的例子可以看出，InnoDB 的行锁是针对索引加的锁，不是针对记录加的锁，并且该索引不能失效，否则会从行锁升级为表锁
+
+:::note
+update 时尽量使用主键更新，或者使用带索引的字段更新
+:::

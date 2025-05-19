@@ -1,0 +1,154 @@
+---
+title: DQL
+sidebar:
+    order: 15
+---
+
+import Mermaid from "@components/Mermaid.astro";
+
+```sql
+SELECT [All | DISTINCT | * | 表名.* | [表名1.字段1 as 别名1, 表名2.字段2 as 别名2] -- 查询格式
+FROM 表名 [AS 表名的别名]
+[LEFT | RIGHT | INNER JOIN 表名2]   -- 连表查询
+[WHERE]                             -- 指定结果徐满足的条件
+[GROUP BY]                          -- 指定结果按那几个字段进行分组
+[HAVING]                            --过滤分组记录必须满足的次要条件
+[ORDER BY]                          -- 指定查询记录按一个或多个条件进行分组
+[LIMIT {[offset,]row_count row_countOFFSET offset}]; --指定查询的记录从那条至哪条
+```
+
+## 基本查询
+
+查询多个字段
+
+```sql /字段[0-9]/ "..." "*"
+-- 查询指定字段
+SELECT 字段1, 字段2, 字段3, ... FROM 表名;
+
+-- 查询全部字段
+SELECT * FROM 表名;
+```
+
+设置别名
+
+```sql /AS 别名[0-9]/
+SELECT 字段1 AS 别名1, 字段2 AS 别名2, 字段3 AS 别名3, ... FROM 表名;
+```
+
+去除重复记录
+
+```sql "DISTINCT"
+SELECT DISTINCT 字段列表 FROM 表名;
+```
+
+## 条件查询
+
+```sql "WHERE 条件列表"
+SELECT 字段列表 FROM 表名 WHERE 条件列表;
+```
+
+### 比较运算符
+
+| 比较运算符            | 功能                                           |
+| --------------------- | ---------------------------------------------- |
+| `>`                   | 大于                                           |
+| `>=`                  | 大于等于                                       |
+| `<`                   | 小于                                           |
+| `<=`                  | 小于等于                                       |
+| `=`                   | 等于                                           |
+| `<>` 或 `!=`          | 不等于                                         |
+| `BETWEEN ... AND ...` | 在某个范围内（包含最小值和最大值）             |
+| `IN(...)`             | 在IN后面的列表中的值                           |
+| `LIKE 占位符`         | 模糊匹配（`_` 匹配单个字符，`%` 匹配多个字符） |
+| `IS NULL`             | 是NULL                                         |
+
+### 逻辑运算符
+
+| 逻辑运算符                        | 功能 |
+| --------------------------------- | ---- |
+| `AND` 或 `&&`                     | 且   |
+| `OR` 或 <code>&#124;&#124;</code> | 或   |
+| `NOT` 或 `!`                      | 非   |
+
+### 聚合函数
+
+将一列数据作为一个整体，进行纵向计算
+
+null 值不参与聚合函数运算
+
+| 函数    | 功能     |
+| ------- | -------- |
+| `COUNT` | 统计数量 |
+| `MAX`   | 最大值   |
+| `MIN`   | 最小值   |
+| `AVG`   | 平均值   |
+| `SUM`   | 求和     |
+
+```sql "MAX(age)"
+-- 查询表内 age 最大的数据
+SELECT MAX(age) FROM 表名;
+```
+
+## 分组查询
+
+```sql "GROUP BY" "HAVING"
+SELECT 字段列表 FROM 表名 [WHERE 条件列表] GROUP BY 分组字段名 [HAVING 分组后过滤条件];
+```
+
+:::note
+分组后查询条件可以使用聚合函数列的别名
+
+```sql "HAVING COUNT_FILED2 > 3"
+SELECT FIELD1, COUNT(FIELD2) COUNT_FILED2 FROM TABLE1 GROUP BY FIELD3 HAVING COUNT_FILED2 > 3;
+```
+
+分组后查询的字段只能是聚合函数和分组的字段
+:::
+
+### where 和 having 的区别
+
+where 是分组前进行过滤，不满足 where 条件，不参与分组，而 having 是分组之后对结果进行过滤
+
+where 不能使用聚合函数作为条件，而 having 可以
+
+## 排序查询
+
+```sql "ORDER BY"
+SELECT 字段列表 FROM 表名 ORDER BY 字段1 排序方式1, 字段2 排序方式2;
+```
+
+排序方式：
+
+- `ASC` - 升序（从小到大，默认）
+- `DESC` - 降序（从大到小）
+
+:::note
+如果是多个字段排序，当第`前面的字段`有`多个相同的值`时才会根据`后面的字段`进行排序
+:::
+
+## 分页查询
+
+```sql "LIMIT"
+SELECT 字段列表 FROM 表名 LIMIT 起始索引, 查询记录数;
+```
+
+:::note
+起始索引从 0 开始，`起始索引` = (`查询页码` - 1) \* `每页显示记录数`
+
+分页查询是数据库的方言，不同的数据库有不同的实现，MySQL 中是 LIMIT
+
+如果查询的是第一页的数据，可以直接使用 `LIMIT 10`
+:::
+
+## DQL 语句执行顺序
+
+<Mermaid
+    code={`
+flowchart LR
+A(FROM) --> B(WHERE)
+B --> C(GROUP BY和HAVING)
+C --> D(SELECT)
+D --> E(ORDER BY)
+E --> F(LIMIT)
+`}
+/>

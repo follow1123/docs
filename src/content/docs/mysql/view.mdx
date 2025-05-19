@@ -1,0 +1,225 @@
+---
+title: 视图
+sidebar:
+    order: 30
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+视图（View）是一种虚拟存在的表。视图中的数据并不在数据库中实际存在，行和列数据来自 `定义视图的查询语句中使用的表`，并且是在使用视图时动态生成的
+
+视图只保存了查询的 SQL 逻辑，不保存查询结果。所以我们在创建视图的时候，主要编写的是 SQL 查询语句
+
+```sql
+-- 创建
+CREATE [OR REPLACE] VIEW 视图名称[(列名列表)] AS SELECT 语句 [WITH[CASCADED | LOCAL] CHECK OPTION];
+
+-- 查看创建视图语句
+SHOW CREATE VIEW 视图名称;
+-- 查看视图数据
+SELECT * FROM 视图名称 ...;
+
+-- 修改
+CREATE [OR REPLACE] VIEW 视图名称[(列名列表)] AS SELECT 语句 [WITH[CASCADED | LOCAL] CHECK OPTION];
+ALTER VIEW 视图名称[(列名列表)] AS SELECT语句 [WITH[CASCADED | LOCAL] CHECK OPTION];
+
+-- 删除
+DROP VIEW [IF EXISTS] 视图名称 [,视图名称] ...;
+```
+
+## 测试数据
+
+```sql
+DROP TABLE IF EXISTS `app_user`;
+
+-- 创建表
+CREATE TABLE `app_user`(
+    `id` INT  NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `name` VARCHAR(50) DEFAULT '' COMMENT '用户名称',
+    `email` VARCHAR(50) NOT NULL COMMENT '邮箱',
+    `phone` VARCHAR(20) DEFAULT '' COMMENT '手机号',
+    `gender` TINYINT DEFAULT '0' COMMENT '性别（0-男  ： 1-女）',
+    `password` VARCHAR(100) NOT NULL COMMENT '密码',
+    `age` TINYINT DEFAULT '0' COMMENT '年龄',
+    `create_time` DATETIME DEFAULT NOW(),
+    `update_time` DATETIME DEFAULT NOW(),
+    PRIMARY KEY (`id`)
+)COMMENT='用户表';
+
+INSERT INTO app_user (name,email,phone,gender,password,age,create_time,update_time) VALUES
+     ('用户0','2737973569qq.com','1839405813',1,'0f1a1342-7b3f-11ef-a986-0242ac110002',63,'2024-09-25 13:07:03','2024-09-25 13:07:03'),
+     ('用户1','2637298275qq.com','181494517358',1,'0f1a16df-7b3f-11ef-a986-0242ac110002',27,'2024-09-25 13:07:03','2024-09-25 13:07:03'),
+     ('用户2','21117464564qq.com','18227598531',1,'0f1a18c5-7b3f-11ef-a986-0242ac110002',81,'2024-09-25 13:07:03','2024-09-25 13:07:03');
+```
+
+## 测试
+
+<Steps>
+
+1.  准备[测试数据](#测试数据)
+
+2.  创建视图
+
+    ```sql
+    -- 创建视图，查询app_user表内前20条数据，只需要id,name,age这几个字段
+    CREATE OR REPLACE VIEW user_v_1 AS SELECT id, name, age FROM app_user WHERE id <= 20;
+
+    -- 查看创建视图语句
+    SHOW CREATE VIEW user_v_1;
+
+    -- 查询视图内数据
+    SELECT * FROM user_v_1;
+
+    -- 修改视图，添加email字段
+    ALTER VIEW user_v_1 AS SELECT id, name, age, email FROM app_user WHERE id <= 20;
+
+    -- 删除视图
+    DROP VIEW user_v_1;
+    ```
+
+</Steps>
+
+## 视图检查选项
+
+当使用 `WITH CHECK OPTION` 子句创建视图时，MySQL 会通过视图检查正在更改的每个行，例如插入，更新，删除，以使其符合视图的定义
+
+MySQL 允许基于另一个视图创建视图，它还会检查依赖视图中的规则以保持一致性，为了确定检查的范围
+
+MySQL 提供了两个选项：`CASCADED`（默认）和 `LOCAL`
+
+### CASCADED
+
+级联，如果当前视图依赖了其他视图，不管依赖的视图有没有检查选项，递归进行检查，一直查到没有依赖的视图处
+
+<Steps>
+
+1. 创建视图 v1
+
+    ```sql "SELECT id, name from table where id <= 20"
+    CREATE OR REPLACE VIEW v1 AS SELECT id, name from table where id <= 20;
+    ```
+
+    测试插入
+
+    ```sql
+    -- 插入成功
+    INSERT INTO v1 VALUES(5, 'a');
+
+    -- 插入成功，因为创建视图时没有指定检查选项，但当前视图无法查询到这个数据
+    INSERT INTO v1 VALUES(25, 'a');
+    ```
+
+2. 创建视图 v2 依赖 v1，添加级联检查选项
+
+    ```sql "SELECT id, name from v1 where id >= 10" "WITH CASCADED CHECK OPTION"
+    CREATE OR REPLACE VIEW v2 AS SELECT id, name from v1 where id >= 10 WITH CASCADED CHECK OPTION;
+    ```
+
+    测试插入
+
+    ```sql
+    -- 插入失败，因为不满足当前视图v2的WHERE条件
+    INSERT INTO v2 VALUES(7, 'a');
+
+    -- 插入失败，由于添加了级联检查选项，即便v1视图没加检查选项，也会检查v1视图的WHERE条件，所以插入失败
+    INSERT INTO v2 VALUES(26, 'a');
+
+    -- 插入成功，既满足v2视图的WHERE条件也满足v1视图的WHERE条件
+    INSERT INTO v2 VALUES(15, 'a');
+    ```
+
+3. 创建视图 v3 依赖 v2，不加检查选项
+
+    ```sql "SELECT id, name from v2 where id <= 15"
+    CREATE OR REPLACE VIEW v3 AS SELECT id, name from v2 where id <= 15;
+    ```
+
+    测试插入
+
+    ```sql
+    -- 插入成功
+    INSERT INTO v3 VALUES(11, 'a');
+
+    -- 插入成功，由于当前视图没加检查选项，所以不检查当前视图的WHERE条件
+    -- 但是当前视图依赖了v2视图，v2视图添加了级联检查条件，所以需要检查
+    -- 满足v1、v2视图的WHERE条件，所以插入成功
+    INSERT INTO v3 VALUES(17, 'a');
+
+    -- 插入失败，不满足视图v1的检查条件
+    INSERT INTO v3 VALUES(28, 'a');
+    ```
+
+</Steps>
+
+### LOCAL
+
+只检查当前视图的 WHERE 条件，如果当前视图依赖了其他视图，则根据依赖视图的检查选项操作
+
+- 如果依赖的视图检查选项是 CASCADED，则按级联的操作递归检查
+- 如果也是 LOCAL，重读这块说明
+- 如果没加检查选项，则不检查
+
+<Steps>
+
+1. 创建视图 v1，不加检查选项
+
+    ```sql "SELECT id, name from table where id <= 15"
+    CREATE OR REPLACE VIEW v1 AS SELECT id, name from table where id <= 15;
+    ```
+
+    测试插入
+
+    ```sql
+    -- 插入成功
+    INSERT INTO v1 VALUES(5, 'a');
+
+    -- 插入成功，因为创建视图时没有指定检查选项，但当前视图无法查询到这个数据
+    INSERT INTO v1 VALUES(16, 'a');
+    ```
+
+2. 创建视图 v2，v1，添加 LOCAL 检查选项
+
+    ```sql "SELECT id, name from v1 where id >= 10" "WITH LOCAL CHECK OPTION"
+    CREATE OR REPLACE VIEW v2 AS SELECT id, name from v1 where id >= 10 WITH LOCAL CHECK OPTION;
+    ```
+
+    测试插入
+
+    ```sql
+    -- 插入成功
+    INSERT INTO v2 VALUES(13, 'a');
+
+    -- 插入成功，满足当前视图的WHERE条件，由于依赖的视图v1没加检查选项，所以不检查
+    INSERT INTO v2 VALUES(17, 'a');
+    ```
+
+3. 创建视图 v3，v2，不加检查选项
+
+    ```sql "SELECT id, name from v2 where id < 20"
+    CREATE OR REPLACE VIEW v3 AS SELECT id, name from v2 where id < 20;
+    ```
+
+    测试插入
+
+    ```sql
+    -- 插入成功，按照规则，我们发现这次插入只在v2视图处进行了WHERE条件检查
+    INSERT INTO v3 VALUES(14, 'a');
+    ```
+
+</Steps>
+
+## 视图的更新
+
+要使视图可更新，视图中的行与基础表中的行之间必须是一对一的关系。如果视图包含以下任何一项，则视图不可更新：
+
+- 聚合函数或窗口函数（SUM()、MIN()、MAX()、COUNT()等）
+- DISTINCT
+- GROUP BY
+- HAVING
+- UNION 或 UNION ALL
+
+## 视图的作用
+
+- `简单` - 视图不仅可以简化用户对数据的理解，也可以简化操作。那些被经常使用的查询可以被定义为视图，从而使用户不必为以后的操作每次指定全部的条件
+- `安全` - 数据库可以授权，但不能授权到数据库特定行和特定的列上，通过视图用户只能查询和修改他们所能见到的数据
+- `数据独立` - 视图可以帮助用户屏蔽真实表结构变化带来的影响

@@ -1,0 +1,156 @@
+---
+title: 性能分析
+sidebar:
+    order: 20
+---
+
+import InternalLink from "@components/InternalLink.astro";
+import { Steps } from "@astrojs/starlight/components";
+
+## 执行频率
+
+MYSQL客户端连接成功后，通过 `SHOW [SESSION | GLOBAL] STATUS` 命令可以查询服务器状态信息
+
+`SHOW GLOBAL STATUS LIKE 'Com_______';` 查询全局所有 INSERT、UPDATE、DELETE、SELECT 的访问次数
+
+## 慢查询日志
+
+慢查询日志记录了所有执行时间超过指定参数（`long_query_time`，单位：秒，默认10秒）的所有 SQL 语句的日志
+
+<Steps>
+
+1. 开启慢查询日志配置
+
+    MySQL 的慢查询日志默认没有开启，需要在 MySQL 的配置文件 `/etc/my.cnf` 中配置
+
+    ```ini title="/etc/my.cnf"
+    # 需要在这个标签下添加
+    [mysqld]
+
+    # 开启MySQL慢查询
+    slow_query_log=1
+
+    # 设置满日志的时间为2秒，SQL语句执行时间超过2秒，就会视为慢查询，记录慢查询日志
+    long_query_time=2
+    ```
+
+2. 重启 MySQL
+3. 查看慢查询日志配置是否开启
+
+    ```sql
+    SHOW VARIABLES LIKE 'slow_query_log%';
+    ```
+
+4. 测试
+
+    ```sql
+    -- 模拟慢查询
+    SELECT sleep(3);
+    ```
+
+    查看日志文件
+
+    ```bash
+    tail -f /var/lib/mysql/日志文件.log
+    ```
+
+</Steps>
+
+## profile 详情
+
+show profile 能够在做 SQL 优化时帮助我们了解时间都耗费在哪了
+
+```sql
+-- 查看当前MySQL是否支持profile操作
+SELECT @@have_profiling;
+
+-- 查看profile功能是否开启
+SELECT @@profiling;
+
+-- 开启profiling
+SET [SESSION | GLOBAL] profiling = 1;
+
+-- 查看每一条SQL的耗时基本情况
+SHOW PROFILES;
+
+-- 查看指定query_id的SQL语句各个阶段的耗时情况
+SHOW PROFILE FOR QUERY query_id;
+
+-- 查看指定query_id的SQL语句CPU的使用情况
+SHOW PROFILE CPU FOR QUERY query_id;
+```
+
+## explain 执行计划
+
+EXPLAIN 或 DESC 命令获取 MYSQL 如何执行 SELECT 语句的信息，包括在 SELECT 语句执行过程中表如何连接的顺序
+
+```sql
+-- 直接在SELECT语句之间加上关键字EXLPAIN或DESC
+EXPLAIN SELECT 字段列表 FROM 表名 WHERE 条件
+```
+
+### explain 执行计划各字段含义
+
+| 字段                        | 含义                                                            |
+| --------------------------- | --------------------------------------------------------------- |
+| [id](#id)                   | SELECT 查询的序号，                                             |
+| [select_type](#select_type) | 表示 SELECT 的类型，常见取值有 SIMPLE、PRIMARY、UNION、SUBQUERY |
+| [type](#type)               | 连接类型                                                        |
+| possible_key                | 显示可能应用在这张表上的索引，一个或多个                        |
+| key                         | 实际使用的索引，如果为 NULL，则没有使用索引                     |
+| [key_len](#key_len)         | 表示索引中使用的字节数                                          |
+| rows                        | MySQL 认为必须要执行查询的行数，在 InnoDB 的表中，是一个估计值  |
+| filtered                    | 表示返回结果的行数占需读取行数的百分比，filtered 的值越大越好   |
+| [extra](#extra)             | 表示是否用到了索引，查询的列是否被索引覆盖                      |
+
+### `id`
+
+表示查询中执行的 SELECT 子句或是操作表的顺序
+
+- id 相同 - 执行顺序从上到下
+- id 不同 - 值越大，越先执行
+
+### `select_type`
+
+| 类型       | 说明                               |
+| ---------- | ---------------------------------- |
+| `SIMPLE`   | 简单表，即不使用表连接或子查询     |
+| `PRIMARY`  | 主查询，即外层的查询               |
+| `UNION`    | UNION 中的第二个或者后面的查询语句 |
+| `SUBQUERY` | SELECT / WHERE 之后包含了子查询    |
+
+### `type`
+
+性能由好到差的连接类型为
+
+`NULL` > `system` > `const` > `eq_ref` > `ref` > `range` > `index` > `all`
+
+### `key_len`
+
+该值为索引字段最大可能长度，并非实际使用长度，在不损失精确性的前提下，长度越短越好
+
+### `extra`
+
+`null`
+
+使用了索引，但是查询的列未被索引覆盖
+
+`using index`
+
+使用了索引，查询的列都被索引覆盖，不需要回表查询，或 order by 时直接按索引顺序返回排序后的数据
+
+`using where;using index`
+
+查询条件不是联合索引的最左列，但是查询的列被联合索引覆盖到了，用到了联合索引
+
+`using where`
+
+用到的索引不是联合索引最左边的字段
+
+`using index condition`
+
+使用了索引，但是需要<InternalLink text="回表查询" href="mysql/index/classification/#回表查询" />数据
+
+`using filesort`
+
+通过表的索引或全表扫描，读取满足条件的数据行，然后再排序缓冲区 sort buffer 中完成排序操作，所以不是通过所以直接返回排序结果的排序都叫 FileSort 排序

@@ -1,0 +1,51 @@
+---
+title: DCL
+sidebar:
+    order: 20
+---
+
+管理数据库用户，控制数据库访问权限
+
+## 用户管理
+
+```sql
+-- 显示所有用户
+USE MYSQL;
+SELECT * FROM USER;
+
+-- 创建用户，主机名使用%表示可以在任意主机上访问该数据库
+CREATE USER '用户名'@'主机名' IDENTIFIED BY '密码';
+
+-- 重命名
+RENAME USER '用户名' TO '新用户名';
+
+-- 修改用户密码
+ALTER USER '用户名'@'主机名' IDENTIFIED WITH MYSQL_NATIVE_PASSWORD BY '新密码';
+
+-- 删除用户
+DROP USER '用户名'@'主机名';
+```
+
+## 权限控制
+
+| 权限                    | 说明                 |
+| ----------------------- | -------------------- |
+| `ALL`, `ALL PRIVILEGES` | 所有权限             |
+| `SELECT`                | 查询数据             |
+| `INSERT`                | 插入数据             |
+| `UPDATE`                | 修改数据             |
+| `DELETE`                | 删除数据             |
+| `ALTER`                 | 修改表               |
+| `DROP`                  | 删除数据库、表、视图 |
+| `CREATTE`               | 创建数据库、表       |
+
+```sql
+-- 查询权限
+SHOW GRANTS FOR '用户名'@'主机名';
+
+-- 授予权限，授予所有数据库的所有权限可以使用*.*
+GRANT 权限列表 ON 数据库名.表名 TO '用户名'@'主机名';
+
+-- 撤销权限
+REVOKE 权限列表 ON 数据库名.表名 FROM '用户名'@'主机名';
+```

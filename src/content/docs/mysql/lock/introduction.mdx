@@ -1,0 +1,39 @@
+---
+title: 说明
+sidebar:
+    order: 0
+---
+
+锁是计算机协调多个进程或线程并发访问某一资源的机制
+
+在数据库中，除传统的计算资源（CPU、RAM、I/O）的争用以外，数据也是一种供许多用户共享的资源
+
+如何保证数据并发访问的一致性、有效性是所有数据库必须解决的一个问题，锁冲突也是影响数据库并发访问性能的一个重要因素
+
+MySQL 中的锁，按照锁的粒度分，分为以下三类：
+
+- `全局锁` - 锁定数据库中的所有表
+- `表级锁` - 每次操作锁住整张表
+- `行级锁` - 每次操作锁住对应的行数据
+
+## 锁查询相关 SQL
+
+查看 `元数据` 加锁情况
+
+```sql
+select object_type, object_schema, object_name, lock_type, lock_duration from performance_schema.metadata_locks;
+```
+
+查看 `意向锁` 和 `行锁` 加锁情况
+
+```sql
+select object_schema, object_name, index_name, lock_type, lock_mode, lock_data from performance_schema.data_locks;
+```
+
+:::note
+部分的字段说明：
+
+- `GAP` - 间隙锁
+- `REC_NOT_GAP` - 普通行锁
+- 没信息就是临界锁
+  :::

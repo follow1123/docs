@@ -1,0 +1,141 @@
+---
+title: DDL
+sidebar:
+    order: 5
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+## 操作数据库
+
+```sql
+-- 查看所有数据库
+SHOW DATABASES;
+
+-- 查看当前数据库
+SELECT DATABASE();
+
+-- 创建数据库
+CREATE DATABASE [IF NOT EXISTS] 数据库名 [DEFAULT CHARSET 字符集][COLLATE 排序规则];
+
+-- 删除数据库
+DROP DATABASE [IF EXISTS] 数据库名;
+
+-- 使用数据库
+USE 数据库名;
+
+-- 查看数据库创建的语句
+SHOW CREATE DATABASE 数据库名;
+```
+
+## 操作表结构
+
+```sql
+-- 查询数据库内的所有表，需要先使用USE 数据库;使用某个数据库
+SHOW TABLES;
+
+-- 查询表结构
+DESC 表名;
+
+-- 查询某个表的建表语句
+SHOW CREATE TABLE 表名;
+```
+
+## 创建表
+
+数据库的字段属性
+
+- `unsigned` - 无符号整型，声明该列不能为负数
+- `zerofill` - 0 填充，不足的位数用零填充
+
+创建表时可以配合<InternalLink text="约束" href="mysql/constraint" />
+
+```sql
+CREATE TABLE [IF NOT EXISTS] 表名(
+    字段1 字段1类型 [COMMENT '字段1注释'],
+    字段2 字段2类型 [COMMENT '字段2注释'],
+    字段3 字段3类型 [COMMENT '字段3注释'],
+    ...
+    字段N 字段N类型 [COMMENT '字段N注释']
+) [COMMENT '表注释'];
+```
+
+## 数据类型
+
+### 数值类型
+
+数值类型分为：有符号（SIGNED，默认）和无符号（UNSIGNED）
+
+| 类型        | 大小（byte） | 有符号范围                  | 无符号范围        | 描述               |
+| ----------- | ------------ | --------------------------- | ----------------- | ------------------ |
+| TINYINT     | 1            | -128~127                    | 0~255             | 小整型数值         |
+| SMALLINT    | 2            | -32768~32767                | 0~65535           | 中整型数值         |
+| MEDIUMINT   | 3            | -8388608~<br/>8388607       | 0~<br/>16777215   | 中整型数值         |
+| INT/INTEGER | 4            | -2147483648~<br/>2147483647 | 0~<br/>4294967295 | 大整型数值         |
+| BIGINT      | 8            | -2^63~2^63-1                | 0~2^64-1          | 极大整型数值       |
+| FLOAT       | 4            |                             |                   | 单精度浮点数值     |
+| DOUBLE      | 8            |                             |                   | 双精度浮点数值     |
+| DECIMAL     |              | M(精度)和D(标度)            | M(精度)和D(标度)  | 小数值(精确定点数) |
+
+```sql "UNSIGNED TINYINT"
+CREATE TABLE IF NOT EXISTS DATA_TYPE_TABLE(
+    age UNSIGNED TINYINT COMMENT '年龄' -- 年龄字段，无符号
+    score DOUBLE(4,1) COMMENT '分数' -- 分数字段，可以为小数，保留一位小数
+) COMMENT '数据类型演示';
+```
+
+### 字符串类型
+
+| 类型       | 大小     | 描述                 |
+| ---------- | -------- | -------------------- |
+| CHAR       | 0~255    | 定长字符串（性能好） |
+| VARCHAR    | 0~2^16-1 | 变长字符串（性能差） |
+| TINYBLOB   | 0~255    | 小二进制数据         |
+| TINYTEXT   | 0~255    | 小文本字符串         |
+| BLOB       | 0~2^16-1 | 中二进制数据         |
+| TEXT       | 0~2^16-1 | 中文本字符串         |
+| MEDIUMBLOB | 0~2^24-1 | 大二进制数据         |
+| MEDIUMTEXT | 0~2^24-1 | 大文本字符串         |
+| LONGBLOB   | 0~2^32-1 | 极大二进制数据       |
+| LONGTEXT   | 0~2^32-1 | 极大文本字符串       |
+
+### 时间日期类型
+
+| 类型      | 大小 | 范围                                          | 格式                | 描述               |
+| --------- | ---- | --------------------------------------------- | ------------------- | ------------------ |
+| DATE      | 3    | 1000-01-01至<br/>9999-12-31                   | YYYY-MM-DD          | 日期               |
+| TIME      | 3    | -838:59:59至<br/>838:59:59                    | HH:MM:SS            | 时间值或持续时间   |
+| YEAR      | 1    | 1901至2155                                    | YYYY                | 年份               |
+| DATETIME  | 8    | 1000-01-01 00:00:00至<br/>9999-12-31 23:59:59 | YYYY-MM-DD HH:MM:SS | 日期和时间         |
+| TIMESTAMP | 4    | 1970-01-01 00:00:01至<br/>2038-01-19 23:14:07 | YYYY-MM-DD HH:MM:SS | 日期和时间，时间戳 |
+
+### 空类型（null）
+
+## 修改表
+
+```sql
+-- 添加字段
+ALTER TABLE 表名 ADD 字段名 类型(长度) [COMMENT '注释'] [约束];
+
+-- 修改字段类型
+ALTER TABLE 表名 MODIFY 字段名 新类型(长度);
+
+-- 修改字段名和类型
+ALTER TABLE 表名 CHANGE 字段名 新字段名 新类型(长度) [COMMENT '注释'] [约束];
+
+-- 删除字段
+ALTER TABLE 表名 DROP 字段名;
+
+-- 重命名
+ALTER TABLE 表名 RENAME TO 新表名;
+```
+
+## 删除表
+
+```sql
+-- 删除表（如果存在）
+DROP TABLE [IF EXISTS] 表名;
+
+-- 删除表，并重新创建该表
+TRUNCATE TABLE 表名;
+```

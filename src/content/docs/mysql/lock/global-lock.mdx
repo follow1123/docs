@@ -1,0 +1,70 @@
+---
+title: 全局锁
+sidebar:
+    order: 5
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+全局锁就是对整个数据库实例加锁，加锁后整个实例就处于只读状态，后续的 DML 的写语句，DDL 语句，以及更新操作的事务提交语句都将被阻塞
+
+其典型的使用场景是做全库的逻辑备份，对所有的表进行锁定，从而获取一致性视图，保证数据的完整性
+
+## 测试数据
+
+```sql
+create table account(
+    id int auto_increment primary key comment '主键',
+    name varchar(10) comment '姓名',
+    money int comment '余额'
+) comment '账户表';
+
+insert into account values (null, 'zhangsan', 2000), (null, 'lisi', 2000);
+```
+
+## 使用全局锁后备份
+
+打开两个命令行窗口，左边是使用 `mysql -uusername -p` 登录的 session，右边是命令行终端
+
+<Tabs>
+
+<TabItem label="session">
+
+    ```sql
+    -- 1. 开启全局锁
+    flush tables with read lock;
+
+    -- 3. 释放锁
+    unlock tables;
+    ```
+
+</TabItem>
+
+<TabItem label="terminal">
+
+    ```bash
+    # 2. 使用mysqldump备份数据库，如果是备份远程的MySQL仓库，则加上-h参数指定ip
+    mysqldump -uusername -ppassword databasename > filename.sql
+    ```
+
+</TabItem>
+
+</Tabs>
+
+:::note
+
+在不加锁的情况下完成备份可以使用 `mysqldump` 命令时添加 `--single-transaction` 参数
+
+```bash
+mysqldump --single-transaction -uusername -ppassword databasename > filename.sql
+```
+
+:::
+
+## 全局锁问题
+
+:::caution
+如果在主库上备份，那么在备份期间都不能执行更新，业务基本上就得停摆
+
+如果在从库上备份，那么在备份期间从库不能执行主库同步过来的二进制日志（binlog） ，会导致主从延迟
+:::

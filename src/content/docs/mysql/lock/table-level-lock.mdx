@@ -1,0 +1,240 @@
+---
+title: 表级锁
+sidebar:
+    order: 10
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import InternalLink from "@components/InternalLink.astro";
+
+表级锁，每次操作锁住整张表。锁定粒度大，发生锁冲突的概率最高，并发度最低
+
+应用在 MyISAM、InnoDB、BDB 等存储引擎中
+
+表级锁主要分为三类：`表锁` `元数据锁（meta data lock，MDL）` `意向锁`
+
+## 表锁
+
+表锁分为：`表共享读锁（read lock）` `表独占写锁（write lock）`
+
+```sql
+-- 加锁
+lock tables 表名... read/write;
+
+-- 释放锁，可以执行以下SQL或客户端断开连接
+unlock tables;
+```
+
+### 表共享读锁
+
+准备<InternalLink text="测试数据" href="mysql/lock/global-lock#测试数据" />
+
+打开两个命令行窗口，使用 `mysql -uusername -p` 分别登录两个 session
+
+<Tabs>
+
+<TabItem label="session1">
+
+    ```sql
+    -- 1. 给account表添加readlock
+    lock tables account read;
+
+    -- 2. 执行查询操作，可以正常查询
+    select * from account where id = 1;
+
+    -- 3. 执行修改操作，报错ERROR 1099 (HY000): Table 'account' was locked with a READ lock and can't be updated
+    update account set money = 1000 where id = 1;
+    ```
+
+</TabItem>
+
+<TabItem label="session2">
+
+    ```sql
+    -- 4. 执行查询操作，可以正常查询
+    select * from account where id = 1;
+
+    -- 5. 执行修改操作，阻塞，直到account的表锁被释放后执行
+    update account set money = 2000 where id = 1;
+    ```
+
+</TabItem>
+
+</Tabs>
+
+测试发现给 account 表添加 `表共享读锁` 的 session 和其他 session 都只能对 account 表进行查询操作，无法进行修改操作
+
+### 表独占写锁
+
+准备<InternalLink text="测试数据" href="mysql/lock/global-lock#测试数据" />
+
+打开两个命令行窗口，使用 `mysql -uusername -p` 分别登录两个 session
+
+<Tabs>
+
+<TabItem label="session1">
+
+    ```sql
+    -- 1. 给account表添加writelock
+    lock tables account write;
+
+    -- 2. 执行查询操作，可以正常查询
+    select * from account where id = 1;
+
+    -- 3. 执行修改操作，可以正常修改
+    update account set money = 1000 where id = 1;
+    ```
+
+</TabItem>
+
+<TabItem label="session2">
+
+    ```sql
+    -- 4. 执行查询操作，阻塞，直到account的表锁被释放后执行
+    select * from account where id = 1;
+
+    -- 4.1. 执行修改操作，阻塞，直到account的表锁被释放后执行
+    update account set money = 2000 where id = 1;
+    ```
+
+</TabItem>
+
+</Tabs>
+
+测试发现给 account 表添加 `表独占写锁` 的 session 可以对 account 表进行读写操作
+
+其他 session 不能对 account 表进行读写操作
+
+## 元数据锁
+
+MDL 加锁过程是系统自动控制，无需显式使用，在访问一张表的时候会自动加上
+
+MDL 锁主要作用是维护表元数据的数据一致性，在表上有活动事务的时候，不可以对元数据进行写入操作，为了避免 DML 与 DDL 冲突，保证读写的正确性
+
+在 MySQL5.5 中引入了 MDL, 当对一张表进行增删改查的时候，加 MDL 读锁（共享）；当对表结构进行变更操作的时候，加 MDL 写锁（排他）。
+
+```sql
+-- 锁类型：SHARED_READ_ONLY / SHARED_NO_READ_WRITE
+lock tables xxx read/write
+
+-- 锁类型：SHARED_READ
+-- 说明：与 SHARED_READ、SHARED_WRITE 兼容，与 EXCLUSIVE 互斥
+select、select .. lock in share mode
+
+-- 锁类型：SHARED_WRITE
+-- 说明：与 SHARED_READ、SHARED_WRITE 兼容，与 EXCLUSIVE 互斥
+insert、update、delete、select ... for update
+
+-- 锁类型：EXCLUSIVE
+-- 说明：与其他的 MDL 都互斥
+alter table ...
+```
+
+准备<InternalLink text="测试数据" href="mysql/lock/global-lock#测试数据" />
+
+<Tabs>
+
+<TabItem label="session1">
+
+    ```sql
+    -- 1. 开启事务
+    begin;
+
+    -- 2. 查询account表
+    select * from account;
+
+    -- 4. 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+<TabItem label="session2">
+
+    ```sql
+    -- 3. 添加字段
+    -- 此时由于account表的元数据在前面的事务内添加了共享锁，与排他锁互斥
+    -- 等待事务提交后才会执行
+    alter table account add age int;
+
+    -- 5. 此时查询表，字段添加成功
+    select * from account;
+    ```
+
+</TabItem>
+
+</Tabs>
+
+## 意向锁
+
+在事务内执行更新操作时，会对更新的数据行加上行锁，此时如果需要给这种表加锁就需要判断一行一行判断里面的数据是否有加锁，这种情况下效率较低
+
+为了避免 DML 在执行时，加的行锁与表锁的冲突，在 InnoDB 中引入了意向锁，使得表锁不用检查每行数据是否加锁，使用意向锁来减少表锁的检查
+
+意向锁分为以下两种：
+
+```sql
+-- 锁类型：意向共享锁（IS）
+-- 说明：与表锁共享锁（read）兼容，与表锁排他锁（write）互斥
+select ... lock in share mode
+
+-- 锁类型：意向排他锁（IX）
+-- 说明：与表锁的共享锁和排他锁都互斥，意向锁之间不会互斥
+insert、update、delete、select ... for update
+```
+
+准备<InternalLink text="测试数据" href="mysql/lock/global-lock#测试数据" />
+
+<Tabs>
+
+<TabItem label="session1">
+
+    ```sql
+    -- 1. 开启事务，测试意向共享锁
+    begin;
+
+    -- 2. 查询account表，手动添加意向共享锁
+    select * from account where id = 1 lock in share mode;
+
+    -- 4. 提交事务
+    commit;
+
+    -- 6. 开启事务，测试意向排他锁
+    begin;
+
+    -- 7. 修改account表id为1的数据，此时会自动加上共享排他锁
+    update account set money = 500 where id = 1;
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+<TabItem label="session2">
+
+    ```sql
+    -- 3. 给account表添加read锁
+    -- 由于account表id为1的数据添加了行锁，这个表也添加了意向共享锁
+    -- 而意向共享锁与表共享锁兼容，所以SQL正常执行
+    lock table account read;
+
+    -- 3.1. 如果是给account表添加write锁
+    -- 由于account表id为1的数据添加了行锁，这个表也添加了意向共享锁
+    -- 而意向共享锁与表排他锁互斥，所以SQL会阻塞，直到之前的事务提交
+    lock table account write;
+
+    -- 5. 释放表锁
+    unlock tables;
+
+    -- 8. 由于account表添加的是意向排他锁，意向排他锁与表共享锁和排他锁都互斥
+    -- 所以现在无论加表共享锁还是排他锁都会阻塞
+    lock table account read;
+
+    -- 释放表锁
+    unlock tables;
+    ```
+
+</TabItem>
+
+</Tabs>

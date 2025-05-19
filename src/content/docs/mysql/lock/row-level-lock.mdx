@@ -1,0 +1,330 @@
+---
+title: 行级锁
+sidebar:
+    order: 15
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import InternalLink from "@components/InternalLink.astro";
+
+行级锁，每次操作锁住对应的行数据。锁定粒度最小，发生锁冲突的概率最低并发度最高，应用在 InnoDB 存储引擎中
+
+InnoDB 的数据是基于索引组织的，行锁是通过对索引上的索引顶加锁来实现的，而不是对记录加的锁
+
+主要分为以下三类：
+
+- `行锁（Record Lock ）` - 锁定单个行记录的锁，防止其他事务对此行进行 update 和 delete，在 RC、RR 隔离级别下都支持
+- `间隙锁（Gap Lock）` - 锁定索引记录间隙〈不含该记录），确保索引记录间隙不变，防止其他事务在这个间隙进行 insert，产生幻读，在 RR 隔离级别下都支持
+- `临键锁（Next-Key Lock）` - 行锁和隙锁组合，同时锁住数据，并锁住数据前面的间隙 Gap，在 RR 隔离级别下支持
+
+## 行锁
+
+InnoDB 实现了以下两种类型的行锁：
+
+- `共享锁（S）` - 允许一个事务去读一行，阻止其他事务获得相同数据集的排它锁
+- `排他锁（x）` - 允许获取排他锁的事务更新数据，阻止其他事务获得相同数据集的共享锁和排他锁
+
+:::note
+两个事务要给同一行加锁的情况下，只有两个事务加的都是 `共享锁` 才能执行成功，如果其中任意一个事务加的是 `排他锁`
+
+另一个事务都会阻塞 可以将 `共享锁` 理解为 `true` ，`排他锁` 理解为 `false`，两个事务之间的关系是 `与`
+:::
+
+| SQL                             | 行锁类型   | 说明                                     |
+| ------------------------------- | ---------- | ---------------------------------------- |
+| `INSERT ...`                    | 排他锁     | 自动加锁                                 |
+| `UPDATE ...`                    | 排他锁     | 自动加锁                                 |
+| `DELETE ...`                    | 排他锁     | 自动加锁                                 |
+| `SELECT ...`                    | 不加任何锁 |                                          |
+| `SELECT ... LOCK IN SHARE MODE` | 共享锁     | 需要手动在SELECT之后加LOCK IN SHARE MODE |
+| `SELECT ... FOR UPDATE`         | 排他锁     | 需要手动在SELECT之后加FOR UPDATE         |
+
+默认情况下，InnoDB 在 REPEATABLE READ 事务隔离级别运行，InnoDB 使用 next-key 锁进行搜索和索引扫描，以防止读
+
+针对唯一索引进行检索时，对已存在的记录进行等值匹配时，将会自动优化为行锁
+
+InnoDB 的行锁是针对于索引加的锁，不通过索引条件检索数据，那么 InnoDB 将对表中的所有记录加锁，此时就会 `升级为表锁`
+
+### 行锁兼容
+
+准备<InternalLink text="测试数据" href="mysql/lock/global-lock#测试数据" />
+
+两个事务对同一行数据添加共享锁情况
+
+<Tabs>
+
+<TabItem label="session1">
+
+    ```sql
+    -- 1. 开启事务，测试意向共享锁
+    begin;
+
+    -- 2. 查询account表，手动添加共享锁
+    select * from account where id = 1 lock in share mode;
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+<TabItem label="session2">
+
+    ```sql
+    -- 3. 开启事务
+    begin;
+
+    -- 4. 查询account表，手动添加共享锁
+    -- 由于两个事务对id为1的数据添加的都是共享锁
+    -- 所以都正常执行
+    select * from account where id = 1 lock in share mode;
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+</Tabs>
+
+一个事务添加共享锁，一个事务添加排他锁情况
+
+<Tabs>
+
+<TabItem label="session1">
+
+    ```sql
+    -- 1. 开启事务，测试意向共享锁
+    begin;
+
+    -- 2. 查询account表，手动添加共享锁
+    select * from account where id = 1 lock in share mode;
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+<TabItem label="session2">
+
+    ```sql
+    -- 3. 开启事务
+    begin;
+
+    -- 4. 修改id为1的数据，此时会自动添加排他锁
+    -- 由于之前的事务已经添加了共享锁，共享锁和排他锁不兼容
+    -- 所以会阻塞
+    update account set money = 1000 where id = 1;
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+</Tabs>
+
+### 行锁升级为表锁
+
+需要保证测试表处主键索引之外没有其他索引
+
+准备<InternalLink text="测试数据" href="mysql/lock/global-lock#测试数据" />
+
+<Tabs>
+
+<TabItem label="session1">
+
+    ```sql
+    -- 1. 开启事务，测试意向共享锁
+    begin;
+
+    -- 2. 修改account表，由于修改时没有使用到索引，所以行锁升级为了表锁
+    update account set name = 'zs' where name = 'zhangsan';
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+<TabItem label="session2">
+
+    ```sql
+    -- 3. 开启事务
+    begin;
+
+    -- 4. 由于上面的事务修改时将行锁升级为了表锁，此时更新其他id的数据也会阻塞
+    update account set name = 'ls' where id = 2;
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+</Tabs>
+
+:::note
+这个情况需要对检索数据的字段添加索引解决
+:::
+
+## 间隙锁/临界锁
+
+间隙锁唯一目的是防止其他事务插入间
+
+间隙锁可以共存，一个事务采用的间隙锁不会阻止另一个事务在同一间隙上采用间隙锁
+
+索引上的等值查询（唯一索引），给不存在的记录加锁时，优化为间隙锁
+
+索引上的等值查询（普通索引），向右遍历时最后一个值不满足查询需求时， next-key lock 退化为间隙锁
+
+索引上的范围查询（唯一索引）会访问到不满足条件的第一个值为止
+
+准备测试数据
+
+```sql
+create table t_user (
+    id INT PRIMARY KEY  NOT NULL AUTO_INCREMENT,
+    name VARCHAR(50),
+    age TINYINT DEFAULT '0'
+)COMMENT='用户表';
+
+
+INSERT INTO t_user (id, name, age) values
+(1, 'zs', 11),(2, 'ls', 12),(5, 'ww', 20),
+(8, 'zl', 33), (10, 'zz', 18), (12, 'wl', 23)
+```
+
+### 使用主键索引（唯一索引）更新不存在的数据情况
+
+<Tabs>
+
+<TabItem label="session1">
+
+    ```sql
+    -- 1. 开启事务，测试意向共享锁
+    begin;
+
+    -- 2. 更新id为3的数据，此时行锁就会优化为间隙锁
+    update t_user set name = 'ww' where id = 3;
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+<TabItem label="session2">
+
+    ```sql
+    -- 3. 开启事务
+    begin;
+
+    -- 4. 由于上面的事务更新不存在的数据导致行锁优化成了间隙锁
+    -- 将id从2到5之间的间隙锁住了所以会阻塞导致无法插入
+    insert into t_user values (4, 'ww1', 12);
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+</Tabs>
+
+### 使用普通索引进行等值查询数据的情况
+
+将匹配的这一行加锁，并将这行普通索引的左右间隙加锁
+
+:::note
+这个左右间隙是针对普通索引的字段
+:::
+
+<Tabs>
+
+<TabItem label="session1">
+
+    ```sql
+    -- 1. 给age字段创建普通索引
+    create index idx_user_age on t_user(age);
+
+    -- 2. 开启事务，测试意向共享锁
+    begin;
+
+    -- 3. 此时年龄33这条数据会被加上行锁，年龄33左边的年龄数据的间隙会被锁住，也就是年龄23到33之间的数据
+    -- 年龄33右边的年龄数据间隙也会被锁住，也就是年龄33到正无穷之间的数据
+    select * from t_user where age = 33 lock in share mode;
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+<TabItem label="session2">
+
+    ```sql
+    -- 4. 开启事务
+    begin;
+
+    -- 5. 由于age为33的左边间隙被锁住了，就是年龄23到33之间的年龄数据，所以会阻塞导致无法插入
+    insert into t_user values (6, 'aa', 24);
+
+    -- 5.1. 由于age为33的右边间隙被锁住了，就是年龄33到正无穷之间的年龄数据，所以会阻塞导致无法插入
+    insert into t_user values (7, 'aa', 34);
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+</Tabs>
+
+### 使用主键索引（唯一索引）范围查询数据的情况
+
+<Tabs>
+
+<TabItem label="session1">
+
+    ```sql
+    -- 1. 开启事务，测试意向共享锁
+    begin;
+
+    -- 2. 范围查询时手动添加共享锁
+    -- 此时会锁住id为8的数据和所有id大于8并且存在的数据的间隙
+    -- 还会锁住最大数据到正无穷数据之间的间隙
+    select * from t_user where id >= 8 lock in share mode;
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+<TabItem label="session2">
+
+    ```sql
+    -- 3. 开启事务
+    begin;
+
+    -- 4. 由于id为10的数据被添加了临界锁，所以会阻塞导致无法更新
+    update t_user set age = 20 where id = 10;
+
+    -- 4.1. 由于id为12的数据被添加了临界锁，所以会阻塞导致无法新增10到12之间的数据
+    insert into t_user values (11, 'aa', 18);
+
+    -- 4.2. 由于对supremum pseudo-record数据添加了临界锁，就是id最大的数据到正无穷的数据，所以之后的数据都会阻塞导致无法添加
+    insert into t_user values (20, 'wer', 33);
+
+    -- 4.3. 由于对id为8之前的数据没影响，所以正常更新
+    update t_user set age = 22 where id = 2;
+
+    -- 提交事务
+    commit;
+    ```
+
+</TabItem>
+
+</Tabs>
