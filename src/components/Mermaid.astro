@@ -1,31 +1,28 @@
 ---
-import mermaidBuilder from "@libs/mermaidBuilder";
+import MermaidClient from "./MermaidClient.astro";
+import MermaidStatic from "./MermaidStatic.astro";
+import generate from "@/libs/mermaid/generator";
 
-const { file, code } = Astro.props;
-mermaidBuilder.build(file, code);
+const isDev = import.meta.env.DEV;
+const { code } = Astro.props;
+
+let svgFile = null;
+if (!isDev) {
+  let filePath = Astro.url.pathname.replace(import.meta.env.BASE_URL, "");
+  if (filePath.startsWith("/")) {
+    filePath = filePath.substring(1);
+  }
+  svgFile = await generate(filePath, code);
+}
 ---
 
-<div>
-  <img
-    src={mermaidBuilder.getLightUrl(file)}
-    alt="Mermaid Diagram"
-    loading="lazy"
-    class="custom-mermaid-light"
-  />
-  <img
-    src={mermaidBuilder.getDarkUrl(file)}
-    alt="Mermaid Diagram"
-    loading="lazy"
-    class="custom-mermaid-dark"
-  />
-</div>
-
-<style>
-  html[data-theme="light"] .custom-mermaid-dark {
-    display: none;
-  }
-
-  html[data-theme="dark"] .custom-mermaid-light {
-    display: none;
-  }
-</style>
+{
+  isDev ? (
+    <MermaidClient code={code} />
+  ) : (
+    <MermaidStatic
+      light-path={svgFile.lightPath}
+      dark-path={svgFile.darkPath}
+    />
+  )
+}

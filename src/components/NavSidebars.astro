@@ -14,14 +14,50 @@ const { topics } = Astro.locals?.starlightSidebarTopics;
 const ungroupedName = "1gjkasfrewrdfksjil";
 const groupedTopics = new Map<string, Array<Topic> | Topic>();
 
+const isASCII = (c: string): boolean => {
+  const codePoint = c.charCodeAt(0);
+  return codePoint >= 0 && codePoint <= 127;
+};
+
+// 根据字符计算宽度
+const getWidth = (str: string): number => {
+  const chars = Array.from(str);
+  let width = 0;
+  chars.forEach((c) => (width += isASCII(c) ? 0.5 : 1.8));
+
+  return width;
+};
+const groupWidthMap = new Map<string, number>();
+
+// 最小宽度页面时的属性
+const minSizeTopics = new Array<Topic>();
+const minSizeTopicName = "主题";
+let minSizeTopicWidth = getWidth(minSizeTopicName);
+
 topics.forEach((t, i) => {
   const idx = t.label.indexOf("/");
   if (idx !== -1) {
     const groupName = t.label.substring(0, idx);
+    if (!groupWidthMap.has(groupName)) {
+      groupWidthMap.set(groupName, getWidth(groupName));
+    }
     const topic = {
       ...t,
       label: t.label.substring(idx + 1),
     };
+    minSizeTopics.push(topic);
+    const curGroupWidth = getWidth(topic.label);
+
+    // 计算最小宽度页面时下拉框的宽度
+    if (curGroupWidth > minSizeTopicWidth) {
+      minSizeTopicWidth = curGroupWidth;
+    }
+
+    const groupWidth = groupWidthMap.get(groupName) as number;
+    if (curGroupWidth > groupWidth) {
+      groupWidthMap.set(groupName, curGroupWidth);
+    }
+
     if (groupedTopics.has(groupName)) {
       const gts = groupedTopics.get(groupName) as Array<Topic>;
       gts.push(topic);
@@ -31,23 +67,28 @@ topics.forEach((t, i) => {
       groupedTopics.set(groupName, gts);
     }
   } else {
+    // 计算最小宽度页面时下拉框的宽度
+    const curWidth = getWidth(t.label);
+    if (curWidth > minSizeTopicWidth) {
+      minSizeTopicWidth = curWidth;
+    }
+    minSizeTopics.push(t);
     groupedTopics.set(ungroupedName + i, t);
   }
 });
 
 const groupedTopicsArr = Array.from(groupedTopics.entries());
-const selectWidth = "7em";
 ---
 
 <nav class="md-nav">
   <LinkSelect
-    label="主题"
-    options={topics.map((t) => ({
+    label={minSizeTopicName}
+    options={minSizeTopics.map((t) => ({
       label: t.label,
       selected: t.isCurrent,
       value: t.link,
     }))}
-    width={selectWidth}
+    width={`${minSizeTopicWidth}em`}
   />
 </nav>
 
@@ -73,7 +114,7 @@ const selectWidth = "7em";
               selected: t.isCurrent,
               value: t.link,
             }))}
-            width={selectWidth}
+            width={`${groupWidthMap.get(gName)}em`}
           />
         );
       }

@@ -1,0 +1,54 @@
+---
+const { code } = Astro.props;
+---
+
+<mermaid-client code={code}></mermaid-client>
+
+<script>
+  import type { Mermaid } from "mermaid";
+
+  class MermaidClient extends HTMLElement {
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      const code = this.getAttribute("code");
+      if (!code) throw new Error("mermaid client need code");
+      import("mermaid").then((module) => {
+        const { default: mermaid } = module;
+        this.render(code, mermaid);
+        const themeObserver = new MutationObserver(() =>
+          this.render(code, mermaid),
+        );
+        themeObserver.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ["data-theme"],
+        });
+      });
+    }
+
+    getTheme(): "dark" | "default" {
+      return document.documentElement.getAttribute("data-theme") === "dark"
+        ? "dark"
+        : "default";
+    }
+
+    render(code: string, mermaid: Mermaid) {
+      const theme = this.getTheme();
+
+      const id = "mermaid-" + Math.round(Math.random() * 100000);
+      mermaid.initialize({ startOnLoad: false, theme });
+      mermaid
+        .render(id, code)
+        .then((result) => {
+          this.innerHTML = result.svg;
+        })
+        .catch((e) => {
+          this.innerHTML = `<p style="color: red;">${e}</p>`;
+          console.error(e);
+        });
+    }
+  }
+  customElements.define("mermaid-client", MermaidClient);
+</script>

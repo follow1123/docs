@@ -1,0 +1,54 @@
+---
+import fs from "fs";
+import path from "path";
+
+const lightPath: string = Astro.props["light-path"];
+const darkPath: string = Astro.props["dark-path"];
+const baseUrl = import.meta.env.BASE_URL;
+
+const lightUrl = path.join(baseUrl, lightPath.replace("public/", ""));
+const darkUrl = path.join(baseUrl, darkPath.replace("public/", ""));
+const lightContent = fs.readFileSync(lightPath);
+
+const searchKey = "max-width: ";
+const widthStart = lightContent.indexOf(searchKey) + searchKey.length;
+let widthEnd = widthStart;
+for (; ; widthEnd++) {
+  const b = lightContent.at(widthEnd) as number;
+  const c = String.fromCharCode(b);
+
+  if (c === "." || c === "p" || c === ";") {
+    break;
+  }
+  if (widthEnd - widthStart > 5) break;
+}
+
+const width = lightContent.subarray(widthStart, widthEnd).toString();
+---
+
+<div>
+  <img
+    src={lightUrl}
+    alt="light mermaid svg"
+    width={width}
+    class="light"
+    loading="lazy"
+  />
+  <img
+    src={darkUrl}
+    alt="dark mermaid svg"
+    width={width}
+    class="dark"
+    loading="lazy"
+  />
+</div>
+
+<style>
+  html[data-theme="light"] .dark {
+    display: none;
+  }
+
+  html[data-theme="dark"] .light {
+    display: none;
+  }
+</style>
