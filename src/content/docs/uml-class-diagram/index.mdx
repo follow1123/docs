@@ -1,0 +1,319 @@
+---
+title: UML 类图
+sidebar:
+    order: 0
+---
+
+import Mermaid from "@components/Mermaid.astro";
+
+使用 [mermaid.js](https://mermaid.js.org/) 画 UML 类图
+
+## 类
+
+<Mermaid
+    code={`
+classDiagram
+    class Person{
+        -name: String
+        -age: int
+        +say() void
+    }
+`}
+/>
+
+```txt
+classDiagram
+    class Person{
+        -name: String
+        -age: int
+        +say() void
+    }
+```
+
+属性/方法的可见性符号
+
+- `+` - public
+- `-` - private
+- `#` - protected
+
+属性的完整表示方式
+
+```txt "可见性" "名称" "类型" "默认值"
+可见性 名称 : 类型 [ = 默认值]
+```
+
+方法的完整表示方式
+
+```txt "可见性" "名称" "参数列表" "返回类型"
+可见性 名称(参数列表) [ : 返回类型]
+```
+
+## 类与类之间关系
+
+### 关联关系
+
+表示对象之间的引用关系，关联关系的类型分为 `一般关联关系`、`聚合关系` 和 `组合关系`
+
+关系可以分为 `单向关联`，`双向关联`，`自关联`
+
+#### 单向关联
+
+用带箭头的实线表示
+
+<Mermaid
+    code={`
+classDiagram
+    class Customer {
+        - address : Address
+    }
+    class Address
+    Customer --> Address
+`}
+/>
+
+```txt
+classDiagram
+    class Customer {
+        - address : Address
+    }
+    class Address
+    Customer --> Address
+```
+
+#### 双向关联
+
+用不带箭头的实线表示
+
+<Mermaid
+    code={`
+classDiagram
+    class Customer {
+        - products: List&lt;Product&gt;
+    }
+    class Product {
+        - customer: Customer
+    }
+    Customer -- Product
+`}
+/>
+
+```txt
+classDiagram
+    class Customer {
+        - products: List&lt;Product&gt;
+    }
+    class Product {
+        - customer: Customer
+    }
+    Customer -- Product
+```
+
+#### 自关联
+
+用指向自身的箭头表示
+
+<Mermaid
+    code={`
+classDiagram
+    class Node {
+        - subNode: Node
+    }
+    Node --> Node
+`}
+/>
+
+```txt
+classDiagram
+    class Node {
+        - subNode: Node
+    }
+    Node --> Node
+```
+
+### 聚合关系
+
+聚合关系是关联关系的一种，是强关联关系，是整体和部分之间的关系
+
+聚合关系也是通过成员变量实现的，其中成员对象是整体对象的一部分，但是成员对象可以脱离整体对象独立存在
+
+例如学校和老师，学校包含老师，但如果学校停办了，老师依然存在
+
+使用带空心菱型的实线表示，菱形指向整体
+
+<Mermaid
+    code={`
+classDiagram
+    class University {
+        - teas: List&lt;Teacher&gt;
+    }
+    class Teacher {
+        - name: String
+        + teach() void
+    }
+    University o-- Teacher
+`}
+/>
+
+```txt
+classDiagram
+    class University {
+        - teas: List&lt;Teacher&gt;
+    }
+    class Teacher {
+        - name: String
+        + teach() void
+    }
+    University o-- Teacher
+```
+
+### 组合关系
+
+组合关系也表示整体和部分之间的关系，但比聚合关系之间的关联性更强
+
+在组合关系中，整体对象可以控制部分对象的生命周期，一旦整体对象不存在了，部分对象也将不存在，部分对象不能脱离整体对象而存在，例如头和嘴
+
+使用带实心菱型的实线表示，菱形指向整体
+
+<Mermaid
+    code={`
+classDiagram
+  class Head {
+      - mouth: Mouth
+  }
+  class Mouth {
+      + eat() void
+  }
+  Head *-- Mouth
+`}
+/>
+
+```txt
+classDiagram
+  class Head {
+      - mouth: Mouth
+  }
+  class Mouth {
+      + eat() void
+  }
+  Head *-- Mouth
+```
+
+### 依赖关系
+
+依赖关系是一种使用关系，它是对象之间耦合度最弱的一种关联方式，是临时性的关联
+
+在代码中，某个类的方法通过局部变量、方法的参数或则对静态方法的调用来方法一个类
+
+使用带箭头的虚线表示，箭头指向被依赖的类
+
+<Mermaid
+    code={`
+classDiagram
+    class Driver {
+        - name: String
+        + drive(Car car) void
+    }
+    class Car {
+        + move() void
+    }
+    Driver ..> Car
+`}
+/>
+
+```txt
+classDiagram
+    class Driver {
+        - name: String
+        + drive(Car car) void
+    }
+    class Car {
+        + move() void
+    }
+    Driver ..> Car
+```
+
+### 继承关系
+
+继承关系耦合度最大，是父类与子类之间的关系
+
+在 UML 类图中使用泛化箭头描述，使用带空心三角箭头的实线表示，箭头指向父类
+
+<Mermaid
+    code={`
+classDiagram
+    class Person {
+        - name: String
+        - age: int
+        + speak() void
+    }
+    class Student {
+        - studentNo: String
+        + study() void
+    }
+    class Teacher {
+        - teacherNo: String
+        + teach() void
+    }
+    Person <|-- Student
+    Person <|-- Teacher
+`}
+/>
+
+```txt
+classDiagram
+    class Person {
+        - name: String
+        - age: int
+        + speak() void
+    }
+    class Student {
+        - studentNo: String
+        + study() void
+    }
+    class Teacher {
+        - teacherNo: String
+        + teach() void
+    }
+    Person <|-- Student
+    Person <|-- Teacher
+```
+
+### 实现关系
+
+接口与实现类之间的关系
+
+使用带空心三角箭头的虚线表示，箭头指向接口
+
+<Mermaid
+    code={`
+classDiagram
+    class Vehicle {
+        + move() void
+    }
+    <<Interface>> Vehicle
+    class Car {
+      + move() void
+    }
+    class Ship {
+      + move() void
+    }
+    Vehicle <|.. Car
+    Vehicle <|.. Ship
+`}
+/>
+
+```txt
+classDiagram
+    class Vehicle {
+        + move() void
+    }
+    <<Interface>> Vehicle
+    class Car {
+      + move() void
+    }
+    class Ship {
+      + move() void
+    }
+    Vehicle <|.. Car
+    Vehicle <|.. Ship
+```

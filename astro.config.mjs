@@ -211,6 +211,11 @@ export default defineConfig({
               "tomcat/troubleshooting",
             ],
           },
+          {
+            label: "其他/UML类图",
+            link: "/uml-class-diagram",
+            items: ["uml-class-diagram"],
+          },
         ]),
       ],
       title: "Docs",
