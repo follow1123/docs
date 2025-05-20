@@ -1,0 +1,27 @@
+---
+title: WSL
+sidebar:
+    order: 5
+---
+
+> [官方文档](https://learn.microsoft.com/zh-cn/windows/wsl)
+
+## 安装
+
+默认已经安装，如果没有则参考[旧版 WSL 的手动安装步骤](https://learn.microsoft.com/zh-cn/windows/wsl/install-manual)
+
+### 安装Linux发行版
+
+```batch
+REM 查询可用的发行版
+wsl -l -o
+
+REM 安装Debian
+wsl --install -d Debian
+
+REM 查看已安装的发行版信息
+wsl -l -v
+
+REM 关闭wsl
+wsl --shutdown
+```

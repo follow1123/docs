@@ -1,0 +1,33 @@
+---
+title: 文件层次
+sidebar:
+    order: 0
+---
+
+import { FileTree } from "@astrojs/starlight/components";
+
+根据语言不同，部分目录名称在文件资源管理器内显示的是系统默认的语言
+
+<FileTree>
+
+- C:/ C 盘，系统文件一般存放在这里
+    - Program&nbsp;Files/ 系统默认软件安装位置（64位）
+    - Program&nbsp;Files&nbsp;(x86)/ 旧版软件安装位置（32位）
+    - Windows/ 操作系统相关文件存放位置
+        - System32/ 操作系统核心文件
+            - config 注册表文件
+            - drivers 设备驱动文件
+        - Fonts/ 系统字体文件
+    - Users/ 用户相关目录存放位置，这个目录下用户名目录就是这个用户的家目录
+        - Default/ 模板用户目录，新创建用户时，会根据这个目录复制一份作为用户的家目录
+        - Public/ 用户共享目录，存放所有用户共享的文件
+        - UserName1/ 用户家目录，UserName1 对应实际的用户名，可能会有多个用户
+            - Desktop/ 对应桌面下的所有文件
+            - Downloads/ 从网上下载的文件
+            - Documents/ 用户文档，部分软件也会将数据存放在这
+            - AppData/ 软件的配置文件或数据目录
+                - Local/ 软件缓存数据
+                - LocalLow/ 需要较低权限软件缓存数据，不常用
+                - Roaming/ 软件配置
+
+</FileTree>

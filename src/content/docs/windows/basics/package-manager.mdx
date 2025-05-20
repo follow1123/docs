@@ -1,0 +1,105 @@
+---
+title: 包管理器
+sidebar:
+    order: 5
+---
+
+## WinGet
+
+> [官方文档](https://learn.microsoft.com/zh-cn/windows/package-manager/winget/)
+
+### 安装
+
+默认已经安装，如果没有在 [Microsoft Store](https://apps.microsoft.com/) 内安装
+
+### 常用命令
+
+| 命令               | 说明               |
+| ------------------ | ------------------ |
+| `winget --help`    | 帮助               |
+| `winget search`    | 搜索软件           |
+| `winget install`   | 安装               |
+| `winget update`    | 更新               |
+| `winget uninstall` | 卸载               |
+| `winget show`      | 查看软件的详细信息 |
+| `winget list`      | 列出所有安装的软件 |
+
+```batch
+winget install 软件名
+
+REM 一般使用这种方式安装
+winget install --id 软件id
+
+REM 安装指定的版本
+winget install --id 软件id -v 版本
+
+REM 查看所有软件是否有更新，winget update其实是winget upgrade的别名
+winget update
+
+REM 更新指定软件
+winget update --id 软件id
+
+REM 卸载指定软件
+winget uninstall --id 软件id
+
+REM 查看所有安装的软件，显示前10个
+winget list -n 10
+```
+
+## Scoop
+
+> [github](https://github.com/ScoopInstaller/Scoop) [wiki](https://github.com/ScoopInstaller/Scoop/wiki) [官网](https://scoop.sh/)
+
+### 安装
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+```
+
+### 常用命令
+
+| 命令              | 说明                             |
+| ----------------- | -------------------------------- |
+| `scoop help`      | 帮助                             |
+| `scoop search`    | 搜索软件                         |
+| `scoop install`   | 安装                             |
+| `scoop update`    | 更新                             |
+| `scoop uninstall` | 卸载                             |
+| `scoop info`      | 查看软件的详细信息               |
+| `scoop prefix`    | 查看软件当前版本的安装路径       |
+| `scoop home`      | 打开软件官网                     |
+| `scoop list`      | 列出所有安装的软件               |
+| `scoop status`    | 查看软件版本状态，是否有更新可用 |
+| `scoop which`     | 查看可执行文件的位置             |
+| `scoop cleanup`   | 清理软件                         |
+| `scoop cache`     | 查看所有软件的所有版本           |
+
+```batch
+REM 安装指定软件
+scoop install 软件名
+
+REM 安装指定软件的指定版本
+scoop install 软件名@版本
+
+REM 更新scoop软件本体
+scoop update
+
+REM 更新指定软件
+scoop update 软件名
+
+REM 更新所有软件
+scoop update *
+
+REM 删除指定软件的所有历史版本
+scoop cleanup 软件名
+
+REM 删除所有软件的所有历史版本
+scoop cleanup -a
+
+REM 查看所有软件的所有版本
+scoop cache
+
+REM 删除指定软件的所有历史版本
+scoop cache rm 软件名
+```

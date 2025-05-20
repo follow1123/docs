@@ -1,0 +1,540 @@
+---
+title: 常用命令
+sidebar:
+    order: 5
+---
+
+## 文件管理
+
+| 命令                                  | 别名                                 | 描述                                          |
+| ------------------------------------- | ------------------------------------ | --------------------------------------------- |
+| [Get-ChildItem](#get-childitem)       | `ls` `dir` `gci`                     | 获取一个或多个指定位置中的<br/>项和子项       |
+| [Set-Location](#set-location)         | `cd` `chdir` `sl`                    | 将当前工作位置设置为指定的位置                |
+| [Get-Location](#get-location)         | `pwd` `gl`                           | 获取有关当前工作位置或某个位置<br/>堆栈的信息 |
+| [Remove-Item](#remove-item)           | `rm` `rmdir` `rd` `del` `erase` `ri` | 删除指定项                                    |
+| [New-Item](#new-item)                 | `ni` `mkdir`                         | 创建新项                                      |
+| [Move-Item](#move-item)               | `mv` `move` `mi`                     | 将项从一个位置移动到另一个位置                |
+| [Copy-Item](#copy-item)               | `cp` `copy` `cpi`                    | 将项从一个位置复制到另一个位置                |
+| [Set-ItemProperty](#set-itemproperty) | `sp`                                 | 创建或更改某一项的属性值                      |
+| [Select-String](#select-string)       | `sls`                                | 在字符串和文件中查找文本                      |
+| [Get-Content](#get-content)           | `cat` `type` `gc`                    | 获取位于指定位置的项的内容                    |
+
+## 服务/进程管理
+
+| 命令                                | 别名           | 描述                   |
+| ----------------------------------- | -------------- | ---------------------- |
+| [Get-Process](#get-process)         | `ps` `gps`     | 获取当前运行的进程信息 |
+| [Start-Process](#start-process)     | `start` `saps` | 启动新进程             |
+| [Stop-Process](#stop-process)       | `kill` `spps`  | 停止一个或多个进程     |
+| [Get-Service](#get-service)         | `gsv`          | 获取服务状态信息       |
+| [Start-Service](#start-service)     | `sasv`         | 启动服务               |
+| [Stop-Service](#stop-service)       | `spsv`         | 停止服务               |
+| [Restart-Service](#restart-service) | -              | 重启服务               |
+
+## 系统管理
+
+| 命令                         | 别名  | 描述                 |
+| ---------------------------- | ----- | -------------------- |
+| Get-ComputerInfo             | `gin` | 获取计算机的详细信息 |
+| [Get/Set-Date](#getset-date) | -     | 日期                 |
+| Get-Culture                  | -     | 区域信息             |
+| Get-TimeZone                 | `gtc` | 时区信息             |
+
+## 网络管理
+
+| 命令                                | 描述                        |
+| ----------------------------------- | --------------------------- |
+| Get/Enable/Disable-NetAdapter       | 网络适配器的详细信息        |
+| Get/New/Remove-NetIPAddress         | 当前的IP地址信息            |
+| Get/New/Remove-NetRoute             | 网络路由表信息              |
+| Get-DnsClient                       | 获取DNS客户端设置           |
+| Set-DnsClientServerAddress          | 设置DNS服务器地址           |
+| Resolve-DnsName                     | 解析DNS名称                 |
+| [Test-Connection](#test-connection) | 测试网络连接                |
+| Test-NetConnection                  | 测试TCP连接，并提供详细信息 |
+
+## 数据流操作
+
+| 命令                              | 别名             | 描述                                                                       |
+| --------------------------------- | ---------------- | -------------------------------------------------------------------------- |
+| [ForEach-Object](#foreach-object) | `foreach` `%`    | 针对输入对象集合中的每个项执行操作                                         |
+| [Where-Object](#where-object)     | `where` `?`      | 根据属性值从集合中选择对象                                                 |
+| [Sort-Object](#sort-object)       | `sort`           | 按照属性值对对象进行排序                                                   |
+| [Group-Object](#group-object)     | `group`          | 包含相同指定属性的值的组对象                                               |
+| [Measure-Object](#measure-object) | `measure`        | 计算对象的数值属性<br/>以及字符串对象（如文本文件）中的<br/>字符、单词和行 |
+| [Select-Object](#select-object)   | `select`         | 选择对象或对象属性                                                         |
+| [Compare-Object](#compare-object) | `diff` `compare` | 将两组对象进行比较                                                         |
+| [Tee-Object](#tee-object)         | `tee`            | 将命令输出保存在文件或变量中<br/>同时通过管道向下发送                      |
+| [Format-Table](#format-table)     | `ft`             | 将输出的格式设置为一个表                                                   |
+| [Format-List](#format-list)       | `fl`             | 将输出的格式设置为属性列表<br/>其中每个属性都显示在一个新行上              |
+
+## PowerShell 相关
+
+| 命令                                               | 别名                | 描述                                      |
+| -------------------------------------------------- | ------------------- | ----------------------------------------- |
+| [Get-Help](#get-help)                              | `man` `help`        | 显示有关 PowerShell <br/>命令和概念的信息 |
+| [Get-Command](#get-command)                        | `gcm`               | 获取所有命令                              |
+| [Get-Variable](#get-variable)                      | `gv`                | 获取当前控制台中的变量                    |
+| [Get-Alias](#get-alias)                            | `gal`               | 获取当前会话的别名                        |
+| [Get-History](#get-history)                        | `h` `history` `ghy` | 获取在当前会话过程中<br/>输入的命令列表   |
+| [Get/Set-ExecutionPolicy](#getset-executionpolicy) | -                   | 执行策略                                  |
+
+## 其他
+
+| 命令                              | 别名           | 描述                   |
+| --------------------------------- | -------------- | ---------------------- |
+| [ConvertTo-Html](#convertto-html) | -              | 转换为html             |
+| [ConvertTo-Json](#convertto-json) | -              | 转换为json             |
+| [Format-Hex](#format-hex)         | `fhx`          | 将文件以16进制格式显示 |
+| [Get-FileHash](#get-filehash)     | -              | 计算文件的Hash值       |
+| [Get-Unique](#get-unique)         | `gu`           | 获取唯一值             |
+| [Read-Host](#read-host)           | -              | 读取终端的输入         |
+| [Start-Sleep](#start-sleep)       | `sleep`        | 睡眠                   |
+| [Write-Output](#write-output)     | `echo` `write` | 写出数据到终端         |
+
+---
+
+## 命令说明
+
+### Get-ChildItem
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/get-childitem?view=powershell-5.1)
+
+```powershell
+# 只显示目录
+ls -Attributes d
+
+# 显示所有的环境变量
+ls env:
+
+# 显示注册表HKEY_CURRENT_USER下的内容
+ls hkcu:
+```
+
+### Set-Location
+
+```powershell
+# 切换到C:\a目录下
+cd C:\a
+
+# 切换到环境变量的PSDrive下
+cd env:
+
+# 切换到注册表HKEY_CURRENT_USER的PSDrive下
+cd hkcu:
+```
+
+### Get-Location
+
+```powershell
+# 显示当前所在目录
+pwd
+
+# 显示当前HKEY_CURRENT_USER所在目录
+pwd -PSDrive hkcu
+```
+
+### Remove-Item
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/remove-item?view=powershell-5.1)
+
+```powershell
+# 强制递归删除某个目录
+rm -Recurse -Force 目录
+
+# 递归删除某个注册表项
+rm hkcu:\注册表项路径 -Recurse
+```
+
+### New-Item
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/new-item?view=powershell-5.1)
+
+```powershell
+# 新建一个文件
+New-Item -Name 文件名 -ItemType file -Value "内容" -Force
+ni a.txt -Value 12342
+
+# 新建目录，可以使用mkdir创建目录
+New-Item -Name 目录名 -ItemType Directory
+
+# 创建软链接，需要管理员权限
+ni -ItemType SymbolicLink -Path 链接路径 -Target 原文件路径
+```
+
+### Move-Item
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/move-item?view=powershell-5.1)
+
+```powershell
+# 将文件移动到另一个目录，如果修改名称则重命名
+Move-Item -Path 原文件 -Destination 目标文件
+```
+
+### Copy-Item
+
+```powershell
+# 将目录递归的复制到另一个目录内
+cp -Recurse 原目录 目标目录
+```
+
+### Set-ItemProperty
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/set-itemproperty?view=powershell-5.1)
+
+```powershell
+# 修改文件的属性为只读
+Set-ItemProperty -Path 文件 -Name IsReadOnly -Value $true
+```
+
+### Select-String
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/select-string?view=powershell-5.1)
+
+```powershell
+# 在当前目录下所有的txt文件内搜索123内容
+Select-String ./*.txt -Pattern "123"
+```
+
+### Get-Content
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/get-content?view=powershell-5.1)
+
+```powershell
+# 显示文件前5行
+cat a.txt -Head 5
+
+# 显示文件后5行
+cat a.txt -Tail 5
+
+# 阻塞终端显示a.txt的内容，类似tail -f
+cat a.txt -Wait
+```
+
+### Get-Process
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/get-process?view=powershell-5.1)
+
+```powershell
+# 显示chrome和nginx进程的信息
+ps chrome,nginx
+
+# 显示进程命令包含win的进程
+ps *win*
+```
+
+### Start-Process
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/start-process?view=powershell-5.1)
+
+```powershell
+# 启动程序
+Start-Process -FilePath "程序路径"
+
+# 以最大窗口启动程序并等待
+start -FilePath "程序路径" -Wait -WindowStyle Maximized
+
+# 以管理员权限启动程序
+start -FilePath "程序路径" -Verb RunAs
+
+# 启动程序并指定参数
+start -FilePath "程序路径" -ArgumentList "参数列表"
+```
+
+### Stop-Process
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/stop-process?view=powershell-5.1)
+
+```powershell
+# 根据名称停止程序
+Stop-Process -Name "程序名"
+
+# 根据id停止程序
+Stop-Process -id id
+```
+
+### Get-Service
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/get-service?view=powershell-5.1)
+
+```powershell
+# 获取mysql服务
+Get-Service mysql
+
+# 获取名称包含win的服务
+Get-Service *win*
+```
+
+### Start-Service
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/start-service?view=powershell-5.1)
+
+### Stop-Service
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/stop-service?view=powershell-5.1)
+
+### Restart-Service
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/restart-service?view=powershell-5.1)
+
+### Get/Set-Date
+
+> `Get-Date` [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/get-date?view=powershell-5.1)
+>
+> `Set-Date` [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/set-date?view=powershell-5.1)
+
+### Test-Connection
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.management/test-connection?view=powershell-5.1)
+
+### ForEach-Object
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.core/foreach-object?view=powershell-5.1)
+
+```powershell
+# 只显示服务名
+Get-Service | ForEach-Object ServiceName
+
+# 每个数组乘10
+1, 2, 3 | % -Process {$_ * 10}
+```
+
+### Where-Object
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.core/where-object?view=powershell-5.1)
+
+```powershell
+# 显示正在运行的服务
+Get-Service | Where-Object Status -EQ "Running"
+
+# 只显示能被2整除的数
+1, 2, 3, 4, 5 | ? { $_ % 2 -eq 0 }
+```
+
+### Sort-Object
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/sort-object?view=powershell-5.1)
+
+```powershell
+# 根据文件大小升序排序
+ls | Sort-Object -Property Length
+
+# 根据程序占用大小降序排序
+ps | sort -Property WS -Descending
+```
+
+### Group-Object
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/group-object?view=powershell-5.1)
+
+```powershell
+# 根据当前目录下所有文件及其子文件的类型进行分组
+ls -Path ./ -Recurse | group -Property Extension
+
+# 统计正在运行和停止的服务
+Get-Service | group -Property Status
+```
+
+### Measure-Object
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/measure-object?view=powershell-5.1)
+
+```powershell
+# 根据当前目录下所有文件的大小进行计量信息
+ls | Measure-Object -Property length -Minimum -Maximum -Sum -Average
+```
+
+### Select-Object
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/select-object?view=powershell-5.1)
+
+```powershell
+# 只显示文件的名称和大小
+ls | Select-Object -Property name,Length
+
+# 显示前5个占用内存最大的进程
+ps | sort -Property WS -Descending | select -First 5
+
+# 去重
+"a","b","c","a","a","a" | Select-Object -Unique
+```
+
+### Compare-Object
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/compare-object?view=powershell-5.1)
+
+### Tee-Object
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/tee-object?view=powershell-5.1)
+
+```powershell
+# 终端显示nginx进程信息并将这些信息保存到对应的文件内
+ps nginx | Tee-Object -FilePath nginx.txt
+```
+
+### Format-Table
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/format-table?view=powershell-5.1)
+
+```powershell
+# 只显示文件的名称和大小
+ls | Format-Table -Property name,Length
+
+```
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/format-list?view=powershell-5.1)
+
+### Format-List
+
+```powershell
+# 以列表的方式显示服务名称和状态
+Get-Service | Format-List -Property ServiceName,Status
+```
+
+### Get-Help
+
+```powershell
+# 查看Get-Command命令的帮助
+Get-Help Get-Command
+
+# 查看Get-Command命令的详细帮助
+Get-Help Get-Command -Full
+
+# 查看Get-Command命令的示例
+Get-Help Get-Command -Examples
+
+# 查看Get-Command命令Name选项的说明
+Get-Help Get-Command -Parameter name
+
+# 弹窗显示Get-Command命令的说明
+Get-Help Get-Command -ShowWindow
+
+# 显示Get-Command命令的在线文档
+Get-Help Get-Command -Online
+```
+
+### Get-Command
+
+获取所有可执行的命令
+
+```powershell
+# 查看所有类型为Cmdlet的命令
+Get-Command -Type Cmdlet
+
+# 查看所有动词是New的命令，就是以New开头的命令
+Get-Command -Verb New
+
+# 查看所有命令名词部分包含path的命令
+Get-Command -Noun *path*
+
+# 查看所有命令名称包含file的命令
+Get-Command *file*
+```
+
+### Get-Variable
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/get-variable?view=powershell-5.1)
+
+这个变量不是环境变量，只是 PowerShell 终端内的变量
+
+```powershell
+# 获取变量名包含file的变量
+Get-Variable *file*
+```
+
+### Get-Alias
+
+```powershell
+# 获取别名命令包含ls的别名
+Get-Alias *ls*
+```
+
+### Get-History
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.core/get-history?view=powershell-5.1)
+
+获取所有历史命令
+
+### Get/Set-ExecutionPolicy
+
+> `Get-ExecutionPolicy` [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.security/get-executionpolicy?view=powershell-5.1)
+>
+> `Set-ExecutionPolicy` [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1)
+
+```powershell
+# 显示每个范围的脚本执行策略
+Get-ExecutionPolicy -List
+
+# 修改当前用户的脚本执行策略为远程脚本需要验证
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+### ConvertTo-Html
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/convertto-html?view=powershell-5.1)
+
+```powershell
+# 将当前用户目录下所有文件信息导出为userhome.html文件
+ls -Path $env:userprofile | ConvertTo-Html >> userhome.html
+```
+
+### ConvertTo-Json
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/convertto-json?view=powershell-5.1)
+
+```powershell
+# 计量用户目录下的文件信息并使用json格式显示
+ls -Path $env:userprofile | measure -Property Length -Maximum -Minimum -Average -Sum | ConvertTo-Json
+```
+
+### Format-Hex
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/format-hex?view=powershell-5.1)
+
+```powershell
+# 将a.txt的内容以16进制格式显示
+Format-Hex a.txt
+```
+
+### Get-FileHash
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/get-filehash?view=powershell-5.1)
+
+```powershell
+计算a.txt文件的Hash值
+Get-FileHash a.txt | Format-List
+```
+
+### Get-Unique
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/get-unique?view=powershell-5.1)
+
+```powershell
+# 获取唯一值
+"a","a", "b", "c","c","c" | Get-Unique
+```
+
+### Read-Host
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/read-host?view=powershell-5.1)
+
+```powershell
+# 读取终端的输入存入变量
+$Age = Read-Host "Please enter your age"
+```
+
+### Start-Sleep
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/start-sleep?view=powershell-5.1)
+
+```powershell
+# 睡2秒
+Start-Sleep -Seconds 2
+
+# 睡2秒，使用毫秒单位
+sleep -Milliseconds 2000
+```
+
+### Write-Output
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/module/microsoft.powershell.utility/write-output?view=powershell-5.1)

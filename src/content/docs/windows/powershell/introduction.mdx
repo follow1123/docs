@@ -1,0 +1,60 @@
+---
+title: 说明
+sidebar:
+    order: 0
+---
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/scripting/overview?view=powershell-5.1)
+
+PowerShell 分为两个版本，`Windows PowerShell` 和 `PowerShell Core`
+
+- `Windows PowerShell` - 是 Windows 系统自带的，目前已停止更新，最新版本为 `5.1`
+- `PowerShell Core` - 是新版的 PowerShell，是跨平台的，需要单独下载
+
+:::note
+当前文档基于 `Windows PowerShell`
+:::
+
+## PowerShell命令组成
+
+PowerShell 的命令叫 `cmdlet`，都是由 `动词`-`名词` 组成的
+
+- `Get-Service` - 获取服务
+- `Set-Alias` - 设置别名
+- `New-Item` - 新建条目
+
+## PSDrive
+
+PowerShell 执行各种命令实际上是在 PSDrive 内进行操作
+
+PSDrive 是类型为 PSProvider 的实例
+
+可以将 PSProvider 理解为模板，而 PSDrive 就是根据这个模板创建的实例，以 Java 来类比的话，PSProvider 就是定义的 Class，PSDrive 就是创建的对象
+
+```powershell
+# 查看有哪些 PSProvider
+Get-PSProvider
+
+# 查看有哪些 PS-Drive
+Get-PSDrive
+```
+
+切换到指定的 PSDrive：`Set-Location PSDrive名称:`
+
+```powershell
+# 切换到环境变量的 PSDrive
+Set-Location Env:
+
+# 切换到注册表 HKEY_CURRENT_USER 下
+Set-Location HKCU:
+
+# 切换到 C 盘下
+Set-Location C:
+```
+
+这样做的好处是可以通过同一套命令在不同的PSDrive内进行操作，`Get-ChildItem` 就是查看 PSDrive 的内容，`Set-Item` 就是修改 PSDrive 的内容
+
+- 在 PSProvider 为 `FileSystem` 的 PSDrive 下，`Get-ChildItem`，就是列出当前目录下的文件
+- 在 PSProvider 为 `Registry` 的 PSDrive下，`Get-ChildItem`，就是列出当前项下面的所有值
+
+我们大部分都会在 PSProvider 为 `FileSystem` 的 PSDrive 下进行操作

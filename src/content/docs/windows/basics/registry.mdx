@@ -1,0 +1,32 @@
+---
+title: 注册表
+sidebar:
+    order: 10
+---
+
+import { Kbd } from "starlight-kbd/components";
+
+注册表主要用于：系统配置、应用程序设置、用户偏好
+
+## 结构
+
+主要分为以下几个根键（Root Keys）
+
+- `HKEY_CLASSES_ROOT(HKCR)` - 存储文件类型和应用程序的关联信息，帮助系统识别不同类型的文件
+- `HKEY_CURRENT_USER(HKCU)` - 存储当前用户的配置信息，包括用户的设置、应用程序的首选项等
+- `HKEY_LOCAL_MACHINE(HKLM)` - 存储计算机级别的设置，影响所有用户的配置。包含硬件信息、安装的软件等
+- `HKEY_USERS(HKU)` - 存储系统中所有用户的配置文件。每个用户的设置都在一个子项下
+- `HKEY_CURRENT_CONFIG(HKCC)` - 存储当前硬件配置的信息
+
+## 内容
+
+- 键（Keys） - 类似于文件夹的结构，用于组织信息
+- 值（Values） - 存储实际的数据，主要有几种类型：
+    - 字符串值（REG_SZ） - 普通字符串
+    - 多字符串值（REG_MULTI_SZ） - 多个字符串的数组
+    - 二进制值（REG_BINARY） - 存储二进制数据
+    - DWORD值（REG_DWORD） - 32位整数
+
+## 使用
+
+打开注册表编辑器：<Kbd linux="win+r" /> regedit

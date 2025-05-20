@@ -133,6 +133,27 @@ export default defineConfig({
             ],
           },
           {
+            label: "Windows",
+            link: "/windows",
+            items: [
+              "windows",
+              {
+                label: "基础",
+                autogenerate: { directory: "windows/basics" },
+              },
+              "windows/wsl",
+              {
+                label: "命令提示符",
+                autogenerate: { directory: "windows/command-prompt" },
+              },
+              {
+                label: "PowerShell",
+                autogenerate: { directory: "windows/powershell" },
+              },
+              "windows/troubleshooting",
+            ],
+          },
+          {
             label: "其他/Nginx",
             link: "/nginx",
             items: ["nginx", "nginx/configuration", "nginx/commands"],

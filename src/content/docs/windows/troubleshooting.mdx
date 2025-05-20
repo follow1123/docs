@@ -1,0 +1,128 @@
+---
+title: 常见问题
+sidebar:
+    order: 10
+---
+
+import { Kbd } from "starlight-kbd/components";
+import { Steps } from "@astrojs/starlight/components";
+
+## 禁用 CapsLock 键
+
+<Steps>
+
+1. 打开注册表编辑器：<Kbd linux="win+r" /> regedit
+
+2. 进入路径：`HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout`
+
+3. **右键点击** 在空白处，单击 **New** 然后点击 **Binary Value**(二进制值). 将新的二进制值命名为 **ScanCode Map**.
+
+4. 设置值为 `00 00 00 00 00 00 00 00 02 00 00 00 00 00 3A 00 00 00 00 00`
+
+5. 保存后重启电脑
+
+</Steps>
+
+## 自定义右键菜单
+
+### 选中文件时的右键菜单
+
+<Steps>
+
+1. 进入 `\HKEY_LOCAL_MACHINE\SOFTWARE\Classes` 路径
+
+2. 路径下第一个项 `*` 代表所有类型的文件，其它已 `.` 开头的项是某个具体类型的文件，根据具体情况在这个项下面的 shell 项内添加就可以了
+
+3. 其它步骤和添加选中文件夹时的右键菜单一样
+
+</Steps>
+
+### 选中文件夹时的右键菜单
+
+<Steps>
+
+1. 打开注册表
+
+2. 进入 `\HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shell` 路径
+
+3. 新建项
+
+4. 设置默认名称的值为右键显示的字符串
+
+5. 新建 icon 字符串，值设置为使用软件的路径
+
+6. 新建项 command
+
+7. 设置默认值为 `软件的路径 "%1"`,其中%1为选中文件夹的路径
+
+</Steps>
+
+### 选中文件夹空白处的右键菜单
+
+<Steps>
+
+1. 进入 `\HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\background\shell` 路径
+
+2. 其它步骤和添加选中文件夹时的右键菜单一样，第 7 步时将 `%1` 改为 `%v.`，同样表示当前文件夹的路径
+
+</Steps>
+
+## Windows 开机启动文件夹
+
+`C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup`
+
+## 安装 MinGW 环境
+
+<Steps>
+
+1. 下载解压
+
+    [下载地址](https://github.com/niXman/mingw-builds-binaries/releases)
+
+    版本选择：
+
+    - `平台` - `x86_64`(64位)、`i686`(32位)
+    - `多线程方案` - `posix`、`win32`
+    - `异常处理方案` - `seh`、`dwarf`、`sjlj`
+    - `c运行时与c库` - `ucrt`、`msvcrt`
+
+    这里选择 `x86_64-14.2.0-release-posix-seh-ucrt-rt_v12-rev0.7z`
+
+    ```powershell
+    Invoke-WebRequest -Uri 'https://github.com/niXman/mingw-builds-binaries/releases/download/14.2.0-rt_v12-rev0/x86_64-14.2.0-release-posix-seh-ucrt-rt_v12-rev0.7z' -OutFile $Env:USERPROFILE/Downloads/mingw.7z
+
+    # 解压，需要安装7-zip，我这里解压到当前用户目录下的software文件夹内
+    7z x $Env:USERPROFILE\Downloads\mingw.7z -o"$Env:USERPROFILE\software"
+    ```
+
+2. 配置环境变量
+
+    ```powershell
+    # 拼接mingw的bin目录到PATH环境变量上
+    $UserPath=[System.Environment]::GetEnvironmentVariable("PATH", [System.EnvironmentVariableTarget]::User) + ";$Env:USERPROFILE\software\mingw64\bin"
+
+    # 修改PATH环境变量
+    [System.Environment]::SetEnvironmentVariable("PATH", $UserPath, [System.EnvironmentVariableTarget]::User)
+    ```
+
+3. 退出 powershell 终端后重新进入，输入 `gcc -v` 查看版本
+
+</Steps>
+
+## 系统禁止运行 PowerShell 脚本问题
+
+执行 `ps1` 脚本时报错
+
+```txt
+无法加载文件 xxx.ps1，因为在此系统上禁止运行脚本。有关详细信息，请参阅 https:/go.microsoft.com/fwlink/?LinkID=135170 中的 about_Execution_Policies
+```
+
+由于 Windows 默认执行策略是 `Restricted` 导致无法运行脚本等，需要修改执行策略
+
+- `RemoteSigned` - 可以执行本地的脚本，执行远程的脚本需要签名
+- `CurrentUser` - 只修改当前用户的执行策略，如果要修改所有用户的改为 LocalMachine
+
+```powershell
+# 给当前用户添加可执行本地脚本策略
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```

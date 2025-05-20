@@ -1,0 +1,221 @@
+---
+title: 脚本
+sidebar:
+    order: 10
+---
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/scripting/lang-spec/chapter-01?view=powershell-5.1)
+
+## 变量
+
+:::note
+PowerShell 内的变量都是以 `$` 开头的
+:::
+
+```powershell
+# 定义
+$var=1
+
+使用
+echo $var
+```
+
+### 变量类型
+
+#### 数组
+
+```powershell
+# 定义数组
+$array=@(1, 2, 3)
+
+# 使用数组
+# 获取
+echo $array[1]
+
+# 修改
+$array[0] = 4
+```
+
+#### Map
+
+```powershell
+# 定义
+$map=@{
+    name="zs"
+    age=11
+}
+
+# 使用
+$map.name
+```
+
+### 变量作用域
+
+- 全局作用域 (Global) - 在整个会话中可见，适用于所有脚本和函数
+- 脚本作用域 (Script) - 仅在当前脚本文件中可见，适用于脚本内的所有代码
+- 函数作用域 (Local) - 在特定函数中可见，函数外无法访问
+- 私有作用域 (Private) - 在定义它的函数内可见，其他函数和脚本无法访问
+
+```powershell
+$Script:name="zs"
+
+function fun1 {
+    $Private:name="fun1"
+    Write-Output $name
+    Write-Output $Private:name
+    Write-Output $Local:name
+    Write-Output $Script:name
+    Write-Output $Global:name
+}
+
+function fun2 {
+    $Private:name="fun2"
+    Write-Output $name
+    Write-Output $Private:name
+    Write-Output $Local:name
+    Write-Output $Script:name
+    Write-Output $Global:name
+}
+
+Write-Output "fun1------------"
+fun1
+Write-Output "fun2------------"
+fun2
+
+Write-Output "out------------"
+
+Write-Output $name
+Write-Output $Private:name
+Write-Output $Local:name
+Write-Output $Script:name
+Write-Output $Global:name
+```
+
+### 特殊变量
+
+`$null`
+
+空值，用于条件判断
+
+`$?`
+
+上一条命令执行的结果
+
+`$LASTEXITCODE`
+
+上一条命令的退出代码
+
+`$_`
+
+管道中当前的对象
+
+```powershell
+# 用$_代表目录对象
+ls | % {$_.Length}
+```
+
+`$Error`
+
+错误信息集合
+
+## 流程控制
+
+### if
+
+```powershell
+$state=1
+if ($state -eq 1){
+    Write-Output 1
+} elseif ($state -eq 2) {
+    Write-Output 2
+} else {
+    Write-Output 3
+}
+```
+
+### switch
+
+```powershell
+switch ($state) {
+    1 { Write-Output 1 }
+    2 { Write-Output 2 }
+    default { Write-Output 3 }
+}
+```
+
+### for
+
+```powershell
+for ($i = 0; $i -lt 10; $i++) {
+    Write-Output $i
+}
+```
+
+### foreach
+
+```powershell
+$collection = 1..5
+foreach ($item in $collection) {
+    Write-Output $item
+}
+```
+
+### while
+
+```powershell
+$i = 0
+while ($i -lt 5) {
+    Write-Output $i
+    $i++
+}
+```
+
+## 逻辑运算符
+
+- `-and` - 与
+- `-or` - 或
+- `-not` - 非
+- `-xor` - 异或
+
+```powershell
+Write-Output ($true -and $true) # true
+Write-Output ($true -and $false) # false
+Write-Output ($false -and $true) # false
+Write-Output ($false -and $false) # false
+
+Write-Output ($true -or $true) # true
+Write-Output ($true -or $false) # true
+Write-Output ($false -or $true) # true
+Write-Output ($false -or $false) # false
+
+Write-Output (-not $true) # false
+Write-Output (-not $false) # true
+
+Write-Output ($true -xor $true) # false
+Write-Output ($true -xor $false) # true
+Write-Output ($false -xor $true) # true
+Write-Output ($false -xor $false) # false
+```
+
+## 函数
+
+> [官方文档](https://learn.microsoft.com/zh-cn/powershell/scripting/learn/ps101/09-functions?view=powershell-5.1)
+
+```powershell
+function add {
+	param (
+		[Int32]$a = 1,
+		[Int32]$b = 2
+	)
+
+	return $a + $b;
+}
+
+Write-Output (add)
+Write-Output (add 5 5)
+
+```
+
+## 其他
+
+转义字符是 <code>&#96;</code>
