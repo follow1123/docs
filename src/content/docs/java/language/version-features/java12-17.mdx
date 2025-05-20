@@ -1,0 +1,113 @@
+---
+title: Java 12~17
+sidebar:
+    order: 3
+---
+
+## 密封类型
+
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java12-17/src/main/java/cn/y/java/sealed_class)
+
+使用 sealed 关键字修饰并使用 permits 指定某些类，表示只允许指定的某些类继承
+
+想要继承使用 sealed 修饰的类当前类必须使用 `final` `sealed` `no-sealed` 修饰
+
+- `final` - 无法被其他类继承
+- `sealed` - 当前类也变成密封类
+- `no-sealed` - 当前类恢复为默认类，可以被其他任何类继承
+
+```java
+public sealed class A permits B {
+}
+
+public [final/sealed/no-sealed] class B extends A {
+}
+```
+
+## `Record` 类
+
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java12-17/src/main/java/cn/y/java/record/RecordTest.java)
+
+```java
+User user = new User("zs", 28);
+// 获取属性方法
+System.out.println(user.name());
+System.out.println(user.age());
+
+// 自动重写equals和hashCode方法
+HashSet<User> users = new HashSet<>();
+users.add(user);
+users.add(new User("zs", 28));
+System.out.println(users);
+```
+
+## switch 表达式
+
+```java
+int i = 0;
+String a = switch (i){
+    case 1, 2 -> "case 1";
+    case 3, 4 -> "case 2";
+    default -> {
+        System.out.println("123");
+        // yield表示在代码块中的返回值，相当于方法里面的return
+        yield "case default";
+    }
+};
+System.out.println(a);
+```
+
+## 文本快
+
+```java
+String s = """
+        12321
+        123123ad
+        qweqwe
+        """;
+System.out.println(s);
+
+// 文本块内使用'\'取消换行
+String s2 = """
+        1 2 \
+        3
+        a b \
+        c""";
+System.out.println(s2);
+```
+
+## 其他
+
+### 新方法
+
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java12-17/src/main/java/cn/y/java/ApisTest.java)
+
+#### `java.lang.String`
+
+- `indent(num)` - 添加缩进，正数添加，负数减少
+- `transform()` - 使用函数式接口转换字符串
+
+### instanceof 增强
+
+```java
+Object o = "aaa";
+if (o instanceof String str){
+    System.out.println(str);
+}
+```
+
+### 空指针报错优化，异常信息更准确
+
+```java
+String a = null;
+
+/*
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "String.length()" because "a" is null
+    at cn.y.java.NullPointerExceptionTest.main(NullPointerExceptionTest.java:7)
+ */
+System.out.println(a.length());
+```
+
+### `jpackage` 打包工具
+
+### 弃用 `Applet` API 以进行删除

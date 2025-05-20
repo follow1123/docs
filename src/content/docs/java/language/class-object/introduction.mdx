@@ -1,0 +1,55 @@
+---
+title: 说明
+sidebar:
+    order: 0
+---
+
+在 Java 中，类（Class）是对象的模板或蓝图，而对象（Object）是类的实例。类定义了对象的属性（成员变量）和行为（方法）
+
+Java 类及类的成员：属性、方法、构造器；代码块、内部类
+
+- `类` - 具有相同特征的事物的抽象描述，是抽象的、概念上的定义
+- `对象` - 实际存在的该类事物的每个个体，是具体的，也称为 `实例(instance)`
+
+## 类的成员
+
+Java 中用类 class 来描述事物，类是一组相关 `属性` 和 `行为` 的集合，这也是类最基本的两个成员
+
+- `属性` - 该类事物的状态。对应类中的 `成员变量(属性、Method)`
+- `行为` - 该类事物要做什么操作，或者基于事物的状态能做什么。对应类中的 `成员方法（函数、Field）`
+
+<details>
+
+<summary>示例</summary>
+
+定义
+
+```java
+public class Phone {
+    // 属性
+    String name;
+    double price;
+
+    // 方法
+    public void call(){
+        System.out.println("打电话");
+    }
+
+    public void playGame(){
+        System.out.println("玩游戏");
+    }
+}
+```
+
+使用
+
+```java
+Phone phone = new Phone();
+phone.name = "hw";
+phone.price = 6999.0;
+
+phone.call();
+phone.playGame();
+```
+
+</details>

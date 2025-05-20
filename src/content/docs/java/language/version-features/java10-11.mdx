@@ -1,0 +1,98 @@
+---
+title: Java 10~11
+sidebar:
+    order: 2
+---
+
+## HTTP Client
+
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java10-11/src/main/java/cn/y/java/HttpClientTest.java)
+
+### 发送 GET 请求
+
+```java
+HttpRequest req = HttpRequest.newBuilder()
+        .uri(URI.create("http://localhost:8989/test"))
+        .GET()
+        .build();
+HttpClient client = HttpClient.newHttpClient();
+HttpResponse<String> respData = client.send(req, HttpResponse.BodyHandlers.ofString());
+System.out.println(respData.body());
+```
+
+### 发送 GET 请求，异步接收
+
+```java
+HttpRequest req = HttpRequest.newBuilder()
+        .uri(URI.create("http://localhost:8989/test"))
+        .GET()
+        .build();
+HttpClient.newHttpClient().sendAsync(req, HttpResponse.BodyHandlers.ofString())
+        .thenApply(HttpResponse::body)
+        .thenAccept(System.out::println)
+        .exceptionally(e ->{
+            System.out.println(e.getMessage());
+            return null;
+        });
+
+// 添加睡眠以防主线程过早退出
+try {
+    Thread.sleep(1000);
+} catch (InterruptedException e) {
+    e.printStackTrace();
+}
+```
+
+### 发送 POST 请求
+
+```java
+HttpRequest req = HttpRequest.newBuilder()
+        .uri(URI.create("http://localhost:8989/test"))
+        .POST(HttpRequest.BodyPublishers.ofString("this is post body"))
+        .build();
+HttpClient client = HttpClient.newHttpClient();
+HttpResponse<String> respData = client.send(req, HttpResponse.BodyHandlers.ofString());
+System.out.println(respData.body());
+```
+
+## 其他
+
+### 新方法
+
+> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java10-11/src/main/java/cn/y/java/ApisTest.java)
+
+#### `java.util.Optional`
+
+- `isEmpty()` - 判断Optional内的值是否为空
+
+#### `java.lang.String`
+
+- `isBlank()` - 判断字符串是否为空串，会判断空格
+- `repeat(num)` - 返回当前字符串重复拼接多少次后的字符串
+- `lines()` - 返回由当前字符串每行组成的流
+- `strip()` - 去除字符串前后空格
+- `stripLeading()` - 去除字符串前面的空格
+- `stripTrailing()` - 去除字符串后面的空格
+
+### var 关键字（Java 10）
+
+添加 `var` 关键字用于类型推断，只适用与局部变量
+
+```java del="var a = 10;" del="static var b = "abc";" {11}
+public class VarTest {
+    // 无法定义成员变量
+    var a = 10;
+
+    // 无法定义静态变量
+    static var b = "abc";
+
+    @Test
+    public void test() {
+        // 类型推断
+        var list = new ArrayList<>();
+
+        // 无法推断lambda表达式对应的函数式接口
+        // var runnable = () -> System.out.println("runnable");
+    }
+}
+```

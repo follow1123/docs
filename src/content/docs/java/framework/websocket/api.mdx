@@ -1,0 +1,144 @@
+---
+title: API
+sidebar:
+    order: 5
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+## Java API
+
+### 编程式 Endpoints
+
+<Steps>
+
+1. 处理消息：实现 `MessageHandler` 类
+
+    ```java
+    public class EchoMsgHandlerTxt implements MessageHandler.Whole<String> {
+
+        private final RemoteEndpoint.Basic remoteEndpoint;
+
+        EchoMsgHandlerTxt(RemoteEndpoint.Basic remoteEndpoint) {
+            this.remoteEndpoint = remoteEndpoint;
+        }
+
+        @Override
+        public void onMessage(String message) {
+            System.out.printf("programmatic string handle message %s%n", message);
+            if (remoteEndpoint != null){
+                try {
+                    remoteEndpoint.sendText(message);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+    ```
+
+2. 添加消息处理器：继承 `Endpoint` 类
+
+    ```java
+    public class ProgrammaticEndpoint extends Endpoint {
+        @Override
+        public void onOpen(Session session, EndpointConfig endpointConfig) {
+            RemoteEndpoint.Basic basicRemote = session.getBasicRemote();
+            session.addMessageHandler(new EchoMsgHandlerTxt(basicRemote));
+        }
+    }
+    ```
+
+3. 配置 Endpoint：实现 `ServerApplicationConfig` 接口
+
+    ```java
+    public class WsConfig implements ServerApplicationConfig {
+        @Override
+        public Set<ServerEndpointConfig> getEndpointConfigs(Set<Class<? extends Endpoint>> endpointClasses) {
+            HashSet<ServerEndpointConfig> configs = new HashSet<>();
+            // 编程方式Endpoint配置方式
+            if (endpointClasses.contains(ProgrammaticEndpoint.class)){
+                configs.add(ServerEndpointConfig.Builder.create(ProgrammaticEndpoint.class, "/ws/echo").build());
+            }
+            return configs;
+        }
+
+        @Override
+        public Set<Class<?>> getAnnotatedEndpointClasses(Set<Class<?>> scanned) {
+            return scanned;
+        }
+    }
+    ```
+
+</Steps>
+
+### 注解式 Endpoint
+
+```java
+@ServerEndpoint("/ws/anno/echo")
+public class AnnotationEndpoint{
+
+    @OnMessage
+    public void echoTxtMsg(Session session, String msg){
+        if (session.isOpen()) {
+            try {
+                RemoteEndpoint.Basic basicRemote = session.getBasicRemote();
+                session.getBasicRemote().sendText(msg);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
+```
+
+:::note
+这种方式无需配置，添加注解即可使用
+:::
+
+#### 其他注解
+
+| 注解        | 事件     |
+| ----------- | -------- |
+| `OnOpen`    | 连接打开 |
+| `OnMessage` | 收到消息 |
+| `OnError`   | 连接出错 |
+| `OnClose`   | 连接关闭 |
+
+```java
+@OnOpen
+public void open(Session session, EndpointConfig conf) { }
+
+@OnMessage
+public void message(Session session, String msg) { }
+
+@OnError
+public void error(Session session, Throwable error) { }
+
+@OnClose
+public void close(Session session, CloseReason reason) { }
+```
+
+## 前端 API
+
+参考：[MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/WebSocket)
+
+```javascript
+// 创建 WebSocket
+let ws = new WebSocket("ws://localhost:8080/ws/echo");
+ws.onopen = function () {
+    // 处理打开连接操作
+};
+ws.onmessage = function (event) {
+    // 处理接收消息操作
+};
+ws.onclose = function (event) {
+    // 处理关闭连接操作
+};
+ws.onerror = function (event) {
+    // 处理错误操作
+};
+
+// 发送消息
+ws.send("hello");
+```

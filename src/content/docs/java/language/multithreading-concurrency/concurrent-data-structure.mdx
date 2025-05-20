@@ -1,0 +1,369 @@
+---
+title: 并发数据结构
+sidebar:
+    order: 45
+---
+
+线程安全集合类，里面包含三类关键词：`Blocking` `CopyOnWrite` `Concurrent`
+
+- `Blocking` - 大部分实现基于锁，并提供用来阻塞的方法
+- `CopyOnWrite` - 修改开销相对较重
+- `Concurrent`
+    - 内部很多操作使用CAS优化，一般可以提供较高吞吐量
+    - 弱一致性
+        - 遍历时弱一致性，例如，当利用迭代器遍历时，如果容器发生修改，迭代器仍然可以继续进行遍历，这时内容是旧的
+        - 求大小弱一致性，`size()` 操作未必是100％准确
+        - 读取弱一致性
+    - 遍历时如果发生了修改，对于非安全容器来讲，使用 `fail-fast` 机制也就是让遍历立刻失败，抛出 `ConcurrentModificationException`，不再继续遍历
+
+## `ConcurrentHashMap`
+
+### 统计多个文件内的字母个数
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/data_structure/ConcurrentHashMapTest.java)
+
+#### 使用 `HashMap` 统计，无法正确统计
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(5);
+HashMap<Character, Integer> map = new HashMap<>();
+CountDownLatch countDownLatch = new CountDownLatch(FILE_COUNT);
+for (int i = 0; i < FILE_COUNT; i++) {
+    int fileSuffix = i;
+    pool.submit(() -> {
+        try (FileInputStream fis = new FileInputStream(new File(FILE_DIR, FILE_PREFIX + fileSuffix))) {
+            int data;
+            while ((data = fis.read()) != -1){
+                // synchronized (map){
+                    char letter = (char) data;
+                    map.compute(letter, (k, v) -> v == null ? 1 : v + 1);
+                // }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }finally {
+            countDownLatch.countDown();
+        }
+    });
+}
+try {countDownLatch.await();} catch (InterruptedException e) {throw new RuntimeException(e);}
+pool.shutdown();
+System.out.println(map);
+```
+
+#### 使用 `ConcurrentHashMap` 统计
+
+```java
+ExecutorService pool = Executors.newFixedThreadPool(5);
+ConcurrentHashMap<Character, Integer> map = new ConcurrentHashMap<>();
+// ConcurrentHashMap<Character, LongAdder> map = new ConcurrentHashMap<>();
+CountDownLatch countDownLatch = new CountDownLatch(FILE_COUNT);
+for (int i = 0; i < FILE_COUNT; i++) {
+    int fileSuffix = i;
+    pool.submit(() -> {
+        try (FileInputStream fis = new FileInputStream(new File(FILE_DIR, FILE_PREFIX + fileSuffix))) {
+            int data;
+            while ((data = fis.read()) != -1){
+                char letter = (char) data;
+                map.compute(letter, (k, v) -> v == null ? 1 : v + 1);
+                // 使用LongAdder累加器方式
+                // LongAdder longAdder = map.computeIfAbsent(letter, k -> new LongAdder());
+                // longAdder.increment();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }finally {
+            countDownLatch.countDown();
+        }
+    });
+}
+try {countDownLatch.await();} catch (InterruptedException e) {throw new RuntimeException(e);}
+pool.shutdown();
+System.out.println(map);
+```
+
+## `LinkedBlockingQueue`
+
+阻塞队列，采用锁机制实现阻塞
+
+常用方法
+
+- `take()` - 获取并**删除**队列头的元素，如果没有则会阻塞
+- `put(E e)` - 向队列尾部添加元素，如果队列已满则会阻塞
+- `poll()` - 获取并**删除**队列头的元素，不会阻塞，可以指定等待时间参数
+- `offer(E e)` - 向队列尾部添加元素，不会阻塞，可以指定等待时间参数
+- `peek()` - 获取队列头的元素，不会阻塞，不会删除元素
+
+### 阻塞方法
+
+```java {7,17}
+ExecutorService pool = Executors.newFixedThreadPool(10);
+LinkedBlockingQueue<Integer> queue = new LinkedBlockingQueue<>(1);
+
+pool.submit(() -> {
+    try {
+        log.info("start take");
+        Integer val = queue.take();
+        log.info("take value: {}", val);
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+});
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+pool.submit(() -> {
+    try {
+        log.info("start put");
+        queue.put(1);
+        log.info("put value: {}", 1);
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+});
+```
+
+### 非阻塞方法
+
+```java {6,14,16}
+ExecutorService pool = Executors.newFixedThreadPool(10);
+LinkedBlockingQueue<Integer> queue = new LinkedBlockingQueue<>(1);
+
+pool.submit(() -> {
+    log.info("start take");
+    Integer val = queue.poll();
+    // 也可以指定等待的时间
+    // queue.poll(1, TimeUnit.SECONDS)
+    log.info("take value: {}", val);
+});
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+pool.submit(() -> {
+    log.info("start put");
+    queue.offer(1);
+    // 也可以指定等待的时间
+    // queue.offer(1, 1, TimeUnit.SECONDS);
+    log.info("put value: {}", 1);
+});
+```
+
+## `ConcurrentLinkedQueue`
+
+非阻塞队列，没有容量限制，使用CAS实现线程安全
+
+常用方法
+
+- `poll()` - 获取并 `删除` 队列头的元素
+- `offer(E e)` - 向队列尾部添加元素
+- `peek()` - 获取队列头的元素，不会删除元素
+- `add(E E)` - 底层调用的 `offer(E e)` 方法
+
+其他方法和集合类似
+
+## `CopyOnWriteArrayList`
+
+底层实现采用了 `写入时拷贝` 的思想，增删改操作会将底层数组拷贝一份，更改操作在新数组上执行，这时不影响其它线程的并发读，`读写分离`
+
+获取和迭代器弱一致性，获取的数据可能不是最新的
+
+`CopyOnWriteArraySet` 基于 `CopyOnWriteArrayList` 实现
+
+常用方法就和 `List` 类似
+
+## `ThreadLocal`
+
+保存线程独立数据
+
+<details>
+
+<summary>测试类</summary>
+
+```java
+@Slf4j(topic = "Rating")
+class Rating{
+
+    private int score;
+
+    private final ThreadLocal<Integer> tl = ThreadLocal.withInitial(() -> 0);
+
+    public synchronized void scoring(int score){
+        log.info("{} 打分：{}", Thread.currentThread().getName(), score);
+        this.score += score;
+    }
+
+    public void scoringLocal(int score){
+        tl.set(tl.get() + score);
+        synchronized (this){
+            this.score += score;
+        }
+    }
+
+    public int myScore(){
+        return tl.get();
+    }
+
+    public void clearScore(){
+        tl.remove();
+    }
+
+    public int total(){
+        return score;
+    }
+}
+```
+
+</details>
+
+### 不使用 `ThreadLocal` 的情况
+
+```java
+Rating rating = new Rating();
+new Thread(() -> rating.scoring(new Random().nextInt(0, 10)), "评委1").start();
+new Thread(() -> rating.scoring(new Random().nextInt(0, 10)), "评委2").start();
+try{Thread.sleep(100);}catch(InterruptedException e){e.printStackTrace();}
+log.info("total score: {}", rating.total());
+```
+
+### 使用 `ThreadLocal`
+
+```java
+Rating rating = new Rating();
+
+new Thread(() -> {
+    try{
+        rating.scoringLocal(new Random().nextInt(0, 10));
+        log.info("{} 打分：{}", Thread.currentThread().getName(), rating.myScore());
+    }finally {
+        rating.clearScore();
+    }
+}, "评委1").start();
+new Thread(() -> {
+    try{
+        rating.scoringLocal(new Random().nextInt(0, 10));
+        log.info("{} 打分：{}", Thread.currentThread().getName(), rating.myScore());
+    }finally {
+        rating.clearScore();
+    }
+}, "评委2").start();
+
+try{Thread.sleep(100);}catch(InterruptedException e){e.printStackTrace();}
+log.info("total score: {}", rating.total());
+```
+
+### 在线程池内使用 `ThreadLocal`
+
+```java
+Rating rating = new Rating();
+ExecutorService pool = Executors.newFixedThreadPool(4);
+
+for (int i = 0; i < 6; i++) {
+    String name = "评委" + (i + 1);
+    pool.submit(() -> {
+        try{
+            rating.scoringLocal(new Random().nextInt(0, 10));
+            log.info("{} 打分：{}", name, rating.myScore());
+        }finally {
+            // 使用线程池的情况下，由于线程会复用，如果不清理，会出现累加的问题
+            rating.clearScore();
+        }
+    });
+}
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+log.info("total score: {}", rating.total());
+pool.shutdown();
+```
+
+### 内存泄漏问题
+
+`ThreadLocal` 在使用后如果无法清理会出现内存泄漏问题
+
+```java {13}
+ExecutorService pool = Executors.newFixedThreadPool(6);
+for (int i = 0; i < 6; i++) {
+    pool.submit(() -> {
+        log.info("enter task");
+        ThreadLocal<Obj> tl = ThreadLocal.withInitial(() -> new Obj(true));
+        try {
+            try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+            Obj obj = tl.get();
+            log.info("use data: {}", obj);
+            // 使用对象...
+        }finally {
+            // 这里注释就会出现内存溢出
+            // tl.remove();
+        }
+    });
+}
+try{Thread.sleep(2000);}catch(InterruptedException e){e.printStackTrace();}
+for (int i = 0; i < 10; i++) {
+    try{Thread.sleep(10);}catch(InterruptedException e){e.printStackTrace();}
+    System.gc();
+}
+
+log.info("create 2mb byte array");
+byte[] data = new byte[1024 * 1024 * 3];
+log.info("use byte array");
+```
+
+## Java 引用
+
+### 强引用
+
+```java
+Obj a = new Obj("a");
+
+new Thread(() -> {
+    // 只有在没有根指向这个引用的情况下才会被回收
+    Obj b = new Obj("b");
+    log.info("use {}", b);
+}).start();
+
+log.info("use {}", a);
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+System.gc();
+try{Thread.sleep(2000);}catch(InterruptedException e){e.printStackTrace();}
+```
+
+### 软引用
+
+```java
+// 执行前添加jvm参数-Xms10m -Xmx10m
+WeakReference<Obj> obj = new WeakReference<>(new Obj());
+log.info("use {}", obj.get());
+// 创建4m内存数组
+byte[] data = new byte[4 * 1024 * 1024];
+// 此时发现对象已经被回收了
+log.info("use {}", obj.get());
+```
+
+### 弱引用
+
+```java
+WeakReference<Obj> obj = new WeakReference<>(new Obj());
+log.info("use {}", obj.get());
+// 手动执行gc
+System.gc();
+// 一执行gc对象就会被回收
+log.info("use {}", obj.get());
+```
+
+### 虚引用
+
+```java
+ReferenceQueue<Obj> objQueue = new ReferenceQueue<>();
+PhantomReference<Obj> obj = new PhantomReference<>(new Obj(), objQueue);
+log.info("use {}", obj.get());
+new Thread(() -> {
+    log.info("listen reference queue");
+    try {
+        // 阻塞直到虚引用被回收
+        objQueue.remove();
+        log.info("obj was recycled");
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+}).start();
+
+try{Thread.sleep(1000);}catch(InterruptedException e){e.printStackTrace();}
+for (int i = 0; i < 10; i++) {
+    System.gc();
+    try{Thread.sleep(200);}catch(InterruptedException e){e.printStackTrace();}
+}
+```

@@ -1,0 +1,213 @@
+---
+title: Log4j2
+sidebar:
+    order: 10
+---
+
+import Mermaid from "@components/Mermaid.astro";
+
+> [详细代码](https://github.com/follow1123/java-frameworks/blob/main/logger/src/main/java/cn/y/java/log4j2)
+>
+> [官方文档](https://logging.apache.org/log4j/2.x/manual/getting-started.html)
+
+## 依赖
+
+- `log4j-core` - 核心库
+- `log4j-api` - api，需要配合核心库使用，也相当于是一个日志门面
+- `log4j-slf4j2-impl` - Slf4j适配器，一般直接引入这个依赖即可
+
+## 日志级别
+
+<Mermaid
+    code={`
+flowchart LR
+a(ALL/TRACE) --> b(DEBUG)
+b --> c(INFO)
+c --> d(WARN)
+d --> e(ERROR)
+e --> f(FATAL)
+f --> g(OFF)
+`}
+/>
+
+## 配置文件
+
+配置文件默认在类路径下的 `log4j2.xml`，使用其他格式配置文件参考[官方文档](https://logging.apache.org/log4j/2.x/manual/configuration.html)
+
+配置文件主要包含下面几个部分：
+
+- `Appenders` - 控制日志输出行为
+- `Loggers` - 控制指定包或类的日志级别
+- `Properties` - 变量
+
+## Appenders
+
+> [官方文档](https://logging.apache.org/log4j/2.x/manual/configuration.html#configuring-appenderrefs)
+>
+> [Appenders文档](https://logging.apache.org/log4j/2.x/manual/appenders.html)
+
+| 类型                                                                                                  | 说明                       |
+| ----------------------------------------------------------------------------------------------------- | -------------------------- |
+| <code>[File](https://logging.apache.org/log4j/2.x/manual/appenders/file.html)</code>                  | 输出到文件                 |
+| <code>[RollingFile](https://logging.apache.org/log4j/2.x/manual/appenders/rolling-file.html)</code>   | 输出到文件，并支持文件滚动 |
+| <code>[JDBC](https://logging.apache.org/log4j/2.x/manual/appenders/database.html#JdbcAppender)</code> | 输出到数据库               |
+
+```xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns="https://logging.apache.org/xml/ns"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="
+                   https://logging.apache.org/xml/ns
+                   https://logging.apache.org/xml/ns/log4j-config-2.xsd">
+    <!-- 属性配置... -->
+
+    <Appenders>
+        <!-- 输出到控制台 -->
+        <Console name="CONSOLE">
+            <PatternLayout pattern="%-d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c %M - %m%n"/>
+        </Console>
+        <!-- 输出到文件 -->
+        <File name="DEBUG_LOG" fileName="${log.dir}/logs/debug.log">
+            <PatternLayout pattern="%d [%t] %p %c - %m%n"/>
+        </File>
+
+        <!-- 输出到文件，滚动更新 -->
+        <RollingFile name="FILE"
+                     fileName="${log.dir}/logs/app.log"
+                     filePattern="${log.dir}/logs/app.%d{yyyy-MM-dd}.%i.log">
+            <!-- 日志输出格式 -->
+            <PatternLayout pattern="%-d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c %M - %m%n"/>
+            <!-- 滚动策略 -->
+            <Policies>
+                <!-- 启动项目时就触发滚动，如果文件超过1字节，直接滚动 -->
+                <OnStartupTriggeringPolicy/>
+                <!-- 根据文件大小进行滚动，默认10MB -->
+                <SizeBasedTriggeringPolicy/>
+
+                <!-- 根据时间滚动，在RollingFile标签上的filePattern配置指定的日志格式
+                    yyyy-MM-dd 每天更新
+                    yyyy-MM-dd-HH 每小时更新 -->
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <!-- 最多只存5份文件 -->
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+    </Appenders>
+
+    <!-- Logger配置... -->
+</Configuration>
+```
+
+## Loggers
+
+```xml
+<Configuration xmlns="https://logging.apache.org/xml/ns"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="
+                   https://logging.apache.org/xml/ns
+                   https://logging.apache.org/xml/ns/log4j-config-2.xsd">
+    <!-- 属性配置... -->
+    <!-- Appender配置... -->
+    <Loggers>
+        <!-- 默认日志级别 -->
+        <Root level="INFO">
+            <AppenderRef ref="CONSOLE" level="ALL"/>
+        </Root>
+        <!-- 指定文件日志 -->
+        <Logger name="cn.y.java.log4j2.debug_package" level="DEBUG">
+            <AppenderRef ref="DEBUG_LOG"/>
+        </Logger>
+        <!-- 指定滚动更新文件日志 -->
+        <Logger name="cn.y.java.log4j2.file_package" level="INFO">
+            <AppenderRef ref="FILE"/>
+        </Logger>
+    </Loggers>
+</Configuration>
+```
+
+## Properties
+
+如果需要引入其他配置属性，参考[官方文档](https://logging.apache.org/log4j/2.x/manual/lookups.html)
+
+- 使用[系统环境变量](https://logging.apache.org/log4j/2.x/manual/lookups.html#EnvironmentLookup)
+- 使用[Java变量](https://logging.apache.org/log4j/2.x/manual/lookups.html#JavaLookup)
+- 使用[Spring Boot变量](https://logging.apache.org/log4j/2.x/manual/lookups.html#SpringBootLookup)
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns="https://logging.apache.org/xml/ns"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="
+                   https://logging.apache.org/xml/ns
+                   https://logging.apache.org/xml/ns/log4j-config-2.xsd">
+    <Properties>
+        <!-- 使用环境变量 -->
+        <Property name="log.dir" value="${env:USERPROFILE}/Desktop"/>
+    </Properties>
+    <!-- Appender配置... -->
+    <!-- Logger配置... -->
+</Configuration>
+```
+
+## 使用
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns="https://logging.apache.org/xml/ns"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="
+                   https://logging.apache.org/xml/ns
+                   https://logging.apache.org/xml/ns/log4j-config-2.xsd">
+    <Properties>
+        <!-- 使用环境变量 -->
+        <Property name="log.dir" value="${env:USERPROFILE}/Desktop"/>
+    </Properties>
+    <Appenders>
+        <!-- 输出到控制台 -->
+        <Console name="CONSOLE">
+            <PatternLayout pattern="%-d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c %M - %m%n"/>
+        </Console>
+        <!-- 输出到文件 -->
+        <File name="DEBUG_LOG" fileName="${log.dir}/logs/debug.log">
+            <PatternLayout pattern="%d [%t] %p %c - %m%n"/>
+        </File>
+
+        <!-- 输出到文件，滚动更新 -->
+        <RollingFile name="FILE"
+                     fileName="${log.dir}/logs/app.log"
+                     filePattern="${log.dir}/logs/app.%d{yyyy-MM-dd}.%i.log">
+            <!-- 日志输出格式 -->
+            <PatternLayout pattern="%-d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c %M - %m%n"/>
+            <!-- 滚动策略 -->
+            <Policies>
+                <!-- 启动项目时就触发滚动，如果文件超过1字节，直接滚动 -->
+                <OnStartupTriggeringPolicy/>
+                <!-- 根据文件大小进行滚动，默认10MB -->
+                <SizeBasedTriggeringPolicy/>
+
+                <!-- 根据时间滚动，在RollingFile标签上的filePattern配置指定的日志格式
+                    yyyy-MM-dd 每天更新
+                    yyyy-MM-dd-HH 每小时更新 -->
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <!-- 最多只存5份文件 -->
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <!-- 默认日志级别 -->
+        <Root level="INFO">
+            <AppenderRef ref="CONSOLE" level="ALL"/>
+        </Root>
+        <!-- 指定文件日志 -->
+        <Logger name="cn.y.java.log4j2.debug_package" level="DEBUG">
+            <AppenderRef ref="DEBUG_LOG"/>
+        </Logger>
+        <!-- 指定滚动更新文件日志 -->
+        <Logger name="cn.y.java.log4j2.file_package" level="INFO">
+            <AppenderRef ref="FILE"/>
+        </Logger>
+    </Loggers>
+</Configuration>
+```

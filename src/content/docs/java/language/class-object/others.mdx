@@ -1,0 +1,125 @@
+---
+title: 其他
+sidebar:
+    order: 20
+---
+
+## 包（package）
+
+用于指明该文件中定义的类、接口等结构所在的包
+
+语法：`package 顶层包名 子包名;`
+
+:::note
+包可以包含类和子包，划分项目层次，便于管理
+
+帮助管理大型软件系统，将功能相近的类划分到同一个包内
+
+解决类命名冲突问题
+
+控制访问权限
+:::
+
+:::caution
+一个源文件只能有一个声明包的 `package` 语句
+
+`package` 语句作为java源文件的第一条语句出现，若缺省该语句，则指定为无名包
+
+包名，属于标识符，满足标识符命名规则和规范（全部小写）、见名知意，包通常使用所在公司域名的倒置
+:::
+
+## import
+
+为了使用定义在其他包内的 java 类，需要使用 import 语句显示引入指定包下的需要的类，相当于 import 语句告诉编译器到哪里去找这个类
+
+语法：`import 包名.类名;`
+
+:::note
+`import` 语句声明在包的声明和类的声明之间
+
+导入多个类或接口，直接写多个`import`语句
+
+一次性导入某个包下的所有类或接口可以使用 `import a.*;`
+
+如果导入的类或接口是java.lang包下的，或者是当前包下的，则可以省略此 `import` 语句
+
+导入 `java.a` 包下的某个类后，如果需要导入 `java.a.b` 包下的某个类仍需要导入
+
+如果有两个同名的类在不同包下，都需要使用的话，需要将其中一个使用全类名方式声明 `a.b.c.People people = new a.b.c.People()`
+
+`import static` 组合使用可以导入指定类下的静态属性或方法
+:::
+
+## 类中属性赋值过程
+
+:::note[在类的属性中，给属性赋值的位置]
+
+1. 默认赋值
+2. 显示赋值
+3. 构造器赋值
+4. `对象.方法`赋值
+5. `对象.属性`赋值
+
+这些位置赋值的顺序：`1`，`2`，`3`，`4/5`
+
+`1`、`2`、`3`只能执行一次，`4`、`5`可以执行多次
+:::
+
+```java
+/**
+ * 测试属性赋值顺序
+ */
+public class AssignmentOrder {
+
+    // int integer; // 默认赋值
+    int integer = 1; // 显示赋值
+
+    public AssignmentOrder(){}
+
+    public AssignmentOrder(int i){
+        integer = i;
+    }
+
+    /**
+     * 方法赋值
+     */
+    public void setInteger(int i){
+        integer = i;
+    }
+
+    public static void main(String[] args) {
+        AssignmentOrder assignmentOrder = new AssignmentOrder();
+        // 打开默认赋值代码注释
+        // System.out.println(assignmentOrder.integer); // 0
+
+        // 打开显示赋值注释
+        System.out.println(assignmentOrder.integer); // 1
+
+        // 构造器赋值
+        AssignmentOrder ao2 = new AssignmentOrder(2);
+        System.out.println(ao2.integer); // 2
+
+        // 对象.属性赋值可以赋值多次
+        ao2.integer = 3;
+        ao2.integer = 4;
+        System.out.println(ao2.integer); // 4
+
+        // 对象.方法赋值可以赋值多次
+        ao2.setInteger(5);
+        ao2.setInteger(6);
+        System.out.println(ao2.integer); // 6
+    }
+}
+```
+
+## JavaBean
+
+JavaBean 是一种 java 语言写的可重用组件
+
+:::note[符合以下标准的类]
+类是公共的
+
+有一个无参的公共构造器
+
+有属性，且有对应的 get，set 方法
+:::

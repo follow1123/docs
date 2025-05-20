@@ -1,0 +1,144 @@
+---
+title: API
+sidebar:
+    order: 5
+---
+
+## 注册驱动
+
+在 Java 中，当使用 JDBC (Java Database Connectivity) 连接数据库时，需要加载数据库特定的驱动程序，以便与数据库进行通信
+
+加载驱动程序的目的是为了注册驱动程序，使得 JDBC API 能够识别并与特定的数据库进行交互
+
+:::note
+从 JDK6 开始，不再需要显式地调用 `Class.forName()` 来加载驱动程序，只要在类路径中集成了对应的 jar 文件，会自动在初始化时注册驱动程序
+:::
+
+## `Connection`
+
+Connection 接囗是 JDBC API 的重要接口，用于建立与数据库的通信通道。换而言之，Connection 对象不为空，则代表一次数据库连接
+
+在建立连接时，需要指定数据库 URL 、用户名、密码参数
+
+```bash
+# jdbc:mysql://IP地址:端口号/数据库名称?参数键值对1&参数键值对2
+jdbc:mysql://localhost:3307/mini_chat
+```
+
+Connection 接囗还负责管理事务， Connection 接口提供了 `commit` 和 `rollback` 方法，用于提交事务和回滚事务
+
+可以创建 statement 对象，用于执行 SQL 语句并与数据库进行交互
+
+在使用 JDBC 技术时，必须要先获取 Connection 对象，在使用完毕后，要释放资源，避免资源占用浪费及泄漏
+
+```java
+// 获取连接对象
+String url = "jdbc:mysql://localhost:3307/mini_chat";
+String username = "root";
+String password = "password";
+Connection connection = DriverManager.getConnection(url, username, password);
+
+// 其他操作...
+
+// 释放资源
+connection.close();
+```
+
+## `Statement`
+
+Statement 接口用于执行 SQL 语句并与数据库进行交互。它是 JDBC API 中的一个重要接口，通过 Statement 对象，可以向数据库发送 SQL 语句并获取执行结果
+
+结果可以是一个或多个
+
+- 增删该：受影响行数单个结果
+- 查询：单行单例、多行多列、单行多列等结果
+
+:::warning
+Statement 接口在执行 SQL 语句时，会产生 SQL 注入攻击问题
+
+当使用 Statement 执行**动态构建**的 SQL 询时，往往需要将查询条件与 SQL 语句拼接在一起，直接将参数和 SQL 语句一并生成，可以让 SQL 的查询条件始终为 true 得到结果
+:::
+
+### SQL 注入
+
+```java
+// 获取连接
+
+// String queryName = "zhangsan";
+// error line
+String queryName = "111' or '1' = '1";
+
+// 编写SQL语句并执行
+String sql = "select id, name, age, points from t_user where name = '" + queryName + "'";
+ResultSet resultSet = statement.executeQuery(sql);
+
+while (resultSet.next()) {
+    long id = resultSet.getLong("id");
+    String name = resultSet.getString("name");
+    int age = resultSet.getInt("age");
+    double points = resultSet.getDouble("points");
+    System.out.println(id + "\t" + name + "\t" + age + "\t" + points);
+}
+
+// 释放资源
+```
+
+拼接 SQL 后：
+
+```sql
+select id, name, age, points from t_user where name = '111' or '1' = '1'
+```
+
+## `PreparedStatement`
+
+`PreparedStatement` 是 `Statement` 接口的子接囗，用于执行预编泽的 SQL 询，有以下作用：
+
+- **预编译 SQL 语句** - 在创建 PreparedStatement 时，就会预编译 SQL 语句，也就是 SQL 语句已经固定
+- **防止 SQL 注入** - PreparedStatement 支持参数化查询，将数据作为为参数传递到 SQL 语句中，采用 `?` 占位符的方式，将传入的参数用一对单引号包裹起来 `''` ，无论传递什么都作为值。有效防止传入关键字或值导致 SQL 注入问题
+- **性能提升** - PreparedStatement 是预编译SQL语句，同一 SQL 语句多次执行的情况下，可以复用，不必每次重新编译和解析
+
+:::note
+设置参数时下标从 `1` 开始
+:::
+
+```java
+// 获取连接
+
+// 获取PreparedStatement
+String sql = "select id, name, age, points from t_user where name = ?";
+PreparedStatement statement = connection.prepareStatement(sql);
+
+// 设置参数
+statement.setString(1, "zhangsan");
+
+// 处理数据...
+
+// 释放资源
+```
+
+## `ResultSet`
+
+ResultSet 是 JDBC API 中的一个接口，用于表示从数据库中执行 `查询语句` 所返回的结果集。它提供了一种用于遍历和访问查询结果的方式
+
+- `遍历结果` - ResultSet 可以使用 `next()` 方法将游标移动到结果集的下一行，逐行遍历数据库查询的结果，返回值为 boolean 类型
+- `获取单列结果` - 可以通过 `getXxx()` 的方法获取单列的数据，该方法为重载方法，支持 `索引` 和 `列名` 进行获取
+
+```java
+// 获取连接
+
+// 准备查询数据
+
+// 获取结果
+ResultSet resultSet = statement.executeQuery();
+
+while (resultSet.next()) {
+    // 通过列下标获取数据，下标从1开始，不推荐
+    long id = resultSet.getLong(1);
+    String name = resultSet.getString("name");
+    int age = resultSet.getInt("age");
+    double points = resultSet.getDouble("points");
+    System.out.println(id + "\t" + name + "\t" + age + "\t" + points);
+}
+
+// 释放资源
+```

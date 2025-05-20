@@ -1,0 +1,262 @@
+---
+title: Collections 工具类
+sidebar:
+    order: 20
+---
+
+Collections 是一个操作 Set、List 和 Map 等集合的工具
+
+## 排序
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/collections/SortTest.java)
+
+### 反转集合
+
+```java
+List list = RandomUtil.getRandomIntList(10, 50);
+System.out.println(list);
+
+Collections.reverse(list);
+
+System.out.println(list);
+```
+
+### 打乱集合内元素位置
+
+```java
+List list = RandomUtil.getRandomIntList(10, 50);
+// 先排序
+Collections.sort(list);
+System.out.println(list);
+
+// 打乱
+Collections.shuffle(list);
+
+System.out.println(list);
+```
+
+### 排序
+
+```java
+// 自然排序
+List list = RandomUtil.getRandomIntList(10, 50);
+System.out.println(list);
+
+Collections.sort(list);
+
+System.out.println(list);
+
+System.out.println("--------");
+// 定制排序
+List list1 = RandomUtil.getRandomIntList(10, 50);
+System.out.println(list1);
+
+// 改为降序
+Collections.sort(list1, new Comparator<Object>() {
+    @Override
+    public int compare(Object o1, Object o2) {
+        return -Integer.compare((Integer) o1, (Integer) o2);
+    }
+});
+
+System.out.println(list1);
+```
+
+### 调换元素位置
+
+```java
+List list = RandomUtil.getRandomIntList(10, 50);
+System.out.println(list);
+
+// 头尾元素调换
+Collections.swap(list, 0, list.size() - 1);
+
+System.out.println(list);
+```
+
+## 查找
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/collections/SearchTest.java)
+
+### 最大值
+
+```java
+// 根据自然排序找出集合内最大的元素
+List list = RandomUtil.getRandomIntList(10, 50);
+System.out.println(list);
+
+System.out.println(Collections.max(list));
+
+System.out.println("---------");
+// 根据定制排序找出集合内最大的元素
+List strList = RandomUtil.getRandomStringList(10, 10);
+System.out.println(strList);
+
+// 根据字符串长度判断元素大小
+System.out.println(Collections.max(strList, new Comparator<String>() {
+    @Override
+    public int compare(String o1, String o2) {
+        return o1.length() - o2.length();
+    }
+}));
+```
+
+### 最小值
+
+```java
+// 根据自然排序找出集合内最小的元素
+List list = RandomUtil.getRandomIntList(10, 50);
+System.out.println(list);
+
+System.out.println(Collections.min(list));
+
+System.out.println("---------");
+// 根据定制排序找出集合内最小的元素
+List strList = RandomUtil.getRandomStringList(10, 10);
+System.out.println(strList);
+
+// 根据字符串长度判断元素大小
+System.out.println(Collections.min(strList, new Comparator<String>() {
+    @Override
+    public int compare(String o1, String o2) {
+        return o1.length() - o2.length();
+    }
+}));
+```
+
+### 二分搜索
+
+```java
+// 根据自然排序搜索元素
+List list = RandomUtil.getRandomIntList(10, 50);
+// 使用二分搜索时集合内的元素必须有序
+Collections.sort(list);
+Object value = list.get(RandomUtil.getRandomInteger(list.size()));
+System.out.println(list + " search: " + value);
+
+System.out.println(Collections.binarySearch(list, value));
+
+System.out.println("-------");
+// 根据定制排序搜索元素
+List list1 = RandomUtil.getRandomIntList(10, 50);
+Comparator<Integer> comparator = new Comparator<>() {
+    @Override
+    public int compare(Integer o1, Integer o2) {
+        return -Integer.compare(o1, o2);
+    }
+};
+// 使用二分搜索时集合内的元素必须有序
+Collections.sort(list1, comparator);
+Integer value1 = (Integer) list1.get(RandomUtil.getRandomInteger(list1.size()));
+System.out.println(list1 + " search: " + value1);
+
+System.out.println(Collections.binarySearch(list1, value1, comparator));
+```
+
+### 元素出现的频率
+
+```java
+List list = RandomUtil.getRandomIntList(10, 5);
+System.out.println(list);
+// 获取元素出现的次数
+System.out.println(Collections.frequency(list, 1));
+```
+
+## 其他
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/collections/OthersTest.java)
+
+### 复制
+
+```java
+List list = RandomUtil.getRandomIntList(10, 50);
+System.out.println(list);
+
+// 由于创建新的数组后大小是0，直接使用会报错，所以需要使用下面的操作
+List<Object> newList = Arrays.asList(new Object[list.size()]);
+Collections.copy(newList, list);
+System.out.println(newList);
+```
+
+### 全部替换
+
+```java
+List list = RandomUtil.getRandomIntList(10, 5);
+System.out.println(list);
+System.out.println(Collections.replaceAll(list, 1, 100));
+System.out.println(list);
+```
+
+### 转换为只读集合或 Map
+
+```java
+List list = RandomUtil.getRandomIntList(10, 50);
+System.out.println(list.get(0));
+list.add("1234");
+System.out.println(list);
+
+// 转换为只读集合
+List list1 = Collections.unmodifiableList(list);
+// 正常读取
+System.out.println(list.get(0));
+// list1.add(1234); 写入元素会报错
+```
+
+### 添加多个元素
+
+```java
+List list = RandomUtil.getRandomIntList(5, 50);
+List list1 = RandomUtil.getRandomStringList(5, 5);
+
+System.out.println(list1);
+Collections.addAll(list, list1.toArray());
+System.out.println(list);
+```
+
+### 转换为线程安全的集合或 Map
+
+```java
+// 线程数组，用于等待所有线程执行完
+ArrayList<Thread> threadList = new ArrayList();
+
+// 普通集合在多线程环境下添加100000个元素
+ArrayList list = new ArrayList();
+for (int i = 0; i < 100000; i++) {
+    Thread thread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            list.add("a");
+        }
+    });
+    threadList.add(thread);
+    thread.start();
+}
+
+// 同步集合在多线程环境下添加100000个元素
+List syncList = Collections.synchronizedList(new ArrayList<>());
+for (int i = 0; i < 100000; i++) {
+    Thread thread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            syncList.add("a");
+        }
+    });
+    threadList.add(thread);
+    thread.start();
+}
+
+// 等待线程执行完成
+for (Thread thread : threadList) {
+    try {
+        thread.join();
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+}
+
+// 普通集合元素的个数
+System.out.println(list.size());
+
+// 同步集合元素的个数
+System.out.println(syncList.size());
+```

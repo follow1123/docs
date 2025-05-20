@@ -1,0 +1,58 @@
+---
+title: 动态 SQL
+sidebar:
+    order: 15
+---
+
+动态 SQL 就是在拼接 SQL 语句，我们只要保证 SQL 的正确性，按照 SQL 的格式，去排列组合就可以了
+
+先写出完整的 SQL，再对应的去修改成为我们的动态 SQL 实现通用即可
+
+## `if`
+
+```xml
+<if test="arg0 != null">
+    `Date` = #{arg0}
+</if>
+
+<if test="arg1 != null">
+    and `EconomyPrice` = #{arg1}
+</if>
+
+<if test="arg2 != null">
+    and `Gate` = #{arg2}
+</if>
+```
+
+## `choose` / `when` / `otherwise`
+
+就是 switch，case，default
+
+```xml
+<choose>
+    <when test="arg0 != null">
+        `Date` = #{arg0}
+    </when>
+    <when test="arg1 != null">
+        and `EconomyPrice` = #{arg1}
+    </when>
+    <when test="arg2 != null">
+        and `Gate` = #{arg2}
+    </when>
+    <otherwise>
+
+    </otherwise>
+</choose>
+```
+
+## `set` / `where`
+
+去除写动态 sql 时多余的符号或关键字
+
+## `foreach`
+
+```xml
+<foreach collection="gates" item="gate" open="`Gate` in (" separator="," close=")">
+    #{gate}
+</foreach>
+```

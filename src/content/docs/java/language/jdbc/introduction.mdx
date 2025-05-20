@@ -1,0 +1,116 @@
+---
+title: 说明
+sidebar:
+    order: 0
+---
+
+import Mermaid from "@components/Mermaid.astro";
+import { Steps } from "@astrojs/starlight/components";
+
+[详细项目代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/jdbc)
+
+JDBC 提供了一套基本的 API 来实现 Java 程序与关系型数据库之间的连接和数据操作
+
+JDBC 是 Java 提供的一组独立于任何数据库管理系统的 API
+
+Java 提供接囗规范，由各个数据库厂商提供接囗的实现，厂商提供的实现类封装成 jar 文件，也就是我们俗称的数据库驱动 jar 包
+
+<Mermaid
+    code={`
+flowchart LR
+a[Java程序] --> b[JDBC的API，一组规范接口]
+b --> md[MySQL驱动]
+b --> od[Oracle驱动]
+b --> sd[SQLServer驱动]
+md --> m((MySQL))
+od --> o((Oracle))
+sd --> s((SQLServer))
+`}
+/>
+
+:::note[接口规范]
+为了项目代码的可移植性，可维护性， SUN 公司从最初就制定了 Java 程序连接各种数据库的统一接囗规范。不管是连接哪一种 DBMS 软件， Java 代码可以保持一致性
+
+接口存储在 `java.sql` 和 `javax.sql` 包下
+:::
+
+:::note[实现规范]
+因为各个数据库厂商的 DBMS 软件各有不同，那么各自的内部如何通过 SQL 实现增、删、改、查等操作管理数据，只有这个数据库厂商自己更清楚，因此把接口规范的实现交给各个数据库厂商自己实现
+
+厂商将实现内容和过程封装成 jar 文件，我们程序员只需要将 jar 文件引入到项目中集成即可，就可以开发调角实现过程操作数据库了
+:::
+
+## 示例
+
+<Steps>
+
+1. 创建数据库 `mini_chat`
+
+2. 添加表格数据
+
+    ```sql
+    use mini_chat;
+
+    create table t_user(
+        id bigint auto_increment comment '用户id' primary key,
+        name varchar(100) not null comment '姓名',
+        age int not null comment '年龄',
+        points double(10,5) not null comment '积分'
+    );
+
+    insert into t_user (name, age, points) values
+    ('zhangsan', 32, 777.77),
+    ('lisi', 41, 666.66),
+    ('wangwu', 23, 111),
+    ('jack', 26, 123),
+    ('aaa', 28, 123);
+    ```
+
+3. 引入 MySQL 驱动，以 Maven 项目为例
+
+    ```xml
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>8.0.33</version>
+    </dependency>
+    ```
+
+4. 编写代码
+
+    ```java
+    // 注册驱动
+    Class.forName("com.mysql.cj.jdbc.Driver");
+
+    // 获取连接对象
+    String url = "jdbc:mysql://localhost:3307/mini_chat";
+    String username = "root";
+    String password = "password";
+    Connection connection = DriverManager.getConnection(url, username, password);
+
+    // 获取执行SQL的对象
+    Statement statement = connection.createStatement();
+
+    // 编写SQL语句并执行
+    String sql = "select id, name, age, points from t_user";
+    ResultSet resultSet = statement.executeQuery(sql);
+
+    while (resultSet.next()) {
+        long id = resultSet.getLong("id");
+        String name = resultSet.getString("name");
+        int age = resultSet.getInt("age");
+        double points = resultSet.getDouble("points");
+        System.out.println(id + "\t" + name + "\t" + age + "\t" + points);
+    }
+
+    // 释放资源
+    resultSet.close();
+    statement.close();
+    connection.close();
+    ```
+
+</Steps>
+
+## 参考
+
+- [黑马](https://www.bilibili.com/video/BV1Tx421S7HZ/)

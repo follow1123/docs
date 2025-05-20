@@ -1,0 +1,221 @@
+---
+title: Logback
+sidebar:
+    order: 5
+---
+
+import Mermaid from "@components/Mermaid.astro";
+
+> [详细代码](https://github.com/follow1123/java-frameworks/blob/main/logger/src/main/java/cn/y/java/logback)
+>
+> [官方文档](https://logback.qos.ch/manual/)
+
+## 依赖
+
+- `logback-core` - logback 核心库
+- `logback-classic` - 实现 Slf4j，包含核心库，一般引入这个依赖
+
+## 日志级别
+
+<Mermaid
+    code={`
+flowchart LR
+a(ALL/TRACE) --> b(DEBUG)
+b --> c(INFO)
+c --> d(WARN)
+d --> e(ERROR)
+e --> f(OFF)
+`}
+/>
+
+## 配置文件
+
+> [官方文档](https://logback.qos.ch/manual/configuration.html#syntax)
+
+配置文件默认在类路径下的 `logback.xml` 文件
+
+配置文件主要包含下面几个部分：
+
+- `appender` - 控制日志输出行为
+- `logger` - 控制指定包或类的日志级别
+- `root` - 全局日志级别
+- `variable` - 定义变量
+
+### 基础配置
+
+```xml
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} %M - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
+```
+
+## Appender
+
+> [官方文档](https://logback.qos.ch/manual/configuration.html#configuringAppenders)
+>
+> [Appender 文档](https://logback.qos.ch/manual/appenders.html)
+
+| 类型                                                                                                 | 说明                       |
+| ---------------------------------------------------------------------------------------------------- | -------------------------- |
+| <code>[ConsoleAppender](https://logback.qos.ch/manual/appenders.html#ConsoleAppender)</code>         | 输出到控制台               |
+| <code>[FileAppender](https://logback.qos.ch/manual/appenders.html#FileAppender)</code>               | 输出到文件                 |
+| <code>[RollingFileAppender](https://logback.qos.ch/manual/appenders.html#RollingFileAppender)</code> | 输出到文件，并支持文件滚动 |
+| <code>[DBAppender](https://logback.qos.ch/manual/appenders.html#DBAppender)</code>                   | 输出到数据库               |
+
+```xml
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>testFile.log</file>
+        <append>true</append>
+        <!-- set immediateFlush to false for much higher logging throughput -->
+        <immediateFlush>true</immediateFlush>
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} -%kvp- %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logFile.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} -%kvp- %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>
+```
+
+### Layouts
+
+默认使用`PatternLayout`，部分转换词参考[官方文档](https://logback.qos.ch/manual/layouts.html#conversionWord)
+
+## Logger/Root
+
+```xml
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+          <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%kvp- %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 指定cn.a.b下的日志级别 -->
+    <logger name="cn.a.b" level="INFO"/>
+
+    <!-- 指定cn.a.c下的日志级别，并指定Appender -->
+    <logger name="cn.a.c">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <!-- Strictly speaking, the level attribute is not necessary since -->
+    <!-- the level of the root level is set to DEBUG by default.       -->
+    <!-- 默认日志级别和对应的Appender -->
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
+```
+
+## Variable
+
+> [官方文档](https://logback.qos.ch/manual/configuration.html#variableSubstitution)
+
+```xml
+<configuration>
+
+    <!-- 定义变量 -->
+    <variable name="USER_HOME" value="/home/sebastien" />
+
+    <!-- 指定properties文件 -->
+    <variable file="src/main/java/chapters/configuration/variables1.properties" />
+
+    <!-- 指定类路径下的properties文件 -->
+    <variable resource="resource1.properties" />
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+
+        <!-- 使用变量 -->
+        <file>${USER_HOME}/myApp.log</file>
+        <encoder>
+            <pattern>%kvp %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
+```
+
+## 使用
+
+```xml
+<configuration>
+    <!-- 在resources目录下添加这个文件即可，添加log_path属性，文件保存路径 -->
+    <variable resource="logback-file.properties"/>
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} %M - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 文件输出 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_path}/logFile.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- keep 30 days' worth of history capped at 1GB total size -->
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} -%kvp- %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 指定包日志级别 -->
+    <logger name="cn.y.java.logback.info_package" level="WARN"/>
+    <!-- 指定包日志级别并指定输出到文件 -->
+    <logger name="cn.y.java.logback.file_package" level="DEBUG">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- 默认日志级别 -->
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
+```

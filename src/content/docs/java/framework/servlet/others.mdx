@@ -1,0 +1,188 @@
+---
+title: 其他
+sidebar:
+    order: 30
+---
+
+import { Steps } from "@astrojs/starlight/components";
+import Mermaid from "@components/Mermaid.astro";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+## Listener
+
+监听器（Listener） 是一种用于监听和处理 Servlet 容器中事件的对象。它是 Servlet 规范的一部分，用于监听容器生命周期中的不同事件（如请求、会话、上下文的创建与销毁等）
+
+| 监听器                            | 所属域     | 说明                                  |
+| --------------------------------- | ---------- | ------------------------------------- |
+| `ServletContextListener`          | **应用域** | 监听应用域<br/>的创建和销毁           |
+| `ServletContextAttributeListener` | **应用域** | 监听应用域<br/>内数据的增删改操作     |
+| `HttpSessionListener`             | **会话域** | 监听会话域<br/>的创建和销毁           |
+| `HttpSessionAttributeListener`    | **会话域** | 监听会话域<br/>内数据的增删改操作     |
+| `HttpSessionBindingListener`      | **会话域** | 监听会话域<br/>内绑定指定绑定解绑操作 |
+| `HttpSessionActivationListener`   | **会话域** | 监听会话域<br/>持久化和激活操作       |
+| `ServletRequestListener`          | **请求域** | 监听请求域<br/>的创建和销毁           |
+| `ServletRequestAttributeListener` | **请求域** | 监听请求域<br/>内数据的增删改操作     |
+
+<Tabs>
+
+<TabItem label="Annotation">
+
+```java
+@WebListener
+public class ContextTestListener implements ServletContextListener {
+
+// ...
+```
+
+</TabItem>
+
+<TabItem label="XML">
+
+```xml
+<listener>
+    <listener-class>cn.y.java.listener.SessionTestListener</listener-class>
+</listener>
+```
+
+</TabItem>
+
+</Tabs>
+
+### Session 的两个特殊监听器
+
+#### `HttpSessionBindingListener`
+
+```java
+// 绑定操作
+session.setAttribute("testBindListener", new SessionBindingTestListener());
+
+// 解绑操作
+session.removeAttribute("testBindListener");
+```
+
+#### `HttpSessionActivationListener`
+
+:::note[配置 Session 持久化]
+在 webapp 目录下新建 `META-INF/context.xml` 文件
+
+```xml
+<Context>
+    <!-- maxIdleSwap: 指定 session 对象多长时间不使用就持久化，单位分钟 -->
+    <Manager className="org.apache.catalina.session.PersistentManager" maxIdleSwap="1">
+    <Store className="org.apache.catalina.session.FileStore" directory="filedir" />
+    </Manager>
+</Context>
+```
+
+:::
+
+## 异步 `Servlet` / `Filter`
+
+### 异步计算
+
+```java
+@WebServlet(value = "/async", asyncSupported = true)
+public class AsyncServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 获取结果，如果有结果直接返回
+        Object result = req.getSession().getAttribute("result");
+        if (result != null){
+            resp.getWriter().write("<h1>OK result: " + result + "</h1>");
+            return;
+        }
+        // 开启异步任务
+        AsyncContext asyncContext = req.startAsync();
+        System.out.println("asyncContext default timeout: " + asyncContext.getTimeout());
+        asyncContext.start(() -> {
+            try {
+                Thread.sleep(2000);
+                HttpSession session = ((HttpServletRequest) asyncContext.getRequest()).getSession();
+                session.setAttribute("result", "111");
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                asyncContext.complete();
+            }
+        });
+
+        // 先返回正在处理
+        resp.setContentType("text/html");
+        resp.setCharacterEncoding("UTF-8");
+        resp.getWriter().write("<h1>正在处理</h1>");
+    }
+}
+```
+
+:::note
+如果要正确使用异步 Servlet 需要包括这个 Servlet 内的所有 `请求链` 都是开启异步支持的，否则会报错 `startAsync 无法启动async，因为处理链中的下列类不支持`
+
+也就是说所有拦截到这个 Servlet 的 Filter 都需要开启异步支持
+:::
+
+## 常见问题
+
+### 乱码问题
+
+#### 在 Idea 内启动 Tomcat `Localhost Log` 和 `Catalina Log` 控制台乱码
+
+<Steps>
+
+1. 确保 Tomcat 安装目录的 `conf/logging.properties` 内所有的 `encoding` 属性都是 UTF-8
+
+2. 找到 Idea 窗口上面的 `Help` 选项，点击 `Edit Custom VM Options...` 在文件内添加：`-Dfile.encoding=UTF-8`
+
+3. 重启 Idea
+
+</Steps>
+
+#### 编写 `System.out.println` 输出中文时乱码
+
+<Steps>
+
+1. 确保 Idea 设置的 `File Encoding` 选项内配置的都是 `UTF-8`
+
+2. 编辑 Tomcat 启动配置，在 `-Dfile.encoding=UTF-8`
+
+3. 重启 Tomcat
+
+</Steps>
+
+### 跨域问题
+
+跨域问题 是指当浏览器在执行跨域请求时，因浏览器的同源策略（Same-Origin Policy）而产生的限制。浏览器的同源策略要求，网页中的脚本只能访问与当前页面同源（协议、域名、端口号都相同）的资源。如果网页需要访问不同域（跨域）的资源，浏览器会阻止该请求，造成 跨域问题
+
+<Mermaid
+    code={`
+sequenceDiagram
+participant client as 客户端
+participant webserver as Web服务器(a.com:80)
+participant server as 后端服务器(b.com:8080)
+
+client ->> webserver: 访问网页index.html
+webserver ->> client: 返回index.html
+client ->> server: 在index.html进行登录，访问后端的/login接口
+Note left of client: 此时浏览器判断不是同源，<br />根据情况先发送预检请求
+client ->> server: 预检请求
+client ->> server: 请求/login接口
+server ->> client: 响应数据
+`}
+/>
+
+添加以下响应头即可
+
+```java
+resp.setHeader("Access-Control-Allow-Origin", "*");
+resp.setHeader("Access-Control-Allow-Methods", "POST,GET,PUT,DELETE,OPTIONS,HEAD");
+resp.setHeader("Access-Control-Max-Age", "3600");
+resp.setHeader("Access-Control-Allow-Headers", "*");
+```
+
+:::note
+什么时候发送预检请求：
+
+- PUT、DELETE 方法
+- 有 `Authorization` 的接口等请求头
+
+:::

@@ -1,0 +1,179 @@
+---
+title: 请求和响应
+sidebar:
+    order: 10
+---
+
+import Mermaid from "@components/Mermaid.astro";
+
+## HttpServletRequest
+
+Tomcat 在接口客户端的请求后会将 HTTP 协议的报文和封装成 `HttpServletRequest` 对象，对象内可以获取所有HTTP协议相关信息
+
+### 请求行
+
+- `getRequestURL()` - 获取URL
+- `getRequestURI()` - 获取URI
+- `getServerPort()` - 获取客户端发送请求时的端口
+- `getLocalPort()` - 获取当前应用所在容器的端口
+- `getRemotePort()` - 获取客户端程序的端口
+- `getScheme()` - 获取请求协议
+- `getProtocol()` - 获取请求协议和版本号
+- `getMethod()` - 获取请求方法
+
+:::note[URL和URI的区别]
+URL 相当于身份证号，URI 相当于电话号码
+:::
+
+### 请求头
+
+- `getHeader(name)` - 获取请求头
+- `getHeaderNames()` - 获取所有请求头的key
+- `getContentType()` - 获取ContentType请求头
+
+### 请求参数
+
+- `getQueryString()` - 获取URL上拼接的请求参数
+- `getParameter(name)` - 根据名称获取参数的值
+- `getParameterValues(name)` - 根据名称获取参数的值，多个值
+- `getParameterNames()` - 根据名称获取参数的值，所有值
+- `getParameterMap()` - 以Map结构获取请求参数
+- `getReader()` - 获取请求内容的Reader
+- `getInputStream()` - 获取请求内容的InputStream
+- `getContentLength()` - 获取请求长度
+
+### 其他
+
+- `getServletPath()` - 获取请求的 Servlet 路径
+- `getServletContext()` - 获取 Servlet Context 对象
+- `getCookies()` - 获取 Cookie
+- `getSession()` - 获取 Session
+- `setCharacterEncoding(env)` - 设置请求字符集
+
+## HttpServletResponse
+
+Tomcat 在接口客户端的请求后，封装 `HttpServletRequest` 对象的同时会创建一个 `HttpServletResponse` 对象用于存储响应数据，在请求结束时服务器会根据这个对象编码成 HTTP 协议对应的响应报文返回给客户端
+
+### 响应行
+
+- `setStatus(sc)` - 设置响应状态码
+
+### 响应头
+
+- `setHeader(name, value)` - 设置响应头信息
+- `setContentType(type)` - 设置响应头的content-type，（媒体类型设置）
+
+### 响应体
+
+- `getWriter()` - 获取响应的 Writer 用于写出数据
+- `getOutputStream()` - 获取响应的 OutputStream 用于写出数据
+- `setContentLength(len)` - 设置响应内容长度，就是设置 content-length 响应头
+
+### 其他
+
+- `sendError(sc, msg)` - 响应错误信息
+- `addCookie(cookie)` - 设置 Cookie
+- `setCharacterEncoding(charset)` - 设置响应字符集
+
+## Content Type
+
+Content Type 是请求和响应头中很重要的一个头信息，参考[请求头](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers)，[MIME Type](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/MIME_types)
+
+常见的 Content Type 和其使用位置
+
+| Content Type                        | 说明                 | 请求 | 响应 |
+| ----------------------------------- | -------------------- | ---- | ---- |
+| `application/json`                  | 请求或响应 json 数据 | √    | √    |
+| `application/xml`                   | 请求或响应 xml 数据  | √    | √    |
+| `text/plain`                        | 请求或响应纯文本数据 | √    | √    |
+| `multipart/form-data`               | 请求文件             | √    |      |
+| `application/x-www-form-urlencoded` | 请求表单             | √    |      |
+| `text/html`                         | 响应 html 文件       |      | √    |
+| `application/pdf`                   | 响应 pdf 文件        |      | √    |
+| `image/png或image/jpeg`             | 响应图片文件         |      | √    |
+| `text/css`                          | 响应 css 文件        |      | √    |
+
+## 转发和重定向
+
+转发和重定向是 web 应用间接访问项目资源的方式
+
+转发通过 `HttpServletRequest` 实现，重定向通过 `HttpServletResponse` 实现
+
+### 请求转发
+
+<Mermaid
+    code={`
+sequenceDiagram
+participant client as 客户端
+box 服务器
+participant sa as ServletA
+participant sb as ServletB
+end
+
+client ->> sa: 请求
+sa ->> sb: 转发
+sb ->> client: 响应
+`}
+/>
+
+```java
+/*
+    转发路径如果填写 webapp 下的资源路径，则可以直接转发到资源
+    可以转发到 WEB-INF 目录下的受保护资源 "WEB-INF/private.html"
+*/
+req.getRequestDispatcher("转发地址").forward(req, resp);
+```
+
+:::note
+请求转发是服务器内部行为，对客户端是屏蔽的，客户端地址栏不会发生变化
+
+由于客户端只发送了一次请求，所以 req resp 对象只有一对
+
+客户端的请求参数在转发到的 Servlet 内可以使用
+
+转发的资源可以是 Servlet 动态资源，也可以是 webapp 目录下的静态资源，也可以是 WEB-INF 目录下的受保护资源
+
+无法转发外部资源，比如一个网址
+:::
+
+:::tip
+可以通过 `req.getAttribute(RequestDispatcher.FORWARD_REQUEST_URI)` 获取是从哪个路径转发过来的
+:::
+
+### 响应重定向
+
+<Mermaid
+    code={`
+sequenceDiagram
+participant client as 客户端
+box 服务器
+participant sa as ServletA
+participant sb as ServletB
+end
+
+client ->> sa: 请求
+sa ->> client: 响应（code: 302 Location: ServletB）
+client ->> sb: 请求
+sb ->> client: 响应
+`}
+/>
+
+```java
+/*
+    转发路径如果填写 webapp 下的资源路径，则可以直接转发到资源，不可以访问 WEB-INF 目录下的受保护资源
+    可以转发到外部资源
+*/
+resp.sendRedirect("资源路径");
+```
+
+:::note
+重定向时服务端会响应302响应码，并添加 `Location` 响应头，指定重定向的路径
+
+客户端至少发送了两次请求，地址栏会发生变化
+
+服务器内第一次请求的相关数据不会跟着重定向给指定的路径，因为发送了多次请求，req resp 对象有多个
+
+重定向也可以访问静态资源，但是不能访问 WEB-INF 目录下的受保护资源
+
+重定向可以访问外部资源
+:::

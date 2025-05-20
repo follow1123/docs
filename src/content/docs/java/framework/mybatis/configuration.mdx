@@ -1,0 +1,158 @@
+---
+title: 配置
+sidebar:
+    order: 10
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+核心配置文件：`mybatis-config.xml`
+
+MyBatis 的配置文件包含了会深深影响 MyBatis 行为的设置和属性信息
+
+- `configuration` - 配置
+- `properties` - 属性
+- `settings` - 设置
+- `typeAliases` - 类型别名
+- `typeHandlers` - 类型处理器
+- `objectFactory` - 对象工厂
+- `plugins` - 插件
+- `environments` - 环境配置
+- `environment` - 环境变量
+- `transactionManager` - 事务管理器
+- `datasource` - 数据源
+
+## environments（环境配置）
+
+MyBatis 可以配置成适应多种环境
+
+尽管可以配置多个环境，但每个 SqlSessionFactory 实例只能选择一种环境
+
+Mybatis 默认的事务管理器就是 JDBC，连接池: POOLED
+
+## properties（属性）
+
+我们可以通过 properties 属性来实现引用配置文件
+
+这些属性都是可外部配置且可动态替换的，既可以在典型的 Java 属性文件中配置，也可通过 properties 元素的子元素来传递
+
+<Steps>
+
+1. 配置文件
+
+    ```properties title="db.properties"
+    driver=com.mysql.cj.jdbc.Driver
+    url=jdbc:mysql://localhost:3306/session1?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username=root
+    password=123456
+    ```
+
+2. 使用
+
+    :::caution
+    properties 标签必须在 configuration 标签内的最前面
+    :::
+
+    ```xml
+    <properties resource="db.properties"/>
+    ```
+
+    :::note
+    可以直接引入外部文件
+
+    可以在其中增加一些属性配置
+
+    如果两个文件有同一个字段，优先使用外部配置文件的
+    :::
+
+</Steps>
+
+## typeAliases（类型别名）
+
+类型别名是为 Java 类型设置一个短的名字
+
+存在的意义仅在于用来减少类完全限定名的冗余
+
+```xml
+<typeAliases>
+    <typeAlias type="com.example.pojo.Users" alias="user"/>
+</typeAliases>
+```
+
+也可以指定一个包名， MyBatis 会在包名下面搜索需要的 Java Bean
+
+扫描实体类的包，它的默认别名就为这个类的类名，首字母小写
+
+```xml
+<typeAliases>
+    <package name="com.example.pojo"/>
+</typeAliases>
+```
+
+:::note
+在实体类比较少的时候，使用第一种方式
+
+如果实体类十分多,建议使用第二种
+
+第一种可以 DIY 别名，第二种则不行，如果非要改，需要在实体上增加注解
+
+```xml
+@Alias("别名")
+public class Users {
+}
+```
+
+:::
+
+## settings（设置）
+
+这是 MyBatis 中极为重要的调整设置，它们会改变 MyBatis 的运行时行为
+
+## 其他配置
+
+- typeHandlers - 类型处理器
+- objectFactory - 对象工厂
+- plugins - 插件
+    - mybatis-generator-core
+    - mybatis-plus
+- 通用 mapper
+
+## mappers（映射器）
+
+MapperRegistry 注册绑定我们的 Mapper 文件
+
+### 方式一
+
+```xml
+<mappers>
+    <mapper resource=对应xml的路径/>
+</mappers>
+```
+
+### 方式二
+
+使用 class 文件绑定注册
+
+:::note
+接口和他的 Mapper 配置文件必须同名
+
+接口和他的 Mapper 配置文件必须在同一个包下
+:::
+
+```xml
+<mappers>
+    <mapper class=对应类的全限定名/>
+</mappers>
+```
+
+### 方式三
+
+使用扫描包进行注入绑定
+
+和方式二需要注意的顶一样
+
+```xml
+<mappers>
+    <package name=对应类的包名/>
+</mappers>
+```

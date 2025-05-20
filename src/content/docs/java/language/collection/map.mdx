@@ -1,0 +1,204 @@
+---
+title: Map
+sidebar:
+    order: 15
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+存储键值对（key-value）
+
+## 实现类
+
+- `HashMap`（主要实现类） - 线程不安全，效率高，可以添加 null 的 key 和 value 值，底层使用 `数组+单向链表+红黑树` 进行存储（jdk8），jdk8 之前没有 `红黑树`
+- `LinkedHashMap` - 是 HashMap 的子类；在现有的 `数组+单向链表+红黑树` 结构的基础上，又添加了一组 `双向链表`，用于记录添加元素的先后顺序
+- `TreeMap` - 底层使用 `红黑树` 存储，可以按照 key-value 键值对里面的 key 进行排序
+- `Hashtable` - 旧实现类，线程不安全，效率低，不可以添加 null 的 key 或 value 值，底层使用 `数组+单向链表` 进行存储
+- `Properties` - 里面的 key 和 value 方法都是 String 类型，常用于处理配置文件
+
+## key-value说明
+
+Map 中的 key-value 不是分开存放的，而是存放在 `Entry` 对象内，所有 key-value 键值对组成 `EntrySet`
+
+:::caution
+key 在 Map 中是无序不可重复的可以理解为 Set，key 所在的类需要重写 `equals()` 和 `hashCode()` 方法
+
+value 在 map 中是无序可重复的可以理解为 Collection，value 所在的类需要重写 `equals()` 方法
+:::
+
+## 常用方法
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/collection/map/MapTest.java)
+
+### 添加
+
+```java
+HashMap map = new HashMap();
+map.put("aa", 1);
+map.put("bb", 2);
+
+System.out.println(map);
+
+HashMap m = new HashMap();
+m.put("cc", 3);
+m.put("dd", 4);
+
+map.putAll(m);
+System.out.println(map);
+```
+
+### 删除
+
+```java
+HashMap map = new HashMap();
+map.put("aa", 1);
+map.put("bb", 2);
+System.out.println(map);
+
+Object removedValue = map.remove("aa");
+System.out.println(removedValue);
+System.out.println(map);
+```
+
+### 修改
+
+```java
+HashMap map = new HashMap();
+map.put("aa", 1);
+map.put("bb", 2);
+map.put("cc", 3);
+System.out.println(map);
+
+// put方法在map内已经存在相同的key时就是修改这个key的值
+map.put("bb", 10);
+System.out.println(map);
+
+HashMap m = new HashMap();
+m.put("cc", 20);
+m.put("dd", 4);
+
+// putAll时如果存在相同的key则修改，不存在就添加
+map.putAll(m);
+System.out.println(map);
+```
+
+### 获取
+
+```java
+HashMap map = new HashMap();
+map.put("aa", 1);
+map.put("bb", 2);
+map.put("cc", 3);
+
+System.out.println(map.get("aa"));
+System.out.println(map.get("cc"));
+```
+
+### 遍历
+
+```java
+HashMap map = new HashMap();
+map.put("aa", 1);
+map.put("bb", 2);
+map.put("cc", 3);
+
+// 使用增强for循环遍历map中所有的key
+for (Object key : map.keySet()) {
+    System.out.println(key);
+}
+
+System.out.println("-------------");
+// 使用迭代器遍历map中的所有value
+Collection values = map.values();
+Iterator valIterator = values.iterator();
+while (valIterator.hasNext()){
+    System.out.println(valIterator.next());
+}
+
+System.out.println("-------------");
+// 使用迭代器遍历map中的Entry并获取里面对应的key-value
+Iterator iterator = map.entrySet().iterator();
+while (iterator.hasNext()){
+    Map.Entry next = (Map.Entry) iterator.next();
+    System.out.println("next.getKey() = " + next.getKey());
+    System.out.println("next.getValue() = " + next.getValue());
+}
+
+System.out.println("-------------");
+
+// 根据keySet遍历所有的key-value
+Set keySet = map.keySet();
+for (Object key : keySet) {
+    System.out.println("key = " + key);
+    System.out.println("map.get(key) = " + map.get(key));
+}
+```
+
+### 其他
+
+```java
+HashMap map = new HashMap();
+map.put("aa", 1);
+map.put("bb", 2);
+map.put("cc", 3);
+
+System.out.println(map);
+
+// map的大小，就是entrySet的长度
+System.out.println(map.size());
+
+// 判断map中key为aa的数据
+System.out.println(map.containsKey("aa"));
+
+// 判断map中是否存在value为4的数据
+System.out.println(map.containsValue(4));
+
+// 清空map
+map.clear();
+
+System.out.println(map);
+```
+
+## TreeMap
+
+底层使用红黑树存储，可以按照添加的 key-value 中的 key 元素的指定的属性的大小顺序进行遍历，详细操作参考 <InternalLink code text="TreeSet" href="java/language/collection/list/#treeset" />
+
+:::caution
+TreeMap 中添加的 key 必须是同一个类型的对象
+:::
+
+## Properties
+
+常用于处理配置文件
+
+读取 Maven 项目下 resources 目录下的 `config.properties` 配置文件
+
+```properties title="config.properties"
+name=zs
+password=123
+```
+
+读取配置
+
+```java
+Properties props = new Properties();
+InputStream is = null;
+try {
+    // 配置文件放在resources目录下
+    is = PropertiesTest.class.getClassLoader().getResourceAsStream("config.properties");
+    props.load(is);
+    // 获取配置文件信息
+    System.out.println("name=" + props.getProperty("name"));
+    System.out.println("password=" + props.getProperty("password"));
+} catch (IOException e) {
+    throw new RuntimeException(e);
+} finally {
+    if (is != null) {
+        try {
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```

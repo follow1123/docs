@@ -1,0 +1,80 @@
+---
+title: 转换流
+sidebar:
+    order: 25
+---
+
+编码和解码
+
+- `编码` - 将可以识别的内容转换为不能识别的内容
+- `解码` - 将不能识别的内容转换为可以识别的内容
+
+字符集： 编码和解码时对应的字典
+
+:::note
+解码时的字符集和编码时的字符集必须相同
+
+大部分常用的字符集（UTF-8、GBK等）都兼容 ASCII
+:::
+
+| 字符集     | 描述                                                                                                                    |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
+| ASCII      | 包含 128 个字符<br/>基本的拉丁字母、数字和常用符号                                                                      |
+| ISO-8859-1 | 包含西欧语言的字符<br/>每个字符占 1 个字节<br/>兼容 ASCII                                                               |
+| GBK        | 存储中间简体繁体<br/>中文占 2 个字节<br/>兼容 ASCII，如果是 ASCII 还是占用一个字节                                      |
+| UTF-8      | 存储世界上所有字符<br/>Unicode 的实现，使用 1~4 个不等长的字节表示一个字符<br/>中文占 3 个字节，兼容 ASCII，占 1 个字节 |
+
+## InputStreamReader/OutputStreamWriter
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/transform/EncodeDecodeTest.java)
+
+### 读取 UTF-8 格式保存的文本并在控制台打印
+
+```java "StandardCharsets.UTF_8"
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/file_utf8.txt");
+try(InputStreamReader isr = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)){
+    char[] chars = new char[1024];
+    int len;
+    while ((len = isr.read(chars)) != -1){
+        System.out.println(new String(chars, 0, len));
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+### 读取 GBK 格式保存的文本并在控制台打印
+
+```java "Charset.forName("gbk")"
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/file_gbk.txt");
+try(InputStreamReader isr = new InputStreamReader(new FileInputStream(file), Charset.forName("gbk"))){
+    char[] chars = new char[1024];
+    int len;
+    while ((len = isr.read(chars)) != -1){
+        System.out.println(new String(chars, 0, len));
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+### 将 UTF-8 格式文本转换为 GBK 格式并保存
+
+```java "StandardCharsets.UTF_8" "Charset.forName("gbk")"
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/file_utf8.txt");
+File file1 = new File(projectPath, "src/main/resources/file_gbk.txt");
+try(InputStreamReader isr = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
+    OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(file1), Charset.forName("gbk"))) {
+    char[] chars = new char[1024];
+    int len;
+    while ((len = isr.read(chars)) != -1){
+        osw.write(chars, 0, len);
+    }
+    System.out.println("done");
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```

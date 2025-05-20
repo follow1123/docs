@@ -1,0 +1,71 @@
+---
+title: 线程通信
+sidebar:
+    order: 25
+---
+
+当需要多个线程来共同完成一件任务，并且我们希望它们有规律的执行，那么多线程之间需要一些通信机制，可以协调它们的工作，以此实现多线程共同操作一份数据
+
+## 等待唤醒机制
+
+在一个线程满足某个条件时，就会进入等待状态 `wait()/wait(time)`
+
+等待其它线程执行完它们指定代码过后再将其唤醒 `notify()`， 或可以指定等待的时间，等时间到了自动唤醒
+
+有多个线程进行等待时，如果需要，可以使用 `notifyAll()` 来唤醒所以的等待线程
+
+`wait/notify` 就是线程间的一种协作机制
+
+- `wait()` - 线程不再活动，不在参与调度，进入 wait set 中，因此不会浪费 CPU 资源，也不会去竞争锁了，这时的线程状态是 `WAITING` 或 `TIMED_WAITING`。它还要等着别的线程执行一个特别的动作，即 notify 或等待时间到，在这个对象上等待的线程从 wait set 中释放出来，重新进入到调度队列 ready queue 中
+- `notify()` - 选取wait set中的一个线程释放
+- `notifyAll()` - 选取wait set中的所有线程释放
+
+:::note
+这三个方法的使用必须在 `同步代码块` 中使用，并且调用者必须是 `同步监视器（锁）`
+:::
+
+:::note[`wait()` 和 `sleep()` 的区别]
+`wait()` 必须在同步代码块内使用，`sleep()` 可以在任意位置使用
+
+`wait()` 等待后会释放同步监视器（锁），`sleep()` 睡眠后不会释放
+:::
+
+### 两个线程依次打印数字
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_communication/ThreadCommunicationTest.java)
+
+```java
+Runnable runnable = new Runnable() {
+    private int number = 1;
+
+    @Override
+    public void run() {
+        while(true){
+            synchronized (this) {
+                notify(); //  唤醒等待中的线程
+                if (number <= 100){
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    System.out.println(Thread.currentThread().getName() + "---" + number);
+                    number++;
+                    try {
+                        wait(); // 释放同步监视器（锁）并进入WAITING状态
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }else {
+                    break;
+                }
+            }
+        }
+    }
+};
+
+Thread thread1 = new Thread(runnable, "线程1");
+Thread thread2 = new Thread(runnable, "线程2");
+thread1.start();
+thread2.start();
+```

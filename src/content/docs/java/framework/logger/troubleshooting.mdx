@@ -1,0 +1,40 @@
+---
+title: 常见问题
+sidebar:
+    order: 20
+---
+
+## 依赖了多个日志实现
+
+```txt
+SLF4J(W): Class path contains multiple SLF4J providers.
+SLF4J(W): Found provider [org.apache.logging.slf4j.SLF4JServiceProvider@14514713]
+SLF4J(W): Found provider [org.slf4j.jul.JULServiceProvider@69663380]
+SLF4J(W): Found provider [ch.qos.logback.classic.spi.LogbackServiceProvider@5b37e0d2]
+SLF4J(W): See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J(I): Actual provider is of type [org.apache.logging.slf4j.SLF4JServiceProvider@14514713]
+```
+
+如果出现了以上警告信息，就表示项目依赖了多个日志实现，需要排除其他日志实现
+
+```xml {7-16}
+<dependencies>
+  <dependency>
+    <groupId> org.apache.cassandra</groupId>
+    <artifactId>cassandra-all</artifactId>
+    <version>0.8.1</version>
+
+    <exclusions>
+      <exclusion>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+      </exclusion>
+      <exclusion>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+      </exclusion>
+    </exclusions>
+
+  </dependency>
+</dependencies>
+```

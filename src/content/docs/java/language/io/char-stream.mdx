@@ -1,0 +1,107 @@
+---
+title: 字符流
+sidebar:
+    order: 10
+---
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/file_stream/FileReaderWriterTest.java)
+
+## `FileReader`
+
+### 读取字符
+
+使用 `FileReader` 将数据从文件内一个字符一个字符的读取
+
+```java {9-10}
+// 创建文件的file对象
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/test1.txt");
+FileReader fileReader = null;
+try {
+    // 创建流
+    fileReader = new FileReader(file);
+    // 读取数据
+    int data;
+    while ((data = fileReader.read()) != -1){
+        System.out.print((char) data);
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+} finally {
+    // 关闭流
+    if (fileReader != null) {
+        try {
+            fileReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### 简化关闭流操作
+
+使用 `try-with-resource` 简化关闭流操作
+
+放入`try()`内的流会自动关闭
+
+```java {5}
+// 创建文件的file对象
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/test1.txt");
+// 创建流
+try(FileReader fileReader = new FileReader(file)){
+    // 读取数据
+    int data;
+    while ((data = fileReader.read()) != -1){
+        System.out.print((char) data);
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+}
+```
+
+### 减少对磁盘的访问
+
+使用 `FileReader` 通过添加临时 char 数组保存数据，减少对磁盘的访问，提高读取速度
+
+```java {6,9}
+// 创建文件的file对象
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/test1.txt");
+// 创建流
+try(FileReader fileReader = new FileReader(file)){
+    char[] chars = new char[4];
+    // 读取数据，一次读取多个数据
+    int len = 0;
+    while ((len = fileReader.read(chars)) != -1){
+        System.out.print(new String(chars, 0, len));
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+}
+```
+
+## `FileWriter`
+
+### 写出数据
+
+使用 `FileWriter` 写出数据
+
+```java
+// 创建文件的file对象
+String projectPath = System.getProperty("user.dir");
+File file = new File(projectPath, "src/main/resources/test2.txt");
+/*
+ 创建文件输出流
+ 文件不存在默认创建，文件存在默认覆盖
+ 创建输出流时第二个参数，表示文件存在就追加内容
+ */
+try (FileWriter fileWriter = new FileWriter(file)) {
+    // 写出数据
+    fileWriter.write("abc");
+    System.out.println("完成");
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```

@@ -1,0 +1,152 @@
+---
+title: CRUD
+sidebar:
+    order: 5
+---
+
+:::note
+namespace 中的包名要和 Dao/mapper 接口的包名一致
+:::
+
+## select
+
+- `id` - 就是对应的 namespace 中的方法名
+- `resultType` - sql 语句执行的返回值
+- `paramterType` - 参数类型
+
+xml 配置
+
+```xml
+<select id="getUserById" parameterType="int" resultType="com.example.pojo.Users">
+    select * from users where users.userId = #{id}
+</select>
+```
+
+代码
+
+```java
+@Test
+public void testGetUser(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    List<Users> user = mapper.getUser();
+    for (Users users : user) {
+        System.out.println(users.getEmail());
+    }
+    //关闭连接
+    sqlSession.close();
+}
+```
+
+## insert
+
+xml 配置
+
+```xml
+<insert id="insertUser" parameterType="com.example.pojo.Users">
+    insert into users (email, password) values (#{Email}, #{Password})
+</insert>
+```
+
+代码
+
+```java
+@Test
+public void testInsertUser(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    HashMap<String, Object> hashMap = new HashMap<>();
+    Users users = new Users();
+    users.setEmail("fsafaefwea");
+    users.setPassword("fdsfsse");
+    int i = mapper.insertUser(users);
+    //提交事务
+    sqlSession.commit();
+    sqlSession.close();
+    System.out.println("修改"+(i > 0 ? "成功！" : "失败！"));
+}
+```
+
+## delete
+
+xml 配置
+
+```xml
+<delete id="deleteUser" parameterType="int">
+    delete from users where users.userId = #{id}
+</delete>
+```
+
+代码
+
+```java
+@Test
+public void testDeleteUser(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    HashMap<String, Object> hashMap = new HashMap<>();
+    int i = mapper.deleteUser(105);
+    //提交事务
+    sqlSession.commit();
+    sqlSession.close();
+    System.out.println("修改"+(i > 0 ? "成功！" : "失败！"));
+}
+```
+
+## update
+
+xml 配置
+
+```xml
+<update id="updateUser" parameterType="java.util.Map">
+    update users set users.password = #{pwd}, users.email = #{email}
+    where users.userId = #{id}
+</update>
+```
+
+代码
+
+```java
+@Test
+public void testUpdateUser(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    HashMap<String, Object> hashMap = new HashMap<>();
+    hashMap.put("pwd", "123456");
+    hashMap.put("email", "behappy@vip.sina.com");
+    hashMap.put("id", 1);
+    int i = mapper.updateUser(hashMap);
+    //提交事务
+    sqlSession.commit();
+    sqlSession.close();
+    System.out.println("修改"+(i > 0 ? "成功！" : "失败！"));
+}
+```
+
+:::caution
+增删改需要提交事务
+:::
+
+:::tip
+如果实体类，或者数据库中的表，字段或者参数过多，考虑使用 Map
+:::
+
+## 模糊查询
+
+xml 配置
+
+```xml
+<select id="getUserByFirstName" parameterType="String" resultType="com.example.pojo.Users">
+    select * from users where users.firstName like '%' #{id} '%'
+</select>
+```
+
+代码
+
+```java
+@Test
+public void testGetUserByEmail(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    List<Users> a = mapper.getUserByFirstName("ia");
+    for (Users users : a) {
+        System.out.println(users.getFirstName() + " " + users.getLastName());
+    }
+    sqlSession.close();
+}
+```

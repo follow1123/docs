@@ -1,0 +1,124 @@
+---
+title: 说明
+sidebar:
+    order: 0
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import { Steps } from "@astrojs/starlight/components";
+
+> [官方文档](https://mybatis.org/mybatis-3/)
+
+<Tabs>
+
+<TabItem label="Maven">
+
+    ```xml
+    <dependency>
+        <groupId>org. mybatis</groupId>
+        <artifactId>mybatis</artifactId>
+        <version>3.5.2</version>
+    </dependency>
+    ```
+
+</TabItem>
+
+<TabItem label="Gradle (kts)">
+
+    ```kotlin
+    implementation("org.mybatis:mybatis:3.5.2")
+    ```
+
+</TabItem>
+
+</Tabs>
+
+## 基础使用
+
+<Steps>
+
+1. 配置
+
+    ```xml
+    <?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE configuration
+            PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+            "http://mybatis.org/dtd/mybatis-3-config.dtd">
+    <configuration>
+        <environments default="development">
+            <environment id="development">
+                <transactionManager type="JDBC"/>
+                <dataSource type="POOLED">
+                    <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+                    <property name="url" value="jdbc:mysql://localhost:3306/session1?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai"/>
+                    <property name="username" value="用户名"/>
+                    <property name="password" value="密码"/>
+                </dataSource>
+            </environment>
+        </environments>
+    </configuration>
+    ```
+
+2. 工具类
+
+    ```java
+    public class JDBCUtils {
+        private static SqlSessionFactory sqlSessionFactory;
+        static {
+            try(InputStream is = JDBCUtils.class.getClassLoader().getResourceAsStream("mybatis-info.xml")){
+                sqlSessionFactory = new SqlSessionFactoryBuilder().build(is);
+            }catch (Exception e){
+                e.printStackTrace();
+                throw new RuntimeException("connection failed!");
+            }
+        }
+        public static SqlSession getSqlSession(){
+            return sqlSessionFactory.openSession();
+        }
+    }
+    ```
+
+3. 编写实体类
+
+4. 编写 Dao 接口
+
+    ```java
+    public interface UserDao {
+        List<Users> getUser();
+    }
+    ```
+
+5. 编写 Dao 对应的 mapper 文件
+
+    ```xml
+    <?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE mapper
+            PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+            "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="dao接口的全限定名">
+        <select id="对应的方法名" resultType="返回结果的全限定名">
+        	sql语句
+        </select>
+    </mapper>
+    ```
+
+6. 测试
+
+    ```java
+    @Test
+    public void testGetUser(){
+        //获取sqlSession对象
+        SqlSession sqlSession = JDBCUtils.getSqlSession();
+        //获取对应的dao对象
+        UserDao mapper = sqlSession.getMapper(UserDao.class);
+        //执行得到结果
+        List<Users> user = mapper.getUser();
+        for (Users users : user) {
+            System.out.println(users.getEmail());
+        }
+        //关闭连接
+        sqlSession.close();
+    }
+    ```
+
+</Steps>

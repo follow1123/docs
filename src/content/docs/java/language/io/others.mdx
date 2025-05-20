@@ -1,0 +1,66 @@
+---
+title: 其他流
+sidebar:
+    order: 35
+---
+
+## 标准输入、输出流
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/other/StandStreamTest.java)
+
+- `System.in` - 标准输入流，默认从键盘输入
+- `System.out` - 标准输出流，默认输出到控制台
+
+使用 `setIn()/setOut()` 修改输入输入流的位置，因为 in 和 out 两个属性是 final 标识的，在 Java 层面无法修改，所以底层调用 `c/c++` 代码实现
+
+```java
+String projectPath = System.getProperty("user.dir");
+File fileA = new File(projectPath, "src/main/resources/a.txt");
+File fileB = new File(projectPath, "src/main/resources/b.txt");
+System.out.println("输入a开头的字符保存到a.txt文件内\n输入b开头的字符保存到b.txt文件内\n输入q退出");
+try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+     PrintStream psA = new PrintStream(fileA);
+     PrintStream psB = new PrintStream(fileB)) {
+    PrintStream defaultPs = System.out;
+
+    String line;
+
+    while (!(line = br.readLine()).equals("q")){
+        if (line.startsWith("a")){
+            System.setOut(psA);
+        }else if (line.startsWith("b")){
+            System.setOut(psB);
+        }else {
+            System.setOut(defaultPs);
+        }
+        System.out.println(line);
+    }
+} catch (IOException e) {
+    throw new RuntimeException(e);
+}
+```
+
+## 字节数组流
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/io/other/ByteArrayStreamTest.java)
+
+对字节数组进行操作
+
+```java
+try {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream(5);
+    baos.write(1);
+    baos.write(new byte[]{2, 3, 4, 5});
+
+    // 转换为byte数组
+    byte[] byteArray = baos.toByteArray();
+    ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+
+    System.out.println(bais.read());
+    System.out.println(bais.read());
+    System.out.println(bais.read());
+    System.out.println(bais.read());
+} catch (IOException e) {
+    e.printStackTrace();
+}
+```

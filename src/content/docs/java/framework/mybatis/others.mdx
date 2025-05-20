@@ -1,0 +1,489 @@
+---
+title: 其他
+sidebar:
+    order: 20
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+## 生命周期和作用域
+
+### `SqlSessionFactorybuilder`
+
+一旦创建了 SqlSessionFactory，就不再需要它了
+
+局部变量
+
+### `SqISessionFactory`
+
+可以想象为数据库连接池
+
+SqlSessionFactory 一旦被创建就应该在应用的运行期间一直存在，没有任何理由丢弃它或重新创建另一个实例
+
+因此 SqlSessionFactory 的最佳作用域是应用作用域
+
+最简单的就是使用单例模式或者静态单例模式
+
+### `SqlSession`
+
+连接到连接池的一个请求
+
+SqlSession 的实例不是线程安全的，因此是不能被共享的，所以它的最佳的作用域是请求或方法作用域
+
+用完之后需要赶紧关闭，否则资源被占用
+
+这里面的每一个 Mapper, 就代表一个具体的业务
+
+## `ResultMap`
+
+### 属性名和字段名不一致的问题
+
+#### 方式一
+
+起别名（在sql层面直接起别名）
+
+#### 使用 ResultMap
+
+Resu1tMap 元素是 MyBatis 中最重要最强大的元素
+
+ResultMap 的设计思想是，对于简单的语句根本不需要配置显式的结果映射，而对于复杂一点的语句只需要描述它们的关系就行了
+
+ResultMap 最优秀的地方在于，虽然你已经对它相当了解了，但是根本就不需要显式地用到他们
+
+```xml
+<resultMap id="mapId" type="对应的实体类">
+    <!-- 将实体类的字段名也数据库表的列名对应起来-->
+    <result column="数据库内的列名" property="对应实体类的字段名"/>
+</resultMap>
+```
+
+## 日志
+
+loglmpl（指定 MyBatis 所用日志的具体实现，未指定时将自动查找）
+
+- SLF4j
+- LOG4J
+- LOG4]2
+- JDK_LOGGING
+- COMMONS_LOGGING
+- STDOUT_LOGGING
+- NO_LOGGING
+
+### 使用标准输出作为日志实现
+
+```xml
+<settings>
+    <setting name="logImpl" value="STDOUT_LOGGING"/>
+</settings>
+```
+
+### 使用 log4j 作为日志实现
+
+```xml
+<settings>
+    <setting name="logImpl" value="LOG4J"/>
+</settings>
+```
+
+## 分页
+
+### limit 进行分页
+
+#### xml 配置
+
+```xml
+<select id="getUserLimit" resultType="com.example.pojo.Users">
+    select * from users limit #{param1}, #{param2}
+</select>
+```
+
+#### 代码
+
+```java
+@Test
+public void testGetUserLimit(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    List<Users> user = mapper.getUserLimit(5, 5);
+    for (Users users : user) {
+        System.out.println(users.getUserId() + "--"+  users.getEmail());
+    }
+    //关闭连接
+    sqlSession.close();
+}
+```
+
+### parameterType 多个参数的解决方法
+
+#### 使用 map 封装
+
+```xml
+<select id="getUserLimit2" parameterType="map" resultType="com.example.pojo.Users">
+    select * from users limit #{startIndex}, #{pageSize}
+</select>
+```
+
+```java
+@Test
+public void testGetUserLimit2(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    HashMap<String, Object> map = new HashMap<>();
+    map.put("startIndex", 0);
+    map.put("pageSize", 5);
+    List<Users> user = mapper.getUserLimit2(map);
+    for (Users users : user) {
+        System.out.println(users.getUserId() + "--"+  users.getEmail());
+    }
+    //关闭连接
+    sqlSession.close();
+}
+```
+
+#### 不写 parameterType 使用 arg 或 param 使用方式
+
+- arg0，arg1，arg2 ……
+- param1，param2，param3 ……
+
+```xml
+<select id="getUserLimit" resultType="com.example.pojo.Users">
+    select * from users limit #{param1}, #{param2}
+</select>
+```
+
+```java
+@Test
+public void testGetUserLimit(){
+    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+    List<Users> user = mapper.getUserLimit(5, 5);
+    for (Users users : user) {
+        System.out.println(users.getUserId() + "--"+  users.getEmail());
+    }
+    //关闭连接
+    sqlSession.close();
+}
+```
+
+### xml 转义字符
+
+| 字符     | 符号 | 说明   |
+| -------- | ---- | ------ |
+| `&lt;`   | `<`  | 小于号 |
+| `&gt;`   | `>`  | 大于号 |
+| `&amp;`  | `&`  | 和     |
+| `&apos;` | `'`  | 单引号 |
+| `&quot;` | `"`  | 双引号 |
+
+### RowBounds 实现分页
+
+#### xml 配置
+
+```xml
+<select id="getUserByRowBounds" resultType="com.example.pojo.Users">
+    select * from users
+</select>
+```
+
+#### 代码
+
+```java
+@Test
+public void getUserByRowBounds(){
+    List<Users> users = sqlSession.selectList("com.example.dao.UserMapper.getUserByRowBounds", null, new RowBounds(5, 5));
+    for (Users user: users) {
+        System.out.println(user.getUserId() + "--"+  user.getEmail());
+    }
+    //关闭连接
+    sqlSession.close();
+}
+```
+
+## 注解开发
+
+<Steps>
+
+1. 编写 Mapper 接口
+
+    ```java
+    public interface UserMapper {
+        @Select("select * from users")
+        List<Users> getUser();
+    }
+    ```
+
+2. 在核心配置文件中绑定接口
+
+    ```xml
+    <mappers>
+        <mapper class="com.example.mapper.UserMapper"/>
+    </mappers>
+    ```
+
+3. 测试
+
+    ```java
+    @Test
+    public void testGetUser(){
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        List<Users> user = mapper.getUser();
+        for (Users users : user) {
+            System.out.println(users.getUserId() + "--" + users.getEmail());
+        }
+    }
+    ```
+
+</Steps>
+
+:::caution[缺点]
+无法使用 ResultMap
+
+在 sql 参数较多时会很麻烦
+:::
+
+### 其他注解
+
+- `@Insert("sql")` - 插入
+- `@Update("sql")` - 修改
+- `@Delete("sql")` - 删除
+
+#### `@Param()`
+
+基本类型的参数或者 String 类型,需要加上
+
+引用类型不需要加
+
+如果只有一个基本类型的话，可以忽略，但是建议都加上
+
+我们在 SQL 中弓|用的就是我们这里的 `@Param()` 中设定的属性名
+
+#### `#{}` 和 `${}` 的区别
+
+就是 Statement 和 PreparedStatement 的区别
+
+## 实体之间的联系
+
+:::note
+
+- 关联 - association（多对一）
+- 集合 - collection（一对多）
+- JavaType 用来指定实体类中属性的类型
+- ofType 用来指定映射到 List 或者集合中的 pojo 类型，泛型中的约束类型
+  :::
+
+### 多对一
+
+#### 按照查询嵌套处理
+
+```xml
+<resultMap id="tsMap" type="student">
+    <!-- 将该属性与表中的tid关联起来-->
+    <!-- select 相当于查询跟tid关联的值赋给teacher属性-->
+    <association property="teacher" javaType="teacher" column="tid" select="getTeacher"/>
+</resultMap>
+
+<select id="getStudent" resultMap="tsMap">
+    select * from student
+</select>
+
+<select id="getTeacher" resultType="teacher">
+    select * from teacher where id = #{id}
+</select>
+```
+
+#### 按照结果嵌套处理
+
+```xml
+<resultMap id="tsMap" type="student">
+    <result property="id" column="sid"/>
+    <result property="name" column="sname"/>
+
+    <!-- 将该引用属性里面的属性与链表查询的值关联起来-->
+    <association property="teacher" javaType="teacher">
+        <result property="name" column="tname"/>
+        <result property="id" column="tid"/>
+    </association>
+</resultMap>
+
+<select id="getStudent" resultMap="tsMap">
+    select s.id sid, s.name sname, t.id tid, t.name tname
+    from student s, teacher t where s.tid = t.id
+</select>
+```
+
+### 一对多
+
+#### 按照查询嵌套处理
+
+```xml
+<resultMap id="tsMap" type="teacher">
+    <result property="id" column="id"/>
+    <!-- 将集合属性进行关联-->
+    <collection property="students" javaType="java.util.ArrayList" ofType="student" column="id" select="getStudents"/>
+</resultMap>
+
+<select id="getTeacher" resultMap="tsMap">
+    select * from teacher
+</select>
+
+<select id="getStudents" resultType="student">
+    select * from student where tid = #{tid}
+</select>
+```
+
+#### 按照结果嵌套处理
+
+```xml
+<resultMap id="tsMap" type="teacher">
+    <result property="id" column="tid"/>
+    <result property="name" column="tname"/>
+
+    <!-- 将集合属性进行关联-->
+    <collection property="students" javaType="java.util.ArrayList" ofType="student">
+        <result property="id" column="sid"/>
+        <result property="name" column="sname"/>
+    </collection>
+</resultMap>
+
+<select id="getTeacher" resultMap="tsMap">
+    select t.id tid, t.name tname, s.id sid, s.name sname
+    from teacher t, student s
+    where t.id = s.tid
+</select>
+```
+
+## 缓存
+
+MyBatis 包含一个非常强大的查询缓存特性，它可以非常方便地定制和配置缓存，缓存可以极大的提升查询效率
+
+MyBatis 系统中默认定义了两级缓存: 一级缓存和二级缓存
+
+默认情况下，只有一级缓存开启 （SqlSession 级别的缓存，也称为本地缓存）
+
+二级缓存需要手动开启和配置，他是基于 namespace 级别的缓存
+
+为了提高扩展性，MyBatis 定义了缓存接口 Cache
+
+我们可以通过实现 Cache 接口来自定义二级缓存
+
+### 一级缓存
+
+一级缓存也叫本地缓存
+
+SqlSession 从开启到关闭前得查询得属性会被缓存
+
+与数据库同一次会话期间查询到的数据会放在本地缓存中
+
+以后如果需要获取相同的数据，直接从缓存中拿，没必须再去查询数据库
+
+缓存失效的情况:
+
+- 查询不同的东西
+- 增删改操作，可能会改变原来的数据，所以必定会刷新缓存!
+- 查询不同的 Mapper.xml
+- 手动清理缓存：
+    - 在下一次查询时调用 `sqlSession.clearCache()` 方法
+
+:::note
+一级缓存默认是开启的， 只在一次 SqlSession 中有效, 也就是拿到连接到关闭连接这个区间段
+
+一级缓存就是一个 map
+:::
+
+### 二级缓存
+
+二级缓存也叫全局缓存，一级缓存作用域太低了，所以诞生了二级缓存
+
+基于 namespace 级别的缓存，一个名称空间，对应一个二级缓存
+
+工作机制：
+
+- 一个会话查询一条数据，这个数据就会被放在当前会话的一级缓存中
+- 如果当前会话关闭了，这个会话对应的一-级缓存就没了，但是我们想要的是，会话关闭了，一级缓存中的数据被保存到二级缓存中
+- 新的会话查询信息，就可以从二级缓存中获取内容
+- 不同的 mapper 查出的数据会放在自己对应的缓存（map）中
+
+在核心配置文件里显示开启二级缓存（默认已开启）
+
+```xml
+<setting name="cacheEnabled" value="true'"/>
+```
+
+在对应得 mapper.xml 文件内加入标签
+
+```xml
+<!-- 默认方式-->
+<cache/>
+
+<!-- 自定义方式-->
+<cache eviction="FIFO"
+       flushInterval="60000"
+       size="512"
+       readOnly="true"/>
+```
+
+:::caution
+开启二级缓存对使用注解完成的 sql 方法无效
+
+需要缓存的类必须实现序列化接口
+
+只要开启了二级缓存，在同一个 Mapper 下就有效
+
+所有的数据都会先放在一级缓存中
+
+只有当会话提交，或者关闭的时候，才会提交到二级缓冲中
+:::
+
+### 缓存原理
+
+缓存顺序：
+
+1. 先看二级缓存中有没有
+2. 再看一级缓存中有没有
+3. 查询数据库
+
+### 自定义缓存
+
+Ehcache 是一种广泛使用的开源 Java 分布式缓存，主要面向通用缓存
+
+```xml
+<dependency>
+    <groupId>org.mybatis.caches</groupId>
+    <artifactId>mybatis-ehcache</artifactId>
+    <version>1.1.0< /version>
+</dependency>
+```
+
+在对应的 mapper.xml 文件内指定缓存的实现方式
+
+```xml
+<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+```
+
+编写 ehcache 配置文件 ehcache.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         updateCheck="false">
+
+    <diskStore path="./tmpdir/Tmp_EhCache"/>
+
+    <defaultCache
+                  eternal="false"
+                  maxElementsInMemory="10000"
+                  overflowToDisk="false"
+                  diskPersistent="false"
+                  timeToIdleSeconds="1800"
+                  timeToLiveSeconds="259200"
+                  memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+           name="cloud_user"
+           eternal="false"
+           maxElementsInMemory="5000"
+           overflowToDisk="false"
+           diskPersistent="false"
+           timeToIdleSeconds="1800"
+           timeToLiveSeconds="1800"
+           memoryStoreEvictionPolicy="LRU"/>
+</ehcache>
+```

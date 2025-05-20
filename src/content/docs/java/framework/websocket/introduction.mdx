@@ -1,0 +1,42 @@
+---
+title: 说明
+sidebar:
+    order: 0
+---
+
+import Mermaid from "@components/Mermaid.astro";
+
+> [详细代码](https://github.com/follow1123/java-frameworks/blob/main/websocket)
+
+WebSocket 是一种网络通信协议，旨在实现客户端和服务器之间的双向、全双工通信
+
+与传统的 HTTP 协议不同，WebSocket 允许在单一的连接上进行实时数据交换，而无需每次请求时都重新建立连接
+
+## WebSocket URL
+
+```bash
+ws://host:port/path?query   # websocket 协议URL
+wss://host:port/path?query  # 使用 SSL/TLS 加密
+```
+
+<Mermaid
+    code={`
+%%{init: {'sequence': {'noteAlign': 'left'}}}%%
+sequenceDiagram
+participant client as 客户端
+participant server as 服务器
+rect rgb(191, 223, 255)
+client ->> server: ws://localhost:8080/echo
+Note right of client: GET /path/to/websocket/endpoint HTTP/1.1<br />Host: localhost<br />Upgrade: websocket<br />Connection: Upgrade<br />Sec-WebSocket-Key: xqBt3ImNzJbYqRINxEFlkg==<br />Origin: http://localhost<br />Sec-WebSocket-Version: 13
+end
+rect rgb(200, 150, 255)
+server ->> client: Switching Protocols
+Note left of server: HTTP/1.1 101 Switching Protocols<br />Upgrade: websocket<br />Connection: Upgrade<br />Sec-WebSocket-Accept: K7DJLdLooIwIG/MOpvWFB3y3FE8=
+end
+`}
+/>
+
+## 参考
+
+- [Jakarta EE](https://jakarta.ee/learn/docs/jakartaee-tutorial/9.1/web/websocket/websocket.html)
+- [Tomcat](https://tomcat.apache.org/tomcat-9.0-doc/web-socket-howto.html)

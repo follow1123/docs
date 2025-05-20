@@ -1,0 +1,153 @@
+---
+title: 其他
+sidebar:
+    order: 10
+---
+
+## 编码器/解码器
+
+需要实现两对接口
+
+- `Encoder.Text<T>` / `Decoder.Text<T>` - 字符串编码解码器
+- `Encoder.Binary<T>` / `Decoder.Binary<T>` - 二进制编码解码器
+
+<details>
+
+<summary>Person 对象</summary>
+
+```java
+public class Person {
+
+    private String name;
+    private int age;
+
+    public String getName() {return name;}
+    public void setName(String name) {this.name = name;}
+    public int getAge() {return age;}
+    public void setAge(int age) {this.age = age;}
+
+    @Override
+    public String toString() {
+        return "Person{name='" + name + '\'' + ", age=" + age + '}';
+    }
+
+}
+```
+
+</details>
+
+<details>
+
+<summary>Person 对象转 json 编码器</summary>
+
+```java
+public class PersonJsonEncoder implements Encoder.Text<Person> {
+
+    @Override
+    public String encode(Person person) throws EncodeException {
+        // 这里使用 jackson 进行 json 转换
+        ObjectMapper om = new ObjectMapper();
+        try {
+            return om.writeValueAsString(person);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void init(EndpointConfig config) {}
+    @Override
+    public void destroy() {}
+}
+```
+
+</details>
+
+<details>
+
+<summary>json 转 Person 对象解码器</summary>
+
+```java
+public class JsonPersonDecoder implements Decoder.Text<Person> {
+
+    @Override
+    public Person decode(String s) throws DecodeException {
+        // 这里使用 jackson 进行 json 转换
+        ObjectMapper om = new ObjectMapper();
+        try {
+            return om.readValue(s, Person.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean willDecode(String s) {
+        // 这里是判断发送过来的字符串是否可以使用当前解码器
+        return true;
+    }
+    @Override
+    public void init(EndpointConfig config) {}
+    @Override
+    public void destroy() {}
+}
+```
+
+</details>
+
+```java
+@ServerEndpoint(
+        value = "/ws/ed/echo",
+        encoders = PersonJsonEncoder.class, // 编码器
+        decoders = JsonPersonDecoder.class // 解码器
+)
+public class EncodeDecodeEndpoint {
+
+    @OnMessage
+    public void echoJsonMsg(Session session, Person person){
+        System.out.printf("encode decode handle message %s%n", person);
+        if (session.isOpen()) {
+            try {
+                session.getBasicRemote().sendObject(person);
+            } catch (IOException | EncodeException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
+```
+
+## 路径参数
+
+```java
+// 使用{}表示参数
+@ServerEndpoint("/ws/param/{name}/echo")
+public class PathParamEndpoint {
+
+    @OnOpen
+    public void open(Session session, EndpointConfig ec, @PathParam("name") String name){
+        // 配合 @PathParam 获取路径参数
+        System.out.printf("handle path param %s%n", name);
+        // 保存到当前会话内
+        session.getUserProperties().put("name", name);
+    }
+
+    @OnMessage
+    public void onHandlePathParam(Session session, String msg){
+        if (session.isOpen()) {
+            // 获取当前会话指定的数据
+            String name = (String) session.getUserProperties().get("name");
+            System.out.printf("get path param %s with message %s%n", name, msg);
+            try {
+                session.getBasicRemote().sendText(msg + name);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}
+```
+
+```
+
+```

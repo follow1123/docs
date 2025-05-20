@@ -1,0 +1,119 @@
+---
+title: 会话管理
+sidebar:
+    order: 15
+---
+
+import Mermaid from "@components/Mermaid.astro";
+
+HTTP 协议是一个无状态的协议，这意味着每个请求都是独立的，服务器不会自动记住之前请求的状态或用户的身份
+
+为了在多次请求之间保持状态，尤其是在用户登录后需要维护会话信息时，会话管理（Session Management）就显得非常重要
+
+:::note[Cookie 和 Session 配合实现会话管理]
+cookie 是在客户端保少量数据的技术，主要通过响应头向客户端响应一些客户端要保的信息
+
+session 是茌服务端保更多数据的技术，主要通过 HttpSession 对保存一些和客户端相关的信息
+:::
+
+## Cookie
+
+<Mermaid
+    code={`
+sequenceDiagram
+participant client as 客户端
+participant server as 服务器
+
+client ->> server: 请求1
+server ->> client: Set-Cookie: aaa=111
+client ->> server: 请求2(cookie: aaa=111)
+`}
+/>
+
+### 响应时添加 Cookie
+
+```java
+resp.addCookie(new Cookie("aaa", "111"));
+```
+
+### 客户端请求时携带的 Cookie
+
+```java
+Cookie[] cookies = req.getCookies();
+if (cookies != null) {
+    for (Cookie cookie : cookies) {
+        System.out.println(cookie.getName() + " - " + cookie.getValue());
+    }
+}
+```
+
+### 相关方法
+
+- `setComment(purpose)` - 添加 Cookie 的注释
+- `setDomain(domain)` - 指定 Cookie 可以被哪个域名访问
+- `setMaxAge(expiry)` - 设置 Cookie 过期时间，单位秒
+- `setPath(uri)` - 指定 Cookie 可以被哪些路径访问
+- `setSecure(flag)` - 指定只有使用 **SSL/TLS** 加密的协议才能访问，例如 **HTTPS**
+- `setHttpOnly(isHttpOnly)` - 指定 Cookie 是否无法在 JavaScript 内获取，防止 XSS 攻击
+
+## Session
+
+HttpSession 是一种保留更多信息在服务端的一种技术，服务器会为每一个客户端开辟一块内存空间，即 Session 对象．客户端在发送请求时，都可以使用自己的 Session 这样服务端就可以通过 Session 来记录某个客户端的状态了
+
+服务端在为客户端创建 Session 时，会同时将 Session 对象的 id ，即 JSESSIONID 以 Cookie 的形式放入响应对象，创建完后，客户端会收到一个特殊的 Cookie，叫做 JSESSIONID
+
+客户端下一次请求时带 JSESSIONID，后端收到后，根据 JSESSIONID 找到对应的 Session 对象
+
+<Mermaid
+    code={`
+sequenceDiagram
+participant client as 客户端
+participant server as 服务器
+
+client ->> server: 请求
+Note right of server: 创建Session(id:234)
+server ->> client: 响应(Set-Cookie: JSESSIONID=234)
+client ->> server: 请求(cookie: JSESSIONID=234)
+Note right of server: 查询是否有id为234的Session，没有就新建一个Session
+server ->> client: 响应
+`}
+/>
+
+```java
+// 只有在执行这个方法之后才会开始会话
+req.getSession();
+```
+
+### Session 创建流程
+
+<Mermaid
+    code={`
+flowchart TD
+a("req.getSession()") --> b{{请求的 Cookie 是否携带 JSESSIONID}}
+b -- 是 --> c{{在服务器查找对应的 Session 对象}}
+b -- 否 --> d[创建 Session 对象]
+c -- 找得到 --> e(返回 Session 对象)
+c -- 找不到 --> d
+d --> e
+`}
+/>
+
+- `isNew()` - 判断 Session 对象是不是新建的
+
+### Session 也是一个域对象
+
+可以使用 `setAttribute()/getAttribute()` 等方法操作域内的数据
+
+### Session 时效性
+
+Session 默认 30 分钟后就销毁，如果 30 分钟内有对应 JSESSIONID 请求过来，则重新计时
+
+```xml
+<!-- 默认在 Tomcat 安装目录下 conf/web.xml 内配置，可以在当前项目的 web.xml 文件内覆盖，单位分钟 -->
+<session-config>
+    <session-timeout>30</session-timeout>
+</session-config>
+```
+
+- `setMaxInactiveInterval(interval)` - 设置 Session 对象的过期时间，单位秒
+- `invalidate()` - 让 Session 直接失效

@@ -1,0 +1,294 @@
+---
+title: IoC 容器
+sidebar:
+    order: 5
+    badge:
+        text: WIP
+        variant: note
+---
+
+> [代码](https://github.com/follow1123/spring-framework-examples)
+
+控制反转 IoC (Inversion of Control)，是一种设计思想，DI（依赖注入）是实现 IoC 的一种方法
+
+## 配置方式
+
+### XML
+
+### 注解
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/annotation-config.html)
+
+#### `@Autowired`
+
+根据类型自动注入
+
+#### `@Qualifiers`
+
+有多个类型是，使用这个注解指定具体的名称
+
+:::note
+必须要配合 `@Autowired` 注解一起使用
+:::
+
+#### JSR-250
+
+##### `@Resource`
+
+默认根据名称自动注入，如果没有指定 `name` 属性，默认使用属性或 setter 方法名（setName 的 name）作为名称
+
+如果匹配不到任何名称，则根据类型自动注入
+
+##### `@PostConstruct` / `@PreDestroy`
+
+在被管理的 Bean 内的方法上标记这两个方法，表示这个 Bean 初始化/销毁是执行这个方法
+
+#### @Value
+
+使用配置文件内的值注入属性，支持 `SpEL`
+
+### 代码配置
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/java.html)
+
+- `@Configuration` - 标记当前类是容器的配置类，类似 XML 方式的一个 xml 文件
+- `@Bean` - 在方法上使用，表示这个方法的返回值会被注入到容器内
+
+#### `@Bean`
+
+##### 生命周期方法
+
+使用 `@Bean` 注解内的 `initMethod` / `destroyMethod` 属性指定这个 Bean 的初始化/销毁方法（定义在这个 Bean 内部的方法）
+
+##### 作用域
+
+配合 `@Scope` 注解指定作用域
+
+##### 名称
+
+- `@Bean("myThing")` - 指定 Bean 的名称
+- `@Bean({"dataSource", "subsystemA-dataSource", "subsystemB-dataSource"})` - 指定 Bean 的多个别名
+
+#### `@Configuration`
+
+配合 `@Import` 注解导入另一个使用 `@Configuration` 标记的配置类，可以指定多个
+
+## Beans
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/definition.html)
+
+### 定义
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+- id - 唯一
+- name - 名称
+- alias - 别名可以指定多个
+
+<Tabs>
+
+<TabItem label="Annotation">
+
+```java
+@Component
+// @Component("beanName")
+// @Controller
+// @Service
+// @Repository
+public class ComponentBean {
+...
+```
+
+</TabItem>
+
+<TabItem label="Code">
+
+```java
+@Configuration
+public class AppConfig {
+    @Bean(name = {"bean1", "bean2", "bean3"})
+    public MyBean myBean() {
+        return new MyBean();
+    }
+}
+```
+
+</TabItem>
+
+<TabItem label="XML">
+
+```xml
+<beans
+    ...>
+    <bean id="bean1" class="org.example.beans.definition.Bean1"/>
+    <bean name="bean2" class="org.example.beans.definition.Bean2"/>
+
+    <alias name="bean2" alias="bean22"/>
+</beans>
+```
+
+</TabItem>
+</Tabs>
+
+### 实例化
+
+- 构造器实例化，使用无参构造器
+- 静态方法实例化，xml 的 `factory-method` 属性
+- 实例工厂实例化，需要自定义一个实例工厂类，xml 配合 `factory-bean` 和 `factory-method` 属性使用
+
+## 依赖
+
+### 依赖注入
+
+#### 构造器注入
+
+##### 构造器参数解析
+
+#### Setter 注入
+
+#### 依赖解析流程
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/dependencies/factory-collaborators.html#beans-dependency-resolution)
+
+### 依赖配置详情
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/dependencies/factory-properties-detailed.html)
+
+### 自动装配
+
+#### 排除
+
+xml 方式下使用 bean 标签内的 `autowire-candidate="false"` 配置排除这个 bean，这个 bean 无法被自动装配到
+
+#### 局限性和问题
+
+### 方法注入
+
+#### lookup
+
+#### 方法替换
+
+### 其他
+
+#### `depends on`
+
+控制 bean 实例化顺序
+
+#### 懒加载
+
+## Bean 作用域
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/factory-scopes.html)
+
+### Singleton（单例）
+
+容器内这个 bean 只回实例化一次
+
+### Prototype（原型）
+
+每个依赖这个 Bean 的 Bean 都会创建一个新的实例
+
+### Web 相关
+
+#### Request（请求）
+
+#### Session（会话）
+
+#### Application（应用）
+
+#### WebSocket
+
+### 自定义作用域
+
+## 自定义 Bean 的性质
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/factory-nature.html)
+
+### 生命周期回调
+
+#### 初始化
+
+#### 销毁
+
+#### 组合多种方式时的顺序
+
+#### `ApplicationContextAware` / `BeanNameAware`
+
+## Bean 继承
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/child-bean-definitions.html)
+
+## 容器扩展点
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/factory-extension.html)
+
+## 类路径扫描和组件管理
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/classpath-scanning.html)
+
+扫描并注入类路径下定义的 Bean
+
+### 相关注解
+
+- `@Component` - 通用组件
+- `@Controller` - 控制器组件
+- `@Service` - 服务组件
+- `@Repository` - 仓储层组件
+
+标记这些注解的类，配合 `@ComponentScan` 注解可以被 Spring 容器自动扫描并注入
+
+这些注解只是表示某种抽象规范的层次，大部分没有其他功能，只是代表可以被 Spring 容器自动扫描并注入
+
+Spring 后续可能会根据这些规范，赋予某个注解特殊的功能
+
+### 扫描过虑
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/classpath-scanning.html#beans-scanning-filters)
+
+使用 `@ComponentScan` 配合 `@Filter` 注解过虑或包含某些路径下的组件
+
+### 其他
+
+- 使用 `@Scope` 注解方式配置 Bean 的作用域
+- 使用 `@Qualifier` 注解指定组件名称
+
+## JSR 330 相关注解
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/standard-annotations.html)
+
+依赖
+
+```xml
+<dependency>
+	<groupId>jakarta.inject</groupId>
+	<artifactId>jakarta.inject-api</artifactId>
+	<version>2.0.0</version>
+</dependency>
+```
+
+| Spring 内置注解       | JSR-330 相关注解          |
+| --------------------- | ------------------------- |
+| `@Autowired`          | `@Inject`                 |
+| `@Component`          | `@Named` / `@ManagedBean` |
+| `@Scope("singleton")` | `@Singleton`              |
+| `@Qualifier`          | `@Qualifier` / `@Named`   |
+| `@Value`              | -                         |
+| `@Lazy`               | -                         |
+
+## 环境抽象
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/environment.html)
+
+使用 `@Profile` 注解指定`开发` `生产` 或其他环境使用不同的 容器配置
+
+## 生命周期
+
+### `Lifecycle`
+
+### `SmartLifecycle`
+
+### `ApplicationContextAware` / `BeanNameAware`
+
+## 事件监听器
+
+> [官方文档](https://docs.spring.io/spring-framework/reference/core/beans/context-introduction.html#context-functionality-events)

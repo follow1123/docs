@@ -1,0 +1,217 @@
+---
+title: 基础
+sidebar:
+    order: 5
+---
+
+import Mermaid from "@components/Mermaid.astro";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+## 生命周期
+
+| 生命周期 | 方法                 | 执行时机             | 执行次数 |
+| -------- | -------------------- | -------------------- | -------- |
+| 构造对象 | 构造器               | 第一次请求或容器启动 | 1        |
+| 初始化   | `init()`             | 构造完成后           | 1        |
+| 处理服务 | `service(req, resp)` | 每次请求             | 多次     |
+| 销毁     | `destroy()`          | 容器关闭             | 1        |
+
+Servlet 默认在请求时才会初始化，如果需要在 Tomcat 容器启动时就启动 Servlet，可以配置 `loadOnStartup` 参数
+
+:::note
+这个数值默认是安装从小到大启动，配置的数值越小，越先启动，推荐从6开始配置
+:::
+
+<Tabs>
+
+<TabItem label="Annotation">
+
+```java
+@WebServlet(value = "/loadonstartup1", loadOnStartup = 101)
+public class LoadOnStartup1Servlet extends HttpServlet {
+
+// ...
+```
+
+</TabItem>
+
+<TabItem label="XML">
+
+```xml
+<servlet>
+    <servlet-name>LoadOnStartup2Servlet</servlet-name>
+    <servlet-class>cn.y.java.servlet.lifecycle.LoadOnStartup2Servlet</servlet-class>
+    <!-- 配置启动时加载这个Servlet -->
+    <load-on-startup>60</load-on-startup>
+</servlet>
+<servlet-mapping>
+    <servlet-name>LoadOnStartup2Servlet</servlet-name>
+    <url-pattern>/loadonstartup2</url-pattern>
+</servlet-mapping>
+```
+
+</TabItem>
+
+</Tabs>
+
+## 继承结构
+
+<Mermaid
+    code={`
+classDiagram
+direction BT
+class GenericServlet
+class HttpServlet
+class Servlet {
+<<Interface>>
+
+}
+
+GenericServlet ..> Servlet
+HttpServlet --> GenericServlet
+`}
+/>
+
+- `Servlet` - 接口，顶级接口，提供 Servlet 生命周期相关方法
+- `GenericServlet` - 抽象类，Servlet 接口的简单实现，用于配置 ServletConfig
+- `HttpServlet` - 抽象类，封装HTTP协议基础操作
+
+## Config
+
+每个 Servlet `独立` 的配置，在启动时加载
+
+<Tabs>
+
+<TabItem label="Annotation">
+
+```java {2-5}
+@WebServlet(value = "/annoconfig",
+        initParams = {
+                @WebInitParam(name = "k1", value = "v1"),
+                @WebInitParam(name = "k2", value = "v2")
+        })
+
+// ...
+```
+
+</TabItem>
+
+<TabItem label="XML">
+
+```xml {4-11}
+<servlet>
+    <servlet-name>XmlServletConfigServlet</servlet-name>
+    <servlet-class>cn.y.java.servlet.servlet_config.XmlServletConfigServlet</servlet-class>
+    <init-param>
+        <param-name>k1</param-name>
+        <param-value>v1</param-value>
+    </init-param>
+    <init-param>
+        <param-name>k2</param-name>
+        <param-value>v2</param-value>
+    </init-param>
+</servlet>
+<servlet-mapping>
+    <servlet-name>XmlServletConfigServlet</servlet-name>
+    <url-pattern>/xmlconfig</url-pattern>
+</servlet-mapping>
+```
+
+</TabItem>
+
+</Tabs>
+
+:::note
+继承 `GenericServlet` 或 `HttpServlet` 的 Servlet 才能调用 `getServletConfig()` 方法
+:::
+
+```java
+ServletConfig servletConfig = getServletConfig();
+
+// 获取指定key对应的数据
+System.out.println(servletConfig.getInitParameter("k1"));
+
+// 获取全部参数
+Enumeration<String> params = getServletConfig().getInitParameterNames();
+while (params.hasMoreElements()) {
+    String key = params.nextElement();
+    System.out.println(key + " - " + servletConfig.getInitParameter(key));
+}
+```
+
+## Context
+
+上下文对象（域对象）
+
+Tomcat 容器会为每个应用创建一个 Servlet Context
+
+### 初始化参数
+
+<Tabs>
+
+<TabItem label="Annotation">
+
+```java
+@WebListener
+public class ServletContextTestListener implements ServletContextListener {
+
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        System.out.println("context initialized ------------------------");
+        ServletContext servletContext = sce.getServletContext();
+        servletContext.setInitParameter("ctx-k1", "v1");
+        servletContext.setInitParameter("ctx-k2", "v2");
+    }
+}
+```
+
+</TabItem>
+
+<TabItem label="XML">
+
+```xml
+<context-param>
+    <param-name>ctx-k2</param-name>
+    <param-value>v22</param-value>
+</context-param>
+<context-param>
+    <param-name>ctx-k3</param-name>
+    <param-value>v3</param-value>
+</context-param>
+```
+
+</TabItem>
+
+</Tabs>
+
+:::note
+`web.xml` 内的参数配置会覆盖 Listener 内添加的配置
+:::
+
+```java
+// 单独获取
+System.out.println(servletContext.getInitParameter("ctx-k1"));
+
+// 获取全部参数
+Enumeration<String> params = servletContext.getInitParameterNames();
+while (params.hasMoreElements()){
+    String key = params.nextElement();
+    System.out.println(key + " - " + servletContext.getInitParameter(key));
+}
+```
+
+:::note[Servlet Context 也是一个域对象]
+
+- `setAttribute(name, object)` - 添加数据
+- `getAttribute(name)` - 获取数据
+- `getAttributeNames()` - 获取所有数据的key
+- `removeAttribute(name)` - 移除数据
+
+Servlet Context 域内的数据添加后所有 Servlet 内都可以使用
+:::
+
+其他
+
+- `getRealPath(path)` - 获取项目运行时的实际路径
+- `getContextPath()` - 获取应用上下文路径，（url的前缀）
+- `getMimeType(file)` - 获取项目内文件的媒体类型

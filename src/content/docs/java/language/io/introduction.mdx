@@ -1,0 +1,55 @@
+---
+title: 说明
+sidebar:
+    order: 0
+---
+
+I/O 流（Input/Output），用于处理设备之间的数据传输。如读/写文件，网络通讯等
+
+- `input` - 读取外部数据（磁盘、光盘等存储设备的数据）到程序（内存）中
+- `output` - 将程序（内存）数据输出到磁盘、光盘等存储设备中
+
+## 流的分类
+
+`java.io` 包下提供了各种 `流` 类和接囗，用以获取不同种类的数据，并通过标准的方法输入或输出数据
+
+按数据流向不同：
+
+- `输入流` - 把数据从 `其他设备` 上读取到 `内存` 中的流，以 `InputStream`、`Reader` 结尾
+- `输出流` - 把数据从 `内存` 中写出到 `其他设备` 上的流，以 `OutputStream`、`Writer` 结尾
+
+操作数据的单位不同：
+
+- `字节流（8bit）` - 以字节为单位，读写数据的流，以 `InputStream`、`OutputStream` 结尾
+- `字符流（16bit）` - 以字符为单位，读写数据的流，以 `Reader`、`Writer` 结尾
+
+IO 流的角色不同：
+
+- `节点流` - 直接从数据源或目的地读写数据
+- `处理流` - 不直接连接到数据源或目的地，而是 `连接` 在已存在的流（节点流或处理流）之上，通过对数据的处理为程序提供更为强大的读写功能
+
+## 流的 API
+
+Java 的 IO 流共涉及 40 多个类，都是从如下 4 个抽象基类派生的
+
+| 抽象类 | 输出流        | 输出流         |
+| ------ | ------------- | -------------- |
+| 字节流 | `InputStream` | `OutputStream` |
+| 字符流 | `Reader`      | `Writer`       |
+
+由这四个类派生出来的子类名称都是以貝父类名作为子类名后缀
+
+| 分类       | 字节输入/输出流                                       | 字符输入/输出流                                    |
+| ---------- | ----------------------------------------------------- | -------------------------------------------------- |
+| 抽象基类   | **InputStream** <br/> **OutputStream**                | **Reader** <br/> **Writer**                        |
+| 访问文件   | **FileInputStream** <br/> **FileOutputStream**        | **FileReader** <br/> **FileWriter**                |
+| 访问数组   | ByteArrayInputStream <br/> ByteArrayOutputStream      | CharArrayReader <br/> CharArrayWriter              |
+| 访问管道   | PipedInputStream <br/> PipedOutputStream              | PipedReader <br/> PipedWriter                      |
+| 访问字符串 | <br/>                                                 | StringReader <br/> StringWriter                    |
+| 缓冲流     | **BufferedInputStream**<br/> **BufferedOutputStream** | **BufferedReader** <br/> **BufferedWriter**        |
+| 转换流     | <br/>                                                 | **InputStreamReader** <br/> **OutputStreamWriter** |
+| 对象流     | **ObjectInputStream** <br/> **ObjectOutputStream**    | <br/>                                              |
+| 过滤流     | FilterInputStream <br/> FilterOutputStream            | FilterReader <br/> FilterWiter                     |
+| 打印流     | <br/> PrintStream                                     | <br/> PrintWriter                                  |
+| 推回输入流 | PushbackInputStream <br/>                             | PushbackReader <br/>                               |
+| 特殊流     | DataInputStream <br/> DataOutputStream                |                                                    |

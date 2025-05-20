@@ -133,6 +133,129 @@ export default defineConfig({
             ],
           },
           {
+            label: "Java/Java语言",
+            link: "/java/language",
+            items: [
+              "java/language",
+              {
+                label: "语法",
+                autogenerate: { directory: "java/language/syntax" },
+              },
+              {
+                label: "类和对象",
+                autogenerate: { directory: "java/language/class-object" },
+              },
+              "java/language/exception-handing",
+              "java/language/generics",
+              {
+                label: "集合框架",
+                autogenerate: { directory: "java/language/collection" },
+              },
+              {
+                label: "常用类",
+                autogenerate: { directory: "java/language/commonly-apis" },
+              },
+              {
+                label: "面向对象",
+                autogenerate: { directory: "java/language/object-oriented" },
+              },
+              {
+                label: "IO",
+                autogenerate: { directory: "java/language/io" },
+              },
+              {
+                label: "网络编程",
+                autogenerate: { directory: "java/language/net" },
+              },
+              {
+                label: "多线程和高并发",
+                autogenerate: {
+                  directory: "java/language/multithreading-concurrency",
+                },
+              },
+              "java/language/reflection",
+              {
+                label: "JDBC",
+                autogenerate: { directory: "java/language/jdbc" },
+              },
+              "java/language/jvm",
+              {
+                label: "各版本新特性",
+                autogenerate: { directory: "java/language/version-features" },
+              },
+              "java/language/commands",
+            ],
+          },
+          {
+            label: "Java/Java构建工具",
+            link: "/java/build-tools",
+            items: [
+              "java/build-tools",
+              "java/build-tools/maven",
+              "java/build-tools/gradle",
+            ],
+          },
+          {
+            label: "Java/Java框架",
+            link: "/java/framework",
+            items: [
+              "java/framework",
+              {
+                label: "Servlet",
+                autogenerate: { directory: "java/framework/servlet" },
+              },
+              {
+                label: "WebSocket",
+                autogenerate: { directory: "java/framework/websocket" },
+              },
+              {
+                label: "日志框架",
+                autogenerate: { directory: "java/framework/logger" },
+              },
+              {
+                label: "Spring Framework",
+                autogenerate: { directory: "java/framework/spring-framework" },
+              },
+              {
+                label: "Spring MVC",
+                autogenerate: { directory: "java/framework/spring-mvc" },
+              },
+              {
+                label: "Mybatis",
+                autogenerate: { directory: "java/framework/mybatis" },
+              },
+              {
+                label: "Spring Security",
+                autogenerate: { directory: "java/framework/spring-security" },
+              },
+              {
+                label: "Shiro",
+                autogenerate: { directory: "java/framework/shiro" },
+              },
+              {
+                label: "Netty",
+                autogenerate: { directory: "java/framework/netty" },
+              },
+            ],
+          },
+          {
+            label: "Java/Java中间件",
+            link: "/java/middleware",
+            items: [
+              "java/middleware",
+              {
+                label: "RabbitMQ",
+                autogenerate: { directory: "java/middleware/rabbitmq" },
+              },
+              "java/middleware/elasticsearch",
+            ],
+          },
+          {
+            label: "Java/Java微服务",
+            link: "/java/microservices",
+            items: ["java/microservices", "java/microservices/consul"],
+          },
+          {
             label: "Windows",
             link: "/windows",
             items: [

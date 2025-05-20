@@ -1,0 +1,112 @@
+---
+title: 过滤器
+sidebar:
+    order: 25
+---
+
+import Mermaid from "@components/Mermaid.astro";
+import InternalLink from "@components/InternalLink.astro";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+Filter（过滤器）是一个用于处理 请求和响应 的组件，它能够在请求到达 Servlet 之前，或者响应返回客户端之前进行一些预处理或后处理
+
+<Mermaid
+    code={`
+sequenceDiagram
+participant client as 客户端
+box 服务器
+participant filter as 过滤器
+participant servlet as Servlet
+end
+
+client ->> filter: 请求
+filter ->> filter: 执行请求之前的操作
+filter ->> servlet: 放行
+servlet ->> filter: 响应
+filter ->> filter: 执行响应之前的操作
+filter ->> client: 响应
+`}
+/>
+
+<Tabs>
+
+<TabItem label="Annotation">
+
+```java
+@WebFilter("/*")
+public class ConfWithAnnotationFilter extends HttpFilter {
+
+// ...
+```
+
+</TabItem>
+
+<TabItem label="XML">
+
+```xml
+<filter>
+    <filter-name>ConfWithXmlFilter</filter-name>
+    <filter-class>cn.y.java.filter.ConfWithXmlFilter</filter-class>
+</filter>
+<filter-mapping>
+    <filter-name>ConfWithXmlFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
+```
+
+</TabItem>
+
+</Tabs>
+
+```java
+@WebFilter("/*")
+public class ConfWithAnnotationFilter extends HttpFilter {
+
+    @Override
+    protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+        System.out.println("annotation filter 请求之前的操作");
+
+        // 放行
+        chain.doFilter(req, res);
+
+        System.out.println("annotation filter 响应之前的操作");
+    }
+}
+```
+
+:::note
+方法内如果判断正常一定要执行 `chain.doFilter(req, resp)` 方法放行
+
+`chain.doFilter(req, resp)` 方法之后才是响应之前的操作，这时 Servlet 内的逻辑已经执行完成了
+:::
+
+## 生命周期
+
+| 生命周期 | 方法                              | 执行时机   | 执行次数 |
+| -------- | --------------------------------- | ---------- | -------- |
+| 构造对象 | 构造器                            | 容器启动   | 1        |
+| 初始化   | `init()`                          | 构造完成后 | 1        |
+| 处理服务 | `service(req, resp, filterChain)` | 每次请求   | 多次     |
+| 销毁     | `destroy()`                       | 容器关闭   | 1        |
+
+:::note
+生命周期部分和 Servlet 生命周期类似，但是 Filter 是在容器启动时就创建的
+:::
+
+## 过滤器链
+
+过滤器链（Filter Chain）是指一系列 Filter（过滤器）按照配置顺序依次处理请求和响应的机制。每个过滤器都可以对请求和响应进行处理，然后将请求传递给下一个过滤器（如果有的话），直到最终的 Servlet 被调用
+
+![过滤器链](@assets/java/framework/servlet/servlet-filter-chain.drawio.png)
+
+:::info[Filter 链执行顺序]
+如果使用 xml 配置的情况下，根据 filter-mapping 标签的定义顺序执行
+
+如果使用注解方式配置，则根据类名顺序执行
+:::
+
+获取过滤器的初始化参数，配置方式参考 <InternalLink text="Servlet Config" href="java/framework/servlet/basics/#config" />
+
+```java
+getFilterConfig().getInitParameter("name")
+```

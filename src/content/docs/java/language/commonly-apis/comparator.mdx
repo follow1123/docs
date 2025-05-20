@@ -1,0 +1,147 @@
+---
+title: 比较器
+sidebar:
+    order: 10
+---
+
+## `Comparable` 接口
+
+实现 `Comparable` 接口，并实现里面的 `compareTo(Object o)` 方法
+
+:::note[比较规则]
+`compareTo(Object o)` 方法返回一个 `int`
+
+如果返回值是正数，当前对象大
+
+如果返回值是负数，当前对象小
+
+如果返回值是 0，一样大
+:::
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/api/comparable/ComparableTest.java)
+
+<details>
+
+<summary>定义对象并实现 `Comparable` 接口</summary>
+
+```java {36-46}
+public class Product implements Comparable {
+
+    private String name;
+    private double price;
+
+    public Product(String name, double price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "name='" + name + '\'' +
+                ", price=" + price +
+                '}';
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (this == o) return 0;
+        if (o instanceof Product){
+            Product p = (Product) o;
+            int v = Double.compare(this.price, p.price);
+            if (v != 0) return v;
+            // 如果price相同，则比较name的大小
+            return this.name.compareTo(p.name);
+        }
+        throw new RuntimeException("类型不匹配");
+    }
+}
+```
+
+</details>
+
+### 比较字符串
+
+```java
+String[] strings = {"f", "g", "d", "e", "p"};
+
+Arrays.sort(strings);
+System.out.println(Arrays.toString(strings));
+```
+
+### 比较对象
+
+```java
+Product[] products = new Product[3];
+
+products[0] = new Product("vde", 1000);
+products[1] = new Product("ads", 2000);
+products[2] = new Product("zdd", 1000);
+
+Arrays.sort(products);
+
+for (Product product : products) {
+    System.out.println(product);
+}
+```
+
+## `Comparator`
+
+当元素的类型没有实现 `Comparable` 接口，而又不方便修改代码时
+
+如果有一个类，实现了 `Comparable` 接口，指定了比较大小的规则，但我不想安装它预定义的方法比较大小，又不能随意修改类时
+
+创建一个实现了 `Comparator` 接口的类，实现 `compare(Object o1, Object o2)` 方法
+
+将实现了排序方法逻辑的类传入 `Arrays.sort(value, comparator)` 方法内实现自定义排序
+
+> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/api/comparable/ComparatorTest.java)
+
+```java
+Product[] products = new Product[4];
+
+products[0] = new Product("vde", 1000);
+products[1] = new Product("ads", 2000);
+products[2] = new Product("zdd", 1000);
+products[3] = new Product("zdd", 5000);
+
+Arrays.sort(products, new Comparator() {
+    @Override
+    public int compare(Object o1, Object o2) {
+        if(o1 == o2) return 0;
+
+        if(o1 instanceof Product && o2 instanceof Product){
+            Product p1 = (Product) o1;
+            Product p2 = (Product) o2;
+            // 先按name从小到大的排序
+            int v = p1.getName().compareTo(p2.getName());
+            if (v != 0) return v;
+
+            // name相同再按price从大到小排序
+            return -Double.compare(p1.getPrice(), p2.getPrice());
+
+        }
+        throw new RuntimeException("类型不匹配");
+    }
+});
+
+for (Product product : products) {
+    System.out.println(product);
+}
+```

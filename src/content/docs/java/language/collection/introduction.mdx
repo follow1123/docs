@@ -1,0 +1,90 @@
+---
+title: 说明
+sidebar:
+    order: 0
+---
+
+import Mermaid from "@components/Mermaid.astro";
+
+## java.util.Collection
+
+`List` - 存储有序、可重复的数据
+
+`Set` - 存储无序、不可重复的数据
+
+<Mermaid
+    code={`
+classDiagram
+direction BT
+class AbstractCollection~E~
+class AbstractList~E~
+class ArrayList~E~
+class Collection~E~ {
+<<Interface>>
+
+}
+class HashSet~E~
+class Iterable~T~ {
+<<Interface>>
+
+}
+class LinkedHashSet~E~
+class LinkedList~E~
+class List~E~ {
+<<Interface>>
+
+}
+class TreeSet~E~
+class Vector~E~
+
+AbstractCollection~E~ ..> Collection~E~
+AbstractList~E~ --> AbstractCollection~E~
+AbstractList~E~ ..> List~E~
+ArrayList~E~ --> AbstractList~E~
+ArrayList~E~ ..> List~E~
+Collection~E~ --> Iterable~T~
+HashSet~E~ --> AbstractCollection~E~
+HashSet~E~ ..> Collection~E~
+LinkedHashSet~E~ ..> Collection~E~
+LinkedHashSet~E~ --> HashSet~E~
+LinkedList~E~ --> AbstractList~E~
+LinkedList~E~ ..> Collection~E~
+LinkedList~E~ ..> List~E~
+List~E~ --> Collection~E~
+TreeSet~E~ --> AbstractCollection~E~
+TreeSet~E~ ..> Collection~E~
+Vector~E~ --> AbstractList~E~
+Vector~E~ ..> List~E~
+`}
+/>
+
+## java.util.Map
+
+`Map` - 存储key-value键值对
+
+<Mermaid
+    code={`
+classDiagram
+direction BT
+class AbstractMap~K, V~
+class HashMap~K, V~
+class Hashtable~K, V~
+class LinkedHashMap~K, V~
+class Map~K, V~ {
+<<Interface>>
+
+}
+class Properties
+class TreeMap~K, V~
+
+AbstractMap~K, V~ ..> Map~K, V~
+HashMap~K, V~ --> AbstractMap~K, V~
+HashMap~K, V~ ..> Map~K, V~
+Hashtable~K, V~ ..> Map~K, V~
+LinkedHashMap~K, V~ --> HashMap~K, V~
+LinkedHashMap~K, V~ ..> Map~K, V~
+Properties --> Hashtable~K, V~
+TreeMap~K, V~ --> AbstractMap~K, V~
+TreeMap~K, V~ ..> Map~K, V~
+`}
+/>

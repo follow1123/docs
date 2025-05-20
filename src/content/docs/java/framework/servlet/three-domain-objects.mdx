@@ -1,0 +1,41 @@
+---
+title: 三大域对象
+sidebar:
+    order: 20
+---
+
+- **请求域** - 一次请求响应内
+- **会话域** - 一次会话内，可以跨多个请求
+- **应用域** - 应用内，可以跨多个会话
+
+![Servlet域对象](@assets/java/framework/servlet/servlet-scope-objects.drawio.png)
+
+## 请求域
+
+```java
+// 添加请求域数据
+req.setAttribute("name", "value");
+
+// 获取请求域数据
+req.getAttribute("name");
+```
+
+## 会话域
+
+```java
+// 添加会话域数据
+req.getSession().setAttribute("name", "value");
+
+// 获取会话域数据
+req.getSession().getAttribute("name");
+```
+
+## 应用域
+
+```java
+// 添加应用域数据
+getServletContext().setAttribute("name", "value");
+
+// 获取应用域数据
+getServletContext().getAttribute("name");
+```

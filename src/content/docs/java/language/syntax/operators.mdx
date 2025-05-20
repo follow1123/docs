@@ -1,0 +1,610 @@
+---
+title: 运算符
+sidebar:
+    order: 15
+---
+
+import InternalLink from "@components/InternalLink.astro";
+
+用于操作变量和常量;
+
+| 分类                        | 运算符                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| 算术运算符（7个）           | `+` `-` `*` `/` `%` `++` `--`                                                  |
+| 赋值运算符（12个）          | `=` `+=` `-=` `*=` `/=` `%=` `>>=` `<<=` `>>>=` `&=` <code>&#124;=</code> `^=` |
+| 比较（或关系）运算符（6个） | `>` `>=` `<` `<=` `==` `!=`                                                    |
+| 逻辑运算符（6个）           | `&` <code>&#124;</code> `^` `!` `&&` <code>&#124;&#124;</code>                 |
+| 位运算符（7个）             | `&` <code>&#124;</code> `^` `~` `<<` `>>` `>>>`                                |
+| 条件运算符（1个）           | (条件表达式)?结果1:结果2                                                       |
+| Lambda运算符（1个）         | `->`                                                                           |
+
+## 算数运算符
+
+- `+` - 正号或加号
+- `-` - 负号或减号
+- `*` - 乘
+- `/` - 除
+- `%` - 取模（取余）
+- `++` - 自增（前）：先运算后取值
+- `++` - 自增（后）：先取值后运算
+- `--` - 自减（前）：先运算后取值
+- `--` - 自减（后）：先取值后运算
+- `+` - 字符串连接
+
+```java
+// 正号
+System.out.println(+3); // 3
+// 负号
+int i1 = 4;
+System.out.println(-i1); // -4
+// 加
+System.out.println(5+5); // 10
+// 减
+System.out.println(6-4); // 2
+// 乘
+System.out.println(3*4); // 12
+// 除
+System.out.println(5/5); // 1
+// 取模（取余）
+System.out.println(7%5); // 2
+// 自增（前）：先运算后取值
+int i2 = 2;
+int i3 = ++i2;
+System.out.println(i2); // 3
+System.out.println(i3); // 3
+// 自增（后）：先取值后运算
+int i4 = 2;
+int i5 = i4++;
+System.out.println(i4); // 3
+System.out.println(i5); // 2
+// 自减（前）：先运算后取值
+int i6 = 2;
+int i7 = --i6;
+System.out.println(i6); // 1
+System.out.println(i7); // 1
+// 自减（后）：先取值后运算
+int i8 = 2;
+int i9 = i8--;
+System.out.println(i8); // 1
+System.out.println(i9); // 2
+// 字符串连接
+System.out.println("He" + "llo"); // Hello
+```
+
+## 赋值运算符
+
+```java
+// 将5赋值给变量i1
+int i1 = 5;
+i1 += 1; // 等同于 i1 = i1 + 1
+System.out.println(i1); // 6
+i1 -= 1; // 等同于 i1 = i1 - 1
+System.out.println(i1); // 5
+i1 *= 2; // 等同于 i1 = i1 * 2
+System.out.println(i1); // 10
+i1 /= 2; // 等同于 i1 = i1 / 2
+System.out.println(i1); // 5
+i1 %= 2; // 等同于 i1 = i1 % 2
+System.out.println(i1); // 1
+// 其他类似
+```
+
+## 比较（关系）运算符
+
+- `==` - 相等于
+- `!=` - 不等于
+- `<` - 小于
+- `>` - 大于
+- `<=` - 小于等于
+- `>=` - 大于等于
+- `instanceof` - 检查是否为类的对象
+
+:::note
+
+- 比较运算符的结果都是 `boolean` 类型： `true` / `false`
+- `>` `<` `>=` `<=` 只适用于基本数据类型（除boolean外），`==` `!=`适用于基本数据类型和引用数据类型
+  :::
+
+:::tip
+`==` `!=` 在比较引用数据类型是对比的是对象的地址，如果需要比较两个对象推荐使用 `equals()` 方法
+:::
+
+```java
+System.out.println(4==3); // false
+System.out.println(4!=3); // true
+System.out.println(4<3); // false
+System.out.println(4>3); // true
+System.out.println(4<=3); // false
+System.out.println(4>=3); // true
+System.out.println("Hello" instanceof String); // true
+```
+
+## 逻辑运算符
+
+| a     | b     | a&b   | a&&b  | a&#124;b | a&#124;&#124;b | !a    | a^b   |
+| ----- | ----- | ----- | ----- | -------- | -------------- | ----- | ----- |
+| true  | true  | true  | true  | true     | true           | false | false |
+| true  | false | false | false | true     | true           | false | true  |
+| false | true  | false | false | true     | true           | true  | true  |
+| false | false | false | false | false    | false          | true  | false |
+
+- `&` 和 `&&` 表示 `且`，两边都是 true 时，结果为 true，否则为 false
+- `|` 和 `||` 表示 `或`，两边其中有一边是 true，结果为 true，两边都是 false 时，结果为 false
+- `!` 表示 `非`，结果取反
+- `^` 表示 `异或`，两边结果不同时为 true，两边结果相同时为 false
+
+```java
+boolean a1 = true;
+boolean b1 = true;
+System.out.println(a1 & b1); // true
+System.out.println(a1 && b1); // true
+System.out.println(a1 | b1); // true
+System.out.println(a1 || b1); // true
+System.out.println(!a1); // false
+System.out.println(a1 ^ b1); // false
+System.out.println("-----------");
+boolean a2 = true;
+boolean b2 = false;
+System.out.println(a2 & b2); // false
+System.out.println(a2 && b2); // false
+System.out.println(a2 | b2); // true
+System.out.println(a2 || b2); // true
+System.out.println(!a2); // false
+System.out.println(a2 ^ b2); // true
+System.out.println("-----------");
+boolean a3 = false;
+boolean b3 = true;
+System.out.println(a3 & b3); // false
+System.out.println(a3 && b3); // false
+System.out.println(a3 | b3); // true
+System.out.println(a3 || b3); // true
+System.out.println(!a3); // true
+System.out.println(a3 ^ b3); // true
+System.out.println("-----------");
+boolean a4 = false;
+boolean b4 = false;
+System.out.println(a4 & b4); // false
+System.out.println(a4 && b4); // false
+System.out.println(a4 | b4); // false
+System.out.println(a4 || b4); // false
+System.out.println(!a4); // true
+System.out.println(a4 ^ b4); // false
+```
+
+:::note[ `&` 和 `&&` ，`|` 和 `||` 之间的关系]
+
+`&&` 表示 `短路且`
+
+- 当符号左边是true时，`&` 和 `&&` 一样
+- 当符号左边是false时，`&` 会执行符号右边的操作，而 `&&` 不会
+
+`||` 表示 `短路或`
+
+- 当符号左边是 false 时， `|` 和 `||` 一样
+- 当符号左边是 true 时， `|` 会执行符号右边的操作，而 `||` 不会
+  :::
+
+```java
+// &和&&，|和||之间的关系
+int i = 3;
+boolean bool = true;
+if (bool & (++i > 3)){
+   System.out.println();
+}
+System.out.println(i); // 4
+
+i = 3;
+bool = false;
+if (bool && (++i > 3)){
+   System.out.println();
+}
+System.out.println(i); // 3
+
+i = 3;
+bool = true;
+if (bool | (++i > 3)){
+   System.out.println();
+}
+System.out.println(i); // 4
+
+i = 3;
+bool = true;
+if (bool || (++i > 3)){
+   System.out.println();
+}
+System.out.println(i); // 3
+```
+
+## 位运算符
+
+位运算操作可以理解为将十进制的数转换为二进制后，对二进制的相关操作
+
+- `<<` - 左移
+- `>>` - 右移
+- `>>>` - 无符号右移
+- `&` - 与运算
+- `|` - 或运算
+- `^` - 异或运算
+- `~` - 取反运算
+
+### 左移
+
+将左边的高位移出去后右边的空位补零
+
+<details>
+
+<summary>`11` 左移2位是 `44`</summary>
+
+<table>
+    <tbody>
+        <tr>
+            <td>二进制</td>
+            <td></td>
+            <td></td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>左移两位</td>
+            <td style={{ backgroundColor: "#db5c5c" }}>0</td>
+            <td style={{ backgroundColor: "#db5c5c" }}>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>高位丢弃，低位补零</td>
+            <td></td>
+            <td></td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+            <td style={{ backgroundColor: "#57965c" }}>0</td>
+            <td style={{ backgroundColor: "#57965c" }}>0</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="12" style={{ textAlign: "center" }}>
+                44
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+</details>
+
+```java
+System.out.println(11 << 2); // 44
+System.out.println(-11 << 2); // -44
+```
+
+### 右移
+
+如果是正数，左边空位补零
+
+如果是负数，左边空位补一
+
+<details>
+
+<summary>`11` 右移 2 位是 `2`</summary>
+
+<table>
+    <tbody>
+        <tr>
+            <td>二进制</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>右移两位</td>
+            <td></td>
+            <td></td>
+            <td>0(符号位)</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td style={{ backgroundColor: "#db5c5c" }}>1</td>
+            <td style={{ backgroundColor: "#db5c5c" }}>1</td>
+        </tr>
+        <tr>
+            <td>低位丢弃，高位补零</td>
+            <td style={{ backgroundColor: "#57965c" }}>0</td>
+            <td style={{ backgroundColor: "#57965c" }}>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="12" style={{ textAlign: "center" }}>
+                2
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+</details>
+
+<details>
+
+<summary>`-11` 右移 2 位是 `-3`</summary>
+
+<table>
+    <tbody>
+        <tr>
+            <td>二进制</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>右移两位</td>
+            <td></td>
+            <td></td>
+            <td>1(符号位)</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td style={{ backgroundColor: "#db5c5c" }}>0</td>
+            <td style={{ backgroundColor: "#db5c5c" }}>1</td>
+        </tr>
+        <tr>
+            <td>低位丢弃，高位补一</td>
+            <td style={{ backgroundColor: "#57965c" }}>1</td>
+            <td style={{ backgroundColor: "#57965c" }}>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>原码</td>
+            <td>1</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="12" style={{ textAlign: "center" }}>
+                -3
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+</details>
+
+```java
+System.out.println(11 >> 2); // 2 System.out.println(-11 >> 2); // -3
+```
+
+### 无符号右移
+
+无论是正数还是负数，被移出的高位都补零
+
+<details>
+
+<summary>`-11` 无符号右移 2 位是 `61`</summary>
+
+<table>
+    <tbody>
+        <tr>
+            <td>二进制</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>右移两位</td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td style={{ backgroundColor: "#db5c5c" }}>0</td>
+            <td style={{ backgroundColor: "#db5c5c" }}>1</td>
+        </tr>
+        <tr>
+            <td>低位丢弃，高位补零</td>
+            <td style={{ backgroundColor: "#57965c" }}>0</td>
+            <td style={{ backgroundColor: "#57965c" }}>0</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="1">结果</td>
+            <td colspan="12" style={{ textAlign: "center" }}>
+                61
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+</details>
+
+:::tip
+由于 java 内没有无符号类型，需要将 `-11` 的补码当作原码存入int内操作，将 `-11` 和 `0xFF` 进行 `与` 操作即可
+:::
+
+```java
+/*
+无符号右移
+                         11110101 b1 -11
+                         11111111 & 0xFF
+00000000 00000000 00000000 11110101 i1
+00000000 00000000 00000000 00111101 61
+*/
+byte b1 = -11;
+int i1 = b1 & 0xFF;
+i1 >>>= 2;
+System.out.println(i1); // 61
+```
+
+### 与、或、异或、取反
+
+<details>
+
+<summary>操作相同，以 `与` 为例，`11` 与 `19` 结果为 `3`</summary>
+
+<table>
+    <thead>
+        <tr>
+            <th>十进制</th>
+            <th colspan="8">二进制</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>11</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>19</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>1</td>
+            <td>1</td>
+        </tr>
+    </tbody>
+</table>
+
+</details>
+
+```java
+/*
+00001011
+00010011
+00000011 3
+
+00001011
+00010011
+00011011 27
+
+00001011
+00010011
+00011000 24
+
+00001011
+11110100
+10001011
+10001100 -12
+
+*/
+System.out.println(11 & 19); // 3
+System.out.println(11 | 19); // 27
+System.out.println(11 ^ 19); // 24
+System.out.println(~11); // -12
+```
+
+## 条件运算符（三元运算符）
+
+格式：`(条件表达式) ? 表达式1 : 表达式2`
+
+```java
+String a = "Hello";
+String b = "Wrold!";
+boolean c = true;
+System.out.println(c ? a : b); // Hello
+```
+
+## Lambda 运算符
+
+> <InternalLink
+>     text="参考"
+>     href="java/language/version-features/java8/#lambda-表达式"
+> />

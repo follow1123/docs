@@ -1,0 +1,118 @@
+---
+title: Consul
+sidebar:
+    order: 5
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+服务发现，分布式配置管理
+
+## 安装
+
+以 Windows 下安装为例
+
+[官网下载](https://developer.hashicorp.com/consul/install#windows)
+
+或使用 `scoop` 包管理器直接安装：`scoop install consul`
+
+## 使用
+
+1. 运行 `consul agent -dev`
+2. 打开Consul首页：`http://localhost:8500`
+3. 创建配置文件并使用 `consul agent -config-file '配置文件路径'` 打开
+
+```hcl
+# 数据目录设置
+data_dir = "C:/your/path/consul/data/"
+
+# 绑定地址设置（监听所有 IPv6 地址和所有 IPv4 地址）
+# bind_addr = "[::]"
+bind_addr = "127.0.0.1"
+
+# advertise_addr = "0.0.0.0"
+
+# 服务节点设置（是否为服务器节点）
+server = true
+
+# 这会告诉Consul在引导期间等待1个服务器节点就绪，然后再引导整个集群。
+bootstrap_expect = 1
+
+# 客户端地址设置（用于监听客户端请求的地址）
+client_addr = "0.0.0.0"
+
+# UI 配置（用于启用内置的 Web UI）
+ui_config {
+	enabled = true
+}
+```
+
+### 配置微服务模块加入 Consul
+
+<Steps>
+
+1. `pom.xml` 内依赖
+
+    ```xml title="pom.xml"
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+    </dependency>
+    ```
+
+2. `application.yaml` 配置
+
+    ```yaml title="application.yaml"
+    spring:
+        cloud:
+            consul:
+                host: localhost
+                port: 8500
+                discovery: # 开启端口
+                    heartbeat:
+                        enabled: true
+    ```
+
+3. 主启动内添加 `@EnableDiscoveryClient`
+
+    ```java {1}
+    @EnableDiscoveryClient
+    @SpringBootApplication
+    @MapperScan("cn.y.demo.mapper")
+    public class ProviderPayment {
+        public static void main(String[] args) {
+            SpringApplication.run(ProviderPayment.class, args);
+        }
+    }
+    ```
+
+4. 对于远程调用的的模块来说，还需要注入 `RestTemplate` 时添加 `@LoadBalanced` 注解，并使用需要调用的微服务名称替换写死的硬编码 URL
+
+    ```diff lang="java" ins="http://cloud-payment-service" del="http://localhost:8001"
+    - public static final String PAYMENT_SERVICES_URL = "http://localhost:8001";
+    + public static final String PAYMENT_SERVICES_URL = "http://cloud-payment-service";
+    ```
+
+</Steps>
+
+## CAP
+
+- `Consistency` - 强一致性
+- `Availability` - 可用性
+- `Partition tolerance` - 分区容错性
+
+CAP理论的核心是一个分布式系统不可能同时很好的满足一致性
+
+可用性和分区容错性这三个需求：
+
+- `CA` - 单点集群，满足一致性，可用性的系统，通常在可扩展性上不太强大
+- `CP` - 满足一致性，分区容错性的系统，通常性能不是特别高
+- `AP` - 满足可用性，分区容错性的系统，通常对一致性的要求低一点
+
+## 注册中心对比
+
+| 组件      | 语言 | CAP | 服务健康检查 | 对外暴露接口 |
+| --------- | ---- | --- | ------------ | ------------ |
+| Eureka    | Java | AP  | 可配支持     | HTTP         |
+| Consul    | Go   | CP  | 支持         | HTTP/DNS     |
+| Zookeeper | Java | CP  | 支持         | 客户端       |

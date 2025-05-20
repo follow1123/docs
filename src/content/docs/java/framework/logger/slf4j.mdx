@@ -1,0 +1,92 @@
+---
+title: Slf4j
+sidebar:
+    order: 15
+---
+
+> [详细代码](https://github.com/follow1123/java-frameworks/blob/main/logger/src/main/java/cn/y/java/slf4j)
+>
+> 日志门面，[官方文档](https://www.slf4j.org/manual.html)
+
+![门面结构图](@assets/java/framework/logger/concrete-bindings.png)
+
+```java
+private static final Logger log = LoggerFactory.getLogger(Slf4jTest.class);
+
+public static void main(String[] args) {
+    log.trace("trace");
+    log.debug("debug");
+    log.info("info");
+    log.warn("warn");
+    log.error("error");
+}
+```
+
+## Marker 使用
+
+需要在 pattern 上添加 `%marker` 占位符来显示
+
+```java
+public class MarkerTest implements Runnable, Callable {
+
+    private static final Logger log = LoggerFactory.getLogger(MarkerTest.class);
+    private static final Marker marker = MarkerFactory.getMarker("TEST");
+
+    @Test
+    public void test() {
+        ExecutorService pool = Executors.newFixedThreadPool(10);
+        for (int i = 0; i < 100; i++) {
+            pool.submit((Runnable) this);
+            pool.submit((Callable<Object>) this);
+        }
+        pool.shutdown();
+    }
+
+    @Override
+    public void run() {
+        log.info(marker, new Random().nextInt() + "");
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Object call() throws Exception {
+        log.info(marker, new Random().nextBoolean() + "");
+        Thread.sleep(100);
+        return "";
+    }
+}
+```
+
+## 使用 jul 日志实现
+
+```xml
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-jdk14</artifactId>
+    <version>2.0.13</version>
+</dependency>
+```
+
+## 使用 logback 日志实现
+
+```xml
+<dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>1.5.6</version>
+</dependency>
+```
+
+## 使用 log4j2 日志实现
+
+```xml
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-slf4j2-impl</artifactId>
+    <version>2.23.1</version>
+</dependency>
+```

@@ -1,0 +1,40 @@
+---
+title: 管理页面
+sidebar:
+    order: 5
+---
+
+使用 docker 安装以 `-management` 结尾的版本会带一个 web 管理页面
+
+- 默认地址 - `localhost:15672`
+- 默认用户名密码 - `guest`
+
+## Exchangese 页面
+
+用于管理交换机相关操作
+
+在 `Add a new exchange` 处新建交换机
+
+在交换机列表内点击交换机的名称进行详细操作
+
+在交换机详细操作页面内的 `Bindings` 处对 queue 进行绑定
+
+在 `Publish message` 处测试发送消息
+
+在 `Delete this exchange` 处删除这个交换机
+
+## Queues and Streams 页面
+
+在 `Add a new queue` 处新建队列
+
+在 queue 列表内点击 queue 的名称进行详细操作
+
+在 queue 详细操作页面内的 `Bindings` 处显示有哪些交换机绑定了当前队列
+
+在 `Get messages` 处可以预览当前队列内的消息
+
+在 `Delete` 处删除当前队列
+
+## Admin 页面
+
+用于用户管理和虚拟主机的管理
