@@ -133,6 +133,25 @@ export default defineConfig({
             ],
           },
           {
+            label: "前端",
+            link: "/frontend",
+            items: [
+              "frontend",
+              {
+                label: "HTML",
+                autogenerate: { directory: "frontend/html" },
+              },
+              {
+                label: "CSS",
+                autogenerate: { directory: "frontend/css" },
+              },
+              {
+                label: "JavaScript",
+                autogenerate: { directory: "frontend/javascript" },
+              },
+            ],
+          },
+          {
             label: "Java/Java语言",
             link: "/java/language",
             items: [
