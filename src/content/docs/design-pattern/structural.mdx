@@ -1,0 +1,107 @@
+---
+title: 结构型模式
+sidebar:
+    order: 15
+---
+
+将类或对象安某种布局组成更大的结构
+
+- 适配器模式
+- 桥接模式
+- 装饰模式
+- 组合模式
+- 外观模式
+- 享元模式
+- 代理模式
+
+## 适配器模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/structural/adapter)
+
+适配器模式里有几个角色：`适配器接口` `适配器本身` `需要适配的类`
+
+将一个类转换为用户所期望的类并执行该类的方法，IO 内的 InputStreamReader 和 OutputStreamWriter 将字节流转换为字符流就是使用适配器模式
+
+## 代理模式
+
+代理模式又分为 `静态代理` 和 `动态代理`
+
+### 静态代理
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/structural/proxy/staticproxy)
+
+静态代理的角色：`抽象角色` `代理角色` `真实角色`
+
+代理模式和现实中的中介类似，当中介介绍找工作时，中介（代理角色）做一些每个人都必须做且重复的事情当工作时就是由你（真实角色）去工作，代理模式也是以这样的方式运行的
+
+### 动态代理
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/structural/proxy/dynamic)
+
+动态代理角色和静态代理一样，只不过动态代理的代理角色是自动生成的，有更好的灵活性
+
+`java.lang.reflect.Proxy` 就是 Java 自带的动态生成代理角色的类
+
+`java.lang.reflect.InvocationHandler` 该类是对代理对象的管理者，实现该接口里的 invoke 方法自动生成的代理对象调用方法时都会在这个方法内集中处理
+
+## 桥接模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/structural/bridge)
+
+针对一个产品或信息有多个维度，例如电脑可以分为台式电脑、笔记本电脑、平板电脑
+
+而这些又有很多品牌如果用继承的方式实现会造成类的膨胀问题，桥接模式就可以很好的解决这些问题
+
+我们可以将电脑种类分为一个维度，将电脑品牌分为另一个维度，用一个 `桥梁`（电脑维度类有品牌维度类的引用）
+
+将这两个维度连接起来，这样就很好的解决了这些问题
+
+造成这些问题的根本原因还是 Java 语言单继承的局限性，如果使用多继承也能解决这样的问题
+
+## 组合模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/structural/composite)
+
+组合模式的角色：`抽象构件` `叶子构件` `容器构件`
+
+这个模式对树形结构有非常好的处理，因为叶子构件和容器构件都是继承抽象构件
+
+而容器构件可以装叶子构件所以这就形成了一个天然的递归，对树形结构的处理非常方便
+
+windows 里的文件管理也是使用这种模式，因为 windows 的文件和目录也是树形结构
+
+## 装饰模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/structural/decorator)
+
+装饰模式角色：`抽象构件` `真实角色` `装饰角色` `具体装饰类`
+
+装饰模式是对真实角色的扩展
+
+例如咖啡店里，咖啡是真实角色，牛奶、巧克力之类的是具体装饰角色牛奶装饰咖啡后变成牛奶咖啡，还可以继续加巧克力，这就等同于装饰角色对真实角色的装饰
+
+这样就可以很灵活的对真实角色进行装饰，装饰模式和桥接模式看起来有点相似
+
+但其实它们有本质的区别，桥接模式的角色本来就是不完整的，使用桥接模式是为了更方便的完成角色的构构建
+
+而装饰模式的角色是完整的，装饰模式只是对该角色进行装饰而已
+
+## 外观模式
+
+使用很频繁就是封装方法，像一些工具类之类的
+
+## 享元模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/structural/flyweight)
+
+享元模式角色：`抽象享元类` `具体享元类` `外部状态类` `享元工厂类`
+
+如果某个角色使用很频繁而这些角色内的属性大致一样，那么就可以使用享元模式
+
+享元模式的字面意思是 `共享元素`，如果角色相似，就可以把该角色类的不能共享的属性单独拆分出来形成外部状态类
+
+将这些享元类存入享元工厂，然后根据外部状态显示该类，不同的外部状态可以显示不同的类，但这些类具体还是共享的一个享元类
+
+这样就类有效的节省内存空间，但该模式缺点也很明显，因为很多对象都是共享同一个类会降低运行速度，这种模式实现起来也比较繁琐
+
+但是该模式节省内存空间的功能也是很强大的

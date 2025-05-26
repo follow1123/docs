@@ -1,0 +1,134 @@
+---
+title: 行为型模式
+sidebar:
+    order: 20
+---
+
+多个对象相互协作完成单个对象无法完成的任务
+
+- 模板方法模式
+- 命令模式
+- 迭代器模式
+- 观察者模式
+- 中介者模式
+- 备忘录模式
+- 解释器模式
+- 状态模式
+- 策略模式
+- 职责链模式
+- 访问者模式
+
+## 职责链模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/behavioral/chainofresponsibility)
+
+以公司请假条为例
+
+员工申请请假会交给上级一层一层审批直到通过
+
+这种模式可以直接用 if...else 语句完成，虽然写起来简单，但是扩展和维护起来会很麻烦
+
+使用责任链模式就可以很好的解决这些问题
+
+将每层领导拆开为单独的 `领导实现类` 这个 `领导接口` 里有定义下一级领导的方法和处理 `请假调` 的方法，这样扩展起来就会很便利
+
+## 中介者模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/behavioral/mediator)
+
+以公司部门管理为例
+
+如果一个公司没有经理来管理各个部门，那么各个部门之间的关系会变得非常复杂
+
+有经理来管理后各个部门想和其它部门交流只能通过经理，经理会根据情况通知各个部门，这样各个部门间的关系就会清晰
+
+软件中也是一样，各个部门可以表示 `同事类`，经理可以表示 `中介者类`，同事类之间的交互会通过中介者类来管理，这样程序效率就会提高
+
+## 模板方法模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/behavioral/templatemethod)
+
+以银行办理各种业务为例
+
+银行办理的业务有很多种类，当办理流程都是一样
+
+我们就可以定一个专门的模板来办理业务，办理业务流程一般是，排队、办理各种业务、评价。其中办理业务可以分很多种
+
+所以可以把定为抽象方法，让继承该类的子类去完善
+
+或者使用匿名内部类实现，这样在执行程序时我们不用关心 `排队` 和 `评价` 流程，只用关心办理的是那种业务
+
+降低了程序的复杂度
+
+## 命令模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/behavioral/command)
+
+该模式有三个角色：`命令发送者` `命令真正执行者` `命令处理者`
+
+命令发送者负责发送命令，命令处理者负责对命令进行批处理，命令真正执行者才会真正处理命令，命令的处理过程被分成三部分
+
+在命令处理者中还可以配合备忘录模式，实现命令的撤销和恢复，还能对命令进行处理，真正提高命令的执行效率
+
+## 策略模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/behavioral/strategy)
+
+以商店老板对新老顾客的折扣方案为例
+
+假设店里有三种顾客，新顾客需要购买小批量该商品、新顾客需要大批量购买该商品、老顾客需要小批量购买该商品、老顾客需要大批量购买该商品
+
+这种情况下，我们可以把这些情况分四种解决方案，这些方案同时继承一个公共接口
+
+这样程序执行时，只需要实现该接口的不同算法就能得到不同的解决方案，有效的降低了程序的复杂度
+
+## 状态模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/behavioral/state)
+
+以淘宝的商品为例
+
+每个商品都有各种状态，每种状态都会有不同的行为
+对于这种情况我们可以用状态模式进行处理，这些状态都会实现一个公共的 `状态` 接口，而 `商品` 类内会有改状态接口的引用
+
+不同的 `状态` 接实现类对应不同的状态，这样这个 `商品` 就会根据不同的状态执行不同的方法
+
+降低了程序的复杂度，这个模式和策略模式结构相似，但是策模式是处理不同的算法而该模式是处理不同的状态
+
+## 观察者模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/behavioral/observer)
+
+该模式的角色：`抽象观察者` `具体观察者` `目标对象`
+
+其中目标对象和具体观察者可以有多个
+
+以 LoL 游戏为例
+
+你操作的英雄是目标对象，你的队友们是观察者，当你从上路移动到中路时，你的队友的电脑上也会显示你操作的角色的移 动方向和具体位置，这就是该模式的具体应用
+
+目标对象内会有观察者容器，当该目标对象的某个属性发生改变时，就会通知这些观察者们，观察者们收到通知时，就会对应执行相应的操作
+
+该模式其实就是 `广播` 的实现，应用非常广泛，java 内也有对应的实现类：`java.java.util.Observable` 和 `java.util.Observer`
+
+## 备忘录模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/behavioral/memo)
+
+该模式的角色：`源发器类` `备忘录类` `负责人类`
+
+该模式真正实现备份和恢复操作，源发器类相当于需要备份的目标对象，备忘录类内有源发器类的各个时间段的备份状态，而负责人类是对备忘录类的管理者
+
+## 迭代器模式（不常用）
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/behavioral/iterator)
+
+这个模式就是对一个容器进行相应的操作，java已有实现，实际一般不会手动实现
+
+## 解释器模式（不常用）
+
+用于创建新的语言，经量不使用
+
+## 访问者模式（不常用）
+
+用于对集合类有很多不同类型的数据的处理，该模式使用范围较小，一般用于 XML 解析之类

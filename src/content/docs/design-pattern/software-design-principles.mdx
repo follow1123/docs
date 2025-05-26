@@ -1,0 +1,367 @@
+---
+title: 软件设计原则
+sidebar:
+    order: 5
+---
+
+import Mermaid from "@components/Mermaid.astro";
+
+提高软件系统的可维护性和可复用性，增加软件的可扩展性和灵活性
+
+## 开闭原则
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/principles/openclosed/Client.java)
+
+`对扩展开放，对修改关闭`，在程序需要扩展时，不能修改原来的代码，实现热插拔效果，提高程序的扩展性
+
+使用接口或抽象类实现
+
+<Mermaid
+    code={`
+classDiagram
+    class Software {
+        - theme: Theme
+        + configTheme(Theme theme) void
+        + open() void
+    }
+    class Theme {
+        + display() void
+    }
+    class DefaultTheme {
+        + display() void
+    }
+    class CustomTheme {
+        + display() void
+    }
+    <<Abstract>> Theme
+    Theme <|-- DefaultTheme
+    Theme <|-- CustomTheme
+    Software o-- Theme
+`}
+/>
+
+## 里氏代换原则
+
+任何父类可以出现的地方，子类一定可以出现，子类可以扩展父类的功能但不能重写父类原有的功能，子类在继承父类后，可以添加新的方法完成新功能，但尽量不要重写父类的方法
+
+### 错误，企鹅不能飞
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/principles/liskovsubstitution/before/Client.java)
+
+<Mermaid
+    code={`
+classDiagram
+    class Bird {
+        + fly() void
+    }
+    class Penguin {
+        + fly() void
+    }
+    Bird <|-- Penguin
+`}
+/>
+
+### 正确示例
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/principles/liskovsubstitution/after/Client.java)
+
+<Mermaid
+    code={`
+classDiagram
+   class FlyingBird {
+       + fly() void
+   }
+   class Bird {
+       + eat() void
+   }
+   class Sparrow {
+       + fly() void
+       + eat() void
+   }
+   class Penguin {
+       + eat() void
+   }
+   <<Interface>> FlyingBird
+   FlyingBird <|.. Sparrow
+   Bird <|-- Sparrow
+   Bird <|-- Penguin
+`}
+/>
+
+## 依赖倒转原则
+
+高层模块不应该依赖低层模块，两者都应该依赖其抽象；抽象不应该依赖细节，细节应该依赖抽象
+
+### 组织电脑
+
+#### 电脑无法使用其他配件
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/principles/dependencyinversion/before/Client.java)
+
+<Mermaid
+    code={`
+classDiagram
+    class IntelCPU {
+        + run() void
+    }
+    class KingstonMemory {
+        + save() void
+    }
+    class XiJieHardDisk {
+        + save(String data) void
+        + getData() String
+    }
+    class Computer {
+        - intelCPU: IntelCPU
+        - kingstonMemory: KingstonMemory
+        - xiJieHardDisk: XiJieHardDisk
+        + run() void
+    }
+    Computer *-- IntelCPU
+    Computer *-- KingstonMemory
+    Computer *-- XiJieHardDisk
+`}
+/>
+
+#### 正确示例
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/principles/dependencyinversion/after/Client.java)
+
+<Mermaid
+    code={`
+classDiagram
+    class CPU {
+        + run() void
+    }
+    class Memory {
+        + save() void
+    }
+    class HardDisk {
+        + save(String data) void
+        + getData() String
+    }
+    class IntelCPU {
+        + run() void
+    }
+    class KingstonMemory {
+        + save() void
+    }
+    class XiJieHardDisk {
+        + save(String data) void
+        + getData() String
+    }
+    class Computer {
+        - intelCPU: IntelCPU
+        - kingstonMemory: KingstonMemory
+        - xiJieHardDisk: XiJieHardDisk
+        + run() void
+    }
+    <<Interface>> CPU
+    <<Interface>> Memory
+    <<Interface>> HardDisk
+    Computer *-- CPU
+    Computer *-- Memory
+    Computer *-- HardDisk
+    CPU <|.. IntelCPU
+    Memory <|.. KingstonMemory
+    HardDisk <|.. XiJieHardDisk
+`}
+/>
+
+## 接口隔离原则
+
+客户端不应该被迫依赖于它不使用的方法；一个类对另一个类的依赖应该建立在最小的接口上
+
+### 安全门
+
+#### 如果新制作的安全门只需要实现防火和防水功能就被迫依赖了防盗功能
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/principles/interfacesegregation/before/Client.java)
+
+<Mermaid
+    code={`
+classDiagram
+    class SafetyDoor {
+        + antiTheft() void
+        + fireproof() void
+        + waterproof() void
+    }
+    class CustomSafetyDoor {
+        + antiTheft() void
+        + fireproof() void
+        + waterproof() void
+    }
+    <<Interface>>SafetyDoor
+    SafetyDoor <|.. CustomSafetyDoor
+`}
+/>
+
+#### 新制作的安全门只需要实现对应功能的接口
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/principles/interfacesegregation/after/Client.java)
+
+<Mermaid
+    code={`
+classDiagram
+    class AntiTheft {
+        + antiTheft() void
+    }
+    class Fireproof {
+      + fireproof() void
+    }
+    class Waterproof {
+      + waterproof() void
+    }
+    class CustomSafetyDoor {
+        + antiTheft() void
+        + fireproof() void
+        + waterproof() void
+    }
+    class AnotherSafetyDoor {
+        + fireproof() void
+        + waterproof() void
+    }
+    <<Interface>>AntiTheft
+    <<Interface>>Fireproof
+    <<Interface>>Waterproof
+    AntiTheft <|.. CustomSafetyDoor
+    Fireproof <|.. CustomSafetyDoor
+    Waterproof <|.. CustomSafetyDoor
+
+    Fireproof <|.. AnotherSafetyDoor
+    Waterproof <|.. AnotherSafetyDoor
+
+`} />
+
+## 迪米特法则
+
+迪米特法则又叫最小知识原则，`和你直接的朋友交谈，不和陌生人说话`
+
+如果两个软件无需直接通信，那么就不应该发生直接的相互调用，可以通过第三个转发该调用。降低类之间的耦合度，提高模块的独立性
+
+迪米特法则中的 `朋友` 是指：当前对象本身、当前对象的成员对象、当前对象所创建的对象、当前对象的方法参数等，这些对象和当前对象存在关联、聚合或组合关系
+
+### 明星和经纪人
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/principles/demeter/Client.java)
+
+<Mermaid
+    code={`
+classDiagram
+    class Star {
+        - name: String
+        + Star(String name)
+        + getName() String
+    }
+    class Fans {
+        - name: String
+        + Fans(String name)
+        + getName() String
+    }
+    class Company {
+        - name: String
+        + Company(String name)
+        + getName() String
+    }
+    class Agent {
+        - star: Star
+        - fans: Fans
+        - company: company
+        + setStar(Star star) void
+        + setFans(Fans fans) void
+        + setCompany(Company company) void
+        + meeting() void
+        + business() void
+    }
+    Agent o-- Star
+    Agent o-- Fans
+    Agent o-- Company
+`}
+/>
+
+## 合成复用原则
+
+合成复用原则是指：尽量组合和聚合等关联关系来实现，其次才考虑使用继承关系实现
+
+通常复用分为继承复用和合成复用两种：
+
+- 继承复用虽然简单易实现，但是破坏了类的封装性，限制了复用的灵活性，子类和父类耦合度高
+- 组合或聚合复用，维持类的封装性，提高了复用的灵活性，对象之间的耦合度低
+
+### 汽车分类
+
+#### 使用继承实现如果需要新加一种类型的车会非常麻烦
+
+<Mermaid
+    code={`
+classDiagram
+    class Car {
+        + move() void
+    }
+    class PetrolCar {
+        + move() void
+    }
+    class ElectricCar {
+        + move() void
+    }
+    class RedPetrolCar {
+        - color: String
+        + move() void
+    }
+    class WhitePetrolCar {
+        - color: String
+        + move() void
+    }
+    class RedElectricCar {
+        - color: String
+        + move() void
+    }
+    class WhiteElectricCar {
+        - color: String
+        + move() void
+    }
+    Car <|-- PetrolCar
+    Car <|-- ElectricCar
+    PetrolCar <|-- RedPetrolCar
+    PetrolCar <|-- WhitePetrolCar
+    ElectricCar <|-- RedElectricCar
+    ElectricCar <|-- WhiteElectricCar
+`}
+/>
+
+#### 使用聚合则只需要新加一个类就可以实现
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/principles/synthesisreuse/Client.java)
+
+<Mermaid
+    code={`
+classDiagram
+    class Car {
+        # color: Color
+        + setColor(Color color) void
+        + move() void
+    }
+    class PetrolCar {
+        + move() void
+    }
+    class ElectricCar {
+        + move() void
+    }
+    class Color {
+        + getColor() String
+    }
+    class Red {
+        + getColor() String
+    }
+    class White {
+        + getColor() String
+    }
+    <<Interface>>Color
+    <<Abstract>>Car
+    Car o-- Color
+    Car <|-- PetrolCar
+    Car <|-- ElectricCar
+    Color <|.. Red
+    Color <|.. White
+`}
+/>

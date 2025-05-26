@@ -1,0 +1,109 @@
+---
+title: 创建型模式
+sidebar:
+    order: 10
+---
+
+用于创建对象，将对象的创建和使用分离
+
+- 单例模式
+- 工厂模式
+- 抽象工厂模式
+- 建造者模式
+- 原型模式
+
+## 单例模式
+
+单例模式有五种实现方式
+
+### 饿汉式
+
+> [代码](https://github.com/follow1123/design-pattern-java/blob/main/src/main/java/cn/y/software/creational/singleton/HungryLoad.java)
+
+- 优点：线程安全，调用效率快
+- 缺点：不能延时加载，能被反射和反编译破解
+
+:::note
+如果该类加载比较占用内存，使用时也没有很平凡的使用，那么不建议使用该实现方式
+:::
+
+### 懒汉式
+
+> [代码](https://github.com/follow1123/design-pattern-java/blob/main/src/main/java/cn/y/software/creational/singleton/LazyLoad.java)
+
+- 优点：线程安全，能够延时加载
+- 缺点：调用效率慢，能被反射和反编译破解
+
+:::note
+该方式实现了延时加载，但是在多线程环境下调用效率会很慢，在多线程环境下不建议使用
+:::
+
+### 双重检测
+
+> [代码](https://github.com/follow1123/design-pattern-java/blob/main/src/main/java/cn/y/software/creational/singleton/DoubleChecked.java)
+
+- 优点：线程安全，能延时加载，调用效率高
+- 缺点：在JVM底层优化和内部模型原因有时会出现问题，能被反射和反编译破解
+
+:::note
+不建议使用
+:::
+
+### 静态内部类
+
+> [代码](https://github.com/follow1123/design-pattern-java/blob/main/src/main/java/cn/y/software/creational/singleton/SingletonStatic.java)
+
+- 优点：线程安全，能延时加载，调用效率高
+- 缺点：能被反射和反编译破解
+
+:::note
+基本上还可以
+:::
+
+### 枚举式
+
+> [代码](https://github.com/follow1123/design-pattern-java/blob/main/src/main/java/cn/y/software/creational/singleton/SingletonEnum.java)
+
+- 优点：线程安全，调用效率高，不能被反射和反编译破解
+- 缺点：不能延时加载，不能继承其他类
+
+:::note
+其他都好就是缺失类的功能，比如不能继承
+:::
+
+## 工厂模式
+
+### 简单工厂
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/creational/factory/simplestaticfactory)
+
+- 优点：客户端只需要知道接口和工厂，有利于使客户端的调用
+- 缺点：没有完全实现OCP原则，对程序进行扩展时需要修改已有的代码
+
+### 工厂方法
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/creational/factory)
+
+- 优点：完全实现OCP原则、有利于程序的扩展
+- 缺点：该模式会创建很多小块类，实际用着也比较麻烦
+
+## 抽象工厂模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/creational/factory/abstractfactory)
+
+- 优点：有利于创建应该产品族
+- 缺点：不利于创建单个产品
+
+## 建造者模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/creational/builder)
+
+- 优点：一个类的组装过程非常麻烦时，将该类的装配过程分为建造者和装配者两个部分从而进行简化
+- 缺点：该模式使用起来非常麻烦，一般情况下遇不到
+
+## 原型模式
+
+> [代码](https://github.com/follow1123/design-pattern-java/tree/main/src/main/java/cn/y/software/creational/prototype)
+
+- 优点：当一个类在创建时会进行很多的耗时操作时可以使用原型模式，原型模式实际上就是克隆，将第一次创建好的类直接进行克隆就避免了一系列的耗时操作，提高了程序的效率
+- 缺点：还不清楚

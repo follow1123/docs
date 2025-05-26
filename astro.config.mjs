@@ -360,6 +360,17 @@ export default defineConfig({
             link: "/uml-class-diagram",
             items: ["uml-class-diagram"],
           },
+          {
+            label: "其他/设计模式",
+            link: "/design-pattern",
+            items: [
+              "design-pattern",
+              "design-pattern/software-design-principles",
+              "design-pattern/creational",
+              "design-pattern/structural",
+              "design-pattern/behavioral",
+            ],
+          },
         ]),
       ],
       title: "Docs",
