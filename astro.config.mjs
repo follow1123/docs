@@ -393,11 +393,21 @@ export default defineConfig({
         ]),
       ],
       title: "Docs",
+      locales: {
+        root: {
+          label: "简体中文",
+          lang: "zh-CN",
+        },
+      },
+      logo: {
+        src: "./public/favicon.svg",
+        replacesTitle: true,
+      },
       social: [
         {
           icon: "github",
           label: "GitHub",
-          href: "https://github.com/withastro/starlight",
+          href: "https://github.com/follow1123/docs",
         },
       ],
     }),
