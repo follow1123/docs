@@ -1,36 +1,80 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
+title: 文档
 template: splash
-hero:
-    tagline: Congrats on setting up a new Starlight project!
-    image:
-        file: ../../assets/houston.webp
-    actions:
-        - text: Example Guide
-          link: /guides/example/
-          icon: right-arrow
-        - text: Read the Starlight docs
-          link: https://starlight.astro.build
-          icon: external
-          variant: minimal
 ---
 
+import InternalLink from "@components/InternalLink.astro";
 import { Card, CardGrid } from "@astrojs/starlight/components";
 
-## Next steps
-
 <CardGrid stagger>
-    <Card title="Update content" icon="pencil">
-        Edit `src/content/docs/index.mdx` to see this page change.
-    </Card>
-    <Card title="Add new content" icon="add-document">
-        Add Markdown or MDX files to `src/content/docs` to create new pages.
-    </Card>
-    <Card title="Configure your site" icon="setting">
-        Edit your `sidebar` and other config in `astro.config.mjs`.
-    </Card>
-    <Card title="Read the docs" icon="open-book">
-        Learn more in [the Starlight Docs](https://starlight.astro.build/).
-    </Card>
+
+<Card title="Linux" icon="linux">
+
+- <InternalLink text="Linux 基础" href="linux/basics/filesystem/" />
+- <InternalLink text="常用命令" href="linux/commands/file-directory/" />
+- ...
+
+</Card>
+
+<Card title="Git" icon="seti:git">
+
+- <InternalLink text="提交" href="git/operation/commit/" />
+- <InternalLink text="还原" href="git/restore-operations/restore" />
+- <InternalLink text="分支" href="git/branch/basics/" />
+- ...
+
+</Card>
+
+<Card title="Neovim" icon="vim">
+
+- <InternalLink text="基础" href="neovim/basics/motions/" />
+- <InternalLink text="搜索" href="neovim/search-replace/search/" />
+- <InternalLink text="跳转" href="neovim/positioning-jumping/jumplist/" />
+- ...
+
+</Card>
+
+<Card title="前端" icon="seti:json">
+
+- <InternalLink text="HTML" href="frontend/html/introduction/" />
+- <InternalLink text="CSS" href="frontend/css/introduction/" />
+- <InternalLink text="JavaScript" href="frontend/javascript/introduction/" />
+- ...
+
+</Card>
+
+<Card title="Java" icon="seti:java">
+
+- <InternalLink text="Java 语言" href="java/language/" />
+- <InternalLink text="构建工具" href="java/build-tools/" />
+- <InternalLink text="框架" href="java/framework/" />
+- <InternalLink text="中间件" href="java/middleware/" />
+- <InternalLink text="微服务" href="java/microservices/" />
+- ...
+
+</Card>
+
+<Card title="Windows" icon="seti:windows">
+
+- <InternalLink text="Windows 基础" href="windows/basics/file-hierarchy/" />
+- <InternalLink text="Cmd" href="windows/command-prompt/introduction/" />
+- <InternalLink text="PowerShell" href="windows/powershell/introduction/" />
+- ...
+
+</Card>
+
+<Card title="其他" icon="document">
+
+- <InternalLink text="Nginx" href="nginx" />
+- <InternalLink text="Redis" href="redis" />
+- <InternalLink text="HTTP" href="http" />
+- <InternalLink text="Docker" href="docker" />
+- <InternalLink text="MySQL" href="mysql" />
+- <InternalLink text="Tomcat" href="tomcat" />
+- <InternalLink text="UML 类图" href="uml-class-diagram" />
+- <InternalLink text="设计模式" href="design-pattern" />
+- ...
+
+</Card>
+
 </CardGrid>
