@@ -21,7 +21,7 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Install dependencies
-        run: pnpm install --pord
+        run: pnpm install --prod
       - name: Build website
         run: pnpm build --site 'https://follow1123.github.io/' --base 'docs/'
       - name: Upload Build Artifact
