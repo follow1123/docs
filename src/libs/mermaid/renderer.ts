@@ -23,9 +23,13 @@ class Renderer {
     this.#page = page;
   }
 
-  async deinit() {
+  deinit() {
     if (this.#browser) {
-      await this.#browser.close();
+      const process = this.#browser.process();
+      if (process) {
+        console.log("kill headless browser: ", process.pid);
+        process.kill();
+      }
     }
   }
 

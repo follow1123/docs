@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
+import renderer from "./renderer";
 
 type SvgFile = { lightPath: string; darkPath: string };
 
@@ -62,8 +63,6 @@ const generate = async (filePath: string, code: string): Promise<SvgFile> => {
     console.log(`\nno need to rebuild, file: ${filePath}-${svgName}`);
   } else {
     try {
-      const m = await import("./renderer");
-      const renderer = m.default;
       const lightId = `mermaid-${svgName}-light`;
       const lightSvgContent = await renderer.render(lightId, code, "default");
       const darkId = `mermaid-${svgName}-dark`;
@@ -81,6 +80,7 @@ const generate = async (filePath: string, code: string): Promise<SvgFile> => {
 
 process.on("exit", () => {
   cleaner.clean();
+  renderer.deinit();
 });
 
 export default generate;
