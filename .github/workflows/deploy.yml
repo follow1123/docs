@@ -18,10 +18,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
-      - name: Install Dependencies
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Install dependencies
         run: pnpm install --pord
-      - name: Build Website
+      - name: Build website
         run: pnpm build --site 'https://follow1123.github.io/' --base 'docs/'
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3
