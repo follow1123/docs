@@ -14,7 +14,7 @@ Java 语言的 JVM 可以运行多个线程，使用 `java.lang.Thread` 类代�
 
 ### 继承 `Thread` 类
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/creation_method/extends_thread/ExtendsThreadTest.java)
+> [代码](https://github.com/follow1123/java-language-examples/tree/main/syntax/src/main/java/org/example/multithreading/creation/ThreadTest.java)
 
 继承 `Thread` 类并重写 `run()` 方法，实例化后调用 `start()`方法（也可以创建 `Thread` 类的匿名子类对象使用)
 
@@ -61,7 +61,7 @@ new Thread(){
 
 ### 实现 `Runnable` 接口
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/creation_method/impl_runnable/ImplRunnableTest.java)
+> [代码](https://github.com/follow1123/java-language-examples/tree/main/syntax/src/main/java/org/example/multithreading/creation/RunnableTest.java)
 
 实现 `Runnable` 接口并实现 `run()` 方法，在 `new Thread()` 时传入该对象（也可以创建 `Runnalbe` 接口的匿名实现类使用）
 
@@ -107,7 +107,7 @@ new Thread(new Runnable() {
 
 ### 实现 `Callable` （jdk5 新增）
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/creation_method/impl_callable/CallableTest.java)
+> [代码](https://github.com/follow1123/java-language-examples/tree/main/syntax/src/main/java/org/example/multithreading/creation/CallableTest.java)
 
 - `call()`方法可以有返回值，可以使用泛型指定返回值类型
 - `call()`方法可以抛出异常
@@ -146,7 +146,7 @@ try {
 
 ### 使用线程池
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/creation_method/thread_pool/ThreadPoolTest.java)
+> [代码](https://github.com/follow1123/java-language-examples/tree/main/syntax/src/main/java/org/example/multithreading/creation/ThreadPoolTest.java)
 
 如果并发的线程数量很多，并且每个线程都执行一个时间很短的任务就结束了，这样频繁的创建线程就会大大降低系统的效率，因为频繁创建线程和销毁线程需要时间
 
@@ -214,7 +214,7 @@ pool.shutdown();
 
 ## Thread类
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_methods/ThreadMethodsTest.java)
+> [代码](https://github.com/follow1123/java-language-examples/tree/main/syntax/src/main/java/org/example/multithreading/ThreadMethodsTest.java)
 
 构造器
 
@@ -399,7 +399,7 @@ for (int i = 1; i <= 100; i++) {
 
 ### interrupt
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/thread_api/InterruptTest.java)
+> [代码](https://github.com/follow1123/java-language-examples/tree/main/standard-library/src/main/java/org/example/juc/threadapi/InterruptTest.java)
 
 - `interrupt()` - 打断指定线程
 - `isInterrupted()` - 判断指定线程是否被打断
@@ -472,7 +472,7 @@ thread.interrupt();
 
 ### 守护线程
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/juc/thread_api/DaemonTest.java)
+> [代码](https://github.com/follow1123/java-language-examples/tree/main/standard-library/src/main/java/org/example/juc/threadapi/DaemonTest.java)
 
 #### 非守护线程
 

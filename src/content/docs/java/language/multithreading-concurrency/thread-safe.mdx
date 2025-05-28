@@ -48,7 +48,7 @@ window3.start();
 `饿汉式` 不存在线程安全问题，主要说明 `懒汉式`
 :::
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_safe/singleton/SingletonTest.java)
+> [代码](https://github.com/follow1123/java-language-examples/tree/main/syntax/src/main/java/org/example/multithreading/safety/singleton/SingletonTest.java)
 
 如果获取实例的方法内部有耗时操作，此时多个线程进入这个方法时都会进入为空判断，卡在耗时操作处，最后创建多个实例
 
@@ -135,7 +135,7 @@ public class SingletonObj {
 
 ### 双重检测锁
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_safe/singleton/SingletonTest.java)
+> [代码](https://github.com/follow1123/java-language-examples/tree/main/syntax/src/main/java/org/example/multithreading/safety/singleton/SingletonTest.java)
 
 这种方式就是细化同步代码块，使同步代码块只包裹到需要同步的代码
 
@@ -199,7 +199,7 @@ public class SingletonObjDCL {
 
 ### 死锁代码
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_safe/deadlock/DeadLockTest.java)
+> [代码](https://github.com/follow1123/java-language-examples/tree/main/syntax/src/main/java/org/example/multithreading/safety/DeadLockTest.java)
 
 ```java {7,10,20,23}
 Object lock1 = new Object();

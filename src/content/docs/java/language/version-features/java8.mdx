@@ -9,7 +9,7 @@ import InternalLink from "@components/InternalLink.astro";
 
 ## Lambda 表达式
 
-> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/lambda/LambdaTest.java)
+> [详细代码](https://github.com/follow1123/java-language-examples/tree/main/version-features/java8/src/main/java/org/example/lambda/LambdaTest.java)
 
 ### 基础使用
 
@@ -50,7 +50,7 @@ Consumer<String> consumer1 = s -> System.out.println(s);
 
 ### 函数式接口
 
-> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/lambda/FunctionInterfaceTest.java)
+> [详细代码](https://github.com/follow1123/java-language-examples/tree/main/version-features/java8/src/main/java/org/example/lambda/FunctionInterfaceTest.java)
 
 接口内只有一个抽象方法
 
@@ -97,7 +97,7 @@ System.out.println(predicate.test(30));
 
 如果一个对象的方法或静态方法与某个函数式接口的抽象方法的参数和返回值相同，则可以使用 `对象::方法` 或 `类::静态方法` 替换
 
-> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/reference/MethodRefTest.java)
+> [详细代码](https://github.com/follow1123/java-language-examples/tree/main/version-features/java8/src/main/java/org/example/reference/MethodRefTest.java)
 
 ### 实例方法引用
 
@@ -138,7 +138,7 @@ System.out.println(comparator1);
 
 ### 构造器引用
 
-> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/reference/ConstructorRefTest.java)
+> [详细代码](https://github.com/follow1123/java-language-examples/tree/main/version-features/java8/src/main/java/org/example/reference/ConstructorRefTest.java)
 
 ```java
 // 无参数构造器
@@ -184,7 +184,7 @@ b --> c(终止操作)`}
 
 ### 实例化
 
-> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/stream/InitTest.java)
+> [详细代码](https://github.com/follow1123/java-language-examples/tree/main/version-features/java8/src/main/java/org/example/stream/InitTest.java)
 
 #### 通过集合初始化
 
@@ -212,7 +212,7 @@ Stream<Integer> integerStream = Stream.of(324, 324, 8790, 4543);
 
 ### 中间操作
 
-> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/stream/OperateTest.java)
+> [详细代码](https://github.com/follow1123/java-language-examples/tree/main/version-features/java8/src/main/java/org/example/stream/OperateTest.java)
 
 #### 筛选和切片
 
@@ -282,7 +282,7 @@ users.stream().sorted((u1, u2) -> u1.getName().compareTo(u2.getName())).forEach(
 
 ### 终止操作
 
-> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/stream/TerminateTest.java)
+> [详细代码](https://github.com/follow1123/java-language-examples/tree/main/version-features/java8/src/main/java/org/example/stream/TerminateTest.java)
 
 #### 匹配和查找
 
@@ -361,7 +361,7 @@ for (Map.Entry<Boolean, List<User>> entry : entries1) {
 
 ## `Optional` 类
 
-> [详细代码](https://github.com/follow1123/java-version-features/blob/main/java8/src/main/java/cn/y/java/optional/OptionalTest.java)
+> [详细代码](https://github.com/follow1123/java-language-examples/tree/main/version-features/java8/src/main/java/org/example/optional/OptionalTest.java)
 
 ### 创建
 

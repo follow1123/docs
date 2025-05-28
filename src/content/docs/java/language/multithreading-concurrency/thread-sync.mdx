@@ -20,7 +20,7 @@ public synchronized void methodName(){
 
 静态的同步方法，默认的同步监视器是 `当前类.class`
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_safe/synchronized_method/SynchronizedMethodTest.java)
+> [代码](https://github.com/follow1123/java-language-examples/tree/main/syntax/src/main/java/org/example/multithreading/safety/syncd/method/SynchronizedMethodTest.java)
 
 ### 解决重复卖票问题
 
@@ -99,7 +99,9 @@ synchronized(同步监视器){
 
 <details>
 
-<summary>实现 <code>Runnable</code> 接口的类</summary>
+<summary>
+    实现 <code>Runnable</code> 接口的类
+</summary>
 
 ```java {1,4,10}
 public class TicketWindowRunnable implements Runnable{
@@ -146,7 +148,9 @@ window3.start();
 
 <details>
 
-<summary>继承 <code>Thread</code> 的类</summary>
+<summary>
+    继承 <code>Thread</code> 的类
+</summary>
 
 ```java {1,3,14}
 public class TicketWindowThread extends Thread{
@@ -191,7 +195,7 @@ w3.start();
 
 ## Lock（jdk5新增）
 
-> [详细代码](https://github.com/follow1123/java-basics/blob/main/src/main/java/cn/y/java/multithreading/thread_safe/lock/LockTest.java)
+> [代码](https://github.com/follow1123/java-language-examples/tree/main/syntax/src/main/java/org/example/multithreading/safety/LockTest.java)
 
 1. 创建 Lock 实例
 2. 执行 `lock()` 方法，锁定对共享资源的调用
