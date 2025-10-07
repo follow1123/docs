@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
-import starlightThemeFlexoki from "starlight-theme-flexoki";
 import starlightKbd from "starlight-kbd";
 import starlightSidebarTopics from "starlight-sidebar-topics";
 // https://astro.build/config
@@ -14,7 +13,6 @@ export default defineConfig({
         Sidebar: "./src/components/Sidebar.astro",
       },
       plugins: [
-        starlightThemeFlexoki(),
         starlightKbd({
           globalPicker: false,
           types: [

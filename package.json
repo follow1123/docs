@@ -16,8 +16,7 @@
     "puppeteer-core": "^24.9.0",
     "sharp": "0.32.6",
     "starlight-kbd": "^0.2.0",
-    "starlight-sidebar-topics": "^0.6.0",
-    "starlight-theme-flexoki": "^0.1.0"
+    "starlight-sidebar-topics": "^0.6.0"
   },
   "devDependencies": {
     "prettier-plugin-astro": "0.14.1"
