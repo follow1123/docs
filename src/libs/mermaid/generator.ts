@@ -3,7 +3,11 @@ import fs from "fs";
 import crypto from "crypto";
 import renderer from "./renderer";
 
-type SvgFile = { lightPath: string; darkPath: string };
+export interface SvgFile {
+  lightPath: string;
+  darkPath: string;
+  width: string | undefined;
+}
 
 class MermaidSvgCleaner {
   #cache: Map<string, Array<string>>;
@@ -48,9 +52,28 @@ const publicPath = "public";
 const prefixPath = "mermaid-svg";
 const cleaner = new MermaidSvgCleaner();
 
+const findWdithFromContent = (
+  content: Buffer<ArrayBufferLike>,
+): string | undefined => {
+  const searchKey = "max-width: ";
+  const widthStart = content.indexOf(searchKey) + searchKey.length;
+  let widthEnd = widthStart;
+  for (; ; widthEnd++) {
+    const b = content.at(widthEnd) as number;
+    const c = String.fromCharCode(b);
+
+    if (c === "." || c === "p" || c === ";") {
+      break;
+    }
+    if (widthEnd - widthStart > 5) break;
+  }
+
+  return content.subarray(widthStart, widthEnd).toString();
+};
+
 const generate = async (filePath: string, code: string): Promise<SvgFile> => {
   filePath = path.normalize(filePath);
-  const dir = path.join(publicPath, prefixPath, filePath.replaceAll("/", "_"));
+  const dir = path.join(publicPath, prefixPath, filePath);
   const svgName = crypto.createHash("md5").update(code, "utf8").digest("hex");
   cleaner.set(dir, svgName);
   const svgDir = path.join(dir, svgName);
@@ -59,23 +82,30 @@ const generate = async (filePath: string, code: string): Promise<SvgFile> => {
   const lightPath = path.join(svgDir, "light.svg");
   const darkPath = path.join(svgDir, "dark.svg");
 
-  if (fs.existsSync(darkPath) && fs.existsSync(lightPath)) {
-    console.log(`\nno need to rebuild, file: ${filePath}-${svgName}`);
-  } else {
-    try {
-      const lightId = `mermaid-${svgName}-light`;
-      const lightSvgContent = await renderer.render(lightId, code, "default");
-      const darkId = `mermaid-${svgName}-dark`;
-      const darkSvgContent = await renderer.render(darkId, code, "dark");
-      fs.writeFileSync(lightPath, lightSvgContent);
-      console.log(`\ngenerate light svg file: ${lightPath}`);
-      fs.writeFileSync(darkPath, darkSvgContent);
-      console.log(`\ngenerate dark svg file: ${darkPath}`);
-    } catch (e) {
-      console.error(`render mermaid svg error: ${e}`);
-    }
+  if (!fs.existsSync(lightPath)) {
+    const content = await renderer.render(
+      `mermaid-${svgName}-light`,
+      code,
+      "default",
+    );
+    fs.writeFileSync(lightPath, content);
   }
-  return { lightPath, darkPath };
+  if (!fs.existsSync(darkPath)) {
+    const content = await renderer.render(
+      `mermaid-${svgName}-dark`,
+      code,
+      "dark",
+    );
+    fs.writeFileSync(darkPath, content);
+  }
+
+  const svgContent = fs.readFileSync(lightPath);
+  const width = findWdithFromContent(svgContent);
+  return {
+    lightPath: lightPath.slice(publicPath.length),
+    darkPath: darkPath.slice(publicPath.length),
+    width,
+  };
 };
 
 process.on("exit", () => {

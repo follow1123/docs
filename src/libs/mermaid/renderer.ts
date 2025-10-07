@@ -16,9 +16,13 @@ class Renderer {
     this.#browser = browser;
 
     const page = await browser.newPage();
+    if (!import.meta.resolve) {
+      throw new Error("resolve method is not available on import.meta");
+    }
+    const tagPath = await import.meta.resolve("mermaid/dist/mermaid.min.js");
+    const startIdx = process.platform == "win32" ? 8 : 7;
     await page.addScriptTag({
-      path: new URL(import.meta.resolve("mermaid/dist/mermaid.min.js"))
-        .pathname,
+      path: tagPath.slice(startIdx),
     });
     this.#page = page;
   }

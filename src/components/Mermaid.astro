@@ -2,15 +2,22 @@
 import MermaidClient from "./MermaidClient.astro";
 import MermaidStatic from "./MermaidStatic.astro";
 import generate from "@/libs/mermaid/generator";
+import type { SvgFile } from "@/libs/mermaid/generator";
 
 const isDev = import.meta.env.DEV;
+
+interface Props {
+  code: string;
+}
+
 const { code } = Astro.props;
 
-let svgFile = null;
+// 初始化空值，防止下面 html 代码内无效的错误提示
+let svgFile: SvgFile = { lightPath: "", darkPath: "", width: "" };
 if (!isDev) {
   let filePath = Astro.url.pathname.replace(import.meta.env.BASE_URL, "");
   if (filePath.startsWith("/")) {
-    filePath = filePath.substring(1);
+    filePath = filePath.slice(1);
   }
   svgFile = await generate(filePath, code);
 }
@@ -21,8 +28,9 @@ if (!isDev) {
     <MermaidClient code={code} />
   ) : (
     <MermaidStatic
-      light-path={svgFile.lightPath}
-      dark-path={svgFile.darkPath}
+      lightPath={svgFile.lightPath}
+      darkPath={svgFile.darkPath}
+      width={svgFile.width}
     />
   )
 }
