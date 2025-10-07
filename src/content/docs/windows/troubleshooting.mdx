@@ -12,27 +12,102 @@ import { Steps } from "@astrojs/starlight/components";
 <Steps>
 
 1. 打开注册表编辑器：<Kbd linux="win+r" /> regedit
-
 2. 进入路径：`HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout`
-
 3. **右键点击** 在空白处，单击 **New** 然后点击 **Binary Value**(二进制值). 将新的二进制值命名为 **ScanCode Map**.
-
 4. 设置值为 `00 00 00 00 00 00 00 00 02 00 00 00 00 00 3A 00 00 00 00 00`
-
 5. 保存后重启电脑
 
 </Steps>
 
+## 关闭快速启动
+
+:::tip
+使用 SSD（固态硬盘）作为系统盘推荐关闭，使用 HDD（机械硬盘）作为系统盘的可选关闭
+:::
+
+<Steps>
+
+1. <Kbd linux="win+r" /> 输入 `powercfg.cpl`
+2. 点击左侧 `选择电源按钮的功能`
+3. 取消勾选 `启用快速启动`（如果无法点，先点上面的 `更改当前不可用的设置`）
+
+</Steps>
+
+## 禁用或启用笔记本键盘
+
+<Steps>
+
+1. <Kbd linux="win+s" /> 输入 `cmd`
+2. 右键点击 `命令提示符` 选择 `以管理员身份运行`
+3. 输入 `sc config i8042prt start= disabled` 回车，重启系统生效
+    - 恢复则输入 `sc config i8042prt start= auto`
+
+</Steps>
+
+## 设置延时更新100年
+
+<Steps>
+
+1. 打开注册表编辑器 <Kbd linux="win+r" /> regedit
+2. 进入 `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings`
+3. 修改 `PauseFeatureUpdatesEndTime` `PauseQualityUpdatesEndTime` `PauseUpdatesExpiryTime` 配置内的时间即可
+
+</Steps>
+
+## 卸载预装软件
+
+:::tip
+可以在 `dism++` 内统一卸载
+:::
+
+| 包名                         | 说明            |
+| ---------------------------- | --------------- |
+| Microsoft.549981C3F5F10      | 小娜（Cortana） |
+| Microsoft.BingNews           | Bing新闻        |
+| Microsoft.BingWeather        | Bing天气        |
+| Microsoft.GetHelp            | 获取帮助        |
+| Microsoft.Getstarted         | 系统使用技巧    |
+| Microsoft.MicrosoftOfficeHub | Office网页版    |
+| Microsoft.People             | 人脉            |
+| Microsoft.WindowsFeedbackHub | 反馈中心        |
+| Microsoft.WindwosMaps        | 地图            |
+| Microsoft.Xbox\*             | Xbox相关软件    |
+| Microsoft.YourPhone          | 你的手机        |
+| Microsoft.OneConnect         | 连接            |
+| Microsoft.Wallet             | 钱包            |
+| Microsoft.Messaging          | 消息            |
+
+### 卸载小娜（Cortana）问题
+
+Windows 10 2004 之前的版本这个命令没用，只有使用组策略或在注册表里禁用
+
+## 添加右键菜单`上帝模式`
+
+<Steps>
+
+1. 打开 regedit
+2. 进入 `计算机\HKEY_CLASSES_ROOT\DesktopBackground\Shell`
+3. 新建项 `God Mode`
+4. 在 `God Mode` 新建项 `command`
+5. 点击右边的 `默认` 输入 `explorer.exe shell:::{ED7BA470-8E54-465E-825C-99712043E01C}`
+
+</Steps>
+
 ## 自定义右键菜单
+
+项目内属性说明
+
+- `SubCommands` - 表示当前项目有子项目
+- `MUIVerb` - 项目名和热键
+- `icon` - 定义图标
+- `Extended` - 按 <Kbd linux="Shift" /> 键显示
 
 ### 选中文件时的右键菜单
 
 <Steps>
 
 1. 进入 `\HKEY_LOCAL_MACHINE\SOFTWARE\Classes` 路径
-
 2. 路径下第一个项 `*` 代表所有类型的文件，其它已 `.` 开头的项是某个具体类型的文件，根据具体情况在这个项下面的 shell 项内添加就可以了
-
 3. 其它步骤和添加选中文件夹时的右键菜单一样
 
 </Steps>
@@ -42,17 +117,11 @@ import { Steps } from "@astrojs/starlight/components";
 <Steps>
 
 1. 打开注册表
-
 2. 进入 `\HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\shell` 路径
-
 3. 新建项
-
 4. 设置默认名称的值为右键显示的字符串
-
 5. 新建 icon 字符串，值设置为使用软件的路径
-
 6. 新建项 command
-
 7. 设置默认值为 `软件的路径 "%1"`,其中%1为选中文件夹的路径
 
 </Steps>
@@ -62,7 +131,6 @@ import { Steps } from "@astrojs/starlight/components";
 <Steps>
 
 1. 进入 `\HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\background\shell` 路径
-
 2. 其它步骤和添加选中文件夹时的右键菜单一样，第 7 步时将 `%1` 改为 `%v.`，同样表示当前文件夹的路径
 
 </Steps>
@@ -70,6 +138,30 @@ import { Steps } from "@astrojs/starlight/components";
 ## Windows 开机启动文件夹
 
 `C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup`
+
+## 修改索引文件
+
+<Steps>
+
+1. <Kbd linux="win+r" /> 输入 `control`
+2. 搜索 `索引` 点击 `索引选项`
+3. 点击修改，可以取消 `Internet Explorer 历史记录` 和 `Microsoft OneNote`，其他按需选择
+    - 我只把 Windows 的索引当作应用启动器，所以只选择可执行文件目录，不选择文件
+
+</Steps>
+
+## 取消默认共享的 `Users` 文件夹
+
+<Steps>
+
+1. <Kbd linux="win+r" /> 输入 `compmgmt.msc` 打开计算机管理面板
+2. 在 `系统工具/共享文件夹/共享` 内查看所有被共享的文件夹
+3. 进入 `C:\Users`（就是 C 盘下的 `用户` 文件夹） 右键，点击 `属性`
+4. 选择 `共享` 标签
+5. 点击 `高级共享`
+6. 取消勾选 `共享此文件夹`，点击 `应用`
+
+</Steps>
 
 ## 安装 MinGW 环境
 
@@ -80,7 +172,6 @@ import { Steps } from "@astrojs/starlight/components";
     [下载地址](https://github.com/niXman/mingw-builds-binaries/releases)
 
     版本选择：
-
     - `平台` - `x86_64`(64位)、`i686`(32位)
     - `多线程方案` - `posix`、`win32`
     - `异常处理方案` - `seh`、`dwarf`、`sjlj`
