@@ -1,0 +1,440 @@
+---
+title: 其他
+sidebar:
+    order: 5
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+## 动态 IP 黑名单
+
+一分多钟内最多访问两次，访问第三次时直接禁用
+
+相关时间可以根据具体情况调整
+
+```nginx
+# 要控制的端口
+define SSH_PORT = 22
+
+table inet filter {
+    set stage1 {
+        typeof ip saddr
+        flags timeout
+    }
+
+    set stage2 {
+        typeof ip saddr
+        flags timeout
+    }
+
+    set stage3 {
+        typeof ip saddr
+        flags timeout
+    }
+
+    chain input {
+        # 挂载到 input 的 hook 上，默认放行
+        type filter hook input priority 0; policy accept;
+        # 通信中的连接放行
+        ct state established,related accept
+
+
+        # 在 stage2 内表示第三次访问，加入 stage3 内标记 1 天
+        ct state new ip saddr @stage2 tcp dport $SSH_PORT add @stage3 { ip saddr timeout 1d }
+
+        # 在 stage1 内表示第二次访问，加入 stage2 内标记 1 分钟
+        ct state new ip saddr @stage1 tcp dport $SSH_PORT add @stage2 { ip saddr timeout 1m }
+
+        # 第一次访问加入 stage1 内标记 1 分钟
+        ct state new tcp dport $SSH_PORT add @stage1 { ip saddr timeout 1m }
+
+        # 在 stage3 内的 ip 直接禁用
+        ct state new ip saddr @stage3 tcp dport $SSH_PORT drop
+    }
+}
+```
+
+## 端口敲门
+
+按顺序“敲”指定端口后，受保护的端口才会放行
+
+```nginx
+# 保护的端口
+define PROTECTED_PORT = 80
+
+# 保护的协议
+define PROTECTED_PROTOCOL = tcp
+
+# 要敲的第一个端口
+define PORT1 = 1234
+# 要敲的第二个端口
+define PORT2 = 5678
+# 要敲的第三个端口
+define PORT3 = 9876
+
+table inet firewall {
+
+    set knock1 {
+        typeof ip saddr
+        flags timeout
+    }
+
+    set knock2 {
+        typeof ip saddr
+        flags timeout
+    }
+
+    set knock3 {
+        typeof ip saddr
+        flags timeout
+    }
+
+    set allowed_ports {
+        typeof ip protocol . th dport
+        flags timeout
+    }
+
+    chain inbound {
+        # 挂载到 input 的 hook 上，默认丢弃
+        type filter hook input priority filter; policy drop;
+
+        # 通信中的连接放行
+        ct state vmap { established : accept, invalid : drop }
+
+        # 在 knock3 内表示完成敲门步骤，将受保护的端口和协议加入 allowed_ports 内
+        ct state new ip saddr @knock3 ip protocol $PROTECTED_PROTOCOL th dport $PROTECTED_PORT counter add @allowed_ports { $PROTECTED_PROTOCOL . $PROTECTED_PORT timeout 5s }
+
+        # 在 knock2 内表示第三次敲门，访问第三个端口时加入 knock3
+        ct state new ip saddr @knock2 th dport $PORT3 counter add @knock3 { ip saddr timeout 30s }
+
+        # 在 knock1 内表示第二次敲门，访问第二个端口时加入 knock2
+        ct state new ip saddr @knock1 th dport $PORT2 counter add @knock2 { ip saddr timeout 30s }
+
+        # 第一次敲门，访问第一个端口时加入 knock1
+        ct state new th dport $PORT1 counter add @knock1 { ip saddr timeout 30s }
+
+        # 在 knock3 内表示完成敲门步骤，并且以及添加受保护的端口，放行并将 ip 从 knock3 内移除
+        ip saddr @knock3 ip protocol . th dport @allowed_ports counter delete @knock3 { ip saddr } accept
+    }
+}
+```
+
+## 热点
+
+:::note
+查看当前设备内的网卡有没有支持 AP 的 `sudo iw list | grep -A 10 "Supported interface modes"`
+
+显示有 AP 关键字就支持，没有就没法操作了
+
+网卡的接口一般以 wlp 开头
+:::
+
+### 依赖
+
+- `nftables` - 防火墙（系统默认已经安装）
+- `systemd-networkd` - （一般使用了 systemd 的系统自带）
+- `hostapd` - AP 服务（WiFi 热点服务）
+
+```bash
+sudo apt install hostapd -y
+```
+
+### 配置
+
+#### systemd-networkd
+
+配置统一存放在 `/etc/systemd/network/` 目录下
+
+:::note
+文件名以数字开头，数字越小越先配置，如果执行的接口名称可以被其他配置里面的名称通配符匹配到，那么这个文件的数字必须小于那个配置文件
+:::
+
+<Steps>
+
+1. 虚拟一个无线接口专门用于启动 AP 服务（开热点）
+
+    ```ini
+    # /etc/systemd/network/15-ap0.netdev
+    [Match]
+    [NetDev]
+    Name=ap0
+    Kind=wlan
+
+    [WLAN]
+    # 无线接口物理设备的下标，使用 iw dev 查看
+    PhysicalDevice=0
+    # 专门用于启动 AP 服务
+    Type=ap
+    ```
+
+2. 配置这个接口的 DHCP 服务配置
+
+    ```ini
+    # /etc/systemd/network/16-ap-dhcp-server.network
+    [Match]
+    # 上面创建的虚拟无线接口
+    Name=ap0
+    
+    [Network]
+    # 网段，192.168.3.1/24 之类的，第三段的 3 可以随便修改
+    Address=<ip>/<mask>
+    DHCPServer=yes
+    # 启用ip伪装，来自这个网段的连接，伪装成可上网的接口地址出去
+    IPMasquerade=ipv4
+    
+    # DHCP 服务器配置相关
+    [DHCPServer]
+    PoolOffset=20
+    # 子网的 IP 数量
+    PoolSize=50
+    DefaultLeaseTimeSec=1h
+    MaxLeaseTimeSec=12h
+    EmitDNS=yes
+    # 可以填本地地址，也可以填 DNS 的 IP
+    # 如果要填本机地址则上面的 Address 是 192.168.3.1/24 这里就填 192.168.3.1
+    DNS=<ip>
+    EmitRouter=yes
+    ```
+
+</Steps>
+
+---
+
+#### hostapd
+
+关闭 hostapd 的开机自启 `sudo systemctl disable hostapd`
+
+```ini
+# /etc/hostapd/hostapd.conf
+
+# 接口名称，手动修改
+interface=<interface>
+# 大多数驱动都支持
+driver=nl80211
+# Wi-Fi 名称，手动修改
+ssid=ajfuwerole
+
+# 无线模式和信道（2.4GHz）
+hw_mode=g
+channel=6
+
+# 开启 QoS（可选）
+wmm_enabled=1
+
+# 加密相关
+auth_algs=1
+wpa=2
+# 密码，手动修改
+wpa_passphrase=<password>
+wpa_key_mgmt=WPA-PSK
+rsn_pairwise=CCMP
+```
+
+### 脚本
+
+<details>
+<summary>net-hotspot.sh</summary>
+
+```bash
+#!/bin/bash
+
+# 使用 systemd-networkd 启动 DHCP 服务的配置
+networkd_dhcp_server_config="/etc/systemd/network/16-ap-dhcp-server.network"
+
+option=$1
+
+networkd_service_exists() {
+	systemctl status systemd-networkd > /dev/null
+	[ $? -ne 4 ]
+}
+
+networkd_is_running() {
+	systemctl status systemd-networkd > /dev/null
+	[ $? -eq 0 ]
+}
+
+networkd_dhcp_server_config_exists() {
+	local disabled_config="${networkd_dhcp_server_config}.disabled"
+	[ -f "$networkd_dhcp_server_config" ] || [ -f "$disabled_config" ]
+}
+
+networkd_dhcp_server_enable_config() {
+	if [ -f "$networkd_dhcp_server_config" ]; then
+		echo "networkd dhcp server config already enabled"
+		return 0
+	fi
+
+	local disabled_config="${networkd_dhcp_server_config}.disabled"
+
+	mv "$disabled_config" "$networkd_dhcp_server_config"
+}
+
+networkd_dhcp_server_disable_config() {
+	local disabled_config="${networkd_dhcp_server_config}.disabled"
+	
+	if [ -f "$disabled_config" ]; then
+		echo "networkd dhcp server config already disalbed"
+		return 0
+	fi
+
+	mv "$networkd_dhcp_server_config" "$disabled_config"
+}
+
+networkd_get_dhcp_address() {
+	local disabled_config="${networkd_dhcp_server_config}.disabled"
+	if [ -f "$networkd_dhcp_server_config" ]; then
+		echo "$(awk -F'=' '/^Address=/{print $2}' $networkd_dhcp_server_config)"
+	elif [ -f "$disabled_config" ]; then
+		echo "$(awk -F'=' '/^Address=/{print $2}' $disabled_config)"
+	fi
+}
+
+network_is_online() {
+	ip route get 114.114.114.114 > /dev/null
+	[ $? -eq 0 ]
+}
+
+hostapd_service_exists() {
+	systemctl status hostapd > /dev/null
+	[ $? -ne 4 ]
+}
+
+hostapd_is_running() {
+	systemctl status hostapd > /dev/null
+	[ $? -eq 0 ]
+}
+
+start_dhcp_server() {
+	networkd_dhcp_server_enable_config
+	systemctl restart systemd-networkd
+}
+
+stop_dhcp_server() {
+	# 这里 systemd-networkd 这里还有其他功能，不能停止
+	networkd_dhcp_server_disable_config
+	systemctl restart systemd-networkd
+}
+
+add_firewall_config() {
+	local network_address="$(networkd_get_dhcp_address)"
+	nft add element inet firewall allowed_ip \{ $network_address \}
+}
+
+remove_firewall_config() {
+	local network_address="$(networkd_get_dhcp_address)"
+	nft delete element inet firewall allowed_ip \{ $network_address \}
+}
+
+start() {
+	if ! network_is_online; then
+		echo "<4>network is not online"
+	fi
+	start_dhcp_server
+
+	systemctl restart hostapd
+
+	add_firewall_config
+}
+
+
+stop() {
+	stop_dhcp_server
+
+	systemctl stop hostapd
+
+	remove_firewall_config
+}
+
+check_services() {
+	if ! networkd_service_exists; then
+		echo "<3>systemd-networkd service not installed"
+		exit 1
+	fi
+
+	if ! networkd_dhcp_server_config_exists; then
+		echo "<3>networkd dhcp server config: $networkd_dhcp_server_config not exists"
+		exit 1
+	fi
+
+	if ! hostapd_service_exists; then
+		echo "<3>hostapd service not installed"
+		exit 1
+	fi
+}
+
+check_services
+
+if [ "$option" == "-S" ] || [ "$option" == "--start" ]; then
+	echo "<5>starting..."
+	start
+elif [ "$option" == "-T" ] || [ "$option" == "--stop" ]; then
+	echo "<5>stoping..."
+	stop
+fi
+```
+
+</details>
+
+<details>
+
+<summary>net-hotspot.service</summary>
+```ini
+[Unit]
+Description=Hotspot Script
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/net-hotspot.sh --start
+ExecStop=/usr/local/bin/net-hotspot.sh --stop
+```
+</details>
+
+<details>
+
+<summary>restart-hostapd-on-resume.sh</summary>
+
+```bash
+#!/bin/bash
+
+if [ "$1" == "post" ]; then
+	systemctl status net-hotspot > /dev/null
+	if [ $? -eq 0 ]; then
+		echo "restart hostapd on resume..."
+		systemctl restart hostapd.service
+	fi
+fi
+```
+
+</details>
+
+<Steps>
+
+1. 安装 `net-hotspot.sh` 脚本到 `/usr/local/bin`
+
+    ```bash
+    sudo ln -s /path/to/nftables_script/net-hotspot.sh /usr/local/bin
+    ```
+
+2. 安装 `net-hotspot.service` systemd 服务
+
+    ```bash
+    sudo ln -s /path/to/nftables_script/net-hotspot.service /etc/systemd/system
+    sudo systemctl daemon-reload
+    ```
+
+3. 添加休眠启动脚本
+
+    系统休眠启动后，`hostapd` 服务可能没有 WIFI 了
+
+    ```bash
+    sudo ln -s /path/to/nftables_script/restart-hostapd-on-resume.sh /lib/systemd/system-sleep
+    ```
+
+4. 启动
+
+    ```bash
+    sudo systemctl start net-hotspot.service
+    ```
+
+</Steps>

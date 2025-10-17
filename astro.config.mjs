@@ -44,6 +44,10 @@ export default defineConfig({
                 autogenerate: { directory: "linux/systemd" },
               },
               {
+                label: "nftables",
+                autogenerate: { directory: "linux/nftables" },
+              },
+              {
                 label: "桌面环境",
                 autogenerate: { directory: "linux/desktop-environment" },
               },

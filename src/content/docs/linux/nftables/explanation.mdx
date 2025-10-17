@@ -1,0 +1,52 @@
+---
+title: 说明
+sidebar:
+    order: 0
+---
+
+
+> [Wiki 文档](https://wiki.nftables.org/wiki-nftables/index.php/Main_Page) | [Wiki 快速开始文档](https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes)
+
+Linux 帮助命令 `man nft`
+
+## nftables 配置
+
+```nginx
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+table inet firewall {
+
+    set allowed_ip {
+        typeof ip saddr
+        flags interval
+    }
+
+    set allowed_port {
+        typeof ip protocol . th dport
+        elements = { tcp . 80, udp . 67 }
+    }
+
+    chain inbound {
+        # 挂载到 input 钩子上，默认丢弃所有包
+        type filter hook input priority filter; policy drop;
+
+        ct state vmap { established : accept, related : accept, invalid : drop } comment "接收已连接或关联的包，丢弃无效的包"
+        iifname "lo" counter accept comment "接收本地回环接口的包"
+        icmp type echo-request limit rate 5/second counter accept
+        icmpv6 type { nd-neighbor-solicit, nd-router-advert, nd-neighbor-advert } counter accept
+
+        ip saddr @allowed_ip accept comment "指定ip放行"
+        ip protocol . th dport @allowed_port accept comment "指定协议和port放行"
+    }
+
+    chain forward {                                                              
+        # 丢弃所有转发的包
+        type filter hook forward priority filter; policy drop;
+        ct state vmap { established : accept, related : accept, invalid : drop } comment "接收已连接或关联的包，丢弃无效的包"
+
+        ip saddr @allowed_ip accept comment "指定ip放行"
+    }   
+}
+```
