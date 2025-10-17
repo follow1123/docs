@@ -25,3 +25,30 @@ wsl -l -v
 REM 关闭wsl
 wsl --shutdown
 ```
+
+## 配置
+
+### `wsl.conf` 文件
+
+> [官方文档](https://learn.microsoft.com/zh-cn/windows/wsl/wsl-config#wslconf)
+
+wsl 系统内部配置，位于虚拟机系统的 `/etc/wsl.conf`
+
+```ini
+[boot]
+systemd=true # 启用 systemd
+
+[interop]
+enabled = true # 允许调用 windows 的程序
+appendWindowsPath = false # 禁止加载 Windows 的 PATH 环境变量
+```
+
+### `.wslconfig` 文件
+
+> [官方文档](https://learn.microsoft.com/zh-cn/windows/wsl/wsl-config#wslconfig)
+
+wsl 相关配置，位于宿主机的 `$ENV:USERPROFILE\.wslconfig`
+
+用于配置虚拟机内核个数，内存大小等，一般使用 `WSL Settings` 程序修改
+
+win + q 搜索 `WSL Settings` 打开
